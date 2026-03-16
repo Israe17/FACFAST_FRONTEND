@@ -348,6 +348,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
           title={t("inventory.entity.product_prices")}
         >
           <DataTable
+            enablePagination={false}
             columns={productPriceColumns}
             data={productPricesQuery.data ?? []}
             emptyMessage={t("inventory.detail.no_product_prices")}
@@ -359,6 +360,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
           title={t("inventory.entity.warehouse_stock")}
         >
           <DataTable
+            enablePagination={false}
             columns={stockColumns}
             data={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
@@ -381,6 +383,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
           title={t("inventory.entity.promotions")}
         >
           <DataTable
+            enablePagination={false}
             columns={promotionColumns}
             data={promotions}
             emptyMessage={t("inventory.detail.no_related_promotions")}
@@ -392,6 +395,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
           title={t("inventory.entity.inventory_lots")}
         >
           <DataTable
+            enablePagination={false}
             columns={lotColumns}
             data={lotRows}
             emptyMessage={t("inventory.detail.no_related_lots")}
@@ -404,6 +408,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
         title={t("inventory.detail.recent_movements_title")}
       >
         <DataTable
+          enablePagination={false}
           columns={movementColumns}
           data={movementRows}
           emptyMessage={t("inventory.detail.no_recent_movements")}

@@ -258,6 +258,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         title={t("inventory.detail.line_items")}
       >
         <DataTable
+          enablePagination={false}
           columns={lineColumns}
           data={headerLines}
           emptyMessage={t("inventory.detail.no_movement_lines")}

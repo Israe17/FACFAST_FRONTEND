@@ -232,6 +232,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
           title={t("inventory.entity.product_prices")}
         >
           <DataTable
+            enablePagination={false}
             columns={priceColumns}
             data={relatedProductPrices}
             emptyMessage={t("inventory.detail.no_price_list_prices")}
@@ -243,6 +244,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
           title={t("inventory.entity.promotions")}
         >
           <DataTable
+            enablePagination={false}
             columns={promotionColumns}
             data={relatedPromotions}
             emptyMessage={t("inventory.detail.no_related_promotions")}

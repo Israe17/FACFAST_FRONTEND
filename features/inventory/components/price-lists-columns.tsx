@@ -1,0 +1,97 @@
+import Link from "next/link";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Eye, Pencil } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { formatDateTime } from "@/shared/lib/utils";
+import { getInventoryPriceListRoute } from "@/shared/lib/routes";
+
+import type { PriceList } from "../types";
+
+type GetPriceListsColumnsParams = {
+  canUpdate: boolean;
+  canView: boolean;
+  onEdit: (priceList: PriceList) => void;
+  t: ReturnType<typeof useAppTranslator>["t"];
+};
+
+function getPriceListsColumns({
+  canUpdate,
+  canView,
+  onEdit,
+  t,
+}: GetPriceListsColumnsParams): ColumnDef<PriceList>[] {
+  const baseColumns: ColumnDef<PriceList>[] = [
+    {
+      accessorKey: "name",
+      header: t("inventory.entity.price_list"),
+      cell: ({ row }) => (
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-medium">{row.original.name}</p>
+            {row.original.is_default ? <Badge>{t("inventory.form.default_price_list")}</Badge> : null}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {row.original.code
+              ? `${t("inventory.common.code")}: ${row.original.code}`
+              : t("inventory.common.no_manual_code")}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "kind",
+      header: t("inventory.common.kind"),
+      cell: ({ row }) => (
+        <Badge variant="outline">
+          {row.original.kind
+            ? t(`inventory.enum.price_list_kind.${row.original.kind}` as const)
+            : t("inventory.common.not_available")}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "currency",
+      header: t("inventory.common.currency"),
+      cell: ({ row }) => row.original.currency,
+    },
+    {
+      accessorKey: "updated_at",
+      header: t("inventory.common.updated"),
+      cell: ({ row }) => <span>{formatDateTime(row.original.updated_at)}</span>,
+    },
+  ];
+
+  if (canUpdate || canView) {
+    baseColumns.push({
+      id: "actions",
+      header: t("inventory.common.actions"),
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href={getInventoryPriceListRoute(row.original.id)}>
+              <Eye className="size-4" />
+              {t("inventory.common.view")}
+            </Link>
+          </Button>
+          {canUpdate ? (
+            <Button
+              onClick={() => onEdit(row.original)}
+              size="sm"
+              variant="outline"
+            >
+              <Pencil className="size-4" />
+              {t("inventory.common.edit")}
+            </Button>
+          ) : null}
+        </div>
+      ),
+    });
+  }
+
+  return baseColumns;
+}
+
+export { getPriceListsColumns };

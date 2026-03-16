@@ -469,8 +469,10 @@ Infraestructura de errores robusta con 5 archivos dedicados:
   access_token_secret: process.env.JWT_ACCESS_SECRET ?? 'change-me-access-secret',
   refresh_token_secret: process.env.JWT_REFRESH_SECRET ?? 'change-me-refresh-secret',
   ```
-  **Debería fallar si no se configuran**, no usar defaults.
+  **Nota:** `env.validation.ts` sí valida que estas variables existan al arrancar, mitigando el riesgo. Sin embargo, el patrón de tener defaults inseguros en el código es riesgoso si alguien bypasea la validación.
 - `FIELD_ENCRYPTION_KEY` en `.env.example` con placeholder (correcto)
+- Refresh tokens hasheados antes de persistir (no plaintext) — Excelente práctica
+- Argon2id para password hashing con parámetros fuertes (memory: 19456 KiB, time: 2) — Excelente
 
 ### 5.4 Variables de Entorno
 
@@ -514,7 +516,7 @@ Infraestructura de errores robusta con 5 archivos dedicados:
 - Sin scripts de test en `package.json`
 - **Cobertura: 0%**
 
-Backend tiene Jest configurado pero no se verificó cobertura.
+Backend tiene Jest configurado con **16 archivos de test** (unit + e2e), incluyendo tests de auth, guards, policies, services y un e2e completo con pg-mem (PostgreSQL in-memory). Cobertura exacta no verificada.
 
 ### 6.2 CI/CD
 
@@ -608,8 +610,8 @@ Backend tiene Jest configurado pero no se verificó cobertura.
 **Área:** Seguridad
 **Archivo(s):** `FACFAST_BACKEND/src/config/auth.config.ts`
 **Descripción:** JWT secrets tienen defaults inseguros (`'change-me-access-secret'`). La app arranca sin configurar secrets reales.
-**Impacto:** Si alguien despliega sin configurar env vars, los tokens JWT son predecibles y la autenticación es bypasseable.
-**Recomendación:** Lanzar error si `JWT_ACCESS_SECRET` o `JWT_REFRESH_SECRET` no están definidos. Usar validación de env con Joi o class-validator para requerir estos campos.
+**Impacto:** Si alguien bypasea `env.validation.ts`, los tokens JWT serían predecibles. La validación de env mitiga el riesgo, pero el patrón es peligroso.
+**Recomendación:** Eliminar los defaults de fallback en `auth.config.ts`. Si `env.validation.ts` ya valida su existencia, los `?? 'change-me'` son código muerto peligroso — eliminarlos.
 **Esfuerzo estimado:** 1h
 
 ### Hallazgo #7
@@ -905,6 +907,10 @@ No todo es negativo. El proyecto tiene fundamentos sólidos que demuestran buen 
 9. **Zero memory leaks** — Todos los useEffect con event listeners tienen cleanup correcto.
 
 10. **Documentación de arquitectura** — 8 archivos markdown (~42 KB) que documentan decisiones, patrones y flujos. Esto es raro y valioso.
+
+11. **Seguridad backend sólida en core** — Argon2id para passwords, refresh tokens hasheados (no plaintext), AES-256-GCM para field encryption, validación de env vars al arranque, 68 permisos RBAC granulares, guard chaining (JWT → Tenant → Permissions).
+
+12. **Backend testing** — 16 archivos de test cubriendo auth, guards, policies y services, con e2e usando pg-mem (PostgreSQL in-memory). El frontend debería seguir este ejemplo.
 
 ---
 

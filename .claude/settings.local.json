@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:UserscenteDocumentsfacfastFACFAST_FRONTENDfrontendapp -maxdepth 3 -type f -name *.tsx -o -name *.ts -o -name *.css)",
+      "Bash(find c:UserscenteDocumentsfacfastFACFAST_FRONTENDfrontendfeatures -type f -name *.tsx -o -name *.ts)",
+      "Bash(find c:UserscenteDocumentsfacfastFACFAST_FRONTENDfrontendshared -type f -name *.tsx -o -name *.ts)",
+      "Bash(find \"c:\\\\Users\\\\cente\\\\Documents\\\\facfast\\\\FACFAST_FRONTEND\\\\frontend\\\\app\\\\\\(auth\\)\" -type f)",
+      "Bash(ls -la '/c/Users/cente/Documents/facfast/FACFAST_FRONTEND/frontend/app/\\(dashboard\\)/')",
+      "Bash(ls -la '/c/Users/cente/Documents/facfast/FACFAST_FRONTEND/frontend/app/\\(platform\\)/')",
+      "Bash(ls -la '/c/Users/cente/Documents/facfast/FACFAST_FRONTEND/frontend/app/\\(auth\\)/')",
+      "Bash(find '/c/Users/cente/Documents/facfast/FACFAST_FRONTEND/frontend/app/\\(auth\\)' -name \"layout.tsx\")",
+      "Bash(find /c/Users/cente/Documents/facfast/FACFAST_FRONTEND/frontend -name *.css -type f)",
+      "Bash(ls \"c:\\\\Users\\\\cente\\\\Documents\\\\facfast\\\\FACFAST_FRONTEND\\\\frontend\\\\app\\\\\\(dashboard\\)\")"
+    ]
+  }
+}

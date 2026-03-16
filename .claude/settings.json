@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"c:\\\\Users\\\\cente\\\\Documents\\\\facfast\\\\FACFAST_FRONTEND\\\\frontend\\\\app\\\\\\(dashboard\\)\\\\branches\")",
+      "Bash(ls \"c:\\\\Users\\\\cente\\\\Documents\\\\facfast\\\\FACFAST_FRONTEND\\\\frontend\\\\app\\\\\\(dashboard\\)\\\\users\")"
+    ]
+  }
+}

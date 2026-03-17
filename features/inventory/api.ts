@@ -692,3 +692,71 @@ export async function cancelInventoryMovement(
   );
   return inventoryMovementCancellationResponseSchema.parse(extractEntity(response.data));
 }
+
+// --- Paginated API functions ---
+
+export type PaginatedQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort_by?: string;
+  sort_order?: "ASC" | "DESC";
+};
+
+export type PaginatedResponse<T> = {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+};
+
+export type CursorResponse<T> = {
+  data: T[];
+  next_cursor: number | null;
+  has_more: boolean;
+};
+
+export async function listProductsPaginated(
+  params: PaginatedQueryParams,
+): Promise<PaginatedResponse<ReturnType<typeof productSchema.parse>>> {
+  const response = await http.get("/products", { params });
+  const raw = response.data;
+  return {
+    data: extractCollection(raw, ["products"]).map((item) => productSchema.parse(item)),
+    total: raw?.total ?? 0,
+    page: raw?.page ?? 1,
+    limit: raw?.limit ?? 20,
+    total_pages: raw?.total_pages ?? 1,
+  };
+}
+
+export async function listInventoryLotsPaginated(
+  params: PaginatedQueryParams,
+): Promise<PaginatedResponse<ReturnType<typeof inventoryLotSchema.parse>>> {
+  const response = await http.get("/inventory-lots", { params });
+  const raw = response.data;
+  return {
+    data: extractCollection(raw, ["inventory_lots", "inventoryLots"]).map((item) =>
+      inventoryLotSchema.parse(item),
+    ),
+    total: raw?.total ?? 0,
+    page: raw?.page ?? 1,
+    limit: raw?.limit ?? 20,
+    total_pages: raw?.total_pages ?? 1,
+  };
+}
+
+export async function listInventoryMovementsCursor(
+  params: PaginatedQueryParams & { cursor?: number },
+): Promise<CursorResponse<ReturnType<typeof inventoryMovementRowSchema.parse>>> {
+  const response = await http.get("/inventory-movements", { params });
+  const raw = response.data;
+  return {
+    data: extractCollection(raw, ["inventory_movements", "inventoryMovements"]).map((item) =>
+      inventoryMovementRowSchema.parse(item),
+    ),
+    next_cursor: raw?.next_cursor ?? null,
+    has_more: raw?.has_more ?? false,
+  };
+}

@@ -17,6 +17,7 @@ import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
@@ -28,7 +29,7 @@ import {
   useCreateInventoryAdjustmentMutation,
   useCreateInventoryTransferMutation,
   useInventoryLotsQuery,
-  useInventoryMovementsQuery,
+  useInventoryMovementsCursorQuery,
   useProductsQuery,
   useWarehouseLocationsQuery,
   useWarehousesQuery,
@@ -61,7 +62,8 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const [transferOpen, setTransferOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [selectedMovement, setSelectedMovement] = useState<InventoryMovementRow | null>(null);
-  const movementsQuery = useInventoryMovementsQuery(enabled && canView);
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
+  const movementsQuery = useInventoryMovementsCursorQuery(queryParams, enabled && canView);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canView);
   const lotsQuery = useInventoryLotsQuery((adjustmentOpen || enabled) && canView);
@@ -216,10 +218,14 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
         >
           <DataTable
             columns={columns}
-            data={movementsQuery.data ?? []}
+            data={movementsQuery.data?.data ?? []}
             emptyMessage={t("inventory.common.empty_entity", {
               entity: t("inventory.entity.inventory_movements"),
             })}
+            onServerStateChange={onStateChange}
+            serverSide
+            serverState={serverState}
+            total={movementsQuery.data?.data.length ?? 0}
           />
         </QueryStateWrapper>
       </CatalogSectionCard>

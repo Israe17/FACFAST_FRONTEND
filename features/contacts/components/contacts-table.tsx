@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { DataTable } from "@/shared/components/data-table";
+import { DataTable, type ServerSideState } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -18,6 +18,9 @@ import { EditContactDialog } from "./edit-contact-dialog";
 
 type ContactsTableProps = {
   data: Contact[];
+  onServerStateChange?: (state: ServerSideState) => void;
+  serverState?: ServerSideState;
+  total?: number;
 };
 
 function ContactStatusBadge({ isActive }: { isActive: boolean }) {
@@ -52,7 +55,7 @@ function ContactRowActions({ contact }: { contact: Contact }) {
   );
 }
 
-function ContactsTable({ data }: ContactsTableProps) {
+function ContactsTable({ data, onServerStateChange, serverState, total }: ContactsTableProps) {
   const columns: ColumnDef<Contact>[] = [
     {
       accessorKey: "name",
@@ -109,6 +112,20 @@ function ContactsTable({ data }: ContactsTableProps) {
       cell: ({ row }) => <ContactRowActions contact={row.original} />,
     },
   ];
+
+  if (serverState && onServerStateChange && total !== undefined) {
+    return (
+      <DataTable
+        columns={columns}
+        data={data}
+        emptyMessage="No contacts found."
+        onServerStateChange={onServerStateChange}
+        serverSide
+        serverState={serverState}
+        total={total}
+      />
+    );
+  }
 
   return <DataTable columns={columns} data={data} emptyMessage="No contacts found." />;
 }

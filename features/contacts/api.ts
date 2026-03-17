@@ -92,6 +92,36 @@ export async function updateContact(contactId: string, payload: UpdateContactInp
   await http.patch(`/contacts/${contactId}`, buildContactPayload(payload));
 }
 
+export type PaginatedQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort_by?: string;
+  sort_order?: "ASC" | "DESC";
+};
+
+export type PaginatedResponse<T> = {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+};
+
+export async function listContactsPaginated(
+  params: PaginatedQueryParams,
+): Promise<PaginatedResponse<ReturnType<typeof contactSchema.parse>>> {
+  const response = await http.get("/contacts", { params });
+  const raw = response.data;
+  return {
+    data: extractCollection(raw, "contacts").map((contact) => contactSchema.parse(contact)),
+    total: raw?.total ?? 0,
+    page: raw?.page ?? 1,
+    limit: raw?.limit ?? 20,
+    total_pages: raw?.total_pages ?? 1,
+  };
+}
+
 export async function lookupContactByIdentification(identification: string) {
   try {
     const response = await http.get(`/contacts/lookup/${encodeURIComponent(identification)}`);

@@ -8,13 +8,14 @@ import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import {
   useBrandsQuery,
   useMeasurementUnitsQuery,
   useProductCategoriesQuery,
-  useProductsQuery,
+  useProductsPaginatedQuery,
   useTaxProfilesQuery,
   useWarrantyProfilesQuery,
 } from "../queries";
@@ -35,7 +36,8 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const canUpdate = can("products.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const productsQuery = useProductsQuery(enabled && canView);
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "name" });
+  const productsQuery = useProductsPaginatedQuery(queryParams, enabled && canView);
   const categoriesQuery = useProductCategoriesQuery(enabled && canView);
   const brandsQuery = useBrandsQuery(enabled && canView);
   const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canView);
@@ -93,10 +95,14 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
         >
           <DataTable
             columns={columns}
-            data={productsQuery.data ?? []}
+            data={productsQuery.data?.data ?? []}
             emptyMessage={t("inventory.common.empty_entity", {
               entity: t("inventory.entity.products"),
             })}
+            onServerStateChange={onStateChange}
+            serverSide
+            serverState={serverState}
+            total={productsQuery.data?.total ?? 0}
           />
         </QueryStateWrapper>
       </CatalogSectionCard>

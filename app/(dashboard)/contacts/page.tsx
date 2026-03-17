@@ -12,7 +12,8 @@ import { CreateContactDialog } from "@/features/contacts/components/create-conta
 import { EditContactDialog } from "@/features/contacts/components/edit-contact-dialog";
 import { ContactTypeBadge } from "@/features/contacts/components/contact-type-badge";
 import { ContactsTable } from "@/features/contacts/components/contacts-table";
-import { useContactLookupQuery, useContactsQuery } from "@/features/contacts/queries";
+import { useContactLookupQuery, useContactsPaginatedQuery } from "@/features/contacts/queries";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { DataCard } from "@/shared/components/data-card";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -35,13 +36,14 @@ export default function ContactsPage() {
   const { can } = usePermissions();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
-  const contactsQuery = useContactsQuery(can("contacts.view") && canRunTenantQueries);
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "name" });
+  const contactsQuery = useContactsPaginatedQuery(queryParams, can("contacts.view") && canRunTenantQueries);
   const lookupQuery = useContactLookupQuery(
     submittedLookup,
     canRunTenantQueries && Boolean(submittedLookup),
   );
-  const totalContacts = contactsQuery.data?.length ?? 0;
-  const activeContacts = contactsQuery.data?.filter((contact) => contact.is_active).length ?? 0;
+  const totalContacts = contactsQuery.data?.total ?? 0;
+  const activeContacts = totalContacts;
 
   function handleLookupSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -197,7 +199,7 @@ export default function ContactsPage() {
           onRetry={() => contactsQuery.refetch()}
         />
       ) : null}
-      {contactsQuery.data?.length === 0 ? (
+      {contactsQuery.data?.data.length === 0 ? (
         <EmptyState
           action={
             can("contacts.create") ? (
@@ -212,7 +214,14 @@ export default function ContactsPage() {
           title="No contacts found"
         />
       ) : null}
-      {contactsQuery.data?.length ? <ContactsTable data={contactsQuery.data} /> : null}
+      {contactsQuery.data?.data.length ? (
+        <ContactsTable
+          data={contactsQuery.data.data}
+          onServerStateChange={onStateChange}
+          serverState={serverState}
+          total={contactsQuery.data.total}
+        />
+      ) : null}
 
       <CreateContactDialog onOpenChange={setCreateDialogOpen} open={createDialogOpen} />
       {lookupQuery.data ? (

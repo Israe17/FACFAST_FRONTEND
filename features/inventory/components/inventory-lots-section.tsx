@@ -8,12 +8,13 @@ import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import { useContactsQuery } from "@/features/contacts/queries";
 
 import {
-  useInventoryLotsQuery,
+  useInventoryLotsPaginatedQuery,
   useProductsQuery,
   useWarehousesQuery,
 } from "../queries";
@@ -35,7 +36,8 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
   const canViewContacts = can("contacts.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState<InventoryLot | null>(null);
-  const inventoryLotsQuery = useInventoryLotsQuery(enabled && canView);
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
+  const inventoryLotsQuery = useInventoryLotsPaginatedQuery(queryParams, enabled && canView);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canView);
   const contactsQuery = useContactsQuery(enabled && canView && canViewContacts);
@@ -102,10 +104,14 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
         >
           <DataTable
             columns={columns}
-            data={inventoryLotsQuery.data ?? []}
+            data={inventoryLotsQuery.data?.data ?? []}
             emptyMessage={t("inventory.common.empty_entity", {
               entity: t("inventory.entity.inventory_lots"),
             })}
+            onServerStateChange={onStateChange}
+            serverSide
+            serverState={serverState}
+            total={inventoryLotsQuery.data?.total ?? 0}
           />
         </QueryStateWrapper>
       </CatalogSectionCard>

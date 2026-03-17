@@ -2,17 +2,12 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Monitor, MoreHorizontal, Pencil } from "lucide-react";
+import { Monitor, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/shared/components/data-table";
+import { TableRowActions } from "@/shared/components/table-row-actions";
+import type { TableAction } from "@/shared/components/table-row-actions";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
@@ -53,29 +48,16 @@ function BranchRowActions({
   const { can } = usePermissions();
   const [editOpen, setEditOpen] = useState(false);
 
+  const actions: TableAction[] = [
+    { icon: Monitor, label: "View terminals", onClick: () => onSelectBranch(branch.id) },
+  ];
+  if (can("branches.update")) {
+    actions.push({ icon: Pencil, label: "Edit branch", onClick: () => setEditOpen(true) });
+  }
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon-sm" variant="outline">
-            <MoreHorizontal className="size-4" />
-            <span className="sr-only">Open actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onSelectBranch(branch.id)}>
-            <Monitor className="size-4" />
-            View terminals
-          </DropdownMenuItem>
-          {can("branches.update") ? (
-            <DropdownMenuItem onClick={() => setEditOpen(true)}>
-              <Pencil className="size-4" />
-              Edit branch
-            </DropdownMenuItem>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
+      <TableRowActions actions={actions} />
       <EditBranchDialog branch={branch} onOpenChange={setEditOpen} open={editOpen} />
     </>
   );

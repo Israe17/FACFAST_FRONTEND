@@ -2,17 +2,12 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/shared/components/data-table";
+import { TableRowActions } from "@/shared/components/table-row-actions";
+import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
 
@@ -45,27 +40,14 @@ function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal
   const { can } = usePermissions();
   const [editOpen, setEditOpen] = useState(false);
 
-  if (!can("branches.update_terminal")) {
-    return null;
+  const actions: TableAction[] = [];
+  if (can("branches.update_terminal")) {
+    actions.push({ icon: Pencil, label: "Edit terminal", onClick: () => setEditOpen(true) });
   }
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon-sm" variant="outline">
-            <MoreHorizontal className="size-4" />
-            <span className="sr-only">Open actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <Pencil className="size-4" />
-            Edit terminal
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
+      <TableRowActions actions={actions} />
       <EditTerminalDialog
         branchId={branchId}
         onOpenChange={setEditOpen}

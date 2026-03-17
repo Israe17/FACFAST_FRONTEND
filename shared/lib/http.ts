@@ -25,6 +25,7 @@ function shouldSkipRefresh(url?: string) {
 function createHttpClient(baseURL: string, cookieHeader?: string) {
   return axios.create({
     baseURL,
+    timeout: 15_000,
     withCredentials: true,
     headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
   });

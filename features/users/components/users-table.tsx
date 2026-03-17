@@ -2,18 +2,12 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, KeyRound, MoreHorizontal, Pencil, ShieldCheck, ToggleLeft, Waypoints } from "lucide-react";
+import { Eye, KeyRound, Pencil, ShieldCheck, ToggleLeft, Waypoints } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/shared/components/data-table";
+import { TableRowActions } from "@/shared/components/table-row-actions";
+import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
 
@@ -50,57 +44,29 @@ function UserRowActions({ user }: { user: User }) {
   const { can } = usePermissions();
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
 
+  const actions: TableAction[] = [];
+  if (can("users.update")) {
+    actions.push({ icon: Pencil, label: "Edit user", onClick: () => setActiveDialog("edit") });
+  }
+  if (can("users.change_status")) {
+    actions.push({ icon: ToggleLeft, label: "Change status", onClick: () => setActiveDialog("status") });
+  }
+  if (can("users.change_password")) {
+    actions.push({ icon: KeyRound, label: "Change password", onClick: () => setActiveDialog("password") });
+  }
+  if (can("users.assign_roles")) {
+    actions.push({ icon: ShieldCheck, label: "Assign roles", onClick: () => setActiveDialog("roles") });
+  }
+  if (can("users.assign_branches")) {
+    actions.push({ icon: Waypoints, label: "Assign branches", onClick: () => setActiveDialog("branches") });
+  }
+  if (can("users.view")) {
+    actions.push({ icon: Eye, label: "Effective permissions", onClick: () => setActiveDialog("permissions") });
+  }
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon-sm" variant="outline">
-            <MoreHorizontal className="size-4" />
-            <span className="sr-only">Open actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {can("users.update") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("edit")}>
-              <Pencil className="size-4" />
-              Edit user
-            </DropdownMenuItem>
-          ) : null}
-          {can("users.change_status") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("status")}>
-              <ToggleLeft className="size-4" />
-              Change status
-            </DropdownMenuItem>
-          ) : null}
-          {can("users.change_password") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("password")}>
-              <KeyRound className="size-4" />
-              Change password
-            </DropdownMenuItem>
-          ) : null}
-          {can("users.assign_roles") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("roles")}>
-              <ShieldCheck className="size-4" />
-              Assign roles
-            </DropdownMenuItem>
-          ) : null}
-          {can("users.assign_branches") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("branches")}>
-              <Waypoints className="size-4" />
-              Assign branches
-            </DropdownMenuItem>
-          ) : null}
-          {can("users.view") ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setActiveDialog("permissions")}>
-                <Eye className="size-4" />
-                Effective permissions
-              </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <TableRowActions actions={actions} />
 
       <EditUserDialog
         onOpenChange={(open) => setActiveDialog(open ? "edit" : null)}

@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useForm } from "react-hook-form";
 
 import {
   Dialog,
@@ -12,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import { emptyTerminalFormValues } from "../form-values";
 import { createTerminalSchema } from "../schemas";
@@ -34,34 +31,16 @@ function CreateTerminalDialog({
   onOpenChange,
   open,
 }: CreateTerminalDialogProps) {
-  const createTerminalMutation = useCreateTerminalMutation(branchId, { showErrorToast: false });
   const { t } = useAppTranslator();
-  const form = useForm<CreateTerminalInput>({
+
+  const { form, formError, isPending, handleSubmit } = useDialogForm<CreateTerminalInput>({
+    open,
+    onOpenChange,
+    schema: createTerminalSchema,
     defaultValues: emptyTerminalFormValues,
-    resolver: buildFormResolver<CreateTerminalInput>(createTerminalSchema),
+    mutation: useCreateTerminalMutation(branchId, { showErrorToast: false }),
+    fallbackErrorMessage: t("branches.terminal_create_error_fallback"),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-
-  useEffect(() => {
-    if (!open) {
-      form.reset(emptyTerminalFormValues);
-      resetBackendFormErrors();
-    }
-  }, [form, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateTerminalInput) {
-    resetBackendFormErrors();
-
-    try {
-      await createTerminalMutation.mutateAsync(values);
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t("branches.terminal_create_error_fallback"),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -75,7 +54,7 @@ function CreateTerminalDialog({
         <TerminalForm
           form={form as unknown as UseFormReturn<TerminalFormValues>}
           formError={formError}
-          isPending={createTerminalMutation.isPending}
+          isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateTerminalInput)}
           submitLabel="Create terminal"
         />

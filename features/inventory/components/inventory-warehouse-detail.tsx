@@ -253,6 +253,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           title={t("inventory.entity.warehouse_locations")}
         >
           <DataTable
+            enablePagination={false}
             columns={locationColumns}
             data={locations}
             emptyMessage={t("inventory.detail.no_warehouse_locations")}
@@ -264,6 +265,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           title={t("inventory.entity.warehouse_stock")}
         >
           <DataTable
+            enablePagination={false}
             columns={stockColumns}
             data={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
@@ -277,6 +279,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           title={t("inventory.entity.inventory_lots")}
         >
           <DataTable
+            enablePagination={false}
             columns={lotColumns}
             data={lots}
             emptyMessage={t("inventory.detail.no_related_lots")}
@@ -288,6 +291,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           title={t("inventory.detail.recent_movements_title")}
         >
           <DataTable
+            enablePagination={false}
             columns={movementColumns}
             data={movements}
             emptyMessage={t("inventory.detail.no_recent_movements")}

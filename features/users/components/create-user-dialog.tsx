@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useForm } from "react-hook-form";
 
 import {
   Dialog,
@@ -12,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import { createUserSchema } from "../schemas";
 import { useCreateUserMutation } from "../queries";
@@ -26,44 +23,22 @@ type CreateUserDialogProps = {
 };
 
 function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
-  const createUserMutation = useCreateUserMutation({ showErrorToast: false });
   const { t } = useAppTranslator();
-  const form = useForm<CreateUserInput>({
+  const createUserMutation = useCreateUserMutation({ showErrorToast: false });
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateUserInput>({
+    open,
+    onOpenChange,
+    schema: createUserSchema,
     defaultValues: {
       email: "",
       max_sale_discount: 0,
       name: "",
       password: "",
     },
-    resolver: buildFormResolver<CreateUserInput>(createUserSchema),
+    mutation: createUserMutation,
+    fallbackErrorMessage: t("users.create_error_fallback"),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-
-  useEffect(() => {
-    if (!open) {
-      form.reset({
-        email: "",
-        max_sale_discount: 0,
-        name: "",
-        password: "",
-      });
-      resetBackendFormErrors();
-    }
-  }, [form, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateUserInput) {
-    resetBackendFormErrors();
-
-    try {
-      await createUserMutation.mutateAsync(values);
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t("users.create_error_fallback"),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -78,7 +53,7 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
           form={form as unknown as UseFormReturn<UserFormValues>}
           formError={formError}
           includePassword
-          isPending={createUserMutation.isPending}
+          isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateUserInput)}
           submitLabel="Create user"
         />

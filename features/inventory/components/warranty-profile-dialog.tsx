@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import {
   emptyWarrantyProfileFormValues,
@@ -37,6 +33,7 @@ function WarrantyProfileDialog({
   open,
   warrantyProfile,
 }: WarrantyProfileDialogProps) {
+  const { t } = useAppTranslator();
   const createWarrantyProfileMutation = useCreateWarrantyProfileMutation({
     showErrorToast: false,
   });
@@ -44,49 +41,21 @@ function WarrantyProfileDialog({
     warrantyProfile?.id ?? "",
     { showErrorToast: false },
   );
-  const { t } = useAppTranslator();
-  const form = useForm<CreateWarrantyProfileInput>({
-    defaultValues: warrantyProfile
-      ? getWarrantyProfileFormValues(warrantyProfile)
-      : emptyWarrantyProfileFormValues,
-    resolver: buildFormResolver<CreateWarrantyProfileInput>(createWarrantyProfileSchema),
-  });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = warrantyProfile
-    ? updateWarrantyProfileMutation
-    : createWarrantyProfileMutation;
 
-  useEffect(() => {
-    form.reset(
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateWarrantyProfileInput, WarrantyProfile>({
+    open,
+    onOpenChange,
+    schema: createWarrantyProfileSchema,
+    defaultValues: emptyWarrantyProfileFormValues,
+    entity: warrantyProfile,
+    mapEntityToForm: getWarrantyProfileFormValues,
+    mutation: warrantyProfile ? updateWarrantyProfileMutation : createWarrantyProfileMutation,
+    fallbackErrorMessage: t(
       warrantyProfile
-        ? getWarrantyProfileFormValues(warrantyProfile)
-        : emptyWarrantyProfileFormValues,
-    );
-    resetBackendFormErrors();
-  }, [form, open, resetBackendFormErrors, warrantyProfile]);
-
-  async function handleSubmit(values: CreateWarrantyProfileInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (warrantyProfile) {
-        await updateWarrantyProfileMutation.mutateAsync(values);
-      } else {
-        await createWarrantyProfileMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          warrantyProfile
-            ? "inventory.warranty_profile_update_error_fallback"
-            : "inventory.warranty_profile_create_error_fallback",
-        ),
-      });
-    }
-  }
+        ? "inventory.warranty_profile_update_error_fallback"
+        : "inventory.warranty_profile_create_error_fallback",
+    ),
+  });
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -106,7 +75,7 @@ function WarrantyProfileDialog({
         <WarrantyProfileForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             warrantyProfile

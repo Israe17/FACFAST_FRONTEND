@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import {
   emptyPromotionFormValues,
@@ -34,45 +30,26 @@ type PromotionDialogProps = {
 };
 
 function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionDialogProps) {
+  const { t } = useAppTranslator();
   const createMutation = useCreatePromotionMutation({ showErrorToast: false });
   const updateMutation = useUpdatePromotionMutation(promotion?.id ?? "", {
     showErrorToast: false,
   });
-  const { t } = useAppTranslator();
-  const form = useForm<CreatePromotionInput>({
-    defaultValues: promotion ? getPromotionFormValues(promotion) : emptyPromotionFormValues,
-    resolver: buildFormResolver<CreatePromotionInput>(createPromotionSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreatePromotionInput, Promotion>({
+    open,
+    onOpenChange,
+    schema: createPromotionSchema,
+    defaultValues: emptyPromotionFormValues,
+    entity: promotion,
+    mapEntityToForm: getPromotionFormValues,
+    mutation: promotion ? updateMutation : createMutation,
+    fallbackErrorMessage: t(
+      promotion
+        ? "inventory.promotion_update_error_fallback"
+        : "inventory.promotion_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = promotion ? updateMutation : createMutation;
-
-  useEffect(() => {
-    form.reset(promotion ? getPromotionFormValues(promotion) : emptyPromotionFormValues);
-    resetBackendFormErrors();
-  }, [form, open, promotion, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreatePromotionInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (promotion) {
-        await updateMutation.mutateAsync(values);
-      } else {
-        await createMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          promotion
-            ? "inventory.promotion_update_error_fallback"
-            : "inventory.promotion_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -92,7 +69,7 @@ function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionD
         <PromotionForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           products={products}
           submitLabel={

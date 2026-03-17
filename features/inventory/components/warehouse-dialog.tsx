@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import type { Branch } from "@/features/branches/types";
 
@@ -38,40 +34,21 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
     showErrorToast: false,
   });
   const { t } = useAppTranslator();
-  const form = useForm<CreateWarehouseInput>({
-    defaultValues: warehouse ? getWarehouseFormValues(warehouse) : emptyWarehouseFormValues,
-    resolver: buildFormResolver<CreateWarehouseInput>(createWarehouseSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateWarehouseInput, Warehouse>({
+    open,
+    onOpenChange,
+    schema: createWarehouseSchema,
+    defaultValues: emptyWarehouseFormValues,
+    entity: warehouse,
+    mapEntityToForm: getWarehouseFormValues,
+    mutation: warehouse ? updateMutation : createMutation,
+    fallbackErrorMessage: t(
+      warehouse
+        ? "inventory.warehouse_update_error_fallback"
+        : "inventory.warehouse_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = warehouse ? updateMutation : createMutation;
-
-  useEffect(() => {
-    form.reset(warehouse ? getWarehouseFormValues(warehouse) : emptyWarehouseFormValues);
-    resetBackendFormErrors();
-  }, [form, open, resetBackendFormErrors, warehouse]);
-
-  async function handleSubmit(values: CreateWarehouseInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (warehouse) {
-        await updateMutation.mutateAsync(values);
-      } else {
-        await createMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          warehouse
-            ? "inventory.warehouse_update_error_fallback"
-            : "inventory.warehouse_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -92,7 +69,7 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
           branches={branches}
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             warehouse

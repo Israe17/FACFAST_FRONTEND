@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import {
   emptyWarehouseLocationFormValues,
@@ -49,44 +45,21 @@ function WarehouseLocationDialog({
     showErrorToast: false,
   });
   const { t } = useAppTranslator();
-  const form = useForm<CreateWarehouseLocationInput>({
-    defaultValues: location ? getWarehouseLocationFormValues(location) : emptyWarehouseLocationFormValues,
-    resolver: buildFormResolver<CreateWarehouseLocationInput>(createWarehouseLocationSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateWarehouseLocationInput, WarehouseLocation>({
+    open,
+    onOpenChange,
+    schema: createWarehouseLocationSchema,
+    defaultValues: emptyWarehouseLocationFormValues,
+    entity: location,
+    mapEntityToForm: getWarehouseLocationFormValues,
+    mutation: location ? updateMutation : createMutation,
+    fallbackErrorMessage: t(
+      location
+        ? "inventory.warehouse_location_update_error_fallback"
+        : "inventory.warehouse_location_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = location ? updateMutation : createMutation;
-
-  useEffect(() => {
-    form.reset(location ? getWarehouseLocationFormValues(location) : emptyWarehouseLocationFormValues);
-    resetBackendFormErrors();
-  }, [form, location, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateWarehouseLocationInput) {
-    resetBackendFormErrors();
-
-    if (!warehouseId) {
-      return;
-    }
-
-    try {
-      if (location) {
-        await updateMutation.mutateAsync(values);
-      } else {
-        await createMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          location
-            ? "inventory.warehouse_location_update_error_fallback"
-            : "inventory.warehouse_location_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -110,7 +83,7 @@ function WarehouseLocationDialog({
         <WarehouseLocationForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             location

@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import { emptyPriceListFormValues, getPriceListFormValues } from "../form-values";
 import {
@@ -30,45 +26,26 @@ type PriceListDialogProps = {
 };
 
 function PriceListDialog({ onOpenChange, open, priceList }: PriceListDialogProps) {
+  const { t } = useAppTranslator();
   const createPriceListMutation = useCreatePriceListMutation({ showErrorToast: false });
   const updatePriceListMutation = useUpdatePriceListMutation(priceList?.id ?? "", {
     showErrorToast: false,
   });
-  const { t } = useAppTranslator();
-  const form = useForm<CreatePriceListInput>({
-    defaultValues: priceList ? getPriceListFormValues(priceList) : emptyPriceListFormValues,
-    resolver: buildFormResolver<CreatePriceListInput>(createPriceListSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreatePriceListInput, PriceList>({
+    open,
+    onOpenChange,
+    schema: createPriceListSchema,
+    defaultValues: emptyPriceListFormValues,
+    entity: priceList,
+    mapEntityToForm: getPriceListFormValues,
+    mutation: priceList ? updatePriceListMutation : createPriceListMutation,
+    fallbackErrorMessage: t(
+      priceList
+        ? "inventory.price_list_update_error_fallback"
+        : "inventory.price_list_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = priceList ? updatePriceListMutation : createPriceListMutation;
-
-  useEffect(() => {
-    form.reset(priceList ? getPriceListFormValues(priceList) : emptyPriceListFormValues);
-    resetBackendFormErrors();
-  }, [form, open, priceList, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreatePriceListInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (priceList) {
-        await updatePriceListMutation.mutateAsync(values);
-      } else {
-        await createPriceListMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          priceList
-            ? "inventory.price_list_update_error_fallback"
-            : "inventory.price_list_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -88,7 +65,7 @@ function PriceListDialog({ onOpenChange, open, priceList }: PriceListDialogProps
         <PriceListForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             priceList

@@ -2,17 +2,21 @@
 
 import { useEffect, useCallback } from "react";
 import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from "react-hook-form";
-import type { UseMutationResult } from "@tanstack/react-query";
 
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
+
+type DialogFormMutation<TInput> = {
+  mutateAsync: (values: TInput) => Promise<unknown>;
+  isPending: boolean;
+};
 
 type UseDialogFormOptions<TInput extends FieldValues, TEntity = unknown> = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   schema: unknown;
   defaultValues: DefaultValues<TInput>;
-  mutation: UseMutationResult<unknown, unknown, TInput>;
+  mutation: DialogFormMutation<TInput>;
   fallbackErrorMessage: string;
   entity?: TEntity | null;
   mapEntityToForm?: (entity: TEntity) => DefaultValues<TInput>;

@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import {
   emptyProductPriceFormValues,
@@ -52,44 +48,21 @@ function ProductPriceDialog({
     showErrorToast: false,
   });
   const { t } = useAppTranslator();
-  const form = useForm<CreateProductPriceInput>({
-    defaultValues: productPrice ? getProductPriceFormValues(productPrice) : emptyProductPriceFormValues,
-    resolver: buildFormResolver<CreateProductPriceInput>(createProductPriceSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateProductPriceInput, ProductPrice>({
+    open,
+    onOpenChange,
+    schema: createProductPriceSchema,
+    defaultValues: emptyProductPriceFormValues,
+    entity: productPrice,
+    mapEntityToForm: getProductPriceFormValues,
+    mutation: productPrice ? updateMutation : createMutation,
+    fallbackErrorMessage: t(
+      productPrice
+        ? "inventory.product_price_update_error_fallback"
+        : "inventory.product_price_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = productPrice ? updateMutation : createMutation;
-
-  useEffect(() => {
-    form.reset(productPrice ? getProductPriceFormValues(productPrice) : emptyProductPriceFormValues);
-    resetBackendFormErrors();
-  }, [form, open, productPrice, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateProductPriceInput) {
-    resetBackendFormErrors();
-
-    if (!productId) {
-      return;
-    }
-
-    try {
-      if (productPrice) {
-        await updateMutation.mutateAsync(values);
-      } else {
-        await createMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          productPrice
-            ? "inventory.product_price_update_error_fallback"
-            : "inventory.product_price_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -113,7 +86,7 @@ function ProductPriceDialog({
         <ProductPriceForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           priceLists={priceLists}
           submitLabel={

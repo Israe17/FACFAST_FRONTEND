@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import {
   emptyProductCategoryFormValues,
@@ -39,47 +35,26 @@ function ProductCategoryDialog({
   onOpenChange,
   open,
 }: ProductCategoryDialogProps) {
+  const { t } = useAppTranslator();
   const createCategoryMutation = useCreateProductCategoryMutation({ showErrorToast: false });
   const updateCategoryMutation = useUpdateProductCategoryMutation(category?.id ?? "", {
     showErrorToast: false,
   });
-  const { t } = useAppTranslator();
-  const form = useForm<CreateProductCategoryInput>({
-    defaultValues: category
-      ? getProductCategoryFormValues(category)
-      : emptyProductCategoryFormValues,
-    resolver: buildFormResolver<CreateProductCategoryInput>(createProductCategorySchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateProductCategoryInput, ProductCategory>({
+    open,
+    onOpenChange,
+    schema: createProductCategorySchema,
+    defaultValues: emptyProductCategoryFormValues,
+    entity: category,
+    mapEntityToForm: getProductCategoryFormValues,
+    mutation: category ? updateCategoryMutation : createCategoryMutation,
+    fallbackErrorMessage: t(
+      category
+        ? "inventory.category_update_error_fallback"
+        : "inventory.category_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = category ? updateCategoryMutation : createCategoryMutation;
-
-  useEffect(() => {
-    form.reset(category ? getProductCategoryFormValues(category) : emptyProductCategoryFormValues);
-    resetBackendFormErrors();
-  }, [category, form, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateProductCategoryInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (category) {
-        await updateCategoryMutation.mutateAsync(values);
-      } else {
-        await createCategoryMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          category
-            ? "inventory.category_update_error_fallback"
-            : "inventory.category_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -101,7 +76,7 @@ function ProductCategoryDialog({
           currentCategoryId={category?.id}
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             category

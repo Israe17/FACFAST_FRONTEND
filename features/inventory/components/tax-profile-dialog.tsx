@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
 import {
   Dialog,
   DialogContent,
@@ -11,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import { emptyTaxProfileFormValues, getTaxProfileFormValues } from "../form-values";
 import {
@@ -30,45 +26,26 @@ type TaxProfileDialogProps = {
 };
 
 function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogProps) {
+  const { t } = useAppTranslator();
   const createTaxProfileMutation = useCreateTaxProfileMutation({ showErrorToast: false });
   const updateTaxProfileMutation = useUpdateTaxProfileMutation(taxProfile?.id ?? "", {
     showErrorToast: false,
   });
-  const { t } = useAppTranslator();
-  const form = useForm<CreateTaxProfileInput>({
-    defaultValues: taxProfile ? getTaxProfileFormValues(taxProfile) : emptyTaxProfileFormValues,
-    resolver: buildFormResolver<CreateTaxProfileInput>(createTaxProfileSchema),
+
+  const { form, formError, handleSubmit, isPending } = useDialogForm<CreateTaxProfileInput, TaxProfile>({
+    open,
+    onOpenChange,
+    schema: createTaxProfileSchema,
+    defaultValues: emptyTaxProfileFormValues,
+    entity: taxProfile,
+    mapEntityToForm: getTaxProfileFormValues,
+    mutation: taxProfile ? updateTaxProfileMutation : createTaxProfileMutation,
+    fallbackErrorMessage: t(
+      taxProfile
+        ? "inventory.tax_profile_update_error_fallback"
+        : "inventory.tax_profile_create_error_fallback",
+    ),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-  const activeMutation = taxProfile ? updateTaxProfileMutation : createTaxProfileMutation;
-
-  useEffect(() => {
-    form.reset(taxProfile ? getTaxProfileFormValues(taxProfile) : emptyTaxProfileFormValues);
-    resetBackendFormErrors();
-  }, [form, open, resetBackendFormErrors, taxProfile]);
-
-  async function handleSubmit(values: CreateTaxProfileInput) {
-    resetBackendFormErrors();
-
-    try {
-      if (taxProfile) {
-        await updateTaxProfileMutation.mutateAsync(values);
-      } else {
-        await createTaxProfileMutation.mutateAsync(values);
-      }
-
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t(
-          taxProfile
-            ? "inventory.tax_profile_update_error_fallback"
-            : "inventory.tax_profile_create_error_fallback",
-        ),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -88,7 +65,7 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
         <TaxProfileForm
           form={form}
           formError={formError}
-          isPending={activeMutation.isPending}
+          isPending={isPending}
           onSubmit={handleSubmit}
           submitLabel={
             taxProfile

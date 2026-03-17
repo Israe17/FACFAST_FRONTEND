@@ -711,12 +711,6 @@ export type PaginatedResponse<T> = {
   total_pages: number;
 };
 
-export type CursorResponse<T> = {
-  data: T[];
-  next_cursor: number | null;
-  has_more: boolean;
-};
-
 export async function listProductsPaginated(
   params: PaginatedQueryParams,
 ): Promise<PaginatedResponse<ReturnType<typeof productSchema.parse>>> {
@@ -747,25 +741,18 @@ export async function listInventoryLotsPaginated(
   };
 }
 
-export type CursorQueryParams = {
-  cursor?: number;
-  limit?: number;
-  search?: string;
-  sort_order?: "ASC" | "DESC";
-};
-
-export async function listInventoryMovementsCursor(
-  params: PaginatedQueryParams & { cursor?: number },
-): Promise<CursorResponse<ReturnType<typeof inventoryMovementRowSchema.parse>>> {
-  // Strip offset-based params that the cursor endpoint doesn't accept
-  const { page: _page, sort_by: _sortBy, ...cursorParams } = params;
-  const response = await http.get("/inventory-movements", { params: cursorParams });
+export async function listInventoryMovementsPaginated(
+  params: PaginatedQueryParams,
+): Promise<PaginatedResponse<ReturnType<typeof inventoryMovementRowSchema.parse>>> {
+  const response = await http.get("/inventory-movements", { params });
   const raw = response.data;
   return {
     data: extractCollection(raw, ["inventory_movements", "inventoryMovements"]).map((item) =>
       inventoryMovementRowSchema.parse(item),
     ),
-    next_cursor: raw?.next_cursor ?? null,
-    has_more: raw?.has_more ?? false,
+    total: raw?.total ?? 0,
+    page: raw?.page ?? 1,
+    limit: raw?.limit ?? 20,
+    total_pages: raw?.total_pages ?? 1,
   };
 }

@@ -29,7 +29,7 @@ import {
   listInventoryLots,
   listInventoryLotsPaginated,
   listInventoryMovements,
-  listInventoryMovementsCursor,
+  listInventoryMovementsPaginated,
   listMeasurementUnits,
   listPriceLists,
   listProductCategories,
@@ -874,14 +874,14 @@ export function useInventoryMovementsQuery(enabled = true) {
   });
 }
 
-export function useInventoryMovementsCursorQuery(
-  params: PaginatedQueryParams & { cursor?: number },
+export function useInventoryMovementsPaginatedQuery(
+  params: PaginatedQueryParams,
   enabled = true,
 ) {
   return useQuery({
     enabled,
-    queryKey: [...inventoryKeys.inventoryMovements(), "cursor", params] as const,
-    queryFn: () => listInventoryMovementsCursor(params),
+    queryKey: [...inventoryKeys.inventoryMovements(), "paginated", params] as const,
+    queryFn: () => listInventoryMovementsPaginated(params),
     placeholderData: (prev) => prev,
   });
 }

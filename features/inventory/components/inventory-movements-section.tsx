@@ -29,7 +29,7 @@ import {
   useCreateInventoryAdjustmentMutation,
   useCreateInventoryTransferMutation,
   useInventoryLotsQuery,
-  useInventoryMovementsCursorQuery,
+  useInventoryMovementsPaginatedQuery,
   useProductsQuery,
   useWarehouseLocationsQuery,
   useWarehousesQuery,
@@ -63,7 +63,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const [cancelOpen, setCancelOpen] = useState(false);
   const [selectedMovement, setSelectedMovement] = useState<InventoryMovementRow | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
-  const movementsQuery = useInventoryMovementsCursorQuery(queryParams, enabled && canView);
+  const movementsQuery = useInventoryMovementsPaginatedQuery(queryParams, enabled && canView);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canView);
   const lotsQuery = useInventoryLotsQuery((adjustmentOpen || enabled) && canView);
@@ -225,7 +225,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
             onServerStateChange={onStateChange}
             serverSide
             serverState={serverState}
-            total={movementsQuery.data?.data.length ?? 0}
+            total={movementsQuery.data?.total ?? 0}
           />
         </QueryStateWrapper>
       </CatalogSectionCard>

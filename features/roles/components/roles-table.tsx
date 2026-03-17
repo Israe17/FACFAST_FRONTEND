@@ -2,19 +2,13 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, ShieldCheck, Trash2 } from "lucide-react";
+import { Pencil, ShieldCheck, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DataTable } from "@/shared/components/data-table";
+import { TableRowActions } from "@/shared/components/table-row-actions";
+import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
 
@@ -39,42 +33,20 @@ function RoleRowActions({ role }: { role: Role }) {
     } catch {}
   }
 
+  const actions: TableAction[] = [];
+  if (can("roles.update")) {
+    actions.push({ icon: Pencil, label: "Edit role", onClick: () => setActiveDialog("edit") });
+  }
+  if (canAll(["roles.assign_permissions", "permissions.view"])) {
+    actions.push({ icon: ShieldCheck, label: "Assign permissions", onClick: () => setActiveDialog("permissions") });
+  }
+  if (can("roles.delete")) {
+    actions.push({ icon: Trash2, label: "Delete role", onClick: () => setActiveDialog("delete"), variant: "destructive" });
+  }
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon-sm" variant="outline">
-            <MoreHorizontal className="size-4" />
-            <span className="sr-only">Open actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {can("roles.update") ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("edit")}>
-              <Pencil className="size-4" />
-              Edit role
-            </DropdownMenuItem>
-          ) : null}
-          {canAll(["roles.assign_permissions", "permissions.view"]) ? (
-            <DropdownMenuItem onClick={() => setActiveDialog("permissions")}>
-              <ShieldCheck className="size-4" />
-              Assign permissions
-            </DropdownMenuItem>
-          ) : null}
-          {can("roles.delete") ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
-                onClick={() => setActiveDialog("delete")}
-              >
-                <Trash2 className="size-4" />
-                Delete role
-              </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <TableRowActions actions={actions} />
 
       <EditRoleDialog
         onOpenChange={(open) => setActiveDialog(open ? "edit" : null)}

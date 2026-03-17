@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useForm } from "react-hook-form";
 
 import {
   Dialog,
@@ -12,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
 import { createContactSchema } from "../schemas";
 import { useCreateContactMutation } from "../queries";
@@ -49,34 +46,16 @@ const defaultValues: CreateContactInput = {
 };
 
 function CreateContactDialog({ onOpenChange, open }: CreateContactDialogProps) {
-  const createContactMutation = useCreateContactMutation({ showErrorToast: false });
   const { t } = useAppTranslator();
-  const form = useForm<CreateContactInput>({
+
+  const { form, formError, isPending, handleSubmit } = useDialogForm<CreateContactInput>({
+    open,
+    onOpenChange,
+    schema: createContactSchema,
     defaultValues,
-    resolver: buildFormResolver<CreateContactInput>(createContactSchema),
+    mutation: useCreateContactMutation({ showErrorToast: false }),
+    fallbackErrorMessage: t("contacts.create_error_fallback"),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-
-  useEffect(() => {
-    if (!open) {
-      form.reset(defaultValues);
-      resetBackendFormErrors();
-    }
-  }, [form, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateContactInput) {
-    resetBackendFormErrors();
-
-    try {
-      await createContactMutation.mutateAsync(values);
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t("contacts.create_error_fallback"),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -90,7 +69,7 @@ function CreateContactDialog({ onOpenChange, open }: CreateContactDialogProps) {
         <ContactForm
           form={form as unknown as UseFormReturn<ContactFormValues>}
           formError={formError}
-          isPending={createContactMutation.isPending}
+          isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateContactInput)}
           submitLabel="Create contact"
         />

@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useForm } from "react-hook-form";
 
 import {
   Dialog,
@@ -12,9 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
+import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { usePermissions } from "@/shared/hooks/use-permissions";
-import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { emptyBranchFormValues, stripSensitiveBranchFields } from "../form-values";
 import { createBranchSchema } from "../schemas";
@@ -28,38 +25,19 @@ type CreateBranchDialogProps = {
 };
 
 function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
-  const createBranchMutation = useCreateBranchMutation({ showErrorToast: false });
   const { can } = usePermissions();
   const { t } = useAppTranslator();
   const canConfigure = can("branches.configure");
-  const form = useForm<CreateBranchInput>({
+
+  const { form, formError, isPending, handleSubmit } = useDialogForm<CreateBranchInput>({
+    open,
+    onOpenChange,
+    schema: createBranchSchema,
     defaultValues: emptyBranchFormValues,
-    resolver: buildFormResolver<CreateBranchInput>(createBranchSchema),
+    mutation: useCreateBranchMutation({ showErrorToast: false }),
+    fallbackErrorMessage: t("branches.create_error_fallback"),
+    transformBeforeSubmit: (values) => stripSensitiveBranchFields(values, canConfigure),
   });
-  const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors(form);
-
-  useEffect(() => {
-    if (!open) {
-      form.reset(emptyBranchFormValues);
-      resetBackendFormErrors();
-    }
-  }, [form, open, resetBackendFormErrors]);
-
-  async function handleSubmit(values: CreateBranchInput) {
-    resetBackendFormErrors();
-
-    try {
-      await createBranchMutation.mutateAsync(
-        stripSensitiveBranchFields(values, canConfigure),
-      );
-      onOpenChange(false);
-    } catch (error) {
-      handleBackendFormError(error, {
-        fallbackMessage: t("branches.create_error_fallback"),
-      });
-    }
-  }
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -73,7 +51,7 @@ function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
         <BranchForm
           form={form as unknown as UseFormReturn<BranchFormValues>}
           formError={formError}
-          isPending={createBranchMutation.isPending}
+          isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateBranchInput)}
           submitLabel="Create branch"
         />

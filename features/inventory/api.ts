@@ -747,10 +747,19 @@ export async function listInventoryLotsPaginated(
   };
 }
 
+export type CursorQueryParams = {
+  cursor?: number;
+  limit?: number;
+  search?: string;
+  sort_order?: "ASC" | "DESC";
+};
+
 export async function listInventoryMovementsCursor(
   params: PaginatedQueryParams & { cursor?: number },
 ): Promise<CursorResponse<ReturnType<typeof inventoryMovementRowSchema.parse>>> {
-  const response = await http.get("/inventory-movements", { params });
+  // Strip offset-based params that the cursor endpoint doesn't accept
+  const { page: _page, sort_by: _sortBy, ...cursorParams } = params;
+  const response = await http.get("/inventory-movements", { params: cursorParams });
   const raw = response.data;
   return {
     data: extractCollection(raw, ["inventory_movements", "inventoryMovements"]).map((item) =>

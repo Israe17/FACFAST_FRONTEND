@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -13,6 +13,7 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -31,6 +32,28 @@ import {
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { cn } from "@/shared/lib/utils";
 
+export type ServerSideState = {
+  page: number;
+  limit: number;
+  search: string;
+  sort_by: string;
+  sort_order: "ASC" | "DESC";
+};
+
+type ServerSideProps = {
+  serverSide: true;
+  total: number;
+  serverState: ServerSideState;
+  onServerStateChange: (state: ServerSideState) => void;
+};
+
+type ClientSideProps = {
+  serverSide?: false;
+  total?: never;
+  serverState?: never;
+  onServerStateChange?: never;
+};
+
 type DataTableProps<TData, TValue> = {
   className?: string;
   columns: ColumnDef<TData, TValue>[];
@@ -42,7 +65,7 @@ type DataTableProps<TData, TValue> = {
   isLoading?: boolean;
   onRetry?: () => void;
   pageSize?: number;
-};
+} & (ServerSideProps | ClientSideProps);
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
@@ -57,19 +80,56 @@ function DataTable<TData, TValue>({
   isLoading = false,
   onRetry,
   pageSize = 20,
+  ...rest
 }: DataTableProps<TData, TValue>) {
   const { t } = useAppTranslator();
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const isServerSide = rest.serverSide === true;
+  const serverState = isServerSide ? rest.serverState : undefined;
+  const onServerStateChange = isServerSide ? rest.onServerStateChange : undefined;
+  const serverTotal = isServerSide ? rest.total : undefined;
+
+  const handleServerSortingChange = useCallback(
+    (updaterOrValue: SortingState | ((old: SortingState) => SortingState)) => {
+      if (!serverState || !onServerStateChange) return;
+      const newSorting = typeof updaterOrValue === "function" ? updaterOrValue([]) : updaterOrValue;
+      if (newSorting.length > 0) {
+        onServerStateChange({
+          ...serverState,
+          sort_by: newSorting[0].id,
+          sort_order: newSorting[0].desc ? "DESC" : "ASC",
+          page: 1,
+        });
+      } else {
+        onServerStateChange({
+          ...serverState,
+          sort_by: "",
+          sort_order: "ASC",
+          page: 1,
+        });
+      }
+    },
+    [serverState, onServerStateChange],
+  );
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
-    state: { sorting },
-    onSortingChange: setSorting,
+    state: {
+      sorting: isServerSide && serverState
+        ? serverState.sort_by
+          ? [{ id: serverState.sort_by, desc: serverState.sort_order === "DESC" }]
+          : []
+        : sorting,
+    },
+    onSortingChange: isServerSide ? handleServerSortingChange : setSorting,
     getCoreRowModel: getCoreRowModel(),
-    ...(enableSorting ? { getSortedRowModel: getSortedRowModel() } : {}),
-    ...(enablePagination
+    manualSorting: isServerSide,
+    manualPagination: isServerSide,
+    ...(enableSorting && !isServerSide ? { getSortedRowModel: getSortedRowModel() } : {}),
+    ...(!isServerSide && enablePagination
       ? {
           getPaginationRowModel: getPaginationRowModel(),
           initialState: { pagination: { pageSize } },
@@ -77,11 +137,28 @@ function DataTable<TData, TValue>({
       : {}),
   });
 
-  const showPagination = enablePagination && data.length > pageSize;
+  const showClientPagination = !isServerSide && enablePagination && data.length > pageSize;
   const rows = table.getRowModel().rows;
 
   return (
     <div className={cn("space-y-3", className)}>
+      {isServerSide && serverState && onServerStateChange ? (
+        <div className="flex items-center gap-2">
+          <Input
+            className="max-w-sm"
+            onChange={(e) =>
+              onServerStateChange({
+                ...serverState,
+                search: e.target.value,
+                page: 1,
+              })
+            }
+            placeholder={t("common.table.search_placeholder")}
+            value={serverState.search}
+          />
+        </div>
+      ) : null}
+
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <Table>
           <TableHeader>
@@ -170,7 +247,14 @@ function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {showPagination ? <DataTablePagination table={table} /> : null}
+      {showClientPagination ? <DataTablePagination table={table} /> : null}
+      {isServerSide && serverState && onServerStateChange && serverTotal !== undefined ? (
+        <ServerSidePagination
+          onStateChange={onServerStateChange}
+          serverState={serverState}
+          total={serverTotal}
+        />
+      ) : null}
     </div>
   );
 }
@@ -259,6 +343,108 @@ function DataTablePagination<TData>({
             aria-label={t("common.table.last_page")}
             disabled={!table.getCanNextPage()}
             onClick={() => table.setPageIndex(pageCount - 1)}
+            size="icon-sm"
+            variant="outline"
+          >
+            <ChevronsRight className="size-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ServerSidePagination({
+  onStateChange,
+  serverState,
+  total,
+}: {
+  onStateChange: (state: ServerSideState) => void;
+  serverState: ServerSideState;
+  total: number;
+}) {
+  const { t } = useAppTranslator();
+  const pageCount = Math.ceil(total / serverState.limit) || 1;
+  const from = (serverState.page - 1) * serverState.limit + 1;
+  const to = Math.min(serverState.page * serverState.limit, total);
+  const canPrevious = serverState.page > 1;
+  const canNext = serverState.page < pageCount;
+
+  return (
+    <div className="flex flex-col items-center justify-between gap-3 px-1 sm:flex-row">
+      <p className="text-sm text-muted-foreground">
+        {total > 0
+          ? t("common.table.showing", {
+              from: String(from),
+              to: String(to),
+              total: String(total),
+            })
+          : null}
+      </p>
+
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t("common.table.rows_per_page")}
+          </span>
+          <Select
+            onValueChange={(value: string) =>
+              onStateChange({ ...serverState, limit: Number(value), page: 1 })
+            }
+            value={String(serverState.limit)}
+          >
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PAGE_SIZE_OPTIONS.map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <span className="text-sm text-muted-foreground">
+          {t("common.table.page", {
+            page: String(serverState.page),
+            totalPages: String(pageCount),
+          })}
+        </span>
+
+        <div className="flex items-center gap-1">
+          <Button
+            aria-label={t("common.table.first_page")}
+            disabled={!canPrevious}
+            onClick={() => onStateChange({ ...serverState, page: 1 })}
+            size="icon-sm"
+            variant="outline"
+          >
+            <ChevronsLeft className="size-4" />
+          </Button>
+          <Button
+            aria-label={t("common.table.previous_page")}
+            disabled={!canPrevious}
+            onClick={() => onStateChange({ ...serverState, page: serverState.page - 1 })}
+            size="icon-sm"
+            variant="outline"
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+          <Button
+            aria-label={t("common.table.next_page")}
+            disabled={!canNext}
+            onClick={() => onStateChange({ ...serverState, page: serverState.page + 1 })}
+            size="icon-sm"
+            variant="outline"
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+          <Button
+            aria-label={t("common.table.last_page")}
+            disabled={!canNext}
+            onClick={() => onStateChange({ ...serverState, page: pageCount })}
             size="icon-sm"
             variant="outline"
           >

@@ -10,9 +10,11 @@ import {
   createContact,
   getContactById,
   listContacts,
+  listContactsPaginated,
   lookupContactByIdentification,
   updateContact,
 } from "./api";
+import type { PaginatedQueryParams } from "./api";
 import type { CreateContactInput, UpdateContactInput } from "./types";
 
 export const contactsKeys = {
@@ -43,6 +45,18 @@ export function useContactsQuery(enabled = true) {
     enabled,
     queryKey: contactsKeys.list(),
     queryFn: listContacts,
+  });
+}
+
+export function useContactsPaginatedQuery(
+  params: PaginatedQueryParams,
+  enabled = true,
+) {
+  return useQuery({
+    enabled,
+    queryKey: [...contactsKeys.list(), "paginated", params] as const,
+    queryFn: () => listContactsPaginated(params),
+    placeholderData: (prev) => prev,
   });
 }
 

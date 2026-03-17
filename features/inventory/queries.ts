@@ -27,13 +27,16 @@ import {
   getWarehouse,
   listBrands,
   listInventoryLots,
+  listInventoryLotsPaginated,
   listInventoryMovements,
+  listInventoryMovementsCursor,
   listMeasurementUnits,
   listPriceLists,
   listProductCategories,
   listProductCategoryTree,
   listProductPrices,
   listProducts,
+  listProductsPaginated,
   listPromotions,
   listTaxProfiles,
   listWarehouses,
@@ -54,6 +57,7 @@ import {
   updateWarehouseLocation,
   updateWarrantyProfile,
 } from "./api";
+import type { PaginatedQueryParams } from "./api";
 import type {
   CancelInventoryMovementInput,
   CreateBrandInput,
@@ -304,6 +308,18 @@ export function useProductsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.products(),
     queryFn: listProducts,
+  });
+}
+
+export function useProductsPaginatedQuery(
+  params: PaginatedQueryParams,
+  enabled = true,
+) {
+  return useQuery({
+    enabled,
+    queryKey: [...inventoryKeys.products(), "paginated", params] as const,
+    queryFn: () => listProductsPaginated(params),
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -786,6 +802,18 @@ export function useInventoryLotsQuery(enabled = true) {
   });
 }
 
+export function useInventoryLotsPaginatedQuery(
+  params: PaginatedQueryParams,
+  enabled = true,
+) {
+  return useQuery({
+    enabled,
+    queryKey: [...inventoryKeys.inventoryLots(), "paginated", params] as const,
+    queryFn: () => listInventoryLotsPaginated(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
 export function useCreateInventoryLotMutation(options: MutationFeedbackOptions = {}) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
@@ -843,6 +871,18 @@ export function useInventoryMovementsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.inventoryMovements(),
     queryFn: listInventoryMovements,
+  });
+}
+
+export function useInventoryMovementsCursorQuery(
+  params: PaginatedQueryParams & { cursor?: number },
+  enabled = true,
+) {
+  return useQuery({
+    enabled,
+    queryKey: [...inventoryKeys.inventoryMovements(), "cursor", params] as const,
+    queryFn: () => listInventoryMovementsCursor(params),
+    placeholderData: (prev) => prev,
   });
 }
 

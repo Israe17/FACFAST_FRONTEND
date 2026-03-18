@@ -13,8 +13,10 @@ import {
   productCategoryTreeSchema,
   productPriceSchema,
   productSchema,
+  productVariantSchema,
   promotionSchema,
   taxProfileSchema,
+  variantAttributeSchema,
   warehouseLocationSchema,
   warehouseSchema,
   warehouseStockRowSchema,
@@ -31,6 +33,7 @@ import type {
   CreateProductCategoryInput,
   CreateProductInput,
   CreateProductPriceInput,
+  CreateProductVariantInput,
   CreatePromotionInput,
   CreateTaxProfileInput,
   CreateWarehouseInput,
@@ -43,6 +46,7 @@ import type {
   UpdateProductCategoryInput,
   UpdateProductInput,
   UpdateProductPriceInput,
+  UpdateProductVariantInput,
   UpdatePromotionInput,
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
@@ -194,6 +198,7 @@ function buildProductPayload(payload: CreateProductInput | UpdateProductInput) {
     category_id: toOptionalNumberId(payload.category_id),
     code: payload.code,
     description: payload.description,
+    has_variants: isProduct ? payload.has_variants : false,
     has_warranty: payload.has_warranty,
     is_active: payload.is_active,
     name: payload.name,
@@ -755,4 +760,78 @@ export async function listInventoryMovementsPaginated(
     limit: raw?.limit ?? 20,
     total_pages: raw?.total_pages ?? 1,
   };
+}
+
+function buildProductVariantPayload(
+  payload: CreateProductVariantInput | UpdateProductVariantInput,
+) {
+  return compactRecord({
+    allow_negative_stock: payload.allow_negative_stock,
+    barcode: payload.barcode,
+    default_warranty_profile_id: toOptionalNumberId(payload.default_warranty_profile_id),
+    fiscal_profile_id: toOptionalNumberId(payload.fiscal_profile_id),
+    is_active: payload.is_active,
+    sale_unit_measure_id: toOptionalNumberId(payload.sale_unit_measure_id),
+    sku: payload.sku,
+    stock_unit_measure_id: toOptionalNumberId(payload.stock_unit_measure_id),
+    track_expiration: payload.track_expiration,
+    track_inventory: payload.track_inventory,
+    track_lots: payload.track_lots,
+    track_serials: payload.track_serials,
+    variant_name: payload.variant_name,
+  });
+}
+
+export async function listProductVariants(productId: string) {
+  const response = await http.get(`/products/${productId}/variants`);
+  return extractCollection(response.data, ["variants"]).map((item) =>
+    productVariantSchema.parse(item),
+  );
+}
+
+export async function createProductVariant(
+  productId: string,
+  payload: CreateProductVariantInput,
+) {
+  const response = await http.post(
+    `/products/${productId}/variants`,
+    buildProductVariantPayload(payload),
+  );
+  return productVariantSchema.parse(extractEntity(response.data, ["variant"]));
+}
+
+export async function updateProductVariant(
+  productId: string,
+  variantId: string,
+  payload: CreateProductVariantInput | UpdateProductVariantInput,
+) {
+  const response = await http.patch(
+    `/products/${productId}/variants/${variantId}`,
+    buildProductVariantPayload(payload),
+  );
+  return productVariantSchema.parse(extractEntity(response.data, ["variant"]));
+}
+
+export async function listVariantAttributes(productId: string) {
+  const response = await http.get(`/products/${productId}/attributes`);
+  return extractCollection(response.data, ["attributes"]).map((item) =>
+    variantAttributeSchema.parse(item),
+  );
+}
+
+export async function setVariantAttributes(
+  productId: string,
+  attributes: { name: string; display_order?: number; values: { value: string; display_order?: number }[] }[],
+) {
+  const response = await http.put(`/products/${productId}/attributes`, { attributes });
+  return extractCollection(response.data, ["attributes"]).map((item) =>
+    variantAttributeSchema.parse(item),
+  );
+}
+
+export async function generateVariantsFromAttributes(productId: string) {
+  const response = await http.post(`/products/${productId}/attributes/generate-variants`);
+  return extractCollection(response.data, ["variants"]).map((item) =>
+    productVariantSchema.parse(item),
+  );
 }

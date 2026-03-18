@@ -88,6 +88,8 @@ const esTranslations = {
   "inventory.entity.product_category": "categoria",
   "inventory.entity.product_categories": "categorias de producto",
   "inventory.entity.products": "productos",
+  "inventory.entity.variant": "variante",
+  "inventory.entity.variants": "variantes",
   "inventory.entity.promotion": "promocion",
   "inventory.entity.promotions": "promociones",
   "inventory.entity.tax_profile": "perfil fiscal",
@@ -166,6 +168,9 @@ const esTranslations = {
   "inventory.form.duration_unit": "Unidad de duracion",
   "inventory.form.duration_value": "Valor de duracion",
   "inventory.form.expiration_date": "Fecha de expiracion",
+  "inventory.form.has_variants": "Tiene variantes",
+  "inventory.form.has_variants_description":
+    "Habilita la gestion de variantes (talla, color, etc.) para este producto.",
   "inventory.form.has_warranty": "Tiene garantia",
   "inventory.form.has_warranty_description":
     "El perfil de garantia se vuelve obligatorio cuando este flag esta activo.",
@@ -611,6 +616,42 @@ const esTranslations = {
     "No fue posible registrar el traslado de inventario.",
   "inventory.inventory_movement_cancel_error_fallback":
     "No fue posible cancelar el movimiento de inventario.",
+  "inventory.variant_create_error_fallback":
+    "No fue posible crear la variante.",
+  "inventory.variant_update_error_fallback":
+    "No fue posible actualizar la variante.",
+  "inventory.variant_attributes_save_error_fallback":
+    "No fue posible guardar los atributos de variantes.",
+  "inventory.variant_generate_error_fallback":
+    "No fue posible generar las variantes.",
+  "inventory.variants.dialog_description":
+    "Configura los detalles de la variante incluyendo SKU, codigo de barras y perfil fiscal.",
+  "inventory.variants.section_title": "Variantes",
+  "inventory.variants.section_description":
+    "Gestiona las variantes de este producto con sus atributos individuales.",
+  "inventory.variants.variant_count": "{count} variante(s)",
+  "inventory.variants.no_variants":
+    "Este producto no tiene variantes configuradas.",
+  "inventory.variants.attributes_title": "Atributos de variantes",
+  "inventory.variants.attributes_description":
+    "Define atributos como talla, color, etc. para generar variantes automaticamente.",
+  "inventory.variants.define_attributes": "Definir atributos",
+  "inventory.variants.define_attributes_description":
+    "Agrega nombres de atributos y sus valores posibles.",
+  "inventory.variants.edit_attributes": "Editar atributos",
+  "inventory.variants.attribute_name": "Nombre del atributo",
+  "inventory.variants.attribute_name_placeholder": "ej. Color, Talla, Material",
+  "inventory.variants.attribute_values": "Valores",
+  "inventory.variants.add_value_placeholder": "Agregar valor y presionar Enter",
+  "inventory.variants.add_attribute": "Agregar atributo",
+  "inventory.variants.save_attributes": "Guardar atributos",
+  "inventory.variants.generate_variants": "Generar variantes",
+  "inventory.variants.generating": "Generando...",
+  "inventory.variants.no_attributes_defined":
+    "No se han definido atributos de variantes. Define atributos para generar variantes automaticamente.",
+  "inventory.form.variant_name": "Nombre de la variante",
+  "inventory.form.variant_name_placeholder": "ej. Negro - 128GB",
+  "inventory.form.track_serials": "Rastrear series",
   "inventory.warranty_profiles.dialog_description":
     "Configura politicas reutilizables de garantia para productos con cobertura postventa.",
   "inventory.warranty_profiles.section_description":
@@ -782,6 +823,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.entity.product_category": "category",
     "inventory.entity.product_categories": "product categories",
     "inventory.entity.products": "products",
+    "inventory.entity.variant": "variant",
+    "inventory.entity.variants": "variants",
     "inventory.entity.promotion": "promotion",
     "inventory.entity.promotions": "promotions",
     "inventory.entity.tax_profile": "tax profile",
@@ -860,6 +903,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.duration_unit": "Duration unit",
     "inventory.form.duration_value": "Duration value",
     "inventory.form.expiration_date": "Expiration date",
+    "inventory.form.has_variants": "Has variants",
+    "inventory.form.has_variants_description":
+      "Enable variant management (size, color, etc.) for this product.",
     "inventory.form.has_warranty": "Has warranty",
     "inventory.form.has_warranty_description":
       "Warranty profile becomes required when this flag is enabled.",
@@ -1306,6 +1352,42 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to register the inventory transfer.",
     "inventory.inventory_movement_cancel_error_fallback":
       "Unable to cancel the inventory movement.",
+    "inventory.variant_create_error_fallback":
+      "Unable to create the variant.",
+    "inventory.variant_update_error_fallback":
+      "Unable to update the variant.",
+    "inventory.variant_attributes_save_error_fallback":
+      "Unable to save variant attributes.",
+    "inventory.variant_generate_error_fallback":
+      "Unable to generate variants.",
+    "inventory.variants.dialog_description":
+      "Configure variant details including SKU, barcode and tax profile.",
+    "inventory.variants.section_title": "Variants",
+    "inventory.variants.section_description":
+      "Manage this product's variants with their individual attributes.",
+    "inventory.variants.variant_count": "{count} variant(s)",
+    "inventory.variants.no_variants":
+      "This product has no configured variants.",
+    "inventory.variants.attributes_title": "Variant attributes",
+    "inventory.variants.attributes_description":
+      "Define attributes like size, color, etc. to auto-generate variants.",
+    "inventory.variants.define_attributes": "Define attributes",
+    "inventory.variants.define_attributes_description":
+      "Add attribute names and their possible values.",
+    "inventory.variants.edit_attributes": "Edit attributes",
+    "inventory.variants.attribute_name": "Attribute name",
+    "inventory.variants.attribute_name_placeholder": "e.g. Color, Size, Material",
+    "inventory.variants.attribute_values": "Values",
+    "inventory.variants.add_value_placeholder": "Add value and press Enter",
+    "inventory.variants.add_attribute": "Add attribute",
+    "inventory.variants.save_attributes": "Save attributes",
+    "inventory.variants.generate_variants": "Generate variants",
+    "inventory.variants.generating": "Generating...",
+    "inventory.variants.no_attributes_defined":
+      "No variant attributes defined. Define attributes to auto-generate variants.",
+    "inventory.form.variant_name": "Variant name",
+    "inventory.form.variant_name_placeholder": "e.g. Black - 128GB",
+    "inventory.form.track_serials": "Track serials",
     "inventory.warranty_profiles.dialog_description":
       "Configure reusable warranty policies for products with post-sale coverage.",
     "inventory.warranty_profiles.section_description":

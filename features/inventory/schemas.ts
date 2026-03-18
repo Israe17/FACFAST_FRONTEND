@@ -276,6 +276,7 @@ export const productSchema = z
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
     description: z.string().nullable().optional().catch(undefined),
+    has_variants: z.boolean().optional().default(false),
     has_warranty: z.boolean().optional().default(false),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
@@ -687,6 +688,7 @@ const productFormObjectSchema = z.object({
   category_id: makeOptionalIdSchema("Select a valid category."),
   code: makeOptionalCodeSchema("PD"),
   description: optionalTextSchema,
+  has_variants: z.boolean().default(false),
   has_warranty: z.boolean().default(false),
   is_active: z.boolean().default(true),
   name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
@@ -1010,3 +1012,99 @@ export const createInventoryTransferSchema = inventoryTransferFormObjectSchema.s
 export const cancelInventoryMovementSchema = z.object({
   notes: optionalTextSchema,
 });
+
+export const productVariantSchema = z
+  .object({
+    allow_negative_stock: z.boolean().optional().default(false),
+    barcode: z.string().nullable().optional().catch(undefined),
+    business_id: idSchema.optional().catch(undefined),
+    created_at: z.string().optional(),
+    default_warranty_profile: inventoryEntitySummarySchema.nullable().optional().catch(undefined),
+    fiscal_profile: inventoryEntitySummarySchema.nullable().optional().catch(undefined),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    is_default: z.boolean().optional().default(false),
+    product_id: idSchema.optional().catch(undefined),
+    sale_unit_measure: measurementUnitSummarySchema.nullable().optional().catch(undefined),
+    sku: z.string().catch(""),
+    stock_unit_measure: measurementUnitSummarySchema.nullable().optional().catch(undefined),
+    track_expiration: z.boolean().optional().default(false),
+    track_inventory: z.boolean().optional().default(true),
+    track_lots: z.boolean().optional().default(false),
+    track_serials: z.boolean().optional().default(false),
+    updated_at: z.string().optional(),
+    variant_name: z.string().nullable().optional().catch(undefined),
+  })
+  .passthrough();
+
+export const variantAttributeValueSchema = z
+  .object({
+    display_order: z.coerce.number().optional().default(0),
+    id: idSchema,
+    value: z.string().catch(""),
+  })
+  .passthrough();
+
+export const variantAttributeSchema = z
+  .object({
+    display_order: z.coerce.number().optional().default(0),
+    id: idSchema,
+    name: z.string().catch(""),
+    values: z.array(variantAttributeValueSchema).optional().default([]),
+  })
+  .passthrough();
+
+const productVariantFormObjectSchema = z.object({
+  allow_negative_stock: z.boolean().default(false),
+  barcode: optionalTextSchema,
+  default_warranty_profile_id: makeOptionalIdSchema("Select a valid warranty profile."),
+  fiscal_profile_id: z.string().regex(positiveIntegerPattern, "Select a valid tax profile."),
+  is_active: z.boolean().default(true),
+  sale_unit_measure_id: makeOptionalIdSchema("Select a valid sale unit."),
+  sku: requiredTrimmedString("SKU is required."),
+  stock_unit_measure_id: makeOptionalIdSchema("Select a valid stock unit."),
+  track_expiration: z.boolean().default(false),
+  track_inventory: z.boolean().default(true),
+  track_lots: z.boolean().default(false),
+  track_serials: z.boolean().default(false),
+  variant_name: requiredTrimmedString("Variant name is required."),
+});
+
+function applyVariantRules(
+  values: Partial<z.infer<typeof productVariantFormObjectSchema>>,
+  ctx: z.RefinementCtx,
+) {
+  if (values.track_lots && !values.track_inventory) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Lot tracking requires inventory tracking.",
+      path: ["track_lots"],
+    });
+  }
+
+  if (values.track_expiration && !values.track_lots) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Expiration tracking requires lot tracking.",
+      path: ["track_expiration"],
+    });
+  }
+
+  if (values.track_serials && !values.track_inventory) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Serial tracking requires inventory tracking.",
+      path: ["track_serials"],
+    });
+  }
+}
+
+export const createProductVariantSchema =
+  productVariantFormObjectSchema.superRefine(applyVariantRules);
+
+export const updateProductVariantSchema = productVariantFormObjectSchema
+  .partial()
+  .extend({
+    is_active: z.boolean().optional(),
+  })
+  .superRefine(applyVariantRules);

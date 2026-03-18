@@ -51,6 +51,30 @@ export const inventoryMovementStatusValues = [
   "partially_received",
 ] as const;
 
+export const serialStatusValues = [
+  "available",
+  "reserved",
+  "sold",
+  "defective",
+  "returned",
+] as const;
+export const serialEventTypeValues = [
+  "received",
+  "transferred",
+  "sold",
+  "returned",
+  "repaired",
+  "status_change",
+] as const;
+
+export const serialStatusOptions = [
+  { label: "Available", value: "available" },
+  { label: "Reserved", value: "reserved" },
+  { label: "Sold", value: "sold" },
+  { label: "Defective", value: "defective" },
+  { label: "Returned", value: "returned" },
+] as const;
+
 export const inventoryViewPermissions = [
   "brands.view",
   "measurement_units.view",

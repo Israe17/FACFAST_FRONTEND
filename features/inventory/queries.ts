@@ -17,11 +17,13 @@ import {
   createProduct,
   createProductCategory,
   createProductPrice,
+  createProductVariant,
   createPromotion,
   createTaxProfile,
   createWarehouse,
   createWarehouseLocation,
   createWarrantyProfile,
+  generateVariantsFromAttributes,
   getPriceList,
   getProduct,
   getWarehouse,
@@ -37,13 +39,16 @@ import {
   listProductPrices,
   listProducts,
   listProductsPaginated,
+  listProductVariants,
   listPromotions,
   listTaxProfiles,
+  listVariantAttributes,
   listWarehouses,
   listWarehouseLocations,
   listWarehouseStock,
   listWarehouseStockByWarehouse,
   listWarrantyProfiles,
+  setVariantAttributes,
   updateBrand,
   updateInventoryLot,
   updateMeasurementUnit,
@@ -51,6 +56,7 @@ import {
   updateProduct,
   updateProductCategory,
   updateProductPrice,
+  updateProductVariant,
   updatePromotion,
   updateTaxProfile,
   updateWarehouse,
@@ -69,6 +75,7 @@ import type {
   CreateProductCategoryInput,
   CreateProductInput,
   CreateProductPriceInput,
+  CreateProductVariantInput,
   CreatePromotionInput,
   CreateTaxProfileInput,
   CreateWarehouseInput,
@@ -81,6 +88,7 @@ import type {
   UpdateProductCategoryInput,
   UpdateProductInput,
   UpdateProductPriceInput,
+  UpdateProductVariantInput,
   UpdatePromotionInput,
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
@@ -110,6 +118,10 @@ export const inventoryKeys = {
   warehouseStock: () => [...inventoryKeys.all, "warehouse-stock"] as const,
   warehouseStockByWarehouse: (warehouseId: string) =>
     [...inventoryKeys.all, "warehouse-stock", warehouseId] as const,
+  productVariants: (productId: string) =>
+    [...inventoryKeys.all, "product-variants", productId] as const,
+  variantAttributes: (productId: string) =>
+    [...inventoryKeys.all, "variant-attributes", productId] as const,
   warrantyProfiles: () => [...inventoryKeys.all, "warranty-profiles"] as const,
 };
 
@@ -956,6 +968,134 @@ export function useCancelInventoryMovementMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.inventory_movement_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useProductVariantsQuery(productId: string, enabled = true) {
+  return useQuery({
+    enabled: enabled && Boolean(productId),
+    queryKey: inventoryKeys.productVariants(productId),
+    queryFn: () => listProductVariants(productId),
+  });
+}
+
+export function useCreateProductVariantMutation(
+  productId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateProductVariantInput) =>
+      createProductVariant(productId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productVariants(productId),
+        inventoryKeys.product(productId),
+      ]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.variant_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateProductVariantMutation(
+  productId: string,
+  variantId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateProductVariantInput | UpdateProductVariantInput) =>
+      updateProductVariant(productId, variantId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productVariants(productId),
+        inventoryKeys.product(productId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.variant_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useVariantAttributesQuery(productId: string, enabled = true) {
+  return useQuery({
+    enabled: enabled && Boolean(productId),
+    queryKey: inventoryKeys.variantAttributes(productId),
+    queryFn: () => listVariantAttributes(productId),
+  });
+}
+
+export function useSetVariantAttributesMutation(
+  productId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (
+      attributes: {
+        name: string;
+        display_order?: number;
+        values: { value: string; display_order?: number }[];
+      }[],
+    ) => setVariantAttributes(productId, attributes),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.variantAttributes(productId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.variant_attributes_save_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useGenerateVariantsMutation(
+  productId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => generateVariantsFromAttributes(productId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productVariants(productId),
+        inventoryKeys.variantAttributes(productId),
+      ]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.variant_generate_error_fallback"),
         });
       }
     },

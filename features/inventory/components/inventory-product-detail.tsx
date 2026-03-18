@@ -28,6 +28,7 @@ import type { InventoryLot, InventoryMovementRow, ProductPrice, Promotion, Wareh
 import { useInventoryModule } from "../use-inventory-module";
 import { InventoryDetailBlock } from "./inventory-detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import { ProductVariantsSection } from "./product-variants-section";
 
 type InventoryProductDetailProps = {
   productId: string;
@@ -86,15 +87,6 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
   const promotions = (promotionsQuery.data ?? []).filter((promotion) =>
     promotion.items.some((item) => item.product.id === product.id),
   );
-  const variants = Array.from(
-    new Map(
-      [...stockRows, ...(movementsQuery.data ?? []).filter((row) => row.product.id === product.id)]
-        .map((row) => row.product_variant)
-        .filter((variant): variant is NonNullable<InventoryMovementRow["product_variant"]> => Boolean(variant))
-        .map((variant) => [variant.id, variant]),
-    ).values(),
-  );
-
   const productPriceColumns: ColumnDef<ProductPrice>[] = [
     {
       accessorKey: "price_list",
@@ -228,6 +220,9 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             {product.track_inventory ? (
               <Badge variant="outline">{t("inventory.form.track_inventory")}</Badge>
             ) : null}
+            {product.has_variants ? (
+              <Badge variant="outline">{t("inventory.form.has_variants")}</Badge>
+            ) : null}
           </>
         }
         breadcrumbs={[
@@ -263,84 +258,60 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <InventoryDetailBlock
-          description={t("inventory.detail.summary_block_description")}
-          title={t("inventory.detail.summary_block_title")}
-        >
-          <dl className="grid gap-4 md:grid-cols-2">
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.entity.brand")}</dt>
-              <dd className="font-medium">{product.brand?.name ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.entity.category")}</dt>
-              <dd className="font-medium">{product.category?.name ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.tax_profile")}</dt>
-              <dd className="font-medium">{product.tax_profile?.name ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.warranty_profile")}</dt>
-              <dd className="font-medium">
-                {product.warranty_profile?.name ?? t("inventory.common.not_available")}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">SKU</dt>
-              <dd className="font-medium">{product.sku ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.barcode")}</dt>
-              <dd className="font-medium">{product.barcode ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.stock_unit")}</dt>
-              <dd className="font-medium">{product.stock_unit?.name ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.sale_unit")}</dt>
-              <dd className="font-medium">{product.sale_unit?.name ?? t("inventory.common.not_available")}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
-              <dd className="font-medium">{formatDateTime(product.updated_at)}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
-              <dd className="font-medium">{formatDateTime(product.created_at)}</dd>
-            </div>
-          </dl>
-          <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
-            {product.description ?? t("inventory.common.no_description")}
+      <InventoryDetailBlock
+        description={t("inventory.detail.summary_block_description")}
+        title={t("inventory.detail.summary_block_title")}
+      >
+        <dl className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.entity.brand")}</dt>
+            <dd className="font-medium">{product.brand?.name ?? t("inventory.common.not_available")}</dd>
           </div>
-        </InventoryDetailBlock>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.entity.category")}</dt>
+            <dd className="font-medium">{product.category?.name ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.form.tax_profile")}</dt>
+            <dd className="font-medium">{product.tax_profile?.name ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.form.warranty_profile")}</dt>
+            <dd className="font-medium">
+              {product.warranty_profile?.name ?? t("inventory.common.not_available")}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">SKU</dt>
+            <dd className="font-medium">{product.sku ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.form.barcode")}</dt>
+            <dd className="font-medium">{product.barcode ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.form.stock_unit")}</dt>
+            <dd className="font-medium">{product.stock_unit?.name ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.form.sale_unit")}</dt>
+            <dd className="font-medium">{product.sale_unit?.name ?? t("inventory.common.not_available")}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
+            <dd className="font-medium">{formatDateTime(product.updated_at)}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
+            <dd className="font-medium">{formatDateTime(product.created_at)}</dd>
+          </div>
+        </dl>
+        <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
+          {product.description ?? t("inventory.common.no_description")}
+        </div>
+      </InventoryDetailBlock>
 
-        <InventoryDetailBlock
-          description={t("inventory.detail.variants_block_description")}
-          title={t("inventory.detail.variants_block_title")}
-        >
-          {variants.length ? (
-            <div className="space-y-3">
-              {variants.map((variant) => (
-                <div key={variant.id} className="rounded-2xl border border-border/70 p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium">{variant.variant_name ?? t("inventory.detail.default_variant")}</p>
-                    {variant.is_default ? <Badge>{t("inventory.detail.default_variant_badge")}</Badge> : null}
-                  </div>
-                  <div className="mt-2 grid gap-2 text-sm text-muted-foreground">
-                    <p>SKU: {variant.sku ?? t("inventory.common.not_available")}</p>
-                    <p>{t("inventory.form.barcode")}: {variant.barcode ?? t("inventory.common.not_available")}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">{t("inventory.detail.no_variants_available")}</p>
-          )}
-        </InventoryDetailBlock>
-      </div>
+      <ProductVariantsSection product={product} />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <InventoryDetailBlock

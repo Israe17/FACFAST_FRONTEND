@@ -9,6 +9,7 @@ import type {
   CreateProductCategoryInput,
   CreateProductInput,
   CreateProductPriceInput,
+  CreateProductVariantInput,
   CreatePromotionInput,
   CreateTaxProfileInput,
   CreateWarehouseInput,
@@ -19,6 +20,7 @@ import type {
   Product,
   ProductCategory,
   ProductPrice,
+  ProductVariant,
   Promotion,
   TaxProfile,
   Warehouse,
@@ -172,6 +174,7 @@ export const emptyProductFormValues: CreateProductInput = {
   category_id: "",
   code: "",
   description: "",
+  has_variants: false,
   has_warranty: false,
   is_active: true,
   name: "",
@@ -194,6 +197,7 @@ export function getProductFormValues(product: Product): CreateProductInput {
     category_id: product.category?.id ?? "",
     code: product.code ?? "",
     description: product.description ?? "",
+    has_variants: product.has_variants,
     has_warranty: product.has_warranty,
     is_active: product.is_active,
     name: product.name,
@@ -389,3 +393,39 @@ export const emptyInventoryTransferFormValues: CreateInventoryTransferInput = {
   reference_type: "",
   unit_cost: undefined,
 };
+
+export const emptyProductVariantFormValues: CreateProductVariantInput = {
+  allow_negative_stock: false,
+  barcode: "",
+  default_warranty_profile_id: "",
+  fiscal_profile_id: "",
+  is_active: true,
+  sale_unit_measure_id: "",
+  sku: "",
+  stock_unit_measure_id: "",
+  track_expiration: false,
+  track_inventory: true,
+  track_lots: false,
+  track_serials: false,
+  variant_name: "",
+};
+
+export function getProductVariantFormValues(
+  variant: ProductVariant,
+): CreateProductVariantInput {
+  return {
+    allow_negative_stock: variant.allow_negative_stock,
+    barcode: variant.barcode ?? "",
+    default_warranty_profile_id: variant.default_warranty_profile?.id ?? "",
+    fiscal_profile_id: variant.fiscal_profile?.id ?? "",
+    is_active: variant.is_active,
+    sale_unit_measure_id: variant.sale_unit_measure?.id ?? "",
+    sku: variant.sku,
+    stock_unit_measure_id: variant.stock_unit_measure?.id ?? "",
+    track_expiration: variant.track_expiration,
+    track_inventory: variant.track_inventory,
+    track_lots: variant.track_lots,
+    track_serials: variant.track_serials,
+    variant_name: variant.variant_name ?? "",
+  };
+}

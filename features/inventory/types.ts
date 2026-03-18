@@ -12,6 +12,7 @@ import {
   createProductCategorySchema,
   createProductPriceSchema,
   createProductSchema,
+  createProductVariantSchema,
   createPromotionSchema,
   createTaxProfileSchema,
   createWarehouseLocationSchema,
@@ -28,6 +29,7 @@ import {
   productCategoryTreeSchema,
   productPriceSchema,
   productSchema,
+  productVariantSchema,
   promotionItemSchema,
   promotionSchema,
   taxProfileSchema,
@@ -38,11 +40,13 @@ import {
   updateProductCategorySchema,
   updateProductPriceSchema,
   updateProductSchema,
+  updateProductVariantSchema,
   updatePromotionSchema,
   updateTaxProfileSchema,
   updateWarehouseLocationSchema,
   updateWarehouseSchema,
   updateWarrantyProfileSchema,
+  variantAttributeSchema,
   warehouseLocationSchema,
   warehouseSchema,
   warehouseStockRowSchema,
@@ -98,3 +102,7 @@ export type UpdateInventoryLotInput = z.infer<typeof updateInventoryLotSchema>;
 export type CreateInventoryAdjustmentInput = z.infer<typeof createInventoryAdjustmentSchema>;
 export type CreateInventoryTransferInput = z.infer<typeof createInventoryTransferSchema>;
 export type CancelInventoryMovementInput = z.infer<typeof cancelInventoryMovementSchema>;
+export type ProductVariant = z.infer<typeof productVariantSchema>;
+export type VariantAttribute = z.infer<typeof variantAttributeSchema>;
+export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>;
+export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>;

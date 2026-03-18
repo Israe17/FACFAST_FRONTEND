@@ -61,6 +61,7 @@ export function ProductForm({
   } = form;
   const { t } = useAppTranslator();
   const productType = form.watch("type");
+  const hasVariants = form.watch("has_variants");
   const hasWarranty = form.watch("has_warranty");
   const isActive = form.watch("is_active");
   const trackInventory = form.watch("track_inventory");
@@ -433,6 +434,20 @@ export function ProductForm({
             <div className="space-y-1">
               <p className="font-medium">{t("inventory.form.allow_negative_stock")}</p>
               <p className="text-sm text-muted-foreground">{t("inventory.form.allow_negative_stock_description")}</p>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
+            <Checkbox
+              checked={Boolean(hasVariants)}
+              disabled={!isProductType}
+              onCheckedChange={(checked) => {
+                form.setValue("has_variants", checked === true, { shouldDirty: true });
+              }}
+            />
+            <div className="space-y-1">
+              <p className="font-medium">{t("inventory.form.has_variants")}</p>
+              <p className="text-sm text-muted-foreground">{t("inventory.form.has_variants_description")}</p>
             </div>
           </label>
 

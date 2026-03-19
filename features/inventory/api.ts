@@ -839,3 +839,8 @@ export async function generateVariantsFromAttributes(productId: string) {
     productVariantSchema.parse(item),
   );
 }
+
+export async function deactivateProductVariant(productId: string, variantId: string) {
+  const response = await http.delete(`/products/${productId}/variants/${variantId}`);
+  return productVariantSchema.parse(extractEntity(response.data, ["variant"]));
+}

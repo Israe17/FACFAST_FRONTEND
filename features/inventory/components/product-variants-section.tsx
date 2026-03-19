@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Power } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
@@ -12,6 +22,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 
 import {
+  useDeactivateProductVariantMutation,
   useMeasurementUnitsQuery,
   useProductVariantsQuery,
   useTaxProfilesQuery,
@@ -36,6 +47,7 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<ProductVariant | null>(null);
 
   const variantsQuery = useProductVariantsQuery(
     product.id,
@@ -48,6 +60,7 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
   const warrantyProfilesQuery = useWarrantyProfilesQuery(
     canRunTenantQueries && can("warranty_profiles.view"),
   );
+  const deactivateMutation = useDeactivateProductVariantMutation(product.id);
 
   const handleCreate = useCallback(() => {
     setSelectedVariant(null);
@@ -59,72 +72,126 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
     setDialogOpen(true);
   }, []);
 
+  const handleDeactivateConfirm = useCallback(async () => {
+    if (!deactivateTarget) return;
+    await deactivateMutation.mutateAsync(deactivateTarget.id);
+    setDeactivateTarget(null);
+  }, [deactivateTarget, deactivateMutation]);
+
   const variants = variantsQuery.data ?? [];
+  const activeVariantCount = variants.filter((v) => v.is_active).length;
 
-  const columns: ColumnDef<ProductVariant>[] = [
-    {
-      accessorKey: "variant_name",
-      header: t("inventory.form.variant_name"),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <span>{row.original.variant_name ?? t("inventory.detail.default_variant")}</span>
-          {row.original.is_default ? (
-            <Badge variant="secondary">{t("inventory.detail.default_variant_badge")}</Badge>
-          ) : null}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "sku",
-      header: "SKU",
-    },
-    {
-      accessorKey: "barcode",
-      header: t("inventory.form.barcode"),
-      cell: ({ row }) => row.original.barcode ?? t("inventory.common.not_available"),
-    },
-    {
-      accessorKey: "fiscal_profile",
-      header: t("inventory.form.tax_profile"),
-      cell: ({ row }) =>
-        row.original.fiscal_profile?.name ?? t("inventory.common.not_available"),
-    },
-    {
-      accessorKey: "is_active",
-      header: t("inventory.common.status"),
-      cell: ({ row }) => (
-        <Badge variant={row.original.is_active ? "default" : "outline"}>
-          {row.original.is_active
-            ? t("inventory.common.active")
-            : t("inventory.common.inactive")}
-        </Badge>
-      ),
-    },
-    ...(canUpdate
-      ? [
-          {
-            id: "actions",
-            cell: ({ row }: { row: { original: ProductVariant } }) => {
-              if (row.original.is_default && !product.has_variants) {
-                return null;
-              }
+  const columns = useMemo<ColumnDef<ProductVariant>[]>(
+    () => [
+      {
+        accessorKey: "variant_name",
+        header: t("inventory.form.variant_name"),
+        cell: ({ row }) => {
+          const v = row.original;
+          const attrValues = v.attribute_values ?? [];
+          const isGenerated = attrValues.length > 0;
 
-              return (
-                <TableRowActions
-                  actions={[
-                    {
-                      icon: Pencil,
-                      label: t("inventory.common.edit"),
-                      onClick: () => handleEdit(row.original),
-                    },
-                  ]}
-                />
-              );
-            },
-          } satisfies ColumnDef<ProductVariant>,
-        ]
-      : []),
-  ];
+          return (
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={v.is_active ? "" : "text-muted-foreground line-through"}>
+                  {v.variant_name ?? t("inventory.detail.default_variant")}
+                </span>
+                {v.is_default ? (
+                  <Badge variant="secondary">{t("inventory.detail.default_variant_badge")}</Badge>
+                ) : null}
+                {!v.is_active ? (
+                  <Badge variant="outline">{t("inventory.common.inactive")}</Badge>
+                ) : null}
+              </div>
+              {isGenerated && !v.is_default ? (
+                <div className="flex flex-wrap gap-1">
+                  {attrValues.map((av) => (
+                    <Badge key={av.id} className="text-xs" variant="outline">
+                      {av.value}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "sku",
+        header: "SKU",
+        cell: ({ row }) => (
+          <span className={row.original.is_active ? "" : "text-muted-foreground"}>
+            {row.original.sku}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "barcode",
+        header: t("inventory.form.barcode"),
+        cell: ({ row }) => row.original.barcode ?? t("inventory.common.not_available"),
+      },
+      {
+        accessorKey: "fiscal_profile",
+        header: t("inventory.form.tax_profile"),
+        cell: ({ row }) =>
+          row.original.fiscal_profile?.name ?? t("inventory.common.not_available"),
+      },
+      {
+        accessorKey: "tracking",
+        header: t("inventory.variants.tracking"),
+        cell: ({ row }) => {
+          const v = row.original;
+          const flags: string[] = [];
+          if (v.track_inventory) flags.push(t("inventory.variants.flag_inventory"));
+          if (v.track_lots) flags.push(t("inventory.variants.flag_lots"));
+          if (v.track_serials) flags.push(t("inventory.variants.flag_serials"));
+          if (!flags.length) return t("inventory.common.not_available");
+          return (
+            <div className="flex flex-wrap gap-1">
+              {flags.map((flag) => (
+                <Badge key={flag} className="text-xs" variant="outline">
+                  {flag}
+                </Badge>
+              ))}
+            </div>
+          );
+        },
+      },
+      ...(canUpdate
+        ? [
+            {
+              id: "actions",
+              cell: ({ row }: { row: { original: ProductVariant } }) => {
+                const v = row.original;
+                if (v.is_default && !product.has_variants) {
+                  return null;
+                }
+
+                const actions = [
+                  {
+                    icon: Pencil,
+                    label: t("inventory.common.edit"),
+                    onClick: () => handleEdit(v),
+                  },
+                ];
+
+                if (!v.is_default && v.is_active && activeVariantCount > 1) {
+                  actions.push({
+                    icon: Power,
+                    label: t("inventory.variants.deactivate"),
+                    onClick: () => setDeactivateTarget(v),
+                  });
+                }
+
+                return <TableRowActions actions={actions} />;
+              },
+            } satisfies ColumnDef<ProductVariant>,
+          ]
+        : []),
+    ],
+    [t, canUpdate, product.has_variants, handleEdit, activeVariantCount],
+  );
 
   return (
     <>
@@ -169,6 +236,30 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
         variant={selectedVariant}
         warrantyProfiles={warrantyProfilesQuery.data ?? []}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeactivateTarget(null);
+        }}
+        open={deactivateTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.variants.deactivate_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.variants.deactivate_description", {
+                name: deactivateTarget?.variant_name ?? deactivateTarget?.sku ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeactivateConfirm}>
+              {t("inventory.variants.deactivate_confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

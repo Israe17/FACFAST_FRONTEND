@@ -1019,9 +1019,18 @@ export const cancelInventoryMovementSchema = z.object({
   notes: optionalTextSchema,
 });
 
+const variantAttributeValueRefSchema = z
+  .object({
+    attribute_id: z.coerce.number().optional(),
+    id: idSchema,
+    value: z.string().catch(""),
+  })
+  .passthrough();
+
 export const productVariantSchema = z
   .object({
     allow_negative_stock: z.boolean().optional().default(false),
+    attribute_values: z.array(variantAttributeValueRefSchema).optional().default([]),
     barcode: z.string().nullable().optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
     created_at: z.string().optional(),

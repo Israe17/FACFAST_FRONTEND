@@ -3,6 +3,16 @@
 import { useState, useCallback } from "react";
 import { Plus, Trash2, Wand2 } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +23,7 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 
 import {
   useGenerateVariantsMutation,
+  useProductVariantsQuery,
   useSetVariantAttributesMutation,
   useVariantAttributesQuery,
 } from "../queries";
@@ -39,12 +50,17 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
     product.id,
     canRunTenantQueries && can("products.view"),
   );
+  const variantsQuery = useProductVariantsQuery(
+    product.id,
+    canRunTenantQueries && can("products.view"),
+  );
   const saveAttributesMutation = useSetVariantAttributesMutation(product.id);
   const generateVariantsMutation = useGenerateVariantsMutation(product.id);
 
   const [editing, setEditing] = useState(false);
   const [attributes, setAttributes] = useState<AttributeFormValue[]>([]);
   const [newValueInputs, setNewValueInputs] = useState<Record<number, string>>({});
+  const [showGenerateConfirm, setShowGenerateConfirm] = useState(false);
 
   const startEditing = useCallback(() => {
     const existingAttributes = attributesQuery.data ?? [];
@@ -84,7 +100,7 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
 
       setAttributes((prev) =>
         prev.map((attr, i) =>
-          i === attrIndex && !attr.values.includes(value)
+          i === attrIndex && !attr.values.some((v) => v.toLowerCase() === value.toLowerCase())
             ? { ...attr, values: [...attr.values, value] }
             : attr,
         ),
@@ -123,8 +139,19 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
     setEditing(false);
   }, [attributes, saveAttributesMutation]);
 
-  const handleGenerate = useCallback(async () => {
+  const handleGenerateClick = useCallback(() => {
+    const existingVariants = variantsQuery.data ?? [];
+    const nonDefaultCount = existingVariants.filter((v) => !v.is_default).length;
+    if (nonDefaultCount > 0) {
+      setShowGenerateConfirm(true);
+    } else {
+      generateVariantsMutation.mutateAsync();
+    }
+  }, [variantsQuery.data, generateVariantsMutation]);
+
+  const handleGenerateConfirm = useCallback(async () => {
     await generateVariantsMutation.mutateAsync();
+    setShowGenerateConfirm(false);
   }, [generateVariantsMutation]);
 
   const existingAttributes = attributesQuery.data ?? [];
@@ -236,58 +263,82 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-border/70 bg-muted/20 p-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h4 className="font-semibold">{t("inventory.variants.attributes_title")}</h4>
+    <>
+      <div className="space-y-3 rounded-xl border border-border/70 bg-muted/20 p-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h4 className="font-semibold">{t("inventory.variants.attributes_title")}</h4>
+            <p className="text-sm text-muted-foreground">
+              {t("inventory.variants.attributes_description")}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {canUpdate ? (
+              <Button onClick={startEditing} size="sm" variant="outline">
+                {existingAttributes.length > 0
+                  ? t("inventory.variants.edit_attributes")
+                  : t("inventory.variants.define_attributes")}
+              </Button>
+            ) : null}
+            {canCreate && existingAttributes.length > 0 ? (
+              <ActionButton
+                icon={Wand2}
+                isLoading={generateVariantsMutation.isPending}
+                loadingText={t("inventory.variants.generating")}
+                onClick={handleGenerateClick}
+                size="sm"
+                variant="outline"
+              >
+                {t("inventory.variants.generate_variants")}
+              </ActionButton>
+            ) : null}
+          </div>
+        </div>
+
+        {existingAttributes.length > 0 ? (
+          <div className="flex flex-wrap gap-3">
+            {existingAttributes.map((attr) => (
+              <div key={attr.id} className="space-y-1">
+                <p className="text-sm font-medium">{attr.name}</p>
+                <div className="flex flex-wrap gap-1">
+                  {attr.values.map((value) => (
+                    <Badge key={value.id} variant="outline">
+                      {value.value}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
           <p className="text-sm text-muted-foreground">
-            {t("inventory.variants.attributes_description")}
+            {t("inventory.variants.no_attributes_defined")}
           </p>
-        </div>
-        <div className="flex gap-2">
-          {canUpdate ? (
-            <Button onClick={startEditing} size="sm" variant="outline">
-              {existingAttributes.length > 0
-                ? t("inventory.variants.edit_attributes")
-                : t("inventory.variants.define_attributes")}
-            </Button>
-          ) : null}
-          {canCreate && existingAttributes.length > 0 ? (
-            <ActionButton
-              icon={Wand2}
-              isLoading={generateVariantsMutation.isPending}
-              loadingText={t("inventory.variants.generating")}
-              onClick={handleGenerate}
-              size="sm"
-              variant="outline"
-            >
-              {t("inventory.variants.generate_variants")}
-            </ActionButton>
-          ) : null}
-        </div>
+        )}
       </div>
 
-      {existingAttributes.length > 0 ? (
-        <div className="flex flex-wrap gap-3">
-          {existingAttributes.map((attr) => (
-            <div key={attr.id} className="space-y-1">
-              <p className="text-sm font-medium">{attr.name}</p>
-              <div className="flex flex-wrap gap-1">
-                {attr.values.map((value) => (
-                  <Badge key={value.id} variant="outline">
-                    {value.value}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          {t("inventory.variants.no_attributes_defined")}
-        </p>
-      )}
-    </div>
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setShowGenerateConfirm(false);
+        }}
+        open={showGenerateConfirm}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.variants.generate_confirm_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.variants.generate_confirm_description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleGenerateConfirm}>
+              {t("inventory.variants.generate_confirm_action")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

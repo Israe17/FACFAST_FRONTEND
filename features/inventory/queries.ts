@@ -18,6 +18,7 @@ import {
   createProductCategory,
   createProductPrice,
   createProductVariant,
+  deactivateProductVariant,
   createPromotion,
   createTaxProfile,
   createWarehouse,
@@ -1096,6 +1097,32 @@ export function useGenerateVariantsMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.variant_generate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateProductVariantMutation(
+  productId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (variantId: string) => deactivateProductVariant(productId, variantId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productVariants(productId),
+        inventoryKeys.product(productId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.variant_deactivate_error_fallback"),
         });
       }
     },

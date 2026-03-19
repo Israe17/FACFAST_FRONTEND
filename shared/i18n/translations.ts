@@ -627,6 +627,8 @@ const esTranslations = {
     "No fue posible guardar los atributos de variantes.",
   "inventory.variant_generate_error_fallback":
     "No fue posible generar las variantes.",
+  "inventory.variant_deactivate_error_fallback":
+    "No fue posible desactivar la variante.",
   "inventory.variants.dialog_description":
     "Configura los detalles de la variante incluyendo SKU, codigo de barras y perfil fiscal.",
   "inventory.variants.section_title": "Variantes",
@@ -652,6 +654,19 @@ const esTranslations = {
   "inventory.variants.generating": "Generando...",
   "inventory.variants.no_attributes_defined":
     "No se han definido atributos de variantes. Define atributos para generar variantes automaticamente.",
+  "inventory.variants.deactivate": "Desactivar",
+  "inventory.variants.deactivate_title": "Desactivar variante",
+  "inventory.variants.deactivate_description":
+    "La variante \"{name}\" sera desactivada. No podra usarse en nuevas operaciones de inventario. Esta accion no elimina datos historicos.",
+  "inventory.variants.deactivate_confirm": "Desactivar",
+  "inventory.variants.generate_confirm_title": "Generar variantes",
+  "inventory.variants.generate_confirm_description":
+    "Se crearan las nuevas combinaciones de atributos que aun no existan como variantes. Las variantes existentes no seran modificadas ni eliminadas.",
+  "inventory.variants.generate_confirm_action": "Generar nuevas combinaciones",
+  "inventory.variants.tracking": "Rastreo",
+  "inventory.variants.flag_inventory": "Inventario",
+  "inventory.variants.flag_lots": "Lotes",
+  "inventory.variants.flag_serials": "Series",
   "inventory.form.variant_name": "Nombre de la variante",
   "inventory.form.variant_name_placeholder": "ej. Negro - 128GB",
   "inventory.form.track_serials": "Rastrear series",
@@ -1366,6 +1381,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to save variant attributes.",
     "inventory.variant_generate_error_fallback":
       "Unable to generate variants.",
+    "inventory.variant_deactivate_error_fallback":
+      "Unable to deactivate the variant.",
     "inventory.variants.dialog_description":
       "Configure variant details including SKU, barcode and tax profile.",
     "inventory.variants.section_title": "Variants",
@@ -1391,6 +1408,19 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.variants.generating": "Generating...",
     "inventory.variants.no_attributes_defined":
       "No variant attributes defined. Define attributes to auto-generate variants.",
+    "inventory.variants.deactivate": "Deactivate",
+    "inventory.variants.deactivate_title": "Deactivate variant",
+    "inventory.variants.deactivate_description":
+      "The variant \"{name}\" will be deactivated. It will not be available for new inventory operations. Historical data will not be affected.",
+    "inventory.variants.deactivate_confirm": "Deactivate",
+    "inventory.variants.generate_confirm_title": "Generate variants",
+    "inventory.variants.generate_confirm_description":
+      "New attribute combinations that do not yet exist as variants will be created. Existing variants will not be modified or removed.",
+    "inventory.variants.generate_confirm_action": "Generate new combinations",
+    "inventory.variants.tracking": "Tracking",
+    "inventory.variants.flag_inventory": "Inventory",
+    "inventory.variants.flag_lots": "Lots",
+    "inventory.variants.flag_serials": "Serials",
     "inventory.form.variant_name": "Variant name",
     "inventory.form.variant_name_placeholder": "e.g. Black - 128GB",
     "inventory.form.track_serials": "Track serials",

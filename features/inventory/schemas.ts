@@ -319,6 +319,7 @@ export const productPriceSchema = z
     price: z.coerce.number().optional().catch(undefined),
     price_list: priceListSummarySchema,
     product_id: idSchema.optional().catch(undefined),
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
     updated_at: z.string().optional(),
     valid_from: z.string().nullable().optional().catch(undefined),
     valid_to: z.string().nullable().optional().catch(undefined),
@@ -428,6 +429,7 @@ export const inventoryLotSchema = z
     lot_number: z.string().catch(""),
     manufacturing_date: z.string().nullable().optional().catch(undefined),
     product: inventoryEntitySummarySchema,
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
     received_at: z.string().nullable().optional().catch(undefined),
     supplier_contact: supplierContactSummarySchema.nullable().optional().catch(undefined),
     unit_cost: z.coerce.number().nullable().optional().catch(undefined),
@@ -775,6 +777,7 @@ const productPriceFormObjectSchema = z.object({
   min_quantity: optionalNumberSchema(z.coerce.number().min(0, "Minimum quantity must be at least 0.")),
   price: z.coerce.number().min(0, "Price must be at least 0."),
   price_list_id: z.string().regex(positiveIntegerPattern, "Select a valid price list."),
+  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   valid_from: optionalDateTimeSchema,
   valid_to: optionalDateTimeSchema,
 });
@@ -938,6 +941,7 @@ const inventoryLotCreateFormObjectSchema = z.object({
   lot_number: requiredTrimmedString("Lot number must contain at least 2 characters.", 2),
   manufacturing_date: optionalDateSchema,
   product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   received_at: optionalDateTimeSchema,
   supplier_contact_id: makeOptionalIdSchema("Select a valid supplier contact."),
   unit_cost: optionalNumberSchema(z.coerce.number().min(0, "Unit cost must be at least 0.")),
@@ -973,6 +977,7 @@ export const createInventoryAdjustmentSchema = z.object({
   movement_type: inventoryAdjustmentTypeSchema,
   notes: optionalTextSchema,
   product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
   reference_id: optionalNumberSchema(
     z.coerce.number().int().positive("Reference id must be a positive integer."),
@@ -989,6 +994,7 @@ const inventoryTransferFormObjectSchema = z.object({
   notes: optionalTextSchema,
   origin_warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid origin warehouse."),
   product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
   reference_id: optionalNumberSchema(
     z.coerce.number().int().positive("Reference id must be a positive integer."),

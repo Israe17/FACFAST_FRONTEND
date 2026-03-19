@@ -47,6 +47,14 @@ export function getProductPricesColumns({
       ),
     },
     {
+      accessorKey: "product_variant",
+      header: t("inventory.form.product_variant"),
+      cell: ({ row }) =>
+        row.original.product_variant && !row.original.product_variant.is_default
+          ? row.original.product_variant.variant_name ?? row.original.product_variant.sku
+          : t("inventory.common.all_variants"),
+    },
+    {
       accessorKey: "price",
       header: t("inventory.form.price"),
       cell: ({ row }) =>

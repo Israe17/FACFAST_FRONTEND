@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
@@ -21,6 +22,7 @@ import type { Contact } from "@/features/contacts/types";
 
 import type { CreateInventoryLotInput, Product, Warehouse } from "../types";
 import { FormFieldError } from "./form-field-error";
+import { VariantPicker } from "./variant-picker";
 
 const EMPTY_SELECT_VALUE = "__none__";
 
@@ -54,6 +56,13 @@ function InventoryLotForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const watchedProductId = form.watch("product_id");
+
+  useEffect(() => {
+    if (!isEditing) {
+      form.setValue("product_variant_id", "", { shouldDirty: true });
+    }
+  }, [form, watchedProductId, isEditing]);
 
   return (
     <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
@@ -119,6 +128,14 @@ function InventoryLotForm({
           />
           <FormFieldError message={errors.product_id?.message} />
         </div>
+
+        <VariantPicker
+          disabled={isEditing}
+          form={form}
+          name="product_variant_id"
+          productId={watchedProductId}
+          products={products}
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

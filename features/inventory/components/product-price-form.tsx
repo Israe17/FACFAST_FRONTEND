@@ -17,8 +17,9 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { CreateProductPriceInput, PriceList } from "../types";
+import type { CreateProductPriceInput, PriceList, Product } from "../types";
 import { FormFieldError } from "./form-field-error";
+import { VariantPicker } from "./variant-picker";
 
 type ProductPriceFormProps = {
   form: UseFormReturn<CreateProductPriceInput>;
@@ -26,6 +27,7 @@ type ProductPriceFormProps = {
   isPending?: boolean;
   onSubmit: (values: CreateProductPriceInput) => Promise<void> | void;
   priceLists: PriceList[];
+  product?: Product | null;
   submitLabel: string;
 };
 
@@ -35,6 +37,7 @@ function ProductPriceForm({
   isPending,
   onSubmit,
   priceLists,
+  product,
   submitLabel,
 }: ProductPriceFormProps) {
   const { t } = useAppTranslator();
@@ -46,6 +49,15 @@ function ProductPriceForm({
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
+
+      {product && (
+        <VariantPicker
+          form={form}
+          name="product_variant_id"
+          productId={product.id}
+          products={product ? [product] : []}
+        />
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">

@@ -36,7 +36,16 @@ export function getInventoryLotsColumns({
     {
       accessorKey: "product",
       header: t("inventory.form.product"),
-      cell: ({ row }) => row.original.product.name,
+      cell: ({ row }) => (
+        <div className="space-y-1 text-sm">
+          <p>{row.original.product.name}</p>
+          {row.original.product_variant && !row.original.product_variant.is_default ? (
+            <p className="text-muted-foreground">
+              {row.original.product_variant.variant_name ?? row.original.product_variant.sku}
+            </p>
+          ) : null}
+        </div>
+      ),
     },
     {
       accessorKey: "warehouse",

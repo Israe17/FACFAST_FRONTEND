@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useWarrantyProfilesQuery } from "../queries";
+import { useDeleteWarrantyProfileMutation, useWarrantyProfilesQuery } from "../queries";
 import type { WarrantyProfile } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { WarrantyProfileDialog } from "./warranty-profile-dialog";
@@ -29,15 +39,29 @@ function WarrantyProfilesSection({ enabled = true }: WarrantyProfilesSectionProp
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedWarrantyProfile, setSelectedWarrantyProfile] =
     useState<WarrantyProfile | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<WarrantyProfile | null>(null);
   const warrantyProfilesQuery = useWarrantyProfilesQuery(enabled && canView);
+  const deleteMutation = useDeleteWarrantyProfileMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((warrantyProfile: WarrantyProfile) => {
     setSelectedWarrantyProfile(warrantyProfile);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getWarrantyProfilesColumns({ canUpdate, onEdit: handleEdit, t }),
+    () =>
+      getWarrantyProfilesColumns({
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        t,
+      }),
     [canUpdate, handleEdit, t],
   );
 
@@ -100,6 +124,30 @@ function WarrantyProfilesSection({ enabled = true }: WarrantyProfilesSectionProp
         open={dialogOpen}
         warrantyProfile={selectedWarrantyProfile}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.warranty_profiles.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.warranty_profiles.delete_description", {
+                name: deleteTarget?.name ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

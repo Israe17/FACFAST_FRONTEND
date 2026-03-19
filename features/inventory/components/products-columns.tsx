@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, Power } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryProductRoute } from "@/shared/lib/routes";
 
@@ -13,11 +14,13 @@ import type { Product } from "../types";
 export function getProductsColumns({
   canUpdate,
   canView,
+  onDeactivate,
   onEdit,
   t,
 }: {
   canUpdate: boolean;
   canView: boolean;
+  onDeactivate: (product: Product) => void;
   onEdit: (product: Product) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 }): ColumnDef<Product>[] {
@@ -85,7 +88,7 @@ export function getProductsColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button asChild size="sm" variant="outline">
             <Link href={getInventoryProductRoute(row.original.id)}>
               <Eye className="size-4" />
@@ -93,16 +96,25 @@ export function getProductsColumns({
             </Link>
           </Button>
           {canUpdate ? (
-            <Button
-              onClick={() => {
-                onEdit(row.original);
-              }}
-              size="sm"
-              variant="outline"
-            >
-              <Pencil className="size-4" />
-              {t("inventory.common.edit")}
-            </Button>
+            <TableRowActions
+              actions={[
+                {
+                  label: t("inventory.common.edit"),
+                  icon: Pencil,
+                  onClick: () => onEdit(row.original),
+                },
+                ...(row.original.is_active
+                  ? [
+                      {
+                        label: t("inventory.common.deactivate"),
+                        icon: Power,
+                        variant: "destructive" as const,
+                        onClick: () => onDeactivate(row.original),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
           ) : null}
         </div>
       ),

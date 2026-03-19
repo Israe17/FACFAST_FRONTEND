@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
@@ -9,11 +9,12 @@ import type { Brand } from "../types";
 
 type GetBrandsColumnsParams = {
   canUpdate: boolean;
+  onDelete: (brand: Brand) => void;
   onEdit: (brand: Brand) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
-function getBrandsColumns({ canUpdate, onEdit, t }: GetBrandsColumnsParams): ColumnDef<Brand>[] {
+function getBrandsColumns({ canUpdate, onDelete, onEdit, t }: GetBrandsColumnsParams): ColumnDef<Brand>[] {
   const baseColumns: ColumnDef<Brand>[] = [
     {
       accessorKey: "name",
@@ -62,6 +63,12 @@ function getBrandsColumns({ canUpdate, onEdit, t }: GetBrandsColumnsParams): Col
               label: t("inventory.common.edit"),
               icon: Pencil,
               onClick: () => onEdit(row.original),
+            },
+            {
+              label: t("inventory.common.delete"),
+              icon: Trash2,
+              variant: "destructive",
+              onClick: () => onDelete(row.original),
             },
           ]}
         />

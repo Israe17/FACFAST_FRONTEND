@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useMeasurementUnitsQuery } from "../queries";
+import { useDeleteMeasurementUnitMutation, useMeasurementUnitsQuery } from "../queries";
 import type { MeasurementUnit } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { MeasurementUnitDialog } from "./measurement-unit-dialog";
@@ -29,15 +39,29 @@ function MeasurementUnitsSection({ enabled = true }: MeasurementUnitsSectionProp
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedMeasurementUnit, setSelectedMeasurementUnit] =
     useState<MeasurementUnit | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<MeasurementUnit | null>(null);
   const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canView);
+  const deleteMutation = useDeleteMeasurementUnitMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((measurementUnit: MeasurementUnit) => {
     setSelectedMeasurementUnit(measurementUnit);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getMeasurementUnitsColumns({ canUpdate, onEdit: handleEdit, t }),
+    () =>
+      getMeasurementUnitsColumns({
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        t,
+      }),
     [canUpdate, handleEdit, t],
   );
 
@@ -100,6 +124,30 @@ function MeasurementUnitsSection({ enabled = true }: MeasurementUnitsSectionProp
         }}
         open={dialogOpen}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.measurement_units.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.measurement_units.delete_description", {
+                name: deleteTarget?.name ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

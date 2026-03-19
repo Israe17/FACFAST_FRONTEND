@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -14,6 +24,7 @@ import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { useContactsQuery } from "@/features/contacts/queries";
 
 import {
+  useDeactivateInventoryLotMutation,
   useInventoryLotsPaginatedQuery,
   useProductsQuery,
   useWarehousesQuery,
@@ -36,11 +47,14 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
   const canViewContacts = can("contacts.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState<InventoryLot | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<InventoryLot | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
   const inventoryLotsQuery = useInventoryLotsPaginatedQuery(queryParams, enabled && canView);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canView);
   const contactsQuery = useContactsQuery(enabled && canView && canViewContacts);
+  const deactivateMutation = useDeactivateInventoryLotMutation({ showErrorToast: true });
+
   const lotEnabledProducts = useMemo(
     () => (productsQuery.data ?? []).filter((product) => product.track_lots),
     [productsQuery.data],
@@ -58,8 +72,20 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
     setDialogOpen(true);
   }, []);
 
+  const handleDeactivateConfirm = useCallback(async () => {
+    if (!deactivateTarget) return;
+    await deactivateMutation.mutateAsync(deactivateTarget.id);
+    setDeactivateTarget(null);
+  }, [deactivateTarget, deactivateMutation]);
+
   const columns = useMemo(
-    () => getInventoryLotsColumns({ canUpdate, onEdit, t }),
+    () =>
+      getInventoryLotsColumns({
+        canUpdate,
+        onDeactivate: setDeactivateTarget,
+        onEdit,
+        t,
+      }),
     [canUpdate, onEdit, t],
   );
 
@@ -129,6 +155,30 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
         suppliers={supplierContacts}
         warehouses={warehousesQuery.data ?? []}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeactivateTarget(null);
+        }}
+        open={deactivateTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.inventory_lots.deactivate_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.inventory_lots.deactivate_description", {
+                lot_number: deactivateTarget?.lot_number ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeactivateConfirm}>
+              {t("inventory.common.deactivate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

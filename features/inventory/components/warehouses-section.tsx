@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -12,7 +22,7 @@ import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import { useBranchesQuery } from "@/features/branches/queries";
 
-import { useWarehousesQuery } from "../queries";
+import { useDeactivateWarehouseMutation, useWarehousesQuery } from "../queries";
 import type { Warehouse } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { WarehouseDialog } from "./warehouse-dialog";
@@ -30,8 +40,10 @@ function WarehousesSection({ enabled = true }: WarehousesSectionProps) {
   const canUpdate = can("warehouses.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<Warehouse | null>(null);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
   const branchesQuery = useBranchesQuery(enabled && canView);
+  const deactivateMutation = useDeactivateWarehouseMutation({ showErrorToast: true });
 
   const branchNameById = useMemo(
     () =>
@@ -44,8 +56,22 @@ function WarehousesSection({ enabled = true }: WarehousesSectionProps) {
     setDialogOpen(true);
   }, []);
 
+  const handleDeactivateConfirm = useCallback(async () => {
+    if (!deactivateTarget) return;
+    await deactivateMutation.mutateAsync(deactivateTarget.id);
+    setDeactivateTarget(null);
+  }, [deactivateTarget, deactivateMutation]);
+
   const columns = useMemo(
-    () => getWarehousesColumns({ branchNameById, canUpdate, canView, onEdit: handleEdit, t }),
+    () =>
+      getWarehousesColumns({
+        branchNameById,
+        canUpdate,
+        canView,
+        onDeactivate: setDeactivateTarget,
+        onEdit: handleEdit,
+        t,
+      }),
     [branchNameById, canUpdate, canView, handleEdit, t],
   );
 
@@ -109,6 +135,30 @@ function WarehousesSection({ enabled = true }: WarehousesSectionProps) {
         open={dialogOpen}
         warehouse={selectedWarehouse}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeactivateTarget(null);
+        }}
+        open={deactivateTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.warehouses.deactivate_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.warehouses.deactivate_description", {
+                name: deactivateTarget?.name ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeactivateConfirm}>
+              {t("inventory.common.deactivate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

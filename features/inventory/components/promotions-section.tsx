@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useProductsQuery, usePromotionsQuery } from "../queries";
+import { useDeletePromotionMutation, useProductsQuery, usePromotionsQuery } from "../queries";
 import type { Promotion } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { PromotionDialog } from "./promotion-dialog";
@@ -28,16 +38,24 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
   const canUpdate = can("promotions.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Promotion | null>(null);
   const promotionsQuery = usePromotionsQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canView);
+  const deleteMutation = useDeletePromotionMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((promotion: Promotion) => {
     setSelectedPromotion(promotion);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getPromotionsColumns({ canUpdate, onEdit: handleEdit, t }),
+    () => getPromotionsColumns({ canUpdate, onDelete: setDeleteTarget, onEdit: handleEdit, t }),
     [canUpdate, handleEdit, t],
   );
 
@@ -101,6 +119,28 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
         products={productsQuery.data ?? []}
         promotion={selectedPromotion}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.promotions.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.promotions.delete_description", { name: deleteTarget?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

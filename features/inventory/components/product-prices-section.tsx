@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,6 +30,7 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import {
+  useDeleteProductPriceMutation,
   usePriceListsQuery,
   useProductPricesQuery,
   useProductsQuery,
@@ -44,6 +55,7 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedProductPrice, setSelectedProductPrice] = useState<ProductPrice | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProductPrice | null>(null);
   const productsQuery = useProductsQuery(enabled && canView);
   const priceListsQuery = usePriceListsQuery(enabled && canView);
   const resolvedSelectedProductId =
@@ -53,14 +65,23 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
   const productPricesQuery = useProductPricesQuery(resolvedSelectedProductId, enabled && canView);
   const selectedProduct =
     productsQuery.data?.find((product) => product.id === resolvedSelectedProductId) ?? null;
+  const deleteMutation = useDeleteProductPriceMutation(resolvedSelectedProductId, {
+    showErrorToast: true,
+  });
 
   const onEdit = useCallback((productPrice: ProductPrice) => {
     setSelectedProductPrice(productPrice);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getProductPricesColumns({ canUpdate, onEdit, t }),
+    () => getProductPricesColumns({ canUpdate, onDelete: setDeleteTarget, onEdit, t }),
     [canUpdate, onEdit, t],
   );
 
@@ -178,6 +199,28 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
         product={selectedProduct}
         productPrice={selectedProductPrice}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.product_prices.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.product_prices.delete_description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

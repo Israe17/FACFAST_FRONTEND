@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { usePriceListsQuery } from "../queries";
+import { useDeletePriceListMutation, usePriceListsQuery } from "../queries";
 import type { PriceList } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { PriceListDialog } from "./price-list-dialog";
@@ -28,15 +38,30 @@ function PriceListsSection({ enabled = true }: PriceListsSectionProps) {
   const canUpdate = can("price_lists.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPriceList, setSelectedPriceList] = useState<PriceList | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<PriceList | null>(null);
   const priceListsQuery = usePriceListsQuery(enabled && canView);
+  const deleteMutation = useDeletePriceListMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((priceList: PriceList) => {
     setSelectedPriceList(priceList);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getPriceListsColumns({ canUpdate, canView, onEdit: handleEdit, t }),
+    () =>
+      getPriceListsColumns({
+        canUpdate,
+        canView,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        t,
+      }),
     [canUpdate, canView, handleEdit, t],
   );
 
@@ -99,6 +124,28 @@ function PriceListsSection({ enabled = true }: PriceListsSectionProps) {
         open={dialogOpen}
         priceList={selectedPriceList}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.price_lists.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.price_lists.delete_description", { name: deleteTarget?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

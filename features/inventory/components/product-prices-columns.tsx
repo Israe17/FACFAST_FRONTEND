@@ -1,9 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { ProductPrice } from "../types";
@@ -22,12 +22,14 @@ function formatPrice(value: number | undefined, currency = "CRC") {
 
 type GetProductPricesColumnsParams = {
   canUpdate: boolean;
+  onDelete: (productPrice: ProductPrice) => void;
   onEdit: (productPrice: ProductPrice) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 export function getProductPricesColumns({
   canUpdate,
+  onDelete,
   onEdit,
   t,
 }: GetProductPricesColumnsParams): ColumnDef<ProductPrice>[] {
@@ -89,14 +91,21 @@ export function getProductPricesColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <Button
-          onClick={() => onEdit(row.original)}
-          size="sm"
-          variant="outline"
-        >
-          <Pencil className="size-4" />
-          {t("inventory.common.edit")}
-        </Button>
+        <TableRowActions
+          actions={[
+            {
+              label: t("inventory.common.edit"),
+              icon: Pencil,
+              onClick: () => onEdit(row.original),
+            },
+            {
+              label: t("inventory.common.delete"),
+              icon: Trash2,
+              variant: "destructive",
+              onClick: () => onDelete(row.original),
+            },
+          ]}
+        />
       ),
     });
   }

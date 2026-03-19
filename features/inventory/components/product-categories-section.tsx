@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useProductCategoriesQuery } from "../queries";
+import { useDeleteProductCategoryMutation, useProductCategoriesQuery } from "../queries";
 import type { ProductCategory } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { getProductCategoriesColumns } from "./product-categories-columns";
@@ -28,7 +38,9 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
   const canUpdate = can("categories.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProductCategory | null>(null);
   const categoriesQuery = useProductCategoriesQuery(enabled && canView);
+  const deleteMutation = useDeleteProductCategoryMutation({ showErrorToast: true });
 
   const parentNameById = useMemo(() => {
     return new Map((categoriesQuery.data ?? []).map((category) => [category.id, category.name]));
@@ -39,8 +51,21 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getProductCategoriesColumns({ canUpdate, onEdit: handleEdit, parentNameById, t }),
+    () =>
+      getProductCategoriesColumns({
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        parentNameById,
+        t,
+      }),
     [canUpdate, handleEdit, parentNameById, t],
   );
 
@@ -104,6 +129,28 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
         }}
         open={dialogOpen}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.categories.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.categories.delete_description", { name: deleteTarget?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

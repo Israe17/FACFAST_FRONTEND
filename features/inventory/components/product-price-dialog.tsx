@@ -89,6 +89,7 @@ function ProductPriceDialog({
           isPending={isPending}
           onSubmit={handleSubmit}
           priceLists={priceLists}
+          product={product}
           submitLabel={
             productPrice
               ? t("inventory.common.save_changes")

@@ -22,9 +22,11 @@ import type {
   CreateInventoryAdjustmentInput,
   InventoryLot,
   Product,
+  ProductVariant,
   Warehouse,
 } from "../types";
 import { FormFieldError } from "./form-field-error";
+import { VariantPicker } from "./variant-picker";
 
 export const EMPTY_SELECT_VALUE = "__none__";
 
@@ -55,8 +57,16 @@ export function InventoryAdjustmentForm({
   const {
     formState: { errors },
   } = form;
-  const selectedProduct = products.find((product) => product.id === form.watch("product_id"));
+  const watchedProductId = form.watch("product_id");
+  const selectedProduct = products.find((product) => product.id === watchedProductId);
   const movementType = form.watch("movement_type");
+
+  useEffect(() => {
+    form.setValue("product_variant_id", "", { shouldDirty: true });
+    if (form.getValues("inventory_lot_id")) {
+      form.setValue("inventory_lot_id", "", { shouldDirty: true });
+    }
+  }, [form, watchedProductId]);
 
   useEffect(() => {
     if (!selectedProduct?.track_lots && form.getValues("inventory_lot_id")) {
@@ -141,6 +151,13 @@ export function InventoryAdjustmentForm({
           />
           <FormFieldError message={errors.product_id?.message} />
         </div>
+
+        <VariantPicker
+          form={form}
+          name="product_variant_id"
+          productId={watchedProductId}
+          products={products}
+        />
 
         <div className="space-y-2">
           <Label htmlFor="inventory-adjustment-type">{t("inventory.form.adjustment_type")}</Label>

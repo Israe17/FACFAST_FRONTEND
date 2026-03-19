@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
@@ -23,6 +24,7 @@ import type {
   Warehouse,
 } from "../types";
 import { FormFieldError } from "./form-field-error";
+import { VariantPicker } from "./variant-picker";
 
 export type InventoryTransferFormProps = {
   form: UseFormReturn<CreateInventoryTransferInput>;
@@ -47,6 +49,12 @@ export function InventoryTransferForm({
   const {
     formState: { errors },
   } = form;
+
+  const watchedProductId = form.watch("product_id");
+
+  useEffect(() => {
+    form.setValue("product_variant_id", "", { shouldDirty: true });
+  }, [form, watchedProductId]);
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -121,6 +129,13 @@ export function InventoryTransferForm({
           />
           <FormFieldError message={errors.product_id?.message} />
         </div>
+
+        <VariantPicker
+          form={form}
+          name="product_variant_id"
+          productId={watchedProductId}
+          products={products}
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

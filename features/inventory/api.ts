@@ -370,6 +370,10 @@ export async function updateBrand(
   return brandSchema.parse(extractEntity(response.data, ["brand"]));
 }
 
+export async function deleteBrand(brandId: string) {
+  await http.delete(`/brands/${brandId}`);
+}
+
 export async function listMeasurementUnits() {
   const response = await http.get("/measurement-units");
   return extractCollection(response.data, ["measurement_units", "measurementUnits"]).map((item) =>
@@ -395,6 +399,10 @@ export async function updateMeasurementUnit(
   return measurementUnitSchema.parse(
     extractEntity(response.data, ["measurement_unit", "measurementUnit"]),
   );
+}
+
+export async function deleteMeasurementUnit(measurementUnitId: string) {
+  await http.delete(`/measurement-units/${measurementUnitId}`);
 }
 
 export async function listProductCategories() {
@@ -429,6 +437,10 @@ export async function updateProductCategory(
   return productCategorySchema.parse(
     extractEntity(response.data, ["product_category", "productCategory"]),
   );
+}
+
+export async function deleteProductCategory(categoryId: string) {
+  await http.delete(`/product-categories/${categoryId}`);
 }
 
 export async function listTaxProfiles() {
@@ -478,6 +490,10 @@ export async function updateWarrantyProfile(
   );
 }
 
+export async function deleteWarrantyProfile(warrantyProfileId: string) {
+  await http.delete(`/warranty-profiles/${warrantyProfileId}`);
+}
+
 export async function listProducts() {
   const response = await http.get("/products");
   return extractCollection(response.data, ["products"]).map((item) => productSchema.parse(item));
@@ -498,6 +514,11 @@ export async function updateProduct(
   payload: CreateProductInput | UpdateProductInput,
 ) {
   const response = await http.patch(`/products/${productId}`, buildProductPayload(payload));
+  return productSchema.parse(extractEntity(response.data, ["product"]));
+}
+
+export async function deactivateProduct(productId: string) {
+  const response = await http.delete(`/products/${productId}`);
   return productSchema.parse(extractEntity(response.data, ["product"]));
 }
 
@@ -526,6 +547,10 @@ export async function updatePriceList(
   return priceListSchema.parse(extractEntity(response.data, ["price_list", "priceList"]));
 }
 
+export async function deletePriceList(priceListId: string) {
+  await http.delete(`/price-lists/${priceListId}`);
+}
+
 export async function listProductPrices(productId: string) {
   const response = await http.get(`/products/${productId}/prices`);
   return extractCollection(response.data, ["product_prices", "productPrices"]).map((item) =>
@@ -542,6 +567,10 @@ export async function createProductPrice(
     buildProductPricePayload(payload),
   );
   return productPriceSchema.parse(extractEntity(response.data, ["product_price", "productPrice"]));
+}
+
+export async function deleteProductPrice(productPriceId: string) {
+  await http.delete(`/product-prices/${productPriceId}`);
 }
 
 export async function updateProductPrice(
@@ -573,6 +602,10 @@ export async function updatePromotion(
   return promotionSchema.parse(extractEntity(response.data, ["promotion"]));
 }
 
+export async function deletePromotion(promotionId: string) {
+  await http.delete(`/promotions/${promotionId}`);
+}
+
 export async function listWarehouses() {
   const response = await http.get("/warehouses");
   return extractCollection(response.data, ["warehouses"]).map((item) => warehouseSchema.parse(item));
@@ -593,6 +626,11 @@ export async function updateWarehouse(
   payload: CreateWarehouseInput | UpdateWarehouseInput,
 ) {
   const response = await http.patch(`/warehouses/${warehouseId}`, buildWarehousePayload(payload));
+  return warehouseSchema.parse(extractEntity(response.data, ["warehouse"]));
+}
+
+export async function deactivateWarehouse(warehouseId: string) {
+  const response = await http.delete(`/warehouses/${warehouseId}`);
   return warehouseSchema.parse(extractEntity(response.data, ["warehouse"]));
 }
 
@@ -663,6 +701,11 @@ export async function updateInventoryLot(
     `/inventory-lots/${inventoryLotId}`,
     buildInventoryLotUpdatePayload(payload),
   );
+  return inventoryLotSchema.parse(extractEntity(response.data, ["inventory_lot", "inventoryLot"]));
+}
+
+export async function deactivateInventoryLot(inventoryLotId: string) {
+  const response = await http.delete(`/inventory-lots/${inventoryLotId}`);
   return inventoryLotSchema.parse(extractEntity(response.data, ["inventory_lot", "inventoryLot"]));
 }
 

@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
@@ -9,12 +9,14 @@ import type { MeasurementUnit } from "../types";
 
 type GetMeasurementUnitsColumnsParams = {
   canUpdate: boolean;
+  onDelete: (measurementUnit: MeasurementUnit) => void;
   onEdit: (measurementUnit: MeasurementUnit) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 function getMeasurementUnitsColumns({
   canUpdate,
+  onDelete,
   onEdit,
   t,
 }: GetMeasurementUnitsColumnsParams): ColumnDef<MeasurementUnit>[] {
@@ -62,6 +64,12 @@ function getMeasurementUnitsColumns({
               label: t("inventory.common.edit"),
               icon: Pencil,
               onClick: () => onEdit(row.original),
+            },
+            {
+              label: t("inventory.common.delete"),
+              icon: Trash2,
+              variant: "destructive",
+              onClick: () => onDelete(row.original),
             },
           ]}
         />

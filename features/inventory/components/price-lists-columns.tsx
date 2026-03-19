@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryPriceListRoute } from "@/shared/lib/routes";
 
@@ -13,6 +14,7 @@ import type { PriceList } from "../types";
 type GetPriceListsColumnsParams = {
   canUpdate: boolean;
   canView: boolean;
+  onDelete: (priceList: PriceList) => void;
   onEdit: (priceList: PriceList) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
@@ -20,6 +22,7 @@ type GetPriceListsColumnsParams = {
 function getPriceListsColumns({
   canUpdate,
   canView,
+  onDelete,
   onEdit,
   t,
 }: GetPriceListsColumnsParams): ColumnDef<PriceList>[] {
@@ -69,7 +72,7 @@ function getPriceListsColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button asChild size="sm" variant="outline">
             <Link href={getInventoryPriceListRoute(row.original.id)}>
               <Eye className="size-4" />
@@ -77,14 +80,25 @@ function getPriceListsColumns({
             </Link>
           </Button>
           {canUpdate ? (
-            <Button
-              onClick={() => onEdit(row.original)}
-              size="sm"
-              variant="outline"
-            >
-              <Pencil className="size-4" />
-              {t("inventory.common.edit")}
-            </Button>
+            <TableRowActions
+              actions={[
+                {
+                  label: t("inventory.common.edit"),
+                  icon: Pencil,
+                  onClick: () => onEdit(row.original),
+                },
+                ...(!row.original.is_default
+                  ? [
+                      {
+                        label: t("inventory.common.delete"),
+                        icon: Trash2,
+                        variant: "destructive" as const,
+                        onClick: () => onDelete(row.original),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
           ) : null}
         </div>
       ),

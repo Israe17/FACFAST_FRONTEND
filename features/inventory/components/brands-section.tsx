@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -10,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useBrandsQuery } from "../queries";
+import { useBrandsQuery, useDeleteBrandMutation } from "../queries";
 import type { Brand } from "../types";
 import { BrandDialog } from "./brand-dialog";
 import { getBrandsColumns } from "./brands-columns";
@@ -28,15 +38,23 @@ function BrandsSection({ enabled = true }: BrandsSectionProps) {
   const canUpdate = can("brands.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Brand | null>(null);
   const brandsQuery = useBrandsQuery(enabled && canView);
+  const deleteMutation = useDeleteBrandMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((brand: Brand) => {
     setSelectedBrand(brand);
     setDialogOpen(true);
   }, []);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
-    () => getBrandsColumns({ canUpdate, onEdit: handleEdit, t }),
+    () => getBrandsColumns({ canUpdate, onDelete: setDeleteTarget, onEdit: handleEdit, t }),
     [canUpdate, handleEdit, t],
   );
 
@@ -97,6 +115,28 @@ function BrandsSection({ enabled = true }: BrandsSectionProps) {
         }}
         open={dialogOpen}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.brands.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.brands.delete_description", { name: deleteTarget?.name ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

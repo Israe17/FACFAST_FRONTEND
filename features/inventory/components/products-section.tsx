@@ -3,6 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
@@ -12,6 +22,7 @@ import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import {
+  useDeactivateProductMutation,
   useBrandsQuery,
   useMeasurementUnitsQuery,
   useProductCategoriesQuery,
@@ -36,6 +47,7 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const canUpdate = can("products.update");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<Product | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "name" });
   const productsQuery = useProductsPaginatedQuery(queryParams, enabled && canView);
   const categoriesQuery = useProductCategoriesQuery(enabled && canView);
@@ -43,14 +55,28 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canView);
   const taxProfilesQuery = useTaxProfilesQuery(enabled && canView);
   const warrantyProfilesQuery = useWarrantyProfilesQuery(enabled && canView);
+  const deactivateMutation = useDeactivateProductMutation({ showErrorToast: true });
 
   const onEdit = useCallback((product: Product) => {
     setSelectedProduct(product);
     setDialogOpen(true);
   }, []);
 
+  const handleDeactivateConfirm = useCallback(async () => {
+    if (!deactivateTarget) return;
+    await deactivateMutation.mutateAsync(deactivateTarget.id);
+    setDeactivateTarget(null);
+  }, [deactivateTarget, deactivateMutation]);
+
   const columns = useMemo(
-    () => getProductsColumns({ canUpdate, canView, onEdit, t }),
+    () =>
+      getProductsColumns({
+        canUpdate,
+        canView,
+        onDeactivate: setDeactivateTarget,
+        onEdit,
+        t,
+      }),
     [canUpdate, canView, onEdit, t],
   );
 
@@ -122,6 +148,30 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
         taxProfiles={taxProfilesQuery.data ?? []}
         warrantyProfiles={warrantyProfilesQuery.data ?? []}
       />
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeactivateTarget(null);
+        }}
+        open={deactivateTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("inventory.products.deactivate_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.products.deactivate_description", {
+                name: deactivateTarget?.name ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeactivateConfirm}>
+              {t("inventory.common.deactivate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

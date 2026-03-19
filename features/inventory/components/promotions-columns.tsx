@@ -1,19 +1,21 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { Promotion } from "../types";
 
 export function getPromotionsColumns({
   canUpdate,
+  onDelete,
   onEdit,
   t,
 }: {
   canUpdate: boolean;
+  onDelete: (promotion: Promotion) => void;
   onEdit: (promotion: Promotion) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 }): ColumnDef<Promotion>[] {
@@ -75,14 +77,21 @@ export function getPromotionsColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <Button
-          onClick={() => onEdit(row.original)}
-          size="sm"
-          variant="outline"
-        >
-          <Pencil className="size-4" />
-          {t("inventory.common.edit")}
-        </Button>
+        <TableRowActions
+          actions={[
+            {
+              label: t("inventory.common.edit"),
+              icon: Pencil,
+              onClick: () => onEdit(row.original),
+            },
+            {
+              label: t("inventory.common.delete"),
+              icon: Trash2,
+              variant: "destructive",
+              onClick: () => onDelete(row.original),
+            },
+          ]}
+        />
       ),
     });
   }

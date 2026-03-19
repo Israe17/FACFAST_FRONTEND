@@ -1,20 +1,22 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Power } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { InventoryLot } from "../types";
 
 type GetInventoryLotsColumnsParams = {
   canUpdate: boolean;
+  onDeactivate: (lot: InventoryLot) => void;
   onEdit: (lot: InventoryLot) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 export function getInventoryLotsColumns({
   canUpdate,
+  onDeactivate,
   onEdit,
   t,
 }: GetInventoryLotsColumnsParams): ColumnDef<InventoryLot>[] {
@@ -81,14 +83,25 @@ export function getInventoryLotsColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <Button
-          onClick={() => onEdit(row.original)}
-          size="sm"
-          variant="outline"
-        >
-          <Pencil className="size-4" />
-          {t("inventory.common.edit")}
-        </Button>
+        <TableRowActions
+          actions={[
+            {
+              label: t("inventory.common.edit"),
+              icon: Pencil,
+              onClick: () => onEdit(row.original),
+            },
+            ...(row.original.is_active
+              ? [
+                  {
+                    label: t("inventory.common.deactivate"),
+                    icon: Power,
+                    variant: "destructive" as const,
+                    onClick: () => onDeactivate(row.original),
+                  },
+                ]
+              : []),
+          ]}
+        />
       ),
     });
   }

@@ -1,14 +1,15 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { ProductCategory } from "../types";
 
 type GetProductCategoriesColumnsParams = {
   canUpdate: boolean;
+  onDelete: (category: ProductCategory) => void;
   onEdit: (category: ProductCategory) => void;
   parentNameById: Map<string, string>;
   t: ReturnType<typeof useAppTranslator>["t"];
@@ -16,6 +17,7 @@ type GetProductCategoriesColumnsParams = {
 
 function getProductCategoriesColumns({
   canUpdate,
+  onDelete,
   onEdit,
   parentNameById,
   t,
@@ -60,14 +62,21 @@ function getProductCategoriesColumns({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
-        <Button
-          onClick={() => onEdit(row.original)}
-          size="sm"
-          variant="outline"
-        >
-          <Pencil className="size-4" />
-          {t("inventory.common.edit")}
-        </Button>
+        <TableRowActions
+          actions={[
+            {
+              label: t("inventory.common.edit"),
+              icon: Pencil,
+              onClick: () => onEdit(row.original),
+            },
+            {
+              label: t("inventory.common.delete"),
+              icon: Trash2,
+              variant: "destructive",
+              onClick: () => onDelete(row.original),
+            },
+          ]}
+        />
       ),
     });
   }

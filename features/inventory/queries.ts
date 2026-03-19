@@ -19,6 +19,16 @@ import {
   createProductPrice,
   createProductVariant,
   deactivateProductVariant,
+  deactivateProduct,
+  deactivateWarehouse,
+  deactivateInventoryLot,
+  deleteBrand,
+  deleteProductCategory,
+  deleteMeasurementUnit,
+  deleteWarrantyProfile,
+  deletePriceList,
+  deleteProductPrice,
+  deletePromotion,
   createPromotion,
   createTaxProfile,
   createWarehouse,
@@ -1123,6 +1133,221 @@ export function useDeactivateProductVariantMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.variant_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteBrandMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (brandId: string) => deleteBrand(brandId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.brands()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteProductCategoryMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (categoryId: string) => deleteProductCategory(categoryId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productCategories(),
+        inventoryKeys.productCategoryTree(),
+      ]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteMeasurementUnitMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (unitId: string) => deleteMeasurementUnit(unitId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.measurementUnits()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteWarrantyProfileMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (profileId: string) => deleteWarrantyProfile(profileId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.warrantyProfiles()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeletePriceListMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (priceListId: string) => deletePriceList(priceListId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.priceLists()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteProductPriceMutation(
+  productId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (priceId: string) => deleteProductPrice(priceId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.productPrices(productId)]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeletePromotionMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (promotionId: string) => deletePromotion(promotionId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.promotions()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateProductMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (productId: string) => deactivateProduct(productId),
+    onSuccess: (_data, productId) => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.products(),
+        inventoryKeys.product(productId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateWarehouseMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (warehouseId: string) => deactivateWarehouse(warehouseId),
+    onSuccess: (_data, warehouseId) => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.warehouses(),
+        inventoryKeys.warehouse(warehouseId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateInventoryLotMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (lotId: string) => deactivateInventoryLot(lotId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.inventoryLots(),
+        inventoryKeys.warehouseStock(),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.delete_error_fallback"),
         });
       }
     },

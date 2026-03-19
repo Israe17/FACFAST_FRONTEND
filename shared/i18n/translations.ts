@@ -53,6 +53,8 @@ const esTranslations = {
   "inventory.common.create_entity": "Crear {entity}",
   "inventory.common.currency": "Moneda",
   "inventory.common.description": "Descripcion",
+  "inventory.common.deactivate": "Desactivar",
+  "inventory.common.delete": "Eliminar",
   "inventory.common.edit": "Editar",
   "inventory.common.edit_entity": "Editar {entity}",
   "inventory.common.empty_entity": "No se encontraron {entity} en el tenant actual.",
@@ -269,14 +271,23 @@ const esTranslations = {
   "inventory.form.validity": "Vigencia",
   "inventory.form.warranty_profile": "Perfil de garantia",
   "inventory.form.zone": "Zona",
+  "inventory.brands.delete_title": "Eliminar marca",
+  "inventory.brands.delete_description":
+    "La marca \"{name}\" sera eliminada permanentemente. Solo es posible si ningun producto la usa actualmente.",
   "inventory.brands.dialog_description":
     "Mantiene el catalogo de marcas usando el contrato actual de inventario del backend.",
   "inventory.brands.section_description":
     "Catalogo comercial de marcas que luego usan productos y precios.",
+  "inventory.categories.delete_title": "Eliminar categoria",
+  "inventory.categories.delete_description":
+    "La categoria \"{name}\" sera eliminada permanentemente. Solo es posible si no tiene subcategorias ni productos asignados.",
   "inventory.categories.dialog_description":
     "Mantiene la jerarquia de categorias de producto usada por inventario.",
   "inventory.categories.section_description":
     "Clasificacion jerarquica para productos y futura analitica de inventario.",
+  "inventory.measurement_units.delete_title": "Eliminar unidad de medida",
+  "inventory.measurement_units.delete_description":
+    "La unidad \"{name}\" sera eliminada permanentemente. Solo es posible si ningun producto o variante la usa.",
   "inventory.measurement_units.dialog_description":
     "Mantiene las unidades de inventario y venta usadas por entidades del modulo.",
   "inventory.measurement_units.section_description":
@@ -496,10 +507,16 @@ const esTranslations = {
     "Las cancelaciones no editan el original; crean un movimiento compensatorio.",
   "inventory.detail.movement_relation_note_3":
     "Usa siempre el header para acciones de alto nivel, no el id individual de la linea.",
+  "inventory.price_lists.delete_title": "Eliminar lista de precios",
+  "inventory.price_lists.delete_description":
+    "La lista \"{name}\" y todos sus precios asociados seran eliminados permanentemente. Esta accion no se puede deshacer.",
   "inventory.price_lists.dialog_description":
     "Define politicas comerciales de listas antes de asignar precios a productos.",
   "inventory.price_lists.section_description":
     "Politicas comerciales de listas que despues usan precios y promociones.",
+  "inventory.product_prices.delete_title": "Eliminar precio",
+  "inventory.product_prices.delete_description":
+    "El precio seleccionado sera eliminado permanentemente.",
   "inventory.product_prices.dialog_description":
     "Administra precios del producto {product} sobre las listas vigentes.",
   "inventory.product_prices.no_product_selected":
@@ -533,8 +550,14 @@ const esTranslations = {
   "inventory.promotions.items_title": "Items de promocion",
   "inventory.promotions.no_items":
     "Todavia no hay items en la promocion. Puedes guardar vacio si el backend lo permite, o agregar productos ahora.",
+  "inventory.promotions.delete_title": "Eliminar promocion",
+  "inventory.promotions.delete_description":
+    "La promocion \"{name}\" y todos sus items seran eliminados permanentemente.",
   "inventory.promotions.section_description":
     "Campanas promocionales con reglas por producto y vigencia temporal.",
+  "inventory.products.deactivate_title": "Desactivar producto",
+  "inventory.products.deactivate_description":
+    "El producto \"{name}\" sera desactivado. No estara disponible para nuevas operaciones de inventario. Los datos historicos no seran afectados.",
   "inventory.products.dialog_description":
     "Crea o actualiza productos y servicios usando el contrato actual de inventario del backend.",
   "inventory.products.general_information_description":
@@ -565,6 +588,9 @@ const esTranslations = {
     "No fue posible crear el perfil fiscal.",
   "inventory.tax_profile_update_error_fallback":
     "No fue posible actualizar el perfil fiscal.",
+  "inventory.warehouses.deactivate_title": "Desactivar bodega",
+  "inventory.warehouses.deactivate_description":
+    "La bodega \"{name}\" sera desactivada. No estara disponible para nuevas operaciones de inventario. Los datos historicos no seran afectados.",
   "inventory.warehouses.dialog_description":
     "Administra bodegas operativas por sucursal dentro del tenant activo.",
   "inventory.warehouses.section_description":
@@ -585,6 +611,9 @@ const esTranslations = {
     "No fue posible actualizar la ubicacion de bodega.",
   "inventory.warehouse_stock.section_description":
     "Lectura materializada de balances por bodega, producto y variante default.",
+  "inventory.inventory_lots.deactivate_title": "Desactivar lote",
+  "inventory.inventory_lots.deactivate_description":
+    "El lote \"{lot_number}\" sera desactivado. No estara disponible para nuevas operaciones. Los datos historicos no seran afectados.",
   "inventory.inventory_lots.dialog_description":
     "Administra lotes y sus cantidades iniciales usando la logica actual del backend.",
   "inventory.inventory_lots.section_description":
@@ -672,6 +701,9 @@ const esTranslations = {
   "inventory.form.track_serials": "Rastrear series",
   "inventory.warranty_profiles.dialog_description":
     "Configura politicas reutilizables de garantia para productos con cobertura postventa.",
+  "inventory.warranty_profiles.delete_title": "Eliminar perfil de garantia",
+  "inventory.warranty_profiles.delete_description":
+    "El perfil \"{name}\" sera eliminado permanentemente. Solo es posible si ningun producto o variante lo referencia.",
   "inventory.warranty_profiles.section_description":
     "Politicas reutilizables de garantia que los productos pueden referenciar cuando aplica cobertura.",
   "inventory.enum.adjustment_type.adjustment_in": "Entrada",
@@ -723,6 +755,31 @@ const esTranslations = {
     "No fue posible crear el perfil de garantia.",
   "inventory.warranty_profile_update_error_fallback":
     "No fue posible actualizar el perfil de garantia.",
+  "inventory.delete_error_fallback": "No fue posible eliminar el elemento.",
+  "inventory.brand_delete_error_fallback": "No fue posible eliminar la marca.",
+  "inventory.category_delete_error_fallback": "No fue posible eliminar la categoria.",
+  "inventory.measurement_unit_delete_error_fallback":
+    "No fue posible eliminar la unidad de medida.",
+  "inventory.warranty_profile_delete_error_fallback":
+    "No fue posible eliminar el perfil de garantia.",
+  "inventory.price_list_delete_error_fallback": "No fue posible eliminar la lista de precios.",
+  "inventory.product_price_delete_error_fallback":
+    "No fue posible eliminar el precio del producto.",
+  "inventory.promotion_delete_error_fallback": "No fue posible eliminar la promocion.",
+  "inventory.product_deactivate_error_fallback": "No fue posible desactivar el producto.",
+  "inventory.warehouse_deactivate_error_fallback": "No fue posible desactivar la bodega.",
+  "inventory.inventory_lot_deactivate_error_fallback": "No fue posible desactivar el lote.",
+  "inventory.error.BRAND_IN_USE": "La marca esta siendo usada por uno o mas productos.",
+  "inventory.error.CATEGORY_HAS_CHILDREN":
+    "La categoria tiene subcategorias. Eliminalas primero.",
+  "inventory.error.CATEGORY_IN_USE":
+    "La categoria esta siendo usada por uno o mas productos.",
+  "inventory.error.MEASUREMENT_UNIT_IN_USE":
+    "La unidad de medida esta siendo usada por uno o mas productos o variantes.",
+  "inventory.error.WARRANTY_PROFILE_IN_USE":
+    "El perfil de garantia esta siendo usado por uno o mas productos o variantes.",
+  "inventory.error.CANNOT_DELETE_DEFAULT_PRICE_LIST":
+    "No es posible eliminar la lista de precios predeterminada.",
   "platform.clear_tenant_error_fallback": "No fue posible salir del contexto de empresa.",
   "platform.clear_tenant_success": "Contexto tenant limpiado correctamente.",
   "platform.enter_tenant_error_fallback":
@@ -806,6 +863,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.common.create_entity": "Create {entity}",
     "inventory.common.currency": "Currency",
     "inventory.common.description": "Description",
+    "inventory.common.deactivate": "Deactivate",
+    "inventory.common.delete": "Delete",
     "inventory.common.edit": "Edit",
     "inventory.common.edit_entity": "Edit {entity}",
     "inventory.common.empty_entity": "No {entity} found in the current tenant.",
@@ -1022,14 +1081,23 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.validity": "Validity",
     "inventory.form.warranty_profile": "Warranty profile",
     "inventory.form.zone": "Zone",
+    "inventory.brands.delete_title": "Delete brand",
+    "inventory.brands.delete_description":
+      "The brand \"{name}\" will be permanently deleted. This is only possible if no product currently uses it.",
     "inventory.brands.dialog_description":
       "Maintain the brand catalog using the current backend inventory contract.",
     "inventory.brands.section_description":
       "Commercial brand catalog used later by products and pricing.",
+    "inventory.categories.delete_title": "Delete category",
+    "inventory.categories.delete_description":
+      "The category \"{name}\" will be permanently deleted. This is only possible if it has no subcategories and no products assigned.",
     "inventory.categories.dialog_description":
       "Maintain the product category hierarchy used by inventory.",
     "inventory.categories.section_description":
       "Hierarchical classification for products and future inventory analytics.",
+    "inventory.measurement_units.delete_title": "Delete measurement unit",
+    "inventory.measurement_units.delete_description":
+      "The unit \"{name}\" will be permanently deleted. This is only possible if no product or variant uses it.",
     "inventory.measurement_units.dialog_description":
       "Maintain the stock and sale units used by inventory entities.",
     "inventory.measurement_units.section_description":
@@ -1249,10 +1317,16 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Cancellations never edit the original; they create a compensating movement.",
     "inventory.detail.movement_relation_note_3":
       "Always use the header for high-level actions, not the individual line id.",
+    "inventory.price_lists.delete_title": "Delete price list",
+    "inventory.price_lists.delete_description":
+      "The price list \"{name}\" and all its associated prices will be permanently deleted. This action cannot be undone.",
     "inventory.price_lists.dialog_description":
       "Define commercial price list policies before assigning prices to products.",
     "inventory.price_lists.section_description":
       "Commercial price list policies used later by product prices and promotions.",
+    "inventory.product_prices.delete_title": "Delete price",
+    "inventory.product_prices.delete_description":
+      "The selected price will be permanently deleted.",
     "inventory.product_prices.dialog_description":
       "Manage prices for product {product} across the available price lists.",
     "inventory.product_prices.no_product_selected":
@@ -1287,8 +1361,14 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.promotions.items_title": "Promotion items",
     "inventory.promotions.no_items":
       "There are no promotion items yet. You can keep it empty if backend rules allow it, or add products now.",
+    "inventory.promotions.delete_title": "Delete promotion",
+    "inventory.promotions.delete_description":
+      "The promotion \"{name}\" and all its items will be permanently deleted.",
     "inventory.promotions.section_description":
       "Promotional campaigns with product rules and validity windows.",
+    "inventory.products.deactivate_title": "Deactivate product",
+    "inventory.products.deactivate_description":
+      "The product \"{name}\" will be deactivated. It will not be available for new inventory operations. Historical data will not be affected.",
     "inventory.products.dialog_description":
       "Create or update products and services using the current backend inventory contract.",
     "inventory.products.general_information_description":
@@ -1319,6 +1399,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to create the tax profile.",
     "inventory.tax_profile_update_error_fallback":
       "Unable to update the tax profile.",
+    "inventory.warehouses.deactivate_title": "Deactivate warehouse",
+    "inventory.warehouses.deactivate_description":
+      "The warehouse \"{name}\" will be deactivated. It will not be available for new inventory operations. Historical data will not be affected.",
     "inventory.warehouses.dialog_description":
       "Manage operational warehouses per branch within the active tenant.",
     "inventory.warehouses.section_description":
@@ -1339,6 +1422,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to update the warehouse location.",
     "inventory.warehouse_stock.section_description":
       "Materialized warehouse balances by warehouse, product and default variant.",
+    "inventory.inventory_lots.deactivate_title": "Deactivate lot",
+    "inventory.inventory_lots.deactivate_description":
+      "The lot \"{lot_number}\" will be deactivated. It will not be available for new operations. Historical data will not be affected.",
     "inventory.inventory_lots.dialog_description":
       "Manage inventory lots and their initial quantities using the current backend logic.",
     "inventory.inventory_lots.section_description":
@@ -1424,6 +1510,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.variant_name": "Variant name",
     "inventory.form.variant_name_placeholder": "e.g. Black - 128GB",
     "inventory.form.track_serials": "Track serials",
+    "inventory.warranty_profiles.delete_title": "Delete warranty profile",
+    "inventory.warranty_profiles.delete_description":
+      "The profile \"{name}\" will be permanently deleted. This is only possible if no product or variant references it.",
     "inventory.warranty_profiles.dialog_description":
       "Configure reusable warranty policies for products with post-sale coverage.",
     "inventory.warranty_profiles.section_description":
@@ -1477,6 +1566,31 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to create the warranty profile.",
     "inventory.warranty_profile_update_error_fallback":
       "Unable to update the warranty profile.",
+    "inventory.delete_error_fallback": "Unable to delete the item.",
+    "inventory.brand_delete_error_fallback": "Unable to delete the brand.",
+    "inventory.category_delete_error_fallback": "Unable to delete the category.",
+    "inventory.measurement_unit_delete_error_fallback":
+      "Unable to delete the measurement unit.",
+    "inventory.warranty_profile_delete_error_fallback":
+      "Unable to delete the warranty profile.",
+    "inventory.price_list_delete_error_fallback": "Unable to delete the price list.",
+    "inventory.product_price_delete_error_fallback": "Unable to delete the product price.",
+    "inventory.promotion_delete_error_fallback": "Unable to delete the promotion.",
+    "inventory.product_deactivate_error_fallback": "Unable to deactivate the product.",
+    "inventory.warehouse_deactivate_error_fallback": "Unable to deactivate the warehouse.",
+    "inventory.inventory_lot_deactivate_error_fallback":
+      "Unable to deactivate the inventory lot.",
+    "inventory.error.BRAND_IN_USE": "The brand is being used by one or more products.",
+    "inventory.error.CATEGORY_HAS_CHILDREN":
+      "The category has subcategories. Delete them first.",
+    "inventory.error.CATEGORY_IN_USE":
+      "The category is being used by one or more products.",
+    "inventory.error.MEASUREMENT_UNIT_IN_USE":
+      "The measurement unit is being used by one or more products or variants.",
+    "inventory.error.WARRANTY_PROFILE_IN_USE":
+      "The warranty profile is being used by one or more products or variants.",
+    "inventory.error.CANNOT_DELETE_DEFAULT_PRICE_LIST":
+      "The default price list cannot be deleted.",
     "platform.clear_tenant_error_fallback":
       "Unable to leave the business context.",
     "platform.clear_tenant_success": "Tenant context cleared successfully.",

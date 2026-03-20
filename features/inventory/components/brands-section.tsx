@@ -36,6 +36,7 @@ function BrandsSection({ enabled = true }: BrandsSectionProps) {
   const canView = can("brands.view");
   const canCreate = can("brands.create");
   const canUpdate = can("brands.update");
+  const canDelete = can("brands.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Brand | null>(null);
@@ -54,8 +55,15 @@ function BrandsSection({ enabled = true }: BrandsSectionProps) {
   }, [deleteTarget, deleteMutation]);
 
   const columns = useMemo(
-    () => getBrandsColumns({ canUpdate, onDelete: setDeleteTarget, onEdit: handleEdit, t }),
-    [canUpdate, handleEdit, t],
+    () =>
+      getBrandsColumns({
+        canDelete,
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        t,
+      }),
+    [canDelete, canUpdate, handleEdit, t],
   );
 
   if (!canView) {

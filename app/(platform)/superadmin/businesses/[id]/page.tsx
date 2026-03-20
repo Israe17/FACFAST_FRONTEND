@@ -71,12 +71,15 @@ export default function SuperadminBusinessDetailPage() {
       ) : null}
       {businessQuery.data ? <BusinessDetailCard business={businessQuery.data} /> : null}
 
-      <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Branches</h2>
-          <p className="text-sm text-muted-foreground">
-            Sucursales visibles desde `/platform/businesses/:id/branches`.
-          </p>
+      <section className="space-y-5 rounded-2xl border border-border bg-card p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold">Branches</h2>
+            <p className="text-sm text-muted-foreground">
+              Sucursales visibles desde `/platform/businesses/:id/branches`.
+            </p>
+          </div>
+          <Badge variant="outline">{totalBranches} registradas</Badge>
         </div>
 
         {branchesQuery.isLoading ? <LoadingState description="Loading business branches." /> : null}
@@ -98,10 +101,10 @@ export default function SuperadminBusinessDetailPage() {
             {branchesQuery.data.map((branch) => (
               <article
                 key={branch.id}
-                className="space-y-2 rounded-xl border border-border/70 p-4"
+                className="rounded-xl border border-border/70 bg-background/50 p-5"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
+                <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-4">
+                  <div className="space-y-1">
                     <p className="font-medium">{branch.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {branch.code ?? branch.branch_number ?? branch.id}
@@ -111,9 +114,43 @@ export default function SuperadminBusinessDetailPage() {
                     {branch.is_active ? "ACTIVE" : "INACTIVE"}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {branch.address ?? "No address provided."}
-                </p>
+
+                <div className="space-y-3 pt-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <p className="text-[0.72rem] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+                        Branch ID
+                      </p>
+                      <p className="mt-1 text-sm">{branch.id}</p>
+                    </div>
+                    <div>
+                      <p className="text-[0.72rem] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+                        Numero
+                      </p>
+                      <p className="mt-1 text-sm">{branch.branch_number ?? "No disponible"}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[0.72rem] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+                      Ubicacion
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {[branch.province, branch.canton, branch.district]
+                        .filter(Boolean)
+                        .join(", ") || "No disponible"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[0.72rem] font-medium tracking-[0.16em] text-muted-foreground uppercase">
+                      Direccion
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {branch.address ?? "No address provided."}
+                    </p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>

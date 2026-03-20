@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil, Power } from "lucide-react";
+import { Eye, Pencil, Power, RotateCcw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,19 +13,23 @@ import type { Warehouse } from "../types";
 
 type GetWarehousesColumnsParams = {
   branchNameById: Map<string, string>;
+  canDelete: boolean;
   canUpdate: boolean;
   canView: boolean;
   onDeactivate: (warehouse: Warehouse) => void;
   onEdit: (warehouse: Warehouse) => void;
+  onReactivate: (warehouse: Warehouse) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 function getWarehousesColumns({
   branchNameById,
+  canDelete,
   canUpdate,
   canView,
   onDeactivate,
   onEdit,
+  onReactivate,
   t,
 }: GetWarehousesColumnsParams): ColumnDef<Warehouse>[] {
   const baseColumns: ColumnDef<Warehouse>[] = [
@@ -89,21 +93,34 @@ function getWarehousesColumns({
               {t("inventory.common.view")}
             </Link>
           </Button>
-          {canUpdate ? (
+          {canUpdate || canDelete ? (
             <TableRowActions
               actions={[
-                {
-                  label: t("inventory.common.edit"),
-                  icon: Pencil,
-                  onClick: () => onEdit(row.original),
-                },
-                ...(row.original.is_active
+                ...(canUpdate
+                  ? [
+                      {
+                        label: t("inventory.common.edit"),
+                        icon: Pencil,
+                        onClick: () => onEdit(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canDelete && row.original.lifecycle.can_deactivate
                   ? [
                       {
                         label: t("inventory.common.deactivate"),
                         icon: Power,
                         variant: "destructive" as const,
                         onClick: () => onDeactivate(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canUpdate && row.original.lifecycle.can_reactivate
+                  ? [
+                      {
+                        label: t("inventory.common.reactivate"),
+                        icon: RotateCcw,
+                        onClick: () => onReactivate(row.original),
                       },
                     ]
                   : []),

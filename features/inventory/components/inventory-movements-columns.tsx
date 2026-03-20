@@ -8,22 +8,22 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryMovementRoute } from "@/shared/lib/routes";
 
-import type { InventoryMovementRow } from "../types";
+import type { InventoryMovementHeader } from "../types";
 
 type GetInventoryMovementsColumnsParams = {
-  canAdjust: boolean;
+  canCancel: boolean;
   canView: boolean;
-  onCancel: (movement: InventoryMovementRow) => void;
+  onCancel: (movement: InventoryMovementHeader) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 export function getInventoryMovementsColumns({
-  canAdjust,
+  canCancel,
   canView,
   onCancel,
   t,
-}: GetInventoryMovementsColumnsParams): ColumnDef<InventoryMovementRow>[] {
-  const baseColumns: ColumnDef<InventoryMovementRow>[] = [
+}: GetInventoryMovementsColumnsParams): ColumnDef<InventoryMovementHeader>[] {
+  const baseColumns: ColumnDef<InventoryMovementHeader>[] = [
     {
       accessorKey: "code",
       header: t("inventory.entity.inventory_movement"),
@@ -38,9 +38,7 @@ export function getInventoryMovementsColumns({
             ) : null}
           </div>
           <p className="text-sm text-muted-foreground">
-            {row.original.header_id
-              ? `${t("inventory.form.header_id")}: ${row.original.header_id}`
-              : `${t("inventory.common.code")}: ${row.original.id}`}
+            {row.original.notes ?? t("inventory.common.no_notes")}
           </p>
         </div>
       ),
@@ -54,30 +52,33 @@ export function getInventoryMovementsColumns({
           : t("inventory.common.not_available"),
     },
     {
-      accessorKey: "warehouse",
-      header: t("inventory.entity.warehouse"),
-      cell: ({ row }) => row.original.warehouse.name,
+      accessorKey: "branch",
+      header: t("inventory.form.branch"),
+      cell: ({ row }) =>
+        row.original.branch?.name ??
+        row.original.branch?.business_name ??
+        t("inventory.common.not_available"),
     },
     {
-      accessorKey: "product",
-      header: t("inventory.form.product"),
+      accessorKey: "line_count",
+      header: t("inventory.detail.line_items"),
       cell: ({ row }) => (
         <div className="space-y-1 text-sm">
-          <p>{row.original.product.name}</p>
-          <p className="text-muted-foreground">
-            {row.original.product_variant?.sku ?? t("inventory.common.not_available")}
-          </p>
+          <p>{row.original.line_count ?? row.original.lines.length}</p>
+          <p className="text-muted-foreground">{row.original.lines[0]?.warehouse.name ?? t("inventory.common.not_available")}</p>
         </div>
       ),
     },
     {
-      accessorKey: "quantity",
-      header: t("inventory.form.quantity"),
+      accessorKey: "lines",
+      header: t("inventory.form.product"),
       cell: ({ row }) => (
         <div className="space-y-1 text-sm">
-          <p>{row.original.quantity ?? 0}</p>
+          <p>{row.original.lines[0]?.product.name ?? t("inventory.common.not_available")}</p>
           <p className="text-muted-foreground">
-            {t("inventory.form.on_hand_delta")}: {row.original.on_hand_delta ?? 0}
+            {row.original.lines[0]?.product_variant?.variant_name ??
+              row.original.lines[0]?.product_variant?.sku ??
+              t("inventory.detail.default_variant")}
           </p>
         </div>
       ),
@@ -89,26 +90,20 @@ export function getInventoryMovementsColumns({
     },
   ];
 
-  if (canAdjust || canView) {
+  if (canCancel || canView) {
     baseColumns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => {
-        const isPrimaryLine = !row.original.line_no || row.original.line_no === 1;
-
-        if (!isPrimaryLine || !row.original.header_id) {
-          return null;
-        }
-
         return (
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline">
-              <Link href={getInventoryMovementRoute(row.original.header_id)}>
+              <Link href={getInventoryMovementRoute(row.original.id)}>
                 <Eye className="size-4" />
                 {t("inventory.common.view")}
               </Link>
             </Button>
-            {canAdjust && row.original.status === "posted" ? (
+            {canCancel && row.original.status === "posted" ? (
               <Button
                 onClick={() => onCancel(row.original)}
                 size="sm"

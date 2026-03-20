@@ -15,7 +15,7 @@ import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { updateContactSchema } from "../schemas";
@@ -121,7 +121,10 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
         {contactQuery.isLoading ? <LoadingState description="Loading contact details." /> : null}
         {contactQuery.isError ? (
           <ErrorState
-            description={getBackendErrorMessage(contactQuery.error, t("common.load_failed"))}
+            description={getTranslatedBackendErrorMessage(contactQuery.error, {
+              fallbackMessage: t("common.load_failed"),
+              translateMessage: t,
+            }) ?? undefined}
             onRetry={() => contactQuery.refetch()}
           />
         ) : null}

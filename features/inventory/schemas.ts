@@ -12,10 +12,11 @@ import {
   inventoryAdjustmentTypeValues,
   inventoryMovementStatusValues,
   ledgerInventoryMovementHeaderTypeValues,
-  legacyInventoryMovementTypeValues,
   priceListKindValues,
   productTypeValues,
   promotionTypeValues,
+  serialEventTypeValues,
+  serialStatusValues,
   taxProfileItemKindValues,
   taxTypeValues,
   warehousePurposeValues,
@@ -28,6 +29,18 @@ const nullableIdSchema = z
   .transform((value) => (value == null ? null : String(value)));
 
 const optionalTextSchema = optionalTrimmedString(z.string());
+const nullableOptionalTextSchema = z.preprocess((value) => {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
+}, z.union([z.string(), z.null()]).optional());
 const optionalDateTimeSchema = optionalTrimmedString(z.string());
 const optionalDateSchema = optionalTrimmedString(z.string());
 
@@ -94,10 +107,11 @@ const productTypeSchema = z.enum(productTypeValues);
 const priceListKindSchema = z.enum(priceListKindValues);
 const promotionTypeSchema = z.enum(promotionTypeValues);
 const warehousePurposeSchema = z.enum(warehousePurposeValues);
-const legacyInventoryMovementTypeSchema = z.enum(legacyInventoryMovementTypeValues);
 const inventoryAdjustmentTypeSchema = z.enum(inventoryAdjustmentTypeValues);
 const ledgerInventoryMovementHeaderTypeSchema = z.enum(ledgerInventoryMovementHeaderTypeValues);
 const inventoryMovementStatusSchema = z.enum(inventoryMovementStatusValues);
+const serialStatusSchema = z.enum(serialStatusValues);
+const serialEventTypeSchema = z.enum(serialEventTypeValues);
 
 const inventoryEntitySummarySchema = z
   .object({
@@ -148,8 +162,10 @@ const productVariantSummarySchema = z
   .object({
     barcode: z.string().nullable().optional().catch(undefined),
     id: idSchema,
+    is_active: z.boolean().optional().default(true),
     is_default: z.boolean().optional().default(false),
     sku: z.string().nullable().optional().catch(undefined),
+    track_serials: z.boolean().optional().default(false),
     variant_name: z.string().optional().catch(undefined),
   })
   .passthrough();
@@ -176,6 +192,20 @@ const inventoryLotSummarySchema = z
   })
   .passthrough();
 
+const lifecycleSchema = z
+  .object({
+    can_deactivate: z.boolean().optional().default(false),
+    can_delete: z.boolean().optional().default(false),
+    can_reactivate: z.boolean().optional().default(false),
+    reasons: z.array(z.string()).optional().default([]),
+  })
+  .passthrough();
+
+const lifecycleFieldSchema = z.preprocess(
+  (value) => (value == null ? {} : value),
+  lifecycleSchema,
+);
+
 export const brandSchema = z
   .object({
     business_id: idSchema.optional().catch(undefined),
@@ -184,6 +214,7 @@ export const brandSchema = z
     description: z.string().nullable().optional().catch(undefined),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Brand"),
     updated_at: z.string().optional(),
   })
@@ -196,6 +227,7 @@ export const measurementUnitSchema = z
     created_at: z.string().optional(),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Measurement unit"),
     symbol: z.string().catch(""),
     updated_at: z.string().optional(),
@@ -211,6 +243,7 @@ const productCategoryBaseSchema = z
     id: idSchema,
     is_active: z.boolean().optional().default(true),
     level: z.coerce.number().optional().catch(undefined),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Category"),
     parent_id: nullableIdSchema.default(null),
     path: z.string().optional().catch(undefined),
@@ -242,6 +275,7 @@ export const taxProfileSchema = z
     item_kind: taxProfileItemKindSchema.optional().catch(undefined),
     iva_rate: z.coerce.number().optional().catch(undefined),
     iva_rate_code: z.string().nullable().optional().catch(undefined),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Tax profile"),
     requires_cabys: z.boolean().optional().default(false),
     specific_tax_name: z.string().nullable().optional().catch(undefined),
@@ -261,6 +295,7 @@ export const warrantyProfileSchema = z
     duration_value: z.coerce.number().optional().catch(undefined),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Warranty profile"),
     updated_at: z.string().optional(),
   })
@@ -280,6 +315,7 @@ export const productSchema = z
     has_warranty: z.boolean().optional().default(false),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Product"),
     sale_unit: measurementUnitSummarySchema.nullable().optional().catch(undefined),
     sku: z.string().nullable().optional().catch(undefined),
@@ -288,8 +324,10 @@ export const productSchema = z
     track_expiration: z.boolean().optional().default(false),
     track_inventory: z.boolean().optional().default(false),
     track_lots: z.boolean().optional().default(false),
+    track_serials: z.boolean().optional().default(false),
     type: productTypeSchema.optional().catch(undefined),
     updated_at: z.string().optional(),
+    variants: z.array(productVariantSummarySchema).optional().default([]),
     warranty_profile: inventoryEntitySummarySchema.nullable().optional().catch(undefined),
   })
   .passthrough();
@@ -304,8 +342,39 @@ export const priceListSchema = z
     is_active: z.boolean().optional().default(true),
     is_default: z.boolean().optional().default(false),
     kind: priceListKindSchema.optional().catch(undefined),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Price list"),
     updated_at: z.string().optional(),
+  })
+  .passthrough();
+
+export const priceListBranchAssignmentSchema = z
+  .object({
+    branch: branchSummarySchema,
+    business_id: idSchema.optional().catch(undefined),
+    created_at: z.string().optional(),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    is_default: z.boolean().optional().default(false),
+    lifecycle: lifecycleFieldSchema,
+    notes: z.string().nullable().optional().catch(undefined),
+    price_list: priceListSummarySchema.nullable().optional().catch(undefined),
+    updated_at: z.string().optional(),
+  })
+  .passthrough();
+
+export const priceListBranchAssignmentsResponseSchema = z
+  .object({
+    assignments: z.array(priceListBranchAssignmentSchema).optional().default([]),
+    price_list_id: idSchema,
+  })
+  .passthrough();
+
+export const branchPriceListsResponseSchema = z
+  .object({
+    assignments: z.array(priceListBranchAssignmentSchema).optional().default([]),
+    branch_id: idSchema,
+    default_price_list_id: nullableIdSchema.default(null),
   })
   .passthrough();
 
@@ -315,9 +384,10 @@ export const productPriceSchema = z
     created_at: z.string().optional(),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     min_quantity: z.coerce.number().optional().catch(undefined),
     price: z.coerce.number().optional().catch(undefined),
-    price_list: priceListSummarySchema,
+    price_list: priceListSummarySchema.nullable().optional().catch(undefined),
     product_id: idSchema.optional().catch(undefined),
     product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
     updated_at: z.string().optional(),
@@ -334,6 +404,7 @@ export const promotionItemSchema = z
     min_quantity: z.coerce.number().nullable().optional().catch(undefined),
     override_price: z.coerce.number().nullable().optional().catch(undefined),
     product: inventoryEntitySummarySchema,
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
   })
   .passthrough();
 
@@ -345,6 +416,7 @@ export const promotionSchema = z
     id: idSchema,
     is_active: z.boolean().optional().default(true),
     items: z.array(promotionItemSchema).optional().default([]),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Promotion"),
     type: promotionTypeSchema.optional().catch(undefined),
     updated_at: z.string().optional(),
@@ -363,6 +435,7 @@ export const warehouseSchema = z
     id: idSchema,
     is_active: z.boolean().optional().default(true),
     is_default: z.boolean().optional().default(false),
+    lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Warehouse"),
     purpose: warehousePurposeSchema.optional().catch(undefined),
     updated_at: z.string().optional(),
@@ -384,6 +457,7 @@ export const warehouseLocationSchema = z
     is_dispatch_area: z.boolean().optional().default(false),
     is_picking_area: z.boolean().optional().default(false),
     is_receiving_area: z.boolean().optional().default(false),
+    lifecycle: lifecycleFieldSchema,
     level: z.string().nullable().optional().catch(undefined),
     name: z.string().catch("Warehouse location"),
     position: z.string().nullable().optional().catch(undefined),
@@ -405,7 +479,7 @@ export const warehouseStockRowSchema = z
     min_stock: z.coerce.number().nullable().optional().catch(undefined),
     outgoing_quantity: z.coerce.number().optional().catch(undefined),
     product: inventoryEntityWithTypeSummarySchema,
-    product_variant: productVariantSummarySchema,
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
     projected_quantity: z.coerce.number().optional().catch(undefined),
     quantity: z.coerce.number().optional().catch(undefined),
     reserved_quantity: z.coerce.number().optional().catch(undefined),
@@ -425,6 +499,7 @@ export const inventoryLotSchema = z
     id: idSchema,
     initial_quantity: z.coerce.number().optional().catch(undefined),
     is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
     location: warehouseLocationSummarySchema.nullable().optional().catch(undefined),
     lot_number: z.string().catch(""),
     manufacturing_date: z.string().nullable().optional().catch(undefined),
@@ -438,92 +513,95 @@ export const inventoryLotSchema = z
   })
   .passthrough();
 
-export const inventoryMovementRowSchema = z
+export const inventoryMovementLineSchema = z
+  .object({
+    created_at: z.string().optional(),
+    id: idSchema,
+    incoming_delta: z.coerce.number().optional().catch(undefined),
+    inventory_lot: inventoryLotSummarySchema.nullable().optional().catch(undefined),
+    line_no: z.coerce.number().optional().catch(undefined),
+    linked_line_id: nullableIdSchema.default(null),
+    location: warehouseLocationSummarySchema.nullable().optional().catch(undefined),
+    on_hand_delta: z.coerce.number().optional().catch(undefined),
+    outgoing_delta: z.coerce.number().optional().catch(undefined),
+    product: inventoryEntityWithTypeSummarySchema,
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
+    quantity: z.coerce.number().optional().catch(undefined),
+    reserved_delta: z.coerce.number().optional().catch(undefined),
+    total_cost: z.coerce.number().nullable().optional().catch(undefined),
+    unit_cost: z.coerce.number().nullable().optional().catch(undefined),
+    updated_at: z.string().optional(),
+    warehouse: warehouseSummarySchema,
+  })
+  .passthrough();
+
+const promotionSummarySchema = z
+  .object({
+    code: z.string().optional().catch(undefined),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    name: z.string().catch("Promotion"),
+    type: promotionTypeSchema.optional().catch(undefined),
+    valid_from: z.string().nullable().optional().catch(undefined),
+    valid_to: z.string().nullable().optional().catch(undefined),
+  })
+  .passthrough();
+
+export const promotionBranchAssignmentSchema = z
+  .object({
+    branch: branchSummarySchema,
+    business_id: idSchema.optional().catch(undefined),
+    created_at: z.string().optional(),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
+    notes: z.string().nullable().optional().catch(undefined),
+    promotion: promotionSummarySchema.nullable().optional().catch(undefined),
+    updated_at: z.string().optional(),
+  })
+  .passthrough();
+
+export const promotionBranchAssignmentsResponseSchema = z
+  .object({
+    assignments: z.array(promotionBranchAssignmentSchema).optional().default([]),
+    promotion_id: idSchema,
+  })
+  .passthrough();
+
+export const branchPromotionsResponseSchema = z
+  .object({
+    assignments: z.array(promotionBranchAssignmentSchema).optional().default([]),
+    branch_id: idSchema,
+  })
+  .passthrough();
+
+export const inventoryMovementHeaderSchema = z
   .object({
     branch: branchSummarySchema.nullable().optional().catch(undefined),
     branch_id: idSchema.optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
-    created_by: userSummarySchema.nullable().optional().catch(undefined),
-    header_id: idSchema.optional().catch(undefined),
-    id: idSchema,
-    incoming_delta: z.coerce.number().optional().catch(undefined),
-    inventory_lot: inventoryLotSummarySchema.nullable().optional().catch(undefined),
-    line_no: z.coerce.number().optional().catch(undefined),
-    linked_line_id: nullableIdSchema.default(null),
-    movement_type: ledgerInventoryMovementHeaderTypeSchema.optional().catch(undefined),
-    new_quantity: z.coerce.number().nullable().optional().catch(undefined),
-    notes: z.string().nullable().optional().catch(undefined),
-    occurred_at: z.string().optional(),
-    on_hand_delta: z.coerce.number().optional().catch(undefined),
-    outgoing_delta: z.coerce.number().optional().catch(undefined),
-    previous_quantity: z.coerce.number().nullable().optional().catch(undefined),
-    product: inventoryEntityWithTypeSummarySchema,
-    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
-    quantity: z.coerce.number().optional().catch(undefined),
-    reference_id: nullableIdSchema.default(null),
-    reference_number: z.string().nullable().optional().catch(undefined),
-    reference_type: z.string().nullable().optional().catch(undefined),
-    reserved_delta: z.coerce.number().optional().catch(undefined),
-    status: inventoryMovementStatusSchema.optional().catch(undefined),
-    total_cost: z.coerce.number().nullable().optional().catch(undefined),
-    unit_cost: z.coerce.number().nullable().optional().catch(undefined),
-    warehouse: warehouseSummarySchema,
-  })
-  .passthrough();
-
-export const inventoryAdjustmentResponseSchema = z
-  .object({
-    branch_id: idSchema.optional().catch(undefined),
-    business_id: idSchema.optional().catch(undefined),
-    code: z.string().optional().catch(undefined),
-    created_at: z.string().optional(),
-    created_by: userSummarySchema.nullable().optional().catch(undefined),
-    id: idSchema,
-    inventory_lot: inventoryLotSummarySchema.nullable().optional().catch(undefined),
-    location: warehouseLocationSummarySchema.nullable().optional().catch(undefined),
-    movement_type: legacyInventoryMovementTypeSchema.optional().catch(undefined),
-    new_quantity: z.coerce.number().nullable().optional().catch(undefined),
-    notes: z.string().nullable().optional().catch(undefined),
-    previous_quantity: z.coerce.number().nullable().optional().catch(undefined),
-    product: inventoryEntitySummarySchema,
-    quantity: z.coerce.number().optional().catch(undefined),
-    reference_id: nullableIdSchema.default(null),
-    reference_type: z.string().nullable().optional().catch(undefined),
-    warehouse: warehouseSummarySchema,
-  })
-  .passthrough();
-
-const inventoryTransferLineSchema = z
-  .object({
-    header_id: idSchema.optional().catch(undefined),
-    id: idSchema,
-    line_no: z.coerce.number().optional().catch(undefined),
-    linked_line_id: nullableIdSchema.default(null),
-    on_hand_delta: z.coerce.number().optional().catch(undefined),
-    product_variant_id: idSchema.optional().catch(undefined),
-    quantity: z.coerce.number().optional().catch(undefined),
-    total_cost: z.coerce.number().nullable().optional().catch(undefined),
-    unit_cost: z.coerce.number().nullable().optional().catch(undefined),
-    warehouse_id: idSchema.optional().catch(undefined),
-  })
-  .passthrough();
-
-export const inventoryTransferResponseSchema = z
-  .object({
-    branch_id: idSchema.optional().catch(undefined),
-    business_id: idSchema.optional().catch(undefined),
-    code: z.string().optional().catch(undefined),
     id: idSchema,
     legacy_movement_ids: z.array(idSchema).optional().default([]),
-    lines: z.array(inventoryTransferLineSchema).optional().default([]),
+    legacy_movements: z.array(z.unknown()).optional().default([]),
+    line_count: z.coerce.number().optional().catch(undefined),
+    lines: z.array(inventoryMovementLineSchema).optional().default([]),
     movement_type: ledgerInventoryMovementHeaderTypeSchema.optional().catch(undefined),
     notes: z.string().nullable().optional().catch(undefined),
     occurred_at: z.string().optional(),
+    performed_by: userSummarySchema.nullable().optional().catch(undefined),
+    source_document_id: nullableIdSchema.default(null),
+    source_document_number: z.string().nullable().optional().catch(undefined),
+    source_document_type: z.string().nullable().optional().catch(undefined),
     status: inventoryMovementStatusSchema.optional().catch(undefined),
+    transferred_serial_ids: z.array(idSchema).optional().default([]),
+    updated_at: z.string().optional(),
   })
   .passthrough();
+
+export const inventoryAdjustmentResponseSchema = inventoryMovementHeaderSchema;
+export const inventoryTransferResponseSchema = inventoryMovementHeaderSchema;
 
 const inventoryCancellationLineSchema = z
   .object({
@@ -569,6 +647,57 @@ export const inventoryMovementCancellationResponseSchema = z
     success: z.boolean(),
   })
   .passthrough();
+
+export const hardDeleteResponseSchema = z
+  .object({
+    id: idSchema,
+  })
+  .passthrough();
+
+export const productSerialSchema = z
+  .object({
+    business_id: idSchema.optional().catch(undefined),
+    created_at: z.string().optional(),
+    id: idSchema,
+    notes: z.string().nullable().optional().catch(undefined),
+    product_variant: productVariantSummarySchema.nullable().optional().catch(undefined),
+    product_variant_id: idSchema.optional().catch(undefined),
+    received_at: z.string().nullable().optional().catch(undefined),
+    serial_number: z.string().catch(""),
+    sold_at: z.string().nullable().optional().catch(undefined),
+    status: serialStatusSchema,
+    updated_at: z.string().optional(),
+    warehouse: warehouseSummarySchema.nullable().optional().catch(undefined),
+  })
+  .passthrough();
+
+export const serialEventSchema = z
+  .object({
+    contact_id: nullableIdSchema.default(null),
+    created_at: z.string().optional(),
+    event_type: serialEventTypeSchema,
+    from_warehouse: warehouseSummarySchema.nullable().optional().catch(undefined),
+    id: idSchema,
+    movement_header_id: nullableIdSchema.default(null),
+    notes: z.string().nullable().optional().catch(undefined),
+    occurred_at: z.string().optional(),
+    performed_by_user_id: nullableIdSchema.default(null),
+    serial_id: idSchema,
+    to_warehouse: warehouseSummarySchema.nullable().optional().catch(undefined),
+  })
+  .passthrough();
+
+export const createProductSerialsSchema = z.object({
+  serial_numbers: z
+    .array(requiredTrimmedString("Serial number is required."))
+    .min(1, "At least one serial number is required."),
+  warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid warehouse."),
+});
+
+export const updateProductSerialStatusSchema = z.object({
+  notes: optionalTextSchema,
+  status: serialStatusSchema,
+});
 
 export const createBrandSchema = z.object({
   code: makeOptionalCodeSchema("MK"),
@@ -701,6 +830,7 @@ const productFormObjectSchema = z.object({
   track_expiration: z.boolean().default(false),
   track_inventory: z.boolean().default(false),
   track_lots: z.boolean().default(false),
+  track_serials: z.boolean().default(false),
   type: productTypeSchema,
   warranty_profile_id: makeOptionalIdSchema("Select a valid warranty profile."),
 });
@@ -726,6 +856,14 @@ function applyProductRules(
       code: z.ZodIssueCode.custom,
       message: "Expiration tracking requires lot tracking.",
       path: ["track_expiration"],
+    });
+  }
+
+  if (values.track_serials && !values.track_inventory) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Serial tracking requires inventory tracking.",
+      path: ["track_serials"],
     });
   }
 
@@ -772,6 +910,24 @@ export const updatePriceListSchema = createPriceListSchema.partial().extend({
   is_default: z.boolean().optional(),
 });
 
+export const createPriceListBranchAssignmentSchema = z.object({
+  branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
+  is_active: z.boolean().default(true),
+  is_default: z.boolean().default(false),
+  notes: optionalTextSchema,
+});
+
+export const updatePriceListBranchAssignmentSchema = createPriceListBranchAssignmentSchema
+  .omit({
+    branch_id: true,
+  })
+  .partial()
+  .extend({
+    is_active: z.boolean().optional(),
+    is_default: z.boolean().optional(),
+    notes: nullableOptionalTextSchema,
+  });
+
 const productPriceFormObjectSchema = z.object({
   is_active: z.boolean().default(true),
   min_quantity: optionalNumberSchema(z.coerce.number().min(0, "Minimum quantity must be at least 0.")),
@@ -804,7 +960,8 @@ const promotionItemFormSchema = z.object({
   discount_value: optionalNumberSchema(z.coerce.number().min(0, "Discount value must be at least 0.")),
   min_quantity: optionalNumberSchema(z.coerce.number().min(0, "Minimum quantity must be at least 0.")),
   override_price: optionalNumberSchema(z.coerce.number().min(0, "Override price must be at least 0.")),
-  product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_id: makeOptionalIdSchema("Select a valid product."),
+  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
 });
 
 const promotionFormObjectSchema = z.object({
@@ -823,18 +980,28 @@ function applyPromotionRules(
 ) {
   refineProductPriceDateRange(values as Record<string, unknown>, ctx);
 
-  const productIds = new Set<string>();
+  const itemKeys = new Set<string>();
 
   values.items?.forEach((item, index) => {
-    if (productIds.has(item.product_id)) {
+    const itemKey = `${item.product_id ?? ""}:${item.product_variant_id ?? ""}`;
+
+    if (!item.product_id && !item.product_variant_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Product cannot repeat inside the same promotion.",
+        message: "Product or variant is required.",
         path: ["items", index, "product_id"],
       });
     }
 
-    productIds.add(item.product_id);
+    if (itemKeys.has(itemKey)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Product or variant cannot repeat inside the same promotion.",
+        path: ["items", index, "product_variant_id"],
+      });
+    }
+
+    itemKeys.add(itemKey);
 
     if (
       (values.type === "percentage" || values.type === "fixed_amount") &&
@@ -886,6 +1053,22 @@ export const updatePromotionSchema = promotionFormObjectSchema
     valid_to: optionalDateTimeSchema,
   })
   .superRefine(applyPromotionRules);
+
+export const createPromotionBranchAssignmentSchema = z.object({
+  branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
+  is_active: z.boolean().default(true),
+  notes: optionalTextSchema,
+});
+
+export const updatePromotionBranchAssignmentSchema = createPromotionBranchAssignmentSchema
+  .omit({
+    branch_id: true,
+  })
+  .partial()
+  .extend({
+    is_active: z.boolean().optional(),
+    notes: nullableOptionalTextSchema,
+  });
 
 export const createWarehouseSchema = z.object({
   branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
@@ -940,7 +1123,7 @@ const inventoryLotCreateFormObjectSchema = z.object({
   location_id: makeOptionalIdSchema("Select a valid warehouse location."),
   lot_number: requiredTrimmedString("Lot number must contain at least 2 characters.", 2),
   manufacturing_date: optionalDateSchema,
-  product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_id: makeOptionalIdSchema("Select a valid product."),
   product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   received_at: optionalDateTimeSchema,
   supplier_contact_id: makeOptionalIdSchema("Select a valid supplier contact."),
@@ -949,7 +1132,17 @@ const inventoryLotCreateFormObjectSchema = z.object({
 });
 
 export const createInventoryLotSchema = inventoryLotCreateFormObjectSchema.superRefine(
-  inventoryLotDateRangeRefiner,
+  (values, ctx) => {
+    inventoryLotDateRangeRefiner(values, ctx);
+
+    if (!values.product_id && !values.product_variant_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Product or variant is required.",
+        path: ["product_id"],
+      });
+    }
+  },
 );
 
 const inventoryLotUpdateFormObjectSchema = z.object({
@@ -976,7 +1169,7 @@ export const createInventoryAdjustmentSchema = z.object({
   location_id: makeOptionalIdSchema("Select a valid warehouse location."),
   movement_type: inventoryAdjustmentTypeSchema,
   notes: optionalTextSchema,
-  product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_id: makeOptionalIdSchema("Select a valid product."),
   product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
   reference_id: optionalNumberSchema(
@@ -984,6 +1177,14 @@ export const createInventoryAdjustmentSchema = z.object({
   ),
   reference_type: optionalTextSchema,
   warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid warehouse."),
+}).superRefine((values, ctx) => {
+  if (!values.product_id && !values.product_variant_id) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Product or variant is required.",
+      path: ["product_id"],
+    });
+  }
 });
 
 const inventoryTransferFormObjectSchema = z.object({
@@ -991,20 +1192,32 @@ const inventoryTransferFormObjectSchema = z.object({
     positiveIntegerPattern,
     "Select a valid destination warehouse.",
   ),
+  destination_location_id: makeOptionalIdSchema("Select a valid destination warehouse location."),
+  inventory_lot_id: makeOptionalIdSchema("Select a valid inventory lot."),
   notes: optionalTextSchema,
+  origin_location_id: makeOptionalIdSchema("Select a valid origin warehouse location."),
   origin_warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid origin warehouse."),
-  product_id: z.string().regex(positiveIntegerPattern, "Select a valid product."),
+  product_id: makeOptionalIdSchema("Select a valid product."),
   product_variant_id: makeOptionalIdSchema("Select a valid variant."),
   quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
   reference_id: optionalNumberSchema(
     z.coerce.number().int().positive("Reference id must be a positive integer."),
   ),
   reference_type: optionalTextSchema,
+  serial_ids: z.array(z.coerce.number().int().positive()).optional().default([]),
   unit_cost: optionalNumberSchema(z.coerce.number().min(0, "Unit cost must be at least 0.")),
 });
 
 export const createInventoryTransferSchema = inventoryTransferFormObjectSchema.superRefine(
   (values, ctx) => {
+    if (!values.product_id && !values.product_variant_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Product or variant is required.",
+        path: ["product_id"],
+      });
+    }
+
     if (values.origin_warehouse_id === values.destination_warehouse_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -1039,6 +1252,7 @@ export const productVariantSchema = z
     id: idSchema,
     is_active: z.boolean().optional().default(true),
     is_default: z.boolean().optional().default(false),
+    lifecycle: lifecycleFieldSchema,
     product_id: idSchema.optional().catch(undefined),
     sale_unit_measure: measurementUnitSummarySchema.nullable().optional().catch(undefined),
     sku: z.string().catch(""),

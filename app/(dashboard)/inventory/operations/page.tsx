@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, Boxes, PackageSearch, ScrollText, Warehouse } from "lucide-react";
+import { Boxes, PackageSearch, ScrollText, Warehouse } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorState } from "@/shared/components/error-state";
+import { ModuleEntryCard } from "@/shared/components/module-entry-card";
 import { PageHeader } from "@/shared/components/page-header";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -64,31 +62,16 @@ export default function InventoryOperationsPage() {
       <div className="grid gap-4 xl:grid-cols-3">
         {operationCards
           .filter((card) => canAny([...card.permissions]))
-          .map((card) => {
-          const Icon = card.icon;
-
-          return (
-            <Card key={card.href} className="border-border/70 bg-card/95">
-              <CardHeader className="space-y-3">
-                <div className="rounded-2xl border border-primary/20 bg-primary/8 p-3 text-primary">
-                  <Icon className="size-5" />
-                </div>
-                <div className="space-y-1">
-                  <CardTitle>{t(card.titleKey)}</CardTitle>
-                  <CardDescription>{t(card.descriptionKey)}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full" variant="outline">
-                  <Link href={card.href}>
-                    {t("inventory.operations.open_view")}
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+          .map((card) => (
+            <ModuleEntryCard
+              key={card.href}
+              ctaLabel={t("inventory.operations.open_view")}
+              description={t(card.descriptionKey)}
+              href={card.href}
+              icon={card.icon}
+              title={t(card.titleKey)}
+            />
+          ))}
       </div>
 
       <div className="rounded-2xl border border-dashed border-border/70 bg-muted/30 p-5 text-sm text-muted-foreground">

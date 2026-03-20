@@ -1,7 +1,11 @@
 import type { FieldPath, FieldValues, UseFormSetError } from "react-hook-form";
 
+import type { TranslationValues } from "@/shared/i18n/translator";
+import type { FrontendTranslationKey } from "@/shared/i18n/translations";
+
 import type { BackendError } from "./api-error";
 import { getBackendFieldErrors, parseBackendError } from "./backend-error-parser";
+import { resolveTranslatedBackendMessage } from "./error-presentation";
 
 export type BackendFieldNameMap<TFieldValues extends FieldValues> = Partial<
   Record<string, FieldPath<TFieldValues>>
@@ -10,6 +14,10 @@ export type BackendFieldNameMap<TFieldValues extends FieldValues> = Partial<
 export type ApplyBackendErrorsToFormOptions<TFieldValues extends FieldValues> = {
   fallbackMessage?: string;
   fieldNameMap?: BackendFieldNameMap<TFieldValues>;
+  translateMessage?: (
+    key: FrontendTranslationKey,
+    values?: TranslationValues,
+  ) => string;
 };
 
 export type ApplyBackendErrorsToFormResult = {
@@ -42,7 +50,18 @@ export function applyBackendErrorsToForm<TFieldValues extends FieldValues>(
     }
 
     setError(fieldName, {
-      message: fieldError.message,
+      message:
+        resolveTranslatedBackendMessage(
+          {
+            code: fieldError.code ?? "VALIDATION_ERROR",
+            message: fieldError.message,
+            messageKey: fieldError.messageKey,
+          },
+          {
+            fallbackMessage: fieldError.message,
+            translateMessage: options.translateMessage,
+          },
+        ) ?? fieldError.message,
       type: "server",
     });
     appliedFieldErrors.add(String(fieldName));

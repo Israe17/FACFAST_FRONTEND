@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
@@ -27,9 +27,15 @@ import { buildFormResolver } from "@/shared/lib/form-resolver";
 import { APP_ROUTES } from "@/shared/lib/routes";
 import { formatDateTime } from "@/shared/lib/utils";
 
-import { useCancelInventoryMovementMutation, useInventoryMovementsQuery } from "../queries";
+import {
+  useCancelInventoryMovementMutation,
+  useInventoryMovementQuery,
+} from "../queries";
 import { cancelInventoryMovementSchema } from "../schemas";
-import type { CancelInventoryMovementInput, InventoryMovementRow } from "../types";
+import type {
+  CancelInventoryMovementInput,
+  InventoryMovementLine,
+} from "../types";
 import { useInventoryModule } from "../use-inventory-module";
 import { InventoryDetailBlock } from "./inventory-detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -43,8 +49,10 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
   const { canRunTenantQueries } = useInventoryModule();
   const { can } = usePermissions();
   const canViewMovements = can("inventory_movements.view");
+  const canCancelMovement = can("inventory_movements.cancel");
   const [cancelOpen, setCancelOpen] = useState(false);
-  const movementsQuery = useInventoryMovementsQuery(
+  const movementQuery = useInventoryMovementQuery(
+    headerId,
     canRunTenantQueries && canViewMovements,
   );
   const cancelMutation = useCancelInventoryMovementMutation(headerId, { showErrorToast: false });
@@ -55,6 +63,12 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(cancelForm);
 
+  const movement = movementQuery.data;
+  const lines = useMemo(
+    () => [...(movement?.lines ?? [])].sort((a, b) => (a.line_no ?? 0) - (b.line_no ?? 0)),
+    [movement?.lines],
+  );
+
   if (!canViewMovements) {
     return (
       <ErrorState
@@ -64,12 +78,20 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
     );
   }
 
-  const headerLines = (movementsQuery.data ?? [])
-    .filter((row) => row.header_id === headerId)
-    .sort((a, b) => (a.line_no ?? 0) - (b.line_no ?? 0));
-  const primaryLine = headerLines[0];
+  if (movementQuery.isLoading) {
+    return <LoadingState description={t("inventory.detail.loading_movement")} />;
+  }
 
-  const lineColumns: ColumnDef<InventoryMovementRow>[] = [
+  if (movementQuery.isError || !movement) {
+    return (
+      <ErrorState
+        description={t("inventory.detail.movement_not_found_description")}
+        title={t("inventory.detail.movement_not_found_title")}
+      />
+    );
+  }
+
+  const lineColumns: ColumnDef<InventoryMovementLine>[] = [
     {
       accessorKey: "line_no",
       header: t("inventory.detail.line_no"),
@@ -80,9 +102,28 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
       cell: ({ row }) => row.original.warehouse.name,
     },
     {
+      accessorKey: "location",
+      header: t("inventory.entity.warehouse_location"),
+      cell: ({ row }) => row.original.location?.name ?? t("inventory.common.not_available"),
+    },
+    {
       accessorKey: "product",
       header: t("inventory.entity.product"),
       cell: ({ row }) => row.original.product.name,
+    },
+    {
+      accessorKey: "product_variant",
+      header: t("inventory.detail.variant_label"),
+      cell: ({ row }) =>
+        row.original.product_variant?.variant_name ??
+        row.original.product_variant?.sku ??
+        t("inventory.detail.default_variant"),
+    },
+    {
+      accessorKey: "inventory_lot",
+      header: t("inventory.entity.inventory_lot"),
+      cell: ({ row }) =>
+        row.original.inventory_lot?.lot_number ?? t("inventory.common.not_available"),
     },
     {
       accessorKey: "quantity",
@@ -95,6 +136,21 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
       cell: ({ row }) => row.original.on_hand_delta ?? 0,
     },
     {
+      accessorKey: "reserved_delta",
+      header: t("inventory.form.reserved_delta"),
+      cell: ({ row }) => row.original.reserved_delta ?? 0,
+    },
+    {
+      accessorKey: "incoming_delta",
+      header: t("inventory.form.incoming_delta"),
+      cell: ({ row }) => row.original.incoming_delta ?? 0,
+    },
+    {
+      accessorKey: "outgoing_delta",
+      header: t("inventory.form.outgoing_delta"),
+      cell: ({ row }) => row.original.outgoing_delta ?? 0,
+    },
+    {
       accessorKey: "unit_cost",
       header: t("inventory.form.unit_cost"),
       cell: ({ row }) => row.original.unit_cost ?? t("inventory.common.not_available"),
@@ -104,25 +160,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
       header: t("inventory.detail.total_cost"),
       cell: ({ row }) => row.original.total_cost ?? t("inventory.common.not_available"),
     },
-    {
-      accessorKey: "linked_line_id",
-      header: t("inventory.detail.linked_line"),
-      cell: ({ row }) => row.original.linked_line_id ?? t("inventory.common.not_available"),
-    },
   ];
-
-  if (movementsQuery.isLoading) {
-    return <LoadingState description={t("inventory.detail.loading_movement")} />;
-  }
-
-  if (movementsQuery.isError || !primaryLine) {
-    return (
-      <ErrorState
-        description={t("inventory.detail.movement_not_found_description")}
-        title={t("inventory.detail.movement_not_found_title")}
-      />
-    );
-  }
 
   async function handleCancel(values: CancelInventoryMovementInput) {
     resetBackendFormErrors();
@@ -141,7 +179,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
     <div className="space-y-6">
       <InventoryEntityHeader
         actions={
-          primaryLine.status === "posted" && can("inventory_movements.adjust") ? (
+          movement.status === "posted" && canCancelMovement ? (
             <Button onClick={() => setCancelOpen(true)} variant="outline">
               {t("inventory.inventory_movements.cancel_action")}
             </Button>
@@ -151,14 +189,14 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         backLabel={t("inventory.detail.back_to_movements")}
         badges={
           <>
-            {primaryLine.status ? (
+            {movement.status ? (
               <Badge variant="outline">
-                {t(`inventory.enum.inventory_movement_status.${primaryLine.status}` as const)}
+                {t(`inventory.enum.inventory_movement_status.${movement.status}` as const)}
               </Badge>
             ) : null}
-            {primaryLine.movement_type ? (
+            {movement.movement_type ? (
               <Badge variant="outline">
-                {t(`inventory.enum.ledger_movement_type.${primaryLine.movement_type}` as const)}
+                {t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as const)}
               </Badge>
             ) : null}
           </>
@@ -167,33 +205,33 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           { href: APP_ROUTES.inventory, label: t("inventory.page_title") },
           { href: APP_ROUTES.inventoryOperations, label: t("inventory.nav.operations") },
           { href: APP_ROUTES.inventoryOperationsMovements, label: t("inventory.entity.inventory_movements") },
-          { label: primaryLine.code ?? headerId },
+          { label: movement.code ?? headerId },
         ]}
-        code={primaryLine.code}
+        code={movement.code}
         description={t("inventory.detail.movement_description")}
-        title={primaryLine.code ?? `${t("inventory.form.header_id")} ${headerId}`}
+        title={movement.code ?? `${t("inventory.form.header_id")} ${headerId}`}
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <DataCard
           description={t("inventory.detail.movement_kpi_lines")}
           title={t("inventory.detail.line_items")}
-          value={headerLines.length}
+          value={movement.line_count ?? lines.length}
         />
         <DataCard
           description={t("inventory.detail.movement_kpi_quantity")}
           title={t("inventory.form.quantity")}
-          value={headerLines.reduce((total, row) => total + (row.quantity ?? 0), 0)}
+          value={lines.reduce((total, line) => total + (line.quantity ?? 0), 0)}
         />
         <DataCard
           description={t("inventory.detail.movement_kpi_warehouses")}
           title={t("inventory.entity.warehouses")}
-          value={new Set(headerLines.map((row) => row.warehouse.id)).size}
+          value={new Set(lines.map((line) => line.warehouse.id)).size}
         />
         <DataCard
           description={t("inventory.detail.movement_kpi_date")}
           title={t("inventory.form.occurred_at")}
-          value={formatDateTime(primaryLine.occurred_at)}
+          value={formatDateTime(movement.occurred_at)}
         />
       </div>
 
@@ -206,38 +244,52 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.form.movement_type")}</dt>
               <dd className="font-medium">
-                {primaryLine.movement_type
-                  ? t(`inventory.enum.ledger_movement_type.${primaryLine.movement_type}` as const)
+                {movement.movement_type
+                  ? t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as const)
                   : t("inventory.common.not_available")}
               </dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.common.status")}</dt>
               <dd className="font-medium">
-                {primaryLine.status
-                  ? t(`inventory.enum.inventory_movement_status.${primaryLine.status}` as const)
+                {movement.status
+                  ? t(`inventory.enum.inventory_movement_status.${movement.status}` as const)
                   : t("inventory.common.not_available")}
               </dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.form.branch")}</dt>
-              <dd className="font-medium">{primaryLine.branch?.business_name ?? t("inventory.common.not_available")}</dd>
+              <dd className="font-medium">
+                {movement.branch?.name ??
+                  movement.branch?.business_name ??
+                  t("inventory.common.not_available")}
+              </dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.detail.registered_by")}</dt>
-              <dd className="font-medium">{primaryLine.created_by?.name ?? t("inventory.common.not_available")}</dd>
+              <dd className="font-medium">
+                {movement.performed_by?.name ?? t("inventory.common.not_available")}
+              </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.reference_type")}</dt>
-              <dd className="font-medium">{primaryLine.reference_type ?? t("inventory.common.not_available")}</dd>
+              <dt className="text-sm text-muted-foreground">
+                {t("inventory.detail.source_document")}
+              </dt>
+              <dd className="font-medium">
+                {movement.source_document_type ?? t("inventory.common.not_available")}
+              </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.reference_id")}</dt>
-              <dd className="font-medium">{primaryLine.reference_id ?? t("inventory.common.not_available")}</dd>
+              <dt className="text-sm text-muted-foreground">
+                {t("inventory.detail.source_document_number")}
+              </dt>
+              <dd className="font-medium">
+                {movement.source_document_number ?? t("inventory.common.not_available")}
+              </dd>
             </div>
           </dl>
           <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
-            {primaryLine.notes ?? t("inventory.common.no_notes")}
+            {movement.notes ?? t("inventory.common.no_notes")}
           </div>
         </InventoryDetailBlock>
 
@@ -245,11 +297,34 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           description={t("inventory.detail.movement_relation_block_description")}
           title={t("inventory.detail.movement_relation_block_title")}
         >
-          <div className="space-y-3 text-sm text-muted-foreground">
-            <p>{t("inventory.detail.movement_relation_note_1")}</p>
-            <p>{t("inventory.detail.movement_relation_note_2")}</p>
-            <p>{t("inventory.detail.movement_relation_note_3")}</p>
-          </div>
+          <dl className="grid gap-4 md:grid-cols-2">
+            <div>
+              <dt className="text-sm text-muted-foreground">{t("inventory.form.reference_id")}</dt>
+              <dd className="font-medium">
+                {movement.source_document_id ?? t("inventory.common.not_available")}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">
+                {t("inventory.detail.transferred_serial_ids")}
+              </dt>
+              <dd className="font-medium">
+                {movement.transferred_serial_ids.length
+                  ? movement.transferred_serial_ids.join(", ")
+                  : t("inventory.common.not_available")}
+              </dd>
+            </div>
+            <div className="md:col-span-2">
+              <dt className="text-sm text-muted-foreground">
+                {t("inventory.detail.legacy_reference")}
+              </dt>
+              <dd className="font-medium">
+                {movement.legacy_movement_ids.length
+                  ? movement.legacy_movement_ids.join(", ")
+                  : t("inventory.common.not_available")}
+              </dd>
+            </div>
+          </dl>
         </InventoryDetailBlock>
       </div>
 
@@ -260,7 +335,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         <DataTable
           enablePagination={false}
           columns={lineColumns}
-          data={headerLines}
+          data={lines}
           emptyMessage={t("inventory.detail.no_movement_lines")}
         />
       </InventoryDetailBlock>
@@ -271,7 +346,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             <DialogTitle>{t("inventory.inventory_movements.cancel_title")}</DialogTitle>
             <DialogDescription>
               {t("inventory.inventory_movements.cancel_description", {
-                code: primaryLine.code ?? headerId,
+                code: movement.code ?? headerId,
               })}
             </DialogDescription>
           </DialogHeader>

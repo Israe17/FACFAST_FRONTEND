@@ -75,21 +75,44 @@ export const serialStatusOptions = [
   { label: "Returned", value: "returned" },
 ] as const;
 
-export const inventoryViewPermissions = [
+export const inventoryCatalogViewPermissions = [
   "brands.view",
   "measurement_units.view",
   "categories.view",
   "tax_profiles.view",
   "warranty_profiles.view",
+] as const;
+
+export const inventoryProductViewPermissions = [
   "products.view",
+  "product_variants.view",
+  "variant_attributes.view",
+  "product_serials.view",
+] as const;
+
+export const inventoryPricingViewPermissions = [
   "price_lists.view",
   "product_prices.view",
   "promotions.view",
+] as const;
+
+export const inventoryWarehouseViewPermissions = [
   "warehouses.view",
   "warehouse_locations.view",
+] as const;
+
+export const inventoryOperationsViewPermissions = [
   "warehouse_stock.view",
   "inventory_lots.view",
   "inventory_movements.view",
+] as const;
+
+export const inventoryViewPermissions = [
+  ...inventoryCatalogViewPermissions,
+  ...inventoryProductViewPermissions,
+  ...inventoryPricingViewPermissions,
+  ...inventoryWarehouseViewPermissions,
+  ...inventoryOperationsViewPermissions,
 ] as const;
 
 export const taxProfileItemKindOptions = [

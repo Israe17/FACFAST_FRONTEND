@@ -20,7 +20,12 @@ import {
   useWarehouseQuery,
   useWarehouseStockByWarehouseQuery,
 } from "../queries";
-import type { InventoryLot, InventoryMovementRow, WarehouseLocation, WarehouseStockRow } from "../types";
+import type {
+  InventoryLot,
+  InventoryMovementHeader,
+  WarehouseLocation,
+  WarehouseStockRow,
+} from "../types";
 import { useInventoryModule } from "../use-inventory-module";
 import { InventoryDetailBlock } from "./inventory-detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -76,7 +81,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
   const stockRows = stockQuery.data ?? [];
   const lots = (lotsQuery.data ?? []).filter((lot) => lot.warehouse.id === warehouse.id);
   const movements = (movementsQuery.data ?? [])
-    .filter((row) => row.warehouse.id === warehouse.id)
+    .filter((movement) => movement.lines.some((line) => line.warehouse.id === warehouse.id))
     .sort((a, b) => {
       const aDate = a.occurred_at ? new Date(a.occurred_at).getTime() : 0;
       const bDate = b.occurred_at ? new Date(b.occurred_at).getTime() : 0;
@@ -101,7 +106,10 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
     {
       accessorKey: "product_variant",
       header: t("inventory.detail.variant_label"),
-      cell: ({ row }) => row.original.product_variant.variant_name ?? t("inventory.detail.default_variant"),
+      cell: ({ row }) =>
+        row.original.product_variant?.variant_name ??
+        row.original.product_variant?.sku ??
+        t("inventory.detail.default_variant"),
     },
     { accessorKey: "quantity", header: t("inventory.form.on_hand_quantity") },
     { accessorKey: "available_quantity", header: t("inventory.form.available_quantity") },
@@ -118,16 +126,16 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
     },
   ];
 
-  const movementColumns: ColumnDef<InventoryMovementRow>[] = [
+  const movementColumns: ColumnDef<InventoryMovementHeader>[] = [
     {
       accessorKey: "code",
       header: t("inventory.entity.inventory_movement"),
-      cell: ({ row }) => row.original.code ?? row.original.header_id ?? row.original.id,
+      cell: ({ row }) => row.original.code ?? row.original.id,
     },
     {
-      accessorKey: "product",
+      accessorKey: "lines",
       header: t("inventory.entity.product"),
-      cell: ({ row }) => row.original.product.name,
+      cell: ({ row }) => row.original.lines[0]?.product.name ?? t("inventory.common.not_available"),
     },
     {
       accessorKey: "movement_type",
@@ -137,7 +145,11 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
           : t("inventory.common.not_available"),
     },
-    { accessorKey: "quantity", header: t("inventory.form.quantity") },
+    {
+      accessorKey: "line_count",
+      header: t("inventory.form.quantity"),
+      cell: ({ row }) => row.original.line_count ?? row.original.lines.length,
+    },
     {
       accessorKey: "occurred_at",
       header: t("inventory.form.occurred_at"),

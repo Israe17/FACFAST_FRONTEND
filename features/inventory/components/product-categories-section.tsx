@@ -36,6 +36,7 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
   const canView = can("categories.view");
   const canCreate = can("categories.create");
   const canUpdate = can("categories.update");
+  const canDelete = can("categories.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ProductCategory | null>(null);
@@ -60,13 +61,14 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
   const columns = useMemo(
     () =>
       getProductCategoriesColumns({
+        canDelete,
         canUpdate,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         parentNameById,
         t,
       }),
-    [canUpdate, handleEdit, parentNameById, t],
+    [canDelete, canUpdate, handleEdit, parentNameById, t],
   );
 
   if (!canView) {

@@ -5,6 +5,7 @@ import {
   branchNumberPattern,
   digitsPattern,
   identificationTypeSchema,
+  normalizeIdentificationTypeValue,
   optionalTrimmedString,
   requiredTrimmedString,
   terminalCodePattern,
@@ -57,7 +58,9 @@ export const branchSchema = z
     has_mail_key: z.boolean().optional().default(false),
     id: stringIdSchema,
     identification_number: z.string().optional().catch(undefined),
-    identification_type: identificationTypeSchema.optional().catch(undefined),
+    identification_type: z
+      .preprocess(normalizeIdentificationTypeValue, identificationTypeSchema.optional())
+      .catch(undefined),
     is_active: z.boolean().optional().default(true),
     legal_name: z.string().optional().catch(undefined),
     name: z.string().catch("Branch"),
@@ -94,7 +97,10 @@ export const createBranchSchema = z.object({
   identification_number: optionalTrimmedString(
     z.string().min(2, "Identification number must contain at least 2 characters."),
   ),
-  identification_type: identificationTypeSchema.optional(),
+  identification_type: z.preprocess(
+    normalizeIdentificationTypeValue,
+    identificationTypeSchema.optional(),
+  ),
   is_active: z.boolean().default(true),
   legal_name: z.string().trim().min(2, "Legal name must contain at least 2 characters."),
   mail_key: optionalTextSchema,

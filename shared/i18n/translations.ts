@@ -2,7 +2,20 @@ import type { AppLanguage } from "./language";
 
 const esTranslations = {
   "branches.create_error_fallback": "No fue posible crear la sucursal.",
+  "branches.delete_error_fallback": "No fue posible eliminar la sucursal.",
+  "branches.delete_forbidden":
+    "No se puede eliminar la sucursal porque tiene dependencias operativas.",
+  "branches.delete_forbidden_dependencies":
+    "No se puede eliminar la sucursal porque todavia tiene dependencias: {dependencies}.",
+  "branches.dependency.inventory_lots": "lotes de inventario",
+  "branches.dependency.inventory_movement_headers": "movimientos encabezado",
+  "branches.dependency.inventory_movements": "movimientos legacy",
+  "branches.dependency.warehouse_branch_links": "enlaces sucursal-bodega",
+  "branches.dependency.warehouse_locations": "ubicaciones de bodega",
+  "branches.dependency.warehouse_stock": "stock por bodega",
+  "branches.dependency.warehouses": "bodegas",
   "branches.terminal_create_error_fallback": "No fue posible crear la terminal.",
+  "branches.terminal_delete_error_fallback": "No fue posible eliminar la terminal.",
   "branches.terminal_update_error_fallback": "No fue posible actualizar la terminal.",
   "branches.update_error_fallback": "No fue posible actualizar la sucursal.",
   "business.update_error_fallback": "No fue posible actualizar la configuracion de empresa.",
@@ -34,10 +47,69 @@ const esTranslations = {
   "common.table.search_placeholder": "Buscar...",
   "common.table.showing": "Mostrando {from}-{to} de {total} registros",
   "common.update_success": "Actualizado correctamente.",
+  "contacts.delete_error_fallback": "No fue posible eliminar el contacto.",
+  "contacts.delete_forbidden":
+    "No se puede eliminar el contacto porque tiene historial operativo.",
+  "contacts.delete_forbidden_dependencies":
+    "No se puede eliminar el contacto porque todavia tiene dependencias: {dependencies}.",
+  "contacts.dependency.inventory_lots": "lotes de inventario",
+  "contacts.dependency.serial_events": "eventos de serial",
   "contacts.create_error_fallback": "No fue posible crear el contacto.",
+  "contacts.branch_assignment_create_error_fallback":
+    "No fue posible crear el contexto comercial por sucursal del contacto.",
+  "contacts.branch_assignment_update_error_fallback":
+    "No fue posible actualizar el contexto comercial por sucursal del contacto.",
+  "contacts.branch_assignment_delete_error_fallback":
+    "No fue posible eliminar el contexto comercial por sucursal del contacto.",
   "contacts.lookup_empty_input": "Ingresa una identificacion para buscar.",
   "contacts.lookup_error_fallback": "No fue posible ejecutar la busqueda del contacto.",
   "contacts.update_error_fallback": "No fue posible actualizar el contacto.",
+  "error.BRANCH_ACCESS_FORBIDDEN": "No tienes acceso a esta sucursal.",
+  "error.BRANCH_CONFIGURATION_PERMISSION_REQUIRED":
+    "No tienes permiso para editar la configuracion sensible de la sucursal.",
+  "error.BRANCH_DELETE_FORBIDDEN":
+    "No se puede eliminar la sucursal porque tiene dependencias operativas.",
+  "error.BRANCH_MANAGE_SCOPE_FORBIDDEN":
+    "No tienes alcance para administrar esta sucursal.",
+  "error.BRANCH_NOT_FOUND": "Sucursal no encontrada.",
+  "error.CONTACT_CODE_DUPLICATE": "Ya existe un contacto con ese codigo.",
+  "error.CONTACT_DELETE_FORBIDDEN":
+    "No se puede eliminar el contacto porque tiene historial operativo.",
+  "error.CONTACT_IDENTIFICATION_DUPLICATE":
+    "Ya existe un contacto con esa identificacion.",
+  "error.CONTACT_BRANCH_ASSIGNMENT_NOT_FOUND":
+    "No se encontro la asignacion comercial de sucursal para este contacto.",
+  "error.CONTACT_BRANCH_ASSIGNMENT_DUPLICATE":
+    "Ya existe una asignacion comercial para este contacto en esa sucursal.",
+  "error.CONTACT_BRANCH_EXCLUSIVE_CONFLICT":
+    "Este contacto ya tiene una asignacion exclusiva activa en otra sucursal.",
+  "error.CONTACT_ACCOUNT_MANAGER_BRANCH_SCOPE_INVALID":
+    "El account manager seleccionado no tiene acceso a la sucursal indicada.",
+  "error.CONTACT_LOOKUP_MULTIPLE":
+    "La busqueda devolvio multiples contactos para esa identificacion.",
+  "error.CONTACT_NOT_FOUND": "Contacto no encontrado.",
+  "error.TERMINAL_NOT_FOUND": "Terminal no encontrada.",
+  "error.USER_CROSS_BUSINESS_MANAGEMENT_FORBIDDEN":
+    "No puedes administrar usuarios fuera de tu negocio activo.",
+  "error.USER_DELETE_FORBIDDEN":
+    "No se puede eliminar el usuario porque tiene historial operativo o dependencias activas.",
+  "error.USER_EMAIL_DUPLICATE": "Ya existe un usuario con ese correo.",
+  "error.USER_INVALID_BRANCHES_FOR_BUSINESS":
+    "Hay sucursales asignadas que no pertenecen al negocio actual.",
+  "error.USER_INVALID_ROLES_FOR_BUSINESS":
+    "Hay roles asignados que no pertenecen al negocio actual.",
+  "error.USER_LAST_OWNER_DELETE_FORBIDDEN":
+    "No se puede eliminar el ultimo owner del negocio.",
+  "error.USER_NOT_FOUND": "Usuario no encontrado.",
+  "error.USER_OWNER_ASSIGNMENT_FORBIDDEN":
+    "No tienes permiso para asignar ownership en este contexto.",
+  "error.USER_OWNER_MANAGEMENT_FORBIDDEN":
+    "No tienes permiso para administrar usuarios owner.",
+  "error.USER_PLATFORM_ADMIN_DELETE_FORBIDDEN":
+    "No se puede eliminar un usuario platform admin.",
+  "error.USER_SELF_DELETE_FORBIDDEN": "No puedes eliminar tu propio usuario.",
+  "error.USER_SYSTEM_MANAGEMENT_FORBIDDEN":
+    "No tienes permiso para administrar usuarios del sistema.",
   "inventory.brand_create_error_fallback": "No fue posible crear la marca.",
   "inventory.brand_update_error_fallback": "No fue posible actualizar la marca.",
   "inventory.access_denied_description":
@@ -54,6 +126,7 @@ const esTranslations = {
   "inventory.common.currency": "Moneda",
   "inventory.common.description": "Descripcion",
   "inventory.common.deactivate": "Desactivar",
+  "inventory.common.reactivate": "Reactivar",
   "inventory.common.delete": "Eliminar",
   "inventory.common.edit": "Editar",
   "inventory.common.edit_entity": "Editar {entity}",
@@ -106,6 +179,8 @@ const esTranslations = {
   "inventory.entity.inventory_lots": "lotes",
   "inventory.entity.inventory_movement": "movimiento",
   "inventory.entity.inventory_movements": "movimientos de inventario",
+  "inventory.entity.product_serial": "serial",
+  "inventory.entity.product_serials": "seriales",
   "inventory.entity.warranty_profile": "perfil de garantia",
   "inventory.entity.warranty_profiles": "perfiles de garantia",
   "inventory.form.active_brand": "Marca activa",
@@ -484,6 +559,8 @@ const esTranslations = {
     "Productos y precios que actualmente usan esta lista comercial.",
   "inventory.detail.price_list_promotions_block_description":
     "Promociones vinculadas por productos ya presentes en esta lista.",
+  "inventory.detail.price_list_public_contract_note":
+    "La ruta oficial sigue publicando precios por producto. Si una fila trae variante, interpretala como refinamiento opcional dentro del mismo contrato publico.",
   "inventory.detail.no_price_list_prices":
     "No hay precios vinculados a esta lista en los productos consultados.",
   "inventory.detail.line_no": "Linea",
@@ -524,7 +601,9 @@ const esTranslations = {
   "inventory.product_prices.no_products_available":
     "No hay productos disponibles para asociar precios.",
   "inventory.product_prices.section_description":
-    "Precios del producto por lista, cantidad minima y rango de vigencia.",
+    "Precios del producto por lista, cantidad minima y rango de vigencia. La variante solo refina la fila cuando el backend la devuelve.",
+  "inventory.product_prices.public_contract_note":
+    "El contrato publico de precios sigue siendo product-level. La variante es opcional y solo refina una fila especifica cuando aplica.",
   "inventory.measurement_unit_create_error_fallback":
     "No fue posible crear la unidad de medida.",
   "inventory.measurement_unit_update_error_fallback":
@@ -536,10 +615,96 @@ const esTranslations = {
   "inventory.price_list_create_error_fallback": "No fue posible crear la lista de precios.",
   "inventory.price_list_update_error_fallback":
     "No fue posible actualizar la lista de precios.",
+  "inventory.price_list_branch_assignment_create_error_fallback":
+    "No fue posible crear la asignacion por sucursal de la lista de precios.",
+  "inventory.price_list_branch_assignment_update_error_fallback":
+    "No fue posible actualizar la asignacion por sucursal de la lista de precios.",
+  "inventory.price_list_branch_assignment_delete_error_fallback":
+    "No fue posible eliminar la asignacion por sucursal de la lista de precios.",
+  "inventory.price_list_branch_assignments.section_title": "Sucursales",
+  "inventory.price_list_branch_assignments.section_description":
+    "Define en que sucursales esta habilitada esta lista global y cual queda como predeterminada.",
+  "inventory.price_list_branch_assignments.active_hint":
+    "Mantiene esta lista habilitada para la sucursal seleccionada.",
+  "inventory.price_list_branch_assignments.default_hint":
+    "El backend normaliza la lista predeterminada por sucursal.",
+  "inventory.price_list_branch_assignments.create_title":
+    "Agregar asignacion por sucursal",
+  "inventory.price_list_branch_assignments.edit_title":
+    "Editar asignacion por sucursal",
+  "inventory.price_list_branch_assignments.dialog_description":
+    "Habilita esta lista global en una sucursal y, si aplica, marquela como predeterminada para esa sucursal.",
+  "inventory.price_list_branch_assignments.create_action":
+    "Agregar asignacion",
+  "inventory.price_list_branch_assignments.load_error":
+    "No fue posible cargar las asignaciones por sucursal de esta lista de precios.",
+  "inventory.price_list_branch_assignments.loading":
+    "Cargando asignaciones por sucursal.",
+  "inventory.price_list_branch_assignments.count": "{count} asignacion(es)",
+  "inventory.price_list_branch_assignments.default_count":
+    "{count} sucursal(es) predeterminada(s)",
+  "inventory.price_list_branch_assignments.branch_access_hint":
+    "Las opciones de sucursal requieren `branches.view` en la sesion actual.",
+  "inventory.price_list_branch_assignments.empty":
+    "Esta lista de precios sigue siendo global y todavia no tiene asignaciones explicitas por sucursal.",
+  "inventory.price_list_branch_assignments.delete_title":
+    "Eliminar asignacion por sucursal",
+  "inventory.price_list_branch_assignments.delete_description":
+    "Esto eliminara permanentemente la asignacion para {branch}.",
+  "inventory.price_list_branch_assignments.reactivate_title":
+    "Reactivar asignacion por sucursal",
+  "inventory.price_list_branch_assignments.reactivate_description":
+    "La asignacion por sucursal volvera a estar activa para {branch}.",
+  "inventory.price_list_branch_assignments.deactivate_title":
+    "Desactivar asignacion por sucursal",
+  "inventory.price_list_branch_assignments.deactivate_description":
+    "La asignacion por sucursal quedara inactiva para {branch}.",
   "inventory.promotion_create_error_fallback":
     "No fue posible crear la promocion.",
   "inventory.promotion_update_error_fallback":
     "No fue posible actualizar la promocion.",
+  "inventory.promotion_branch_assignment_create_error_fallback":
+    "No fue posible crear la asignacion por sucursal de la promocion.",
+  "inventory.promotion_branch_assignment_update_error_fallback":
+    "No fue posible actualizar la asignacion por sucursal de la promocion.",
+  "inventory.promotion_branch_assignment_delete_error_fallback":
+    "No fue posible eliminar la asignacion por sucursal de la promocion.",
+  "inventory.promotion_branch_assignments.manage_action": "Sucursales",
+  "inventory.promotion_branch_assignments.section_title": "Sucursales",
+  "inventory.promotion_branch_assignments.section_description":
+    "Define en que sucursales aplica la promocion global {promotion}. Esta capa solo controla alcance por sucursal; no resuelve el motor comercial final.",
+  "inventory.promotion_branch_assignments.permission_hint":
+    "No tienes permiso para revisar las asignaciones por sucursal de esta promocion.",
+  "inventory.promotion_branch_assignments.create_title":
+    "Agregar asignacion por sucursal",
+  "inventory.promotion_branch_assignments.edit_title":
+    "Editar asignacion por sucursal",
+  "inventory.promotion_branch_assignments.dialog_description":
+    "Activa o desactiva la aplicabilidad de esta promocion en una sucursal especifica.",
+  "inventory.promotion_branch_assignments.create_action": "Agregar asignacion",
+  "inventory.promotion_branch_assignments.load_error":
+    "No fue posible cargar las asignaciones por sucursal de esta promocion.",
+  "inventory.promotion_branch_assignments.loading":
+    "Cargando asignaciones por sucursal.",
+  "inventory.promotion_branch_assignments.count": "{count} asignacion(es)",
+  "inventory.promotion_branch_assignments.active_hint":
+    "Mantiene esta promocion disponible para la sucursal seleccionada.",
+  "inventory.promotion_branch_assignments.branch_access_hint":
+    "Las opciones de sucursal requieren `branches.view` en la sesion actual.",
+  "inventory.promotion_branch_assignments.empty":
+    "Esta promocion todavia no tiene asignaciones explicitas por sucursal.",
+  "inventory.promotion_branch_assignments.delete_title":
+    "Eliminar asignacion por sucursal",
+  "inventory.promotion_branch_assignments.delete_description":
+    "Esto eliminara permanentemente la asignacion de la promocion para {branch}.",
+  "inventory.promotion_branch_assignments.reactivate_title":
+    "Reactivar asignacion por sucursal",
+  "inventory.promotion_branch_assignments.reactivate_description":
+    "La asignacion por sucursal volvera a estar activa para {branch}.",
+  "inventory.promotion_branch_assignments.deactivate_title":
+    "Desactivar asignacion por sucursal",
+  "inventory.promotion_branch_assignments.deactivate_description":
+    "La asignacion por sucursal quedara inactiva para {branch}.",
   "inventory.promotions.add_item": "Agregar item",
   "inventory.promotions.dialog_description":
     "Configura promociones y sus productos afectados usando el contrato actual del backend.",
@@ -688,6 +853,10 @@ const esTranslations = {
   "inventory.variants.deactivate_description":
     "La variante \"{name}\" sera desactivada. No podra usarse en nuevas operaciones de inventario. Esta accion no elimina datos historicos.",
   "inventory.variants.deactivate_confirm": "Desactivar",
+  "inventory.variants.delete_title": "Eliminar variante permanentemente",
+  "inventory.variants.delete_description":
+    "La variante \"{name}\" sera eliminada permanentemente. Usa esta accion solo cuando lifecycle lo permita.",
+  "inventory.variants.delete_confirm": "Eliminar permanentemente",
   "inventory.variants.generate_confirm_title": "Generar variantes",
   "inventory.variants.generate_confirm_description":
     "Se crearan las nuevas combinaciones de atributos que aun no existan como variantes. Las variantes existentes no seran modificadas ni eliminadas.",
@@ -735,6 +904,11 @@ const esTranslations = {
   "inventory.enum.promotion_type.fixed_amount": "Monto fijo",
   "inventory.enum.promotion_type.percentage": "Porcentaje",
   "inventory.enum.promotion_type.price_override": "Precio override",
+  "inventory.enum.serial_status.available": "Disponible",
+  "inventory.enum.serial_status.defective": "Defectuoso",
+  "inventory.enum.serial_status.reserved": "Reservado",
+  "inventory.enum.serial_status.returned": "Devuelto",
+  "inventory.enum.serial_status.sold": "Vendido",
   "inventory.enum.tax_profile_item_kind.goods": "Bienes",
   "inventory.enum.tax_profile_item_kind.service": "Servicio",
   "inventory.enum.tax_type.exento": "Exento",
@@ -780,6 +954,214 @@ const esTranslations = {
     "El perfil de garantia esta siendo usado por uno o mas productos o variantes.",
   "inventory.error.CANNOT_DELETE_DEFAULT_PRICE_LIST":
     "No es posible eliminar la lista de precios predeterminada.",
+  "inventory.form.track_serials_description":
+    "Permite operar unidades por serie cuando el backend lo soporta.",
+  "inventory.form.origin_location": "Ubicacion origen",
+  "inventory.form.destination_location": "Ubicacion destino",
+  "inventory.form.serial_ids": "IDs de seriales",
+  "inventory.form.serial_ids_placeholder": "Ej: 101, 102, 103",
+  "inventory.form.reserved_delta": "Delta reservado",
+  "inventory.form.incoming_delta": "Delta entrante",
+  "inventory.form.outgoing_delta": "Delta saliente",
+  "inventory.serials.section_description":
+    "Consulta, registra y actualiza seriales para la variante operativa seleccionada.",
+  "inventory.serials.kpi_total": "Seriales",
+  "inventory.serials.kpi_total_description":
+    "Total de seriales visibles con los filtros activos.",
+  "inventory.serials.kpi_available_description":
+    "Seriales disponibles para la variante y filtros activos.",
+  "inventory.serials.kpi_reserved_description":
+    "Seriales reservados actualmente para la variante seleccionada.",
+  "inventory.serials.kpi_sold_description":
+    "Seriales vendidos historicamente en la variante seleccionada.",
+  "inventory.serials.status_filter": "Estado",
+  "inventory.serials.all_statuses": "Todos los estados",
+  "inventory.serials.warehouse_filter": "Bodega",
+  "inventory.serials.all_warehouses": "Todas las bodegas",
+  "inventory.serials.register_action": "Registrar seriales",
+  "inventory.serials.inactive_variant_hint":
+    "El producto o la variante operativa estan inactivos. Puedes consultar seriales existentes, pero no registrar ni actualizar estados desde esta vista.",
+  "inventory.serials.register_no_stock_hint":
+    "Registrar seriales no incrementa stock automaticamente. Este flujo solo crea seriales usando el contrato oficial del backend.",
+  "inventory.serials.no_serials":
+    "No hay seriales para la variante seleccionada con los filtros actuales.",
+  "inventory.serials.register_dialog_title": "Registrar seriales",
+  "inventory.serials.register_dialog_description":
+    "Agrega seriales para {variant} usando el contrato oficial confirmado.",
+  "inventory.serials.serial_numbers": "Numeros de serie",
+  "inventory.serials.serial_numbers_placeholder":
+    "Uno por linea o separados por coma",
+  "inventory.serials.register_hint":
+    "Puedes pegar varios seriales. Se enviaran exactamente como serial_numbers.",
+  "inventory.serials.update_status_action": "Actualizar estado",
+  "inventory.serials.update_status_title": "Actualizar estado del serial",
+  "inventory.serials.update_status_description":
+    "Actualiza el estado operativo de {serial}.",
+  "inventory.serials.received_at": "Recibido",
+  "inventory.serials.sold_at": "Vendido",
+  "inventory.detail.source_document": "Documento fuente",
+  "inventory.detail.source_document_number": "Numero documento",
+  "inventory.detail.transferred_serial_ids": "Seriales transferidos",
+  "inventory.detail.legacy_reference": "Legacy",
+  "inventory.product_serial_create_error_fallback":
+    "No fue posible registrar los seriales.",
+  "inventory.product_serial_update_error_fallback":
+    "No fue posible actualizar el estado del serial.",
+  "inventory.variant_delete_error_fallback":
+    "No fue posible eliminar permanentemente la variante.",
+  "inventory.error.PRODUCT_NOT_FOUND": "Producto no encontrado.",
+  "inventory.error.PRODUCT_VARIANT_NOT_FOUND": "Variante no encontrada.",
+  "inventory.error.WAREHOUSE_NOT_FOUND": "Bodega no encontrada.",
+  "inventory.error.WAREHOUSE_LOCATION_NOT_FOUND": "Ubicacion no encontrada.",
+  "inventory.error.INVENTORY_LOT_NOT_FOUND": "Lote no encontrado.",
+  "inventory.error.SERIAL_NOT_FOUND": "Serial no encontrado.",
+  "inventory.error.PRICE_LIST_NOT_FOUND": "Lista de precios no encontrada.",
+  "inventory.error.PRODUCT_PRICE_NOT_FOUND": "Precio de producto no encontrado.",
+  "inventory.error.PROMOTION_NOT_FOUND": "Promocion no encontrada.",
+  "inventory.error.BRAND_NOT_FOUND": "Marca no encontrada.",
+  "inventory.error.CATEGORY_NOT_FOUND": "Categoria no encontrada.",
+  "inventory.error.MEASUREMENT_UNIT_NOT_FOUND": "Unidad de medida no encontrada.",
+  "inventory.error.TAX_PROFILE_NOT_FOUND": "Perfil fiscal no encontrado.",
+  "inventory.error.WARRANTY_PROFILE_NOT_FOUND": "Perfil de garantia no encontrado.",
+  "inventory.error.BRANCH_NOT_FOUND": "Sucursal no encontrada.",
+  "inventory.error.PRODUCT_INACTIVE": "El producto esta inactivo.",
+  "inventory.error.VARIANT_INACTIVE": "La variante esta inactiva.",
+  "inventory.error.WAREHOUSE_INACTIVE": "La bodega esta inactiva.",
+  "inventory.error.WAREHOUSE_LOCATION_INACTIVE": "La ubicacion esta inactiva.",
+  "inventory.error.INVENTORY_LOT_INACTIVE": "El lote esta inactivo.",
+  "inventory.error.PRICE_LIST_INACTIVE": "La lista de precios esta inactiva.",
+  "inventory.error.BRAND_INACTIVE": "La marca esta inactiva.",
+  "inventory.error.CATEGORY_INACTIVE": "La categoria esta inactiva.",
+  "inventory.error.MEASUREMENT_UNIT_INACTIVE": "La unidad de medida esta inactiva.",
+  "inventory.error.TAX_PROFILE_INACTIVE": "El perfil fiscal esta inactivo.",
+  "inventory.error.WARRANTY_PROFILE_INACTIVE": "El perfil de garantia esta inactivo.",
+  "inventory.error.PRODUCT_OR_VARIANT_REQUIRED": "Debes seleccionar un producto o una variante.",
+  "inventory.error.VARIANT_REQUIRED_FOR_MULTI_VARIANT_PRODUCT":
+    "Debes seleccionar una variante para productos multivariante.",
+  "inventory.error.VARIANT_PRODUCT_MISMATCH":
+    "La variante seleccionada no pertenece al producto indicado.",
+  "inventory.error.PRODUCT_DOES_NOT_SUPPORT_VARIANTS":
+    "El producto no admite variantes.",
+  "inventory.error.CANNOT_EDIT_DEFAULT_VARIANT_OF_SIMPLE_PRODUCT":
+    "No se puede editar la variante por defecto de un producto simple.",
+  "inventory.error.CANNOT_DEACTIVATE_DEFAULT_VARIANT":
+    "No se puede desactivar la variante por defecto.",
+  "inventory.error.CANNOT_DEACTIVATE_LAST_ACTIVE_VARIANT":
+    "No se puede desactivar la ultima variante activa.",
+  "inventory.error.PRODUCT_SKU_DUPLICATE": "El SKU del producto ya existe.",
+  "inventory.error.PRODUCT_BARCODE_DUPLICATE": "El codigo de barras del producto ya existe.",
+  "inventory.error.VARIANT_SKU_DUPLICATE": "El SKU de la variante ya existe.",
+  "inventory.error.VARIANT_BARCODE_DUPLICATE":
+    "El codigo de barras de la variante ya existe.",
+  "inventory.error.PRODUCT_VARIANT_DELETE_FORBIDDEN":
+    "La variante no puede eliminarse permanentemente en su estado actual.",
+  "inventory.error.PRODUCT_INVENTORY_TRACKING_REQUIRED":
+    "El producto debe rastrear inventario para esta operacion.",
+  "inventory.error.VARIANT_INVENTORY_TRACKING_REQUIRED":
+    "La variante debe rastrear inventario para esta operacion.",
+  "inventory.error.PRODUCT_LOT_TRACKING_REQUIRED":
+    "El producto debe rastrear lotes para esta operacion.",
+  "inventory.error.PRODUCT_LOT_TRACKING_REQUIRES_INVENTORY":
+    "Rastrear lotes en producto requiere rastrear inventario.",
+  "inventory.error.PRODUCT_EXPIRATION_REQUIRES_LOTS":
+    "Rastrear vencimiento en producto requiere rastrear lotes.",
+  "inventory.error.VARIANT_LOT_TRACKING_REQUIRES_INVENTORY":
+    "Rastrear lotes en variante requiere rastrear inventario.",
+  "inventory.error.VARIANT_EXPIRATION_REQUIRES_LOTS":
+    "Rastrear vencimiento en variante requiere rastrear lotes.",
+  "inventory.error.VARIANT_SERIAL_TRACKING_REQUIRES_INVENTORY":
+    "Rastrear seriales en variante requiere rastrear inventario.",
+  "inventory.error.PRODUCT_WARRANTY_PROFILE_REQUIRED":
+    "Debes seleccionar un perfil de garantia para el producto.",
+  "inventory.error.PRODUCT_UNIT_CONVERSION_NOT_SUPPORTED":
+    "La conversion de unidades no esta soportada en esta fase.",
+  "inventory.error.PRODUCT_TAX_PROFILE_ITEM_KIND_INVALID":
+    "El perfil fiscal no coincide con el tipo de item del producto.",
+  "inventory.error.INVENTORY_LOT_REQUIRED": "Debes seleccionar un lote.",
+  "inventory.error.INVENTORY_LOT_NUMBER_DUPLICATE": "El numero de lote ya existe.",
+  "inventory.error.INVENTORY_LOT_EXPIRATION_REQUIRED":
+    "La fecha de vencimiento es obligatoria para este lote.",
+  "inventory.error.INVENTORY_LOT_WAREHOUSE_MISMATCH":
+    "El lote no pertenece a la bodega seleccionada.",
+  "inventory.error.INVENTORY_LOT_PRODUCT_MISMATCH":
+    "El lote no pertenece al producto seleccionado.",
+  "inventory.error.INVENTORY_LOT_VARIANT_MISMATCH":
+    "El lote no pertenece a la variante seleccionada.",
+  "inventory.error.INVENTORY_LOT_LOCATION_MISMATCH":
+    "El lote no pertenece a la ubicacion seleccionada.",
+  "inventory.error.INVENTORY_NEGATIVE_STOCK_FORBIDDEN":
+    "La operacion dejaria el inventario en negativo y no esta permitido.",
+  "inventory.error.INVENTORY_LOT_NEGATIVE_BALANCE_FORBIDDEN":
+    "La operacion dejaria el lote con balance negativo.",
+  "inventory.error.INSUFFICIENT_STOCK": "No hay stock suficiente para completar la operacion.",
+  "inventory.error.TRANSFER_WAREHOUSE_DUPLICATE":
+    "La bodega origen y destino deben ser distintas.",
+  "inventory.error.WAREHOUSE_LOCATION_MISMATCH":
+    "La ubicacion no pertenece a la bodega seleccionada.",
+  "inventory.error.WAREHOUSE_NOT_ALLOWED_FOR_BRANCH":
+    "La bodega no pertenece a la sucursal activa.",
+  "inventory.error.TENANT_MISMATCH":
+    "El recurso no pertenece al tenant operativo actual.",
+  "inventory.error.INVENTORY_MOVEMENT_NOT_FOUND": "Movimiento no encontrado.",
+  "inventory.error.INVENTORY_MOVEMENT_ALREADY_CANCELLED":
+    "El movimiento ya fue cancelado.",
+  "inventory.error.INVENTORY_MOVEMENT_POSTED_REQUIRED":
+    "La accion requiere un movimiento en estado posted.",
+  "inventory.error.INVENTORY_MOVEMENT_LINES_REQUIRED":
+    "El movimiento debe incluir al menos una linea.",
+  "inventory.error.INVENTORY_MOVEMENT_RELATION_MISSING":
+    "Faltan relaciones operativas del movimiento.",
+  "inventory.error.SERIAL_NUMBERS_REQUIRED":
+    "Debes enviar al menos un numero de serie.",
+  "inventory.error.SERIAL_NUMBER_DUPLICATE":
+    "Uno o mas numeros de serie ya existen.",
+  "inventory.error.VARIANT_SERIAL_TRACKING_DISABLED":
+    "La variante no tiene rastreo de seriales habilitado.",
+  "inventory.error.SERIALS_REQUIRED_FOR_SERIAL_TRACKED_VARIANT":
+    "Debes seleccionar seriales para esta variante serializada.",
+  "inventory.error.SERIAL_TRANSFER_INTEGER_QUANTITY_REQUIRED":
+    "La cantidad debe ser entera cuando la variante usa seriales.",
+  "inventory.error.SERIAL_TRANSFER_QUANTITY_MISMATCH":
+    "La cantidad debe coincidir con la cantidad de seriales enviados.",
+  "inventory.error.SERIAL_VARIANT_MISMATCH":
+    "Uno o mas seriales no pertenecen a la variante seleccionada.",
+  "inventory.error.SERIAL_WAREHOUSE_MISMATCH":
+    "Uno o mas seriales no pertenecen a la bodega origen.",
+  "inventory.error.SERIAL_STATUS_NOT_TRANSFERABLE":
+    "Uno o mas seriales no estan en estado transferible.",
+  "inventory.error.SERIALS_OUTSIDE_BUSINESS":
+    "Uno o mas seriales no pertenecen a la empresa activa.",
+  "inventory.error.PRICE_LIST_NAME_DUPLICATE":
+    "Ya existe una lista de precios con ese nombre.",
+  "inventory.error.BRANCH_PRICE_LIST_ASSIGNMENT_NOT_FOUND":
+    "No se encontro la asignacion de esta lista de precios para la sucursal indicada.",
+  "inventory.error.BRANCH_PRICE_LIST_ASSIGNMENT_DUPLICATE":
+    "Esta lista de precios ya tiene una asignacion para la sucursal indicada.",
+  "inventory.error.BRANCH_PRICE_LIST_DEFAULT_REQUIRES_ACTIVE_ASSIGNMENT":
+    "La lista por defecto de sucursal requiere una asignacion activa.",
+  "inventory.error.PRICE_VALID_RANGE_INVALID":
+    "El rango de vigencia del precio no es valido.",
+  "inventory.error.PROMOTION_NAME_DUPLICATE":
+    "Ya existe una promocion con ese nombre.",
+  "inventory.error.PROMOTION_INACTIVE": "La promocion esta inactiva.",
+  "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_NOT_FOUND":
+    "No se encontro la asignacion de esta promocion para la sucursal indicada.",
+  "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_DUPLICATE":
+    "Esta promocion ya tiene una asignacion para la sucursal indicada.",
+  "inventory.error.PROMOTION_PRODUCT_OR_VARIANT_REQUIRED":
+    "Cada item de promocion requiere producto o variante.",
+  "inventory.error.PROMOTION_DUPLICATE_ITEMS":
+    "No puedes repetir el mismo producto o variante en la promocion.",
+  "inventory.error.PROMOTION_ITEMS_OUTSIDE_BUSINESS":
+    "La promocion incluye items fuera de la empresa activa.",
+  "inventory.error.PROMOTION_DISCOUNT_VALUE_REQUIRED":
+    "Debes indicar el valor del descuento para esta promocion.",
+  "inventory.error.PROMOTION_OVERRIDE_PRICE_REQUIRED":
+    "Debes indicar el precio override para esta promocion.",
+  "inventory.error.PROMOTION_BUY_X_GET_Y_FIELDS_REQUIRED":
+    "Debes indicar min quantity y bonus quantity para la promocion.",
+  "inventory.error.PROMOTION_DATE_RANGE_INVALID":
+    "El rango de fechas de la promocion no es valido.",
   "platform.clear_tenant_error_fallback": "No fue posible salir del contexto de empresa.",
   "platform.clear_tenant_success": "Contexto tenant limpiado correctamente.",
   "platform.enter_tenant_error_fallback":
@@ -795,6 +1177,7 @@ const esTranslations = {
   "users.branches_update_error_fallback":
     "No fue posible actualizar las sucursales del usuario.",
   "users.create_error_fallback": "No fue posible crear el usuario.",
+  "users.delete_error_fallback": "No fue posible eliminar el usuario.",
   "users.password_update_error_fallback":
     "No fue posible actualizar la contrasena del usuario.",
   "users.password_updated_success": "Contrasena actualizada correctamente.",
@@ -812,7 +1195,20 @@ type TranslationDictionary = Record<FrontendTranslationKey, string>;
 export const translations: Record<AppLanguage, TranslationDictionary> = {
   en: {
     "branches.create_error_fallback": "Unable to create the branch.",
+    "branches.delete_error_fallback": "Unable to delete the branch.",
+    "branches.delete_forbidden":
+      "This branch cannot be deleted because it still has operational dependencies.",
+    "branches.delete_forbidden_dependencies":
+      "This branch cannot be deleted because it still has dependencies: {dependencies}.",
+    "branches.dependency.inventory_lots": "inventory lots",
+    "branches.dependency.inventory_movement_headers": "movement headers",
+    "branches.dependency.inventory_movements": "legacy movements",
+    "branches.dependency.warehouse_branch_links": "warehouse branch links",
+    "branches.dependency.warehouse_locations": "warehouse locations",
+    "branches.dependency.warehouse_stock": "warehouse stock",
+    "branches.dependency.warehouses": "warehouses",
     "branches.terminal_create_error_fallback": "Unable to create the terminal.",
+    "branches.terminal_delete_error_fallback": "Unable to delete the terminal.",
     "branches.terminal_update_error_fallback": "Unable to update the terminal.",
     "branches.update_error_fallback": "Unable to update the branch.",
     "business.update_error_fallback": "Unable to update business settings.",
@@ -844,10 +1240,69 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "common.table.search_placeholder": "Search...",
     "common.table.showing": "Showing {from}-{to} of {total} records",
     "common.update_success": "Updated successfully.",
+    "contacts.delete_error_fallback": "Unable to delete the contact.",
+    "contacts.delete_forbidden":
+      "This contact cannot be deleted because it still has operational history.",
+    "contacts.delete_forbidden_dependencies":
+      "This contact cannot be deleted because it still has dependencies: {dependencies}.",
+    "contacts.dependency.inventory_lots": "inventory lots",
+    "contacts.dependency.serial_events": "serial events",
     "contacts.create_error_fallback": "Unable to create the contact.",
+    "contacts.branch_assignment_create_error_fallback":
+      "Unable to create the contact branch commercial context.",
+    "contacts.branch_assignment_update_error_fallback":
+      "Unable to update the contact branch commercial context.",
+    "contacts.branch_assignment_delete_error_fallback":
+      "Unable to delete the contact branch commercial context.",
     "contacts.lookup_empty_input": "Enter an identification to search.",
     "contacts.lookup_error_fallback": "Unable to execute the contact lookup.",
     "contacts.update_error_fallback": "Unable to update the contact.",
+    "error.BRANCH_ACCESS_FORBIDDEN": "You do not have access to this branch.",
+    "error.BRANCH_CONFIGURATION_PERMISSION_REQUIRED":
+      "You do not have permission to edit the sensitive branch configuration.",
+    "error.BRANCH_DELETE_FORBIDDEN":
+      "This branch cannot be deleted because it still has operational dependencies.",
+    "error.BRANCH_MANAGE_SCOPE_FORBIDDEN":
+      "You do not have scope to manage this branch.",
+    "error.BRANCH_NOT_FOUND": "Branch not found.",
+    "error.CONTACT_CODE_DUPLICATE": "A contact with that code already exists.",
+    "error.CONTACT_DELETE_FORBIDDEN":
+      "This contact cannot be deleted because it still has operational history.",
+    "error.CONTACT_IDENTIFICATION_DUPLICATE":
+      "A contact with that identification already exists.",
+    "error.CONTACT_BRANCH_ASSIGNMENT_NOT_FOUND":
+      "The branch commercial assignment for this contact was not found.",
+    "error.CONTACT_BRANCH_ASSIGNMENT_DUPLICATE":
+      "A branch commercial assignment for this contact already exists in that branch.",
+    "error.CONTACT_BRANCH_EXCLUSIVE_CONFLICT":
+      "This contact already has another active exclusive branch assignment.",
+    "error.CONTACT_ACCOUNT_MANAGER_BRANCH_SCOPE_INVALID":
+      "The selected account manager does not have access to the target branch.",
+    "error.CONTACT_LOOKUP_MULTIPLE":
+      "The lookup returned multiple contacts for that identification.",
+    "error.CONTACT_NOT_FOUND": "Contact not found.",
+    "error.TERMINAL_NOT_FOUND": "Terminal not found.",
+    "error.USER_CROSS_BUSINESS_MANAGEMENT_FORBIDDEN":
+      "You cannot manage users outside your active business.",
+    "error.USER_DELETE_FORBIDDEN":
+      "This user cannot be deleted because it still has operational history or active dependencies.",
+    "error.USER_EMAIL_DUPLICATE": "A user with that email already exists.",
+    "error.USER_INVALID_BRANCHES_FOR_BUSINESS":
+      "Some assigned branches do not belong to the current business.",
+    "error.USER_INVALID_ROLES_FOR_BUSINESS":
+      "Some assigned roles do not belong to the current business.",
+    "error.USER_LAST_OWNER_DELETE_FORBIDDEN":
+      "The last owner of the business cannot be deleted.",
+    "error.USER_NOT_FOUND": "User not found.",
+    "error.USER_OWNER_ASSIGNMENT_FORBIDDEN":
+      "You do not have permission to assign ownership in this context.",
+    "error.USER_OWNER_MANAGEMENT_FORBIDDEN":
+      "You do not have permission to manage owner users.",
+    "error.USER_PLATFORM_ADMIN_DELETE_FORBIDDEN":
+      "Platform admin users cannot be deleted.",
+    "error.USER_SELF_DELETE_FORBIDDEN": "You cannot delete your own user.",
+    "error.USER_SYSTEM_MANAGEMENT_FORBIDDEN":
+      "You do not have permission to manage system users.",
     "inventory.brand_create_error_fallback": "Unable to create the brand.",
     "inventory.brand_update_error_fallback": "Unable to update the brand.",
     "inventory.access_denied_description":
@@ -864,6 +1319,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.common.currency": "Currency",
     "inventory.common.description": "Description",
     "inventory.common.deactivate": "Deactivate",
+    "inventory.common.reactivate": "Reactivate",
     "inventory.common.delete": "Delete",
     "inventory.common.edit": "Edit",
     "inventory.common.edit_entity": "Edit {entity}",
@@ -916,6 +1372,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.entity.inventory_lots": "inventory lots",
     "inventory.entity.inventory_movement": "inventory movement",
     "inventory.entity.inventory_movements": "inventory movements",
+    "inventory.entity.product_serial": "serial",
+    "inventory.entity.product_serials": "serials",
     "inventory.entity.warranty_profile": "warranty profile",
     "inventory.entity.warranty_profiles": "warranty profiles",
     "inventory.form.active_brand": "Active brand",
@@ -1294,6 +1752,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Products and prices currently using this commercial list.",
     "inventory.detail.price_list_promotions_block_description":
       "Promotions linked through products already present in this list.",
+    "inventory.detail.price_list_public_contract_note":
+      "The official route still exposes prices at product level. If a row includes a variant, treat it as an optional refinement inside the same public contract.",
     "inventory.detail.no_price_list_prices":
       "No prices are linked to this list in the queried products.",
     "inventory.detail.line_no": "Line",
@@ -1334,7 +1794,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.product_prices.no_products_available":
       "No products are available to attach prices yet.",
     "inventory.product_prices.section_description":
-      "Product prices per list, minimum quantity and validity range.",
+      "Product prices per list, minimum quantity and validity range. A variant only refines the row when the backend returns it.",
+    "inventory.product_prices.public_contract_note":
+      "The public pricing contract remains product-level. A variant is optional and only refines a specific row when applicable.",
     "inventory.measurement_unit_create_error_fallback":
       "Unable to create the measurement unit.",
     "inventory.measurement_unit_update_error_fallback":
@@ -1347,10 +1809,97 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to create the price list.",
     "inventory.price_list_update_error_fallback":
       "Unable to update the price list.",
+    "inventory.price_list_branch_assignment_create_error_fallback":
+      "Unable to create the price list branch assignment.",
+    "inventory.price_list_branch_assignment_update_error_fallback":
+      "Unable to update the price list branch assignment.",
+    "inventory.price_list_branch_assignment_delete_error_fallback":
+      "Unable to delete the price list branch assignment.",
+    "inventory.price_list_branch_assignments.section_title": "Branches",
+    "inventory.price_list_branch_assignments.section_description":
+      "Define which branches can use this global list and which one keeps it as default.",
+    "inventory.price_list_branch_assignments.active_hint":
+      "Keeps this price list enabled for the selected branch.",
+    "inventory.price_list_branch_assignments.default_hint":
+      "The backend normalizes the default list per branch.",
+    "inventory.price_list_branch_assignments.create_title":
+      "Add branch assignment",
+    "inventory.price_list_branch_assignments.edit_title":
+      "Edit branch assignment",
+    "inventory.price_list_branch_assignments.dialog_description":
+      "Enable this global list for a branch and optionally mark it as that branch default.",
+    "inventory.price_list_branch_assignments.create_action":
+      "Add assignment",
+    "inventory.price_list_branch_assignments.load_error":
+      "Unable to load branch assignments for this price list.",
+    "inventory.price_list_branch_assignments.loading":
+      "Loading branch assignments.",
+    "inventory.price_list_branch_assignments.count": "{count} assignment(s)",
+    "inventory.price_list_branch_assignments.default_count":
+      "{count} default branch(es)",
+    "inventory.price_list_branch_assignments.branch_access_hint":
+      "Branch options require `branches.view` in the current session.",
+    "inventory.price_list_branch_assignments.empty":
+      "This price list is still global and has no explicit branch assignments yet.",
+    "inventory.price_list_branch_assignments.delete_title":
+      "Delete branch assignment",
+    "inventory.price_list_branch_assignments.delete_description":
+      "This will permanently remove the branch assignment for {branch}.",
+    "inventory.price_list_branch_assignments.reactivate_title":
+      "Reactivate branch assignment",
+    "inventory.price_list_branch_assignments.reactivate_description":
+      "This branch assignment will become active again for {branch}.",
+    "inventory.price_list_branch_assignments.deactivate_title":
+      "Deactivate branch assignment",
+    "inventory.price_list_branch_assignments.deactivate_description":
+      "This branch assignment will become inactive for {branch}.",
     "inventory.promotion_create_error_fallback":
       "Unable to create the promotion.",
     "inventory.promotion_update_error_fallback":
       "Unable to update the promotion.",
+    "inventory.promotion_branch_assignment_create_error_fallback":
+      "Unable to create the promotion branch assignment.",
+    "inventory.promotion_branch_assignment_update_error_fallback":
+      "Unable to update the promotion branch assignment.",
+    "inventory.promotion_branch_assignment_delete_error_fallback":
+      "Unable to delete the promotion branch assignment.",
+    "inventory.promotion_branch_assignments.manage_action": "Branches",
+    "inventory.promotion_branch_assignments.section_title": "Branches",
+    "inventory.promotion_branch_assignments.section_description":
+      "Define where the global promotion {promotion} applies. This layer only scopes branch applicability; it does not resolve the final commercial engine.",
+    "inventory.promotion_branch_assignments.permission_hint":
+      "You do not have permission to review branch assignments for this promotion.",
+    "inventory.promotion_branch_assignments.create_title":
+      "Add branch assignment",
+    "inventory.promotion_branch_assignments.edit_title":
+      "Edit branch assignment",
+    "inventory.promotion_branch_assignments.dialog_description":
+      "Activate or deactivate the applicability of this promotion in a specific branch.",
+    "inventory.promotion_branch_assignments.create_action":
+      "Add assignment",
+    "inventory.promotion_branch_assignments.load_error":
+      "Unable to load branch assignments for this promotion.",
+    "inventory.promotion_branch_assignments.loading":
+      "Loading branch assignments.",
+    "inventory.promotion_branch_assignments.count": "{count} assignment(s)",
+    "inventory.promotion_branch_assignments.active_hint":
+      "Keeps this promotion available for the selected branch.",
+    "inventory.promotion_branch_assignments.branch_access_hint":
+      "Branch options require `branches.view` in the current session.",
+    "inventory.promotion_branch_assignments.empty":
+      "This promotion does not have explicit branch assignments yet.",
+    "inventory.promotion_branch_assignments.delete_title":
+      "Delete branch assignment",
+    "inventory.promotion_branch_assignments.delete_description":
+      "This will permanently remove the promotion branch assignment for {branch}.",
+    "inventory.promotion_branch_assignments.reactivate_title":
+      "Reactivate branch assignment",
+    "inventory.promotion_branch_assignments.reactivate_description":
+      "This branch assignment will become active again for {branch}.",
+    "inventory.promotion_branch_assignments.deactivate_title":
+      "Deactivate branch assignment",
+    "inventory.promotion_branch_assignments.deactivate_description":
+      "This branch assignment will become inactive for {branch}.",
     "inventory.promotions.add_item": "Add item",
     "inventory.promotions.dialog_description":
       "Configure promotions and affected products using the current backend contract.",
@@ -1499,6 +2048,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.variants.deactivate_description":
       "The variant \"{name}\" will be deactivated. It will not be available for new inventory operations. Historical data will not be affected.",
     "inventory.variants.deactivate_confirm": "Deactivate",
+    "inventory.variants.delete_title": "Permanently delete variant",
+    "inventory.variants.delete_description":
+      "The variant \"{name}\" will be permanently deleted. Use this action only when lifecycle explicitly allows it.",
+    "inventory.variants.delete_confirm": "Delete permanently",
     "inventory.variants.generate_confirm_title": "Generate variants",
     "inventory.variants.generate_confirm_description":
       "New attribute combinations that do not yet exist as variants will be created. Existing variants will not be modified or removed.",
@@ -1546,6 +2099,11 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.enum.promotion_type.fixed_amount": "Fixed amount",
     "inventory.enum.promotion_type.percentage": "Percentage",
     "inventory.enum.promotion_type.price_override": "Price override",
+    "inventory.enum.serial_status.available": "Available",
+    "inventory.enum.serial_status.defective": "Defective",
+    "inventory.enum.serial_status.reserved": "Reserved",
+    "inventory.enum.serial_status.returned": "Returned",
+    "inventory.enum.serial_status.sold": "Sold",
     "inventory.enum.tax_profile_item_kind.goods": "Goods",
     "inventory.enum.tax_profile_item_kind.service": "Service",
     "inventory.enum.tax_type.exento": "Exempt",
@@ -1591,6 +2149,222 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The warranty profile is being used by one or more products or variants.",
     "inventory.error.CANNOT_DELETE_DEFAULT_PRICE_LIST":
       "The default price list cannot be deleted.",
+    "inventory.form.track_serials_description":
+      "Allows unit-by-unit serial operations when supported by the backend.",
+    "inventory.form.origin_location": "Origin location",
+    "inventory.form.destination_location": "Destination location",
+    "inventory.form.serial_ids": "Serial IDs",
+    "inventory.form.serial_ids_placeholder": "Example: 101, 102, 103",
+    "inventory.form.reserved_delta": "Reserved delta",
+    "inventory.form.incoming_delta": "Incoming delta",
+    "inventory.form.outgoing_delta": "Outgoing delta",
+    "inventory.serials.section_description":
+      "Review, register and update serials for the selected operational variant.",
+    "inventory.serials.kpi_total": "Serials",
+    "inventory.serials.kpi_total_description":
+      "Total serials visible with the active filters.",
+    "inventory.serials.kpi_available_description":
+      "Available serials for the selected variant and active filters.",
+    "inventory.serials.kpi_reserved_description":
+      "Serials currently reserved for the selected variant.",
+    "inventory.serials.kpi_sold_description":
+      "Serials already sold for the selected variant.",
+    "inventory.serials.status_filter": "Status",
+    "inventory.serials.all_statuses": "All statuses",
+    "inventory.serials.warehouse_filter": "Warehouse",
+    "inventory.serials.all_warehouses": "All warehouses",
+    "inventory.serials.register_action": "Register serials",
+    "inventory.serials.inactive_variant_hint":
+      "The product or operational variant is inactive. You can review existing serials, but you cannot register or update statuses from this view.",
+    "inventory.serials.register_no_stock_hint":
+      "Registering serials does not increase stock automatically. This flow only creates serials using the official backend contract.",
+    "inventory.serials.no_serials":
+      "There are no serials for the selected variant with the current filters.",
+    "inventory.serials.register_dialog_title": "Register serials",
+    "inventory.serials.register_dialog_description":
+      "Add serials for {variant} using the confirmed official contract.",
+    "inventory.serials.serial_numbers": "Serial numbers",
+    "inventory.serials.serial_numbers_placeholder":
+      "One per line or separated by commas",
+    "inventory.serials.register_hint":
+      "You can paste multiple serials. They will be sent exactly as serial_numbers.",
+    "inventory.serials.update_status_action": "Update status",
+    "inventory.serials.update_status_title": "Update serial status",
+    "inventory.serials.update_status_description":
+      "Update the operational status of {serial}.",
+    "inventory.serials.received_at": "Received",
+    "inventory.serials.sold_at": "Sold",
+    "inventory.detail.source_document": "Source document",
+    "inventory.detail.source_document_number": "Document number",
+    "inventory.detail.transferred_serial_ids": "Transferred serials",
+    "inventory.detail.legacy_reference": "Legacy",
+    "inventory.product_serial_create_error_fallback":
+      "Unable to register the serials.",
+    "inventory.product_serial_update_error_fallback":
+      "Unable to update the serial status.",
+    "inventory.variant_delete_error_fallback":
+      "Unable to permanently delete the variant.",
+    "inventory.error.PRODUCT_NOT_FOUND": "Product not found.",
+    "inventory.error.PRODUCT_VARIANT_NOT_FOUND": "Product variant not found.",
+    "inventory.error.WAREHOUSE_NOT_FOUND": "Warehouse not found.",
+    "inventory.error.WAREHOUSE_LOCATION_NOT_FOUND": "Warehouse location not found.",
+    "inventory.error.INVENTORY_LOT_NOT_FOUND": "Inventory lot not found.",
+    "inventory.error.SERIAL_NOT_FOUND": "Serial not found.",
+    "inventory.error.PRICE_LIST_NOT_FOUND": "Price list not found.",
+    "inventory.error.PRODUCT_PRICE_NOT_FOUND": "Product price not found.",
+    "inventory.error.PROMOTION_NOT_FOUND": "Promotion not found.",
+    "inventory.error.BRAND_NOT_FOUND": "Brand not found.",
+    "inventory.error.CATEGORY_NOT_FOUND": "Category not found.",
+    "inventory.error.MEASUREMENT_UNIT_NOT_FOUND": "Measurement unit not found.",
+    "inventory.error.TAX_PROFILE_NOT_FOUND": "Tax profile not found.",
+    "inventory.error.WARRANTY_PROFILE_NOT_FOUND": "Warranty profile not found.",
+    "inventory.error.BRANCH_NOT_FOUND": "Branch not found.",
+    "inventory.error.PRODUCT_INACTIVE": "The product is inactive.",
+    "inventory.error.VARIANT_INACTIVE": "The variant is inactive.",
+    "inventory.error.WAREHOUSE_INACTIVE": "The warehouse is inactive.",
+    "inventory.error.WAREHOUSE_LOCATION_INACTIVE":
+      "The warehouse location is inactive.",
+    "inventory.error.INVENTORY_LOT_INACTIVE": "The inventory lot is inactive.",
+    "inventory.error.PRICE_LIST_INACTIVE": "The price list is inactive.",
+    "inventory.error.BRAND_INACTIVE": "The brand is inactive.",
+    "inventory.error.CATEGORY_INACTIVE": "The category is inactive.",
+    "inventory.error.MEASUREMENT_UNIT_INACTIVE":
+      "The measurement unit is inactive.",
+    "inventory.error.TAX_PROFILE_INACTIVE": "The tax profile is inactive.",
+    "inventory.error.WARRANTY_PROFILE_INACTIVE":
+      "The warranty profile is inactive.",
+    "inventory.error.PRODUCT_OR_VARIANT_REQUIRED":
+      "You must select a product or a variant.",
+    "inventory.error.VARIANT_REQUIRED_FOR_MULTI_VARIANT_PRODUCT":
+      "A variant is required for multi-variant products.",
+    "inventory.error.VARIANT_PRODUCT_MISMATCH":
+      "The selected variant does not belong to the selected product.",
+    "inventory.error.PRODUCT_DOES_NOT_SUPPORT_VARIANTS":
+      "The selected product does not support variants.",
+    "inventory.error.CANNOT_EDIT_DEFAULT_VARIANT_OF_SIMPLE_PRODUCT":
+      "The default variant of a simple product cannot be edited.",
+    "inventory.error.CANNOT_DEACTIVATE_DEFAULT_VARIANT":
+      "The default variant cannot be deactivated.",
+    "inventory.error.CANNOT_DEACTIVATE_LAST_ACTIVE_VARIANT":
+      "The last active variant cannot be deactivated.",
+    "inventory.error.PRODUCT_SKU_DUPLICATE": "The product SKU already exists.",
+    "inventory.error.PRODUCT_BARCODE_DUPLICATE":
+      "The product barcode already exists.",
+    "inventory.error.VARIANT_SKU_DUPLICATE": "The variant SKU already exists.",
+    "inventory.error.VARIANT_BARCODE_DUPLICATE":
+      "The variant barcode already exists.",
+    "inventory.error.PRODUCT_VARIANT_DELETE_FORBIDDEN":
+      "The variant cannot be permanently deleted in its current state.",
+    "inventory.error.PRODUCT_INVENTORY_TRACKING_REQUIRED":
+      "The product must track inventory for this operation.",
+    "inventory.error.VARIANT_INVENTORY_TRACKING_REQUIRED":
+      "The variant must track inventory for this operation.",
+    "inventory.error.PRODUCT_LOT_TRACKING_REQUIRED":
+      "The product must track lots for this operation.",
+    "inventory.error.PRODUCT_LOT_TRACKING_REQUIRES_INVENTORY":
+      "Product lot tracking requires inventory tracking.",
+    "inventory.error.PRODUCT_EXPIRATION_REQUIRES_LOTS":
+      "Product expiration tracking requires lot tracking.",
+    "inventory.error.VARIANT_LOT_TRACKING_REQUIRES_INVENTORY":
+      "Variant lot tracking requires inventory tracking.",
+    "inventory.error.VARIANT_EXPIRATION_REQUIRES_LOTS":
+      "Variant expiration tracking requires lot tracking.",
+    "inventory.error.VARIANT_SERIAL_TRACKING_REQUIRES_INVENTORY":
+      "Variant serial tracking requires inventory tracking.",
+    "inventory.error.PRODUCT_WARRANTY_PROFILE_REQUIRED":
+      "A warranty profile is required for the product.",
+    "inventory.error.PRODUCT_UNIT_CONVERSION_NOT_SUPPORTED":
+      "Unit conversion is not supported in this phase.",
+    "inventory.error.PRODUCT_TAX_PROFILE_ITEM_KIND_INVALID":
+      "The tax profile does not match the product item kind.",
+    "inventory.error.INVENTORY_LOT_REQUIRED": "An inventory lot is required.",
+    "inventory.error.INVENTORY_LOT_NUMBER_DUPLICATE":
+      "The inventory lot number already exists.",
+    "inventory.error.INVENTORY_LOT_EXPIRATION_REQUIRED":
+      "Expiration date is required for this lot.",
+    "inventory.error.INVENTORY_LOT_WAREHOUSE_MISMATCH":
+      "The inventory lot does not belong to the selected warehouse.",
+    "inventory.error.INVENTORY_LOT_PRODUCT_MISMATCH":
+      "The inventory lot does not belong to the selected product.",
+    "inventory.error.INVENTORY_LOT_VARIANT_MISMATCH":
+      "The inventory lot does not belong to the selected variant.",
+    "inventory.error.INVENTORY_LOT_LOCATION_MISMATCH":
+      "The inventory lot does not belong to the selected location.",
+    "inventory.error.INVENTORY_NEGATIVE_STOCK_FORBIDDEN":
+      "The operation would leave inventory negative and that is not allowed.",
+    "inventory.error.INVENTORY_LOT_NEGATIVE_BALANCE_FORBIDDEN":
+      "The operation would leave the lot with a negative balance.",
+    "inventory.error.INSUFFICIENT_STOCK":
+      "There is not enough stock to complete the operation.",
+    "inventory.error.TRANSFER_WAREHOUSE_DUPLICATE":
+      "Origin and destination warehouses must be different.",
+    "inventory.error.WAREHOUSE_LOCATION_MISMATCH":
+      "The location does not belong to the selected warehouse.",
+    "inventory.error.WAREHOUSE_NOT_ALLOWED_FOR_BRANCH":
+      "The warehouse does not belong to the active branch.",
+    "inventory.error.TENANT_MISMATCH":
+      "The resource does not belong to the current operational tenant.",
+    "inventory.error.INVENTORY_MOVEMENT_NOT_FOUND": "Inventory movement not found.",
+    "inventory.error.INVENTORY_MOVEMENT_ALREADY_CANCELLED":
+      "The inventory movement has already been cancelled.",
+    "inventory.error.INVENTORY_MOVEMENT_POSTED_REQUIRED":
+      "This action requires a movement in posted status.",
+    "inventory.error.INVENTORY_MOVEMENT_LINES_REQUIRED":
+      "The movement must include at least one line.",
+    "inventory.error.INVENTORY_MOVEMENT_RELATION_MISSING":
+      "The movement is missing required operational relations.",
+    "inventory.error.SERIAL_NUMBERS_REQUIRED":
+      "You must send at least one serial number.",
+    "inventory.error.SERIAL_NUMBER_DUPLICATE":
+      "One or more serial numbers already exist.",
+    "inventory.error.VARIANT_SERIAL_TRACKING_DISABLED":
+      "Serial tracking is disabled for the selected variant.",
+    "inventory.error.SERIALS_REQUIRED_FOR_SERIAL_TRACKED_VARIANT":
+      "Serials are required for this serial-tracked variant.",
+    "inventory.error.SERIAL_TRANSFER_INTEGER_QUANTITY_REQUIRED":
+      "Quantity must be an integer when the variant uses serials.",
+    "inventory.error.SERIAL_TRANSFER_QUANTITY_MISMATCH":
+      "Quantity must match the amount of serials sent.",
+    "inventory.error.SERIAL_VARIANT_MISMATCH":
+      "One or more serials do not belong to the selected variant.",
+    "inventory.error.SERIAL_WAREHOUSE_MISMATCH":
+      "One or more serials do not belong to the origin warehouse.",
+    "inventory.error.SERIAL_STATUS_NOT_TRANSFERABLE":
+      "One or more serials are not in a transferable status.",
+    "inventory.error.SERIALS_OUTSIDE_BUSINESS":
+      "One or more serials do not belong to the active business.",
+    "inventory.error.PRICE_LIST_NAME_DUPLICATE":
+      "A price list with that name already exists.",
+    "inventory.error.BRANCH_PRICE_LIST_ASSIGNMENT_NOT_FOUND":
+      "This price list branch assignment was not found.",
+    "inventory.error.BRANCH_PRICE_LIST_ASSIGNMENT_DUPLICATE":
+      "This price list already has an assignment for the target branch.",
+    "inventory.error.BRANCH_PRICE_LIST_DEFAULT_REQUIRES_ACTIVE_ASSIGNMENT":
+      "A branch default price list requires an active assignment.",
+    "inventory.error.PRICE_VALID_RANGE_INVALID":
+      "The price validity range is invalid.",
+    "inventory.error.PROMOTION_NAME_DUPLICATE":
+      "A promotion with that name already exists.",
+    "inventory.error.PROMOTION_INACTIVE":
+      "The promotion is inactive.",
+    "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_NOT_FOUND":
+      "This promotion branch assignment was not found.",
+    "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_DUPLICATE":
+      "This promotion already has an assignment for the target branch.",
+    "inventory.error.PROMOTION_PRODUCT_OR_VARIANT_REQUIRED":
+      "Each promotion item requires a product or a variant.",
+    "inventory.error.PROMOTION_DUPLICATE_ITEMS":
+      "You cannot repeat the same product or variant in the promotion.",
+    "inventory.error.PROMOTION_ITEMS_OUTSIDE_BUSINESS":
+      "The promotion includes items outside the active business.",
+    "inventory.error.PROMOTION_DISCOUNT_VALUE_REQUIRED":
+      "Discount value is required for this promotion.",
+    "inventory.error.PROMOTION_OVERRIDE_PRICE_REQUIRED":
+      "Override price is required for this promotion.",
+    "inventory.error.PROMOTION_BUY_X_GET_Y_FIELDS_REQUIRED":
+      "Min quantity and bonus quantity are required for this promotion.",
+    "inventory.error.PROMOTION_DATE_RANGE_INVALID":
+      "The promotion date range is invalid.",
     "platform.clear_tenant_error_fallback":
       "Unable to leave the business context.",
     "platform.clear_tenant_success": "Tenant context cleared successfully.",
@@ -1607,6 +2381,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "users.branches_update_error_fallback":
       "Unable to update user branches.",
     "users.create_error_fallback": "Unable to create the user.",
+    "users.delete_error_fallback": "Unable to delete the user.",
     "users.password_update_error_fallback":
       "Unable to update the user password.",
     "users.password_updated_success": "Password updated successfully.",

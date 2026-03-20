@@ -8,13 +8,20 @@ import { formatDateTime } from "@/shared/lib/utils";
 import type { Brand } from "../types";
 
 type GetBrandsColumnsParams = {
+  canDelete: boolean;
   canUpdate: boolean;
   onDelete: (brand: Brand) => void;
   onEdit: (brand: Brand) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
-function getBrandsColumns({ canUpdate, onDelete, onEdit, t }: GetBrandsColumnsParams): ColumnDef<Brand>[] {
+function getBrandsColumns({
+  canDelete,
+  canUpdate,
+  onDelete,
+  onEdit,
+  t,
+}: GetBrandsColumnsParams): ColumnDef<Brand>[] {
   const baseColumns: ColumnDef<Brand>[] = [
     {
       accessorKey: "name",
@@ -52,24 +59,32 @@ function getBrandsColumns({ canUpdate, onDelete, onEdit, t }: GetBrandsColumnsPa
     },
   ];
 
-  if (canUpdate) {
+  if (canUpdate || canDelete) {
     baseColumns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
         <TableRowActions
           actions={[
-            {
-              label: t("inventory.common.edit"),
-              icon: Pencil,
-              onClick: () => onEdit(row.original),
-            },
-            {
-              label: t("inventory.common.delete"),
-              icon: Trash2,
-              variant: "destructive",
-              onClick: () => onDelete(row.original),
-            },
+            ...(canUpdate
+              ? [
+                  {
+                    label: t("inventory.common.edit"),
+                    icon: Pencil,
+                    onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(canDelete && row.original.lifecycle.can_delete
+              ? [
+                  {
+                    label: t("inventory.common.delete"),
+                    icon: Trash2,
+                    variant: "destructive" as const,
+                    onClick: () => onDelete(row.original),
+                  },
+                ]
+              : []),
           ]}
         />
       ),

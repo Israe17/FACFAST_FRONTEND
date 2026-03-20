@@ -16,7 +16,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 
 export default function UsersPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -62,7 +62,10 @@ export default function UsersPage() {
       {usersQuery.isLoading ? <LoadingState description="Loading users." /> : null}
       {usersQuery.isError ? (
         <ErrorState
-          description={getBackendErrorMessage(usersQuery.error, t("common.load_failed"))}
+          description={getTranslatedBackendErrorMessage(usersQuery.error, {
+            fallbackMessage: t("common.load_failed"),
+            translateMessage: t,
+          }) ?? undefined}
           onRetry={() => usersQuery.refetch()}
         />
       ) : null}

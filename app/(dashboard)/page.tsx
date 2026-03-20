@@ -6,7 +6,6 @@ import {
   Boxes,
   BriefcaseBusiness,
   Building2,
-  ChevronRight,
   ContactRound,
   GitBranch,
   ShieldCheck,
@@ -22,6 +21,7 @@ import { DataCard } from "@/shared/components/data-card";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { ModuleEntryCard } from "@/shared/components/module-entry-card";
 import { PageHeader } from "@/shared/components/page-header";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -107,7 +107,7 @@ export default function DashboardPage() {
             ) : null}
           </div>
         }
-        description="Panel operativo del tenant activo. Desde aquÃ­ puedes entrar directamente a los mÃ³dulos administrativos reales."
+        description="Panel operativo del tenant activo. Desde aqui puedes entrar directamente a los modulos administrativos reales."
         eyebrow={isTenantContextMode ? "Tenant Context" : "Tenant"}
         title={businessQuery.data?.name ?? `Bienvenido${user?.name ? `, ${user.name}` : ""}`}
       />
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           value={businessQuery.data?.name ?? "Cargando"}
         />
         <DataCard
-          description="Cantidad de roles visibles en la sesiÃ³n actual."
+          description="Cantidad de roles visibles en la sesion actual."
           icon={<ShieldCheck className="size-5" />}
           title="Roles"
           value={user?.roles.length ?? 0}
@@ -141,9 +141,9 @@ export default function DashboardPage() {
           value={branchSummary}
         />
         <DataCard
-          description="MÃ³dulos tenant disponibles desde este contexto."
+          description="Modulos tenant disponibles desde este contexto."
           icon={<Users className="size-5" />}
-          title="MÃ³dulos"
+          title="Modulos"
           value={visibleQuickLinks.length}
         />
       </section>
@@ -157,43 +157,35 @@ export default function DashboardPage() {
       ) : null}
       {!businessQuery.isLoading && !businessQuery.isError && !businessQuery.data ? (
         <EmptyState
-          description="La sesiÃ³n entrÃ³ al shell tenant, pero el backend no devolviÃ³ la empresa actual."
+          description="La sesion entro al shell tenant, pero el backend no devolvio la empresa actual."
           icon={BriefcaseBusiness}
           title="Sin empresa activa"
         />
       ) : null}
 
-      <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">NavegaciÃ³n tenant real</h2>
-          <p className="text-sm text-muted-foreground">
-            Estos accesos abren los mÃ³dulos operativos del tenant seleccionado sin volver al modo plataforma.
-          </p>
-        </div>
+      <section className="space-y-5 pt-2">
+        <PageHeader
+          actions={
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <Badge variant="outline">{visibleQuickLinks.length} modulos habilitados</Badge>
+              <Badge variant="outline">{branchSummary}</Badge>
+            </div>
+          }
+          description="Estos accesos abren los modulos operativos del tenant seleccionado sin volver al modo plataforma."
+          eyebrow="Acceso operativo"
+          title="Navegacion tenant real"
+        />
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleQuickLinks.map((item) => (
-            <article
+            <ModuleEntryCard
               key={item.href}
-              className="group flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/60 p-5 transition-all duration-200 hover:border-primary/30 hover:bg-card hover:shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="rounded-xl border border-primary/15 bg-primary/8 p-3 text-primary">
-                  <item.icon className="size-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              </div>
-
-              <Button asChild className="w-full" variant="outline">
-                <Link href={item.href}>
-                  Abrir módulo
-                  <ChevronRight className="ml-auto size-4" />
-                </Link>
-              </Button>
-            </article>
+              ctaLabel="Abrir modulo"
+              description={item.description}
+              href={item.href}
+              icon={item.icon}
+              title={item.title}
+            />
           ))}
         </div>
       </section>

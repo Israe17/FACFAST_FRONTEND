@@ -23,6 +23,7 @@ import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import {
   useDeactivateProductMutation,
+  useReactivateProductMutation,
   useBrandsQuery,
   useMeasurementUnitsQuery,
   useProductCategoriesQuery,
@@ -45,17 +46,24 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const canView = can("products.view");
   const canCreate = can("products.create");
   const canUpdate = can("products.update");
+  const canDelete = can("products.delete");
+  const canViewCategories = can("categories.view");
+  const canViewBrands = can("brands.view");
+  const canViewMeasurementUnits = can("measurement_units.view");
+  const canViewTaxProfiles = can("tax_profiles.view");
+  const canViewWarrantyProfiles = can("warranty_profiles.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Product | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "name" });
   const productsQuery = useProductsPaginatedQuery(queryParams, enabled && canView);
-  const categoriesQuery = useProductCategoriesQuery(enabled && canView);
-  const brandsQuery = useBrandsQuery(enabled && canView);
-  const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canView);
-  const taxProfilesQuery = useTaxProfilesQuery(enabled && canView);
-  const warrantyProfilesQuery = useWarrantyProfilesQuery(enabled && canView);
+  const categoriesQuery = useProductCategoriesQuery(enabled && canViewCategories);
+  const brandsQuery = useBrandsQuery(enabled && canViewBrands);
+  const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canViewMeasurementUnits);
+  const taxProfilesQuery = useTaxProfilesQuery(enabled && canViewTaxProfiles);
+  const warrantyProfilesQuery = useWarrantyProfilesQuery(enabled && canViewWarrantyProfiles);
   const deactivateMutation = useDeactivateProductMutation({ showErrorToast: true });
+  const reactivateMutation = useReactivateProductMutation({ showErrorToast: true });
 
   const onEdit = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -71,13 +79,17 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const columns = useMemo(
     () =>
       getProductsColumns({
+        canDelete,
         canUpdate,
         canView,
         onDeactivate: setDeactivateTarget,
         onEdit,
+        onReactivate: (product) => {
+          void reactivateMutation.mutateAsync(product.id);
+        },
         t,
       }),
-    [canUpdate, canView, onEdit, t],
+    [canDelete, canUpdate, canView, onEdit, reactivateMutation, t],
   );
 
   if (!canView) {

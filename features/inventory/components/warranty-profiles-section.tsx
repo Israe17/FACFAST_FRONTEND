@@ -36,6 +36,7 @@ function WarrantyProfilesSection({ enabled = true }: WarrantyProfilesSectionProp
   const canView = can("warranty_profiles.view");
   const canCreate = can("warranty_profiles.create");
   const canUpdate = can("warranty_profiles.update");
+  const canDelete = can("warranty_profiles.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedWarrantyProfile, setSelectedWarrantyProfile] =
     useState<WarrantyProfile | null>(null);
@@ -57,12 +58,13 @@ function WarrantyProfilesSection({ enabled = true }: WarrantyProfilesSectionProp
   const columns = useMemo(
     () =>
       getWarrantyProfilesColumns({
+        canDelete,
         canUpdate,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         t,
       }),
-    [canUpdate, handleEdit, t],
+    [canDelete, canUpdate, handleEdit, t],
   );
 
   if (!canView) {

@@ -1,9 +1,20 @@
 import { AxiosError } from "axios";
+import { z } from "zod/v4";
 
 import { http } from "@/shared/lib/http";
 
-import { contactSchema } from "./schemas";
-import type { CreateContactInput, UpdateContactInput } from "./types";
+import { contactBranchAssignmentSchema, contactBranchContextSchema, contactSchema } from "./schemas";
+import type {
+  CreateContactBranchAssignmentInput,
+  CreateContactInput,
+  UpdateContactBranchAssignmentInput,
+  UpdateContactInput,
+} from "./types";
+
+const deleteResponseSchema = z.object({
+  deleted: z.boolean().optional().default(true),
+  id: z.union([z.string(), z.number()]).transform(String),
+});
 
 function extractCollection(data: unknown, explicitKey?: string) {
   if (Array.isArray(data)) {
@@ -49,6 +60,12 @@ function compactRecord<T extends Record<string, unknown>>(record: T) {
   );
 }
 
+function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
+  return Object.fromEntries(
+    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
+  );
+}
+
 function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
   return compactRecord({
     address: payload.address,
@@ -74,6 +91,41 @@ function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
   });
 }
 
+function toOptionalNumberId(value: string | number | null | undefined, preserveNull = false) {
+  if (value === "") {
+    return undefined;
+  }
+
+  if (value === null) {
+    return preserveNull ? null : undefined;
+  }
+
+  if (value === undefined) {
+    return undefined;
+  }
+
+  return Number(value);
+}
+
+function buildContactBranchAssignmentPayload(
+  payload: CreateContactBranchAssignmentInput | UpdateContactBranchAssignmentInput,
+) {
+  return compactNullableRecord({
+    account_manager_user_id: toOptionalNumberId(payload.account_manager_user_id, true),
+    branch_id: "branch_id" in payload ? toOptionalNumberId(payload.branch_id) : undefined,
+    credit_enabled: payload.credit_enabled,
+    custom_credit_limit: payload.custom_credit_limit,
+    custom_price_list_id: toOptionalNumberId(payload.custom_price_list_id, true),
+    is_active: payload.is_active,
+    is_default: payload.is_default,
+    is_exclusive: payload.is_exclusive,
+    is_preferred: payload.is_preferred,
+    notes: payload.notes === "" ? null : payload.notes,
+    purchases_enabled: payload.purchases_enabled,
+    sales_enabled: payload.sales_enabled,
+  });
+}
+
 export async function listContacts() {
   const response = await http.get("/contacts");
   return extractCollection(response.data, "contacts").map((contact) => contactSchema.parse(contact));
@@ -89,7 +141,50 @@ export async function createContact(payload: CreateContactInput) {
 }
 
 export async function updateContact(contactId: string, payload: UpdateContactInput) {
-  await http.patch(`/contacts/${contactId}`, buildContactPayload(payload));
+  const response = await http.patch(`/contacts/${contactId}`, buildContactPayload(payload));
+  return contactSchema.parse(extractEntity(response.data, "contact"));
+}
+
+export async function deleteContact(contactId: string) {
+  const response = await http.delete(`/contacts/${contactId}`);
+  return deleteResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function getContactBranchContext(contactId: string) {
+  const response = await http.get(`/contacts/${contactId}/branches`);
+  return contactBranchContextSchema.parse(extractEntity(response.data));
+}
+
+export async function createContactBranchAssignment(
+  contactId: string,
+  payload: CreateContactBranchAssignmentInput,
+) {
+  const response = await http.post(
+    `/contacts/${contactId}/branches`,
+    buildContactBranchAssignmentPayload(payload),
+  );
+  return contactBranchAssignmentSchema.parse(
+    extractEntity(response.data, "assignment"),
+  );
+}
+
+export async function updateContactBranchAssignment(
+  contactId: string,
+  assignmentId: string,
+  payload: UpdateContactBranchAssignmentInput,
+) {
+  const response = await http.patch(
+    `/contacts/${contactId}/branches/${assignmentId}`,
+    buildContactBranchAssignmentPayload(payload),
+  );
+  return contactBranchAssignmentSchema.parse(
+    extractEntity(response.data, "assignment"),
+  );
+}
+
+export async function deleteContactBranchAssignment(contactId: string, assignmentId: string) {
+  const response = await http.delete(`/contacts/${contactId}/branches/${assignmentId}`);
+  return deleteResponseSchema.parse(extractEntity(response.data));
 }
 
 export type PaginatedQueryParams = {

@@ -30,6 +30,7 @@ import {
   useCreateInventoryTransferMutation,
   useInventoryLotsQuery,
   useInventoryMovementsPaginatedQuery,
+  useProductVariantsQuery,
   useProductsQuery,
   useWarehouseLocationsQuery,
   useWarehousesQuery,
@@ -41,7 +42,7 @@ import {
 import type {
   CreateInventoryAdjustmentInput,
   CreateInventoryTransferInput,
-  InventoryMovementRow,
+  InventoryMovementHeader,
 } from "../types";
 import { CancelMovementDialog } from "./cancel-movement-dialog";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -58,17 +59,31 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const { t } = useAppTranslator();
   const canView = can("inventory_movements.view");
   const canAdjust = can("inventory_movements.adjust");
+  const canTransfer = can("inventory_movements.transfer");
+  const canCancel = can("inventory_movements.cancel");
+  const canViewProducts = can("products.view");
+  const canViewWarehouses = can("warehouses.view");
+  const canViewLots = can("inventory_lots.view");
+  const canViewLocations = can("warehouse_locations.view");
+  const canViewVariants = can("product_variants.view");
+  const canOpenAdjustmentForm = canAdjust && canViewProducts && canViewWarehouses && canViewVariants;
+  const canOpenTransferForm = canTransfer && canViewProducts && canViewWarehouses && canViewVariants;
   const [adjustmentOpen, setAdjustmentOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
-  const [selectedMovement, setSelectedMovement] = useState<InventoryMovementRow | null>(null);
+  const [selectedMovement, setSelectedMovement] = useState<InventoryMovementHeader | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
   const movementsQuery = useInventoryMovementsPaginatedQuery(queryParams, enabled && canView);
-  const warehousesQuery = useWarehousesQuery(enabled && canView);
-  const productsQuery = useProductsQuery(enabled && canView);
-  const lotsQuery = useInventoryLotsQuery((adjustmentOpen || enabled) && canView);
+  const warehousesQuery = useWarehousesQuery(
+    (adjustmentOpen || transferOpen) && canViewWarehouses,
+  );
+  const productsQuery = useProductsQuery((adjustmentOpen || transferOpen) && canViewProducts);
+  const lotsQuery = useInventoryLotsQuery((adjustmentOpen || transferOpen) && canViewLots);
   const inventoryProducts = useMemo(
-    () => (productsQuery.data ?? []).filter((product) => product.track_inventory),
+    () =>
+      (productsQuery.data ?? []).filter(
+        (product) => product.is_active && product.type === "product" && product.track_inventory,
+      ),
     [productsQuery.data],
   );
 
@@ -79,14 +94,39 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const adjustmentWarehouseId = useWatch({
     control: adjustmentForm.control,
     name: "warehouse_id",
-  });
+  }) ?? "";
   const adjustmentProductId = useWatch({
     control: adjustmentForm.control,
     name: "product_id",
-  });
+  }) ?? "";
+  const adjustmentVariantId = useWatch({
+    control: adjustmentForm.control,
+    name: "product_variant_id",
+  }) ?? "";
+  const adjustmentSelectedProduct = inventoryProducts.find((product) => product.id === adjustmentProductId);
+  const { data: adjustmentProductVariants = [] } = useProductVariantsQuery(
+    adjustmentProductId,
+    adjustmentOpen && canViewVariants && Boolean(adjustmentSelectedProduct?.has_variants),
+  );
+  const adjustmentSelectedVariant = adjustmentProductVariants.find(
+    (variant) => variant.id === adjustmentVariantId,
+  );
+  const adjustmentRequiresLot = adjustmentSelectedProduct?.has_variants
+    ? Boolean(adjustmentSelectedVariant?.track_lots)
+    : Boolean(adjustmentSelectedProduct?.track_lots);
   const adjustmentLocationsQuery = useWarehouseLocationsQuery(
     adjustmentWarehouseId,
-    adjustmentOpen && Boolean(adjustmentWarehouseId),
+    adjustmentOpen && canViewLocations && Boolean(adjustmentWarehouseId),
+  );
+  const adjustmentLocations = useMemo(
+    () =>
+      (adjustmentLocationsQuery.data ?? [])
+        .filter((location) => location.is_active)
+        .map((location) => ({
+          id: location.id,
+          name: location.name,
+        })),
+    [adjustmentLocationsQuery.data],
   );
   const adjustmentMutation = useCreateInventoryAdjustmentMutation({ showErrorToast: false });
   const {
@@ -99,6 +139,62 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
     defaultValues: emptyInventoryTransferFormValues,
     resolver: buildFormResolver<CreateInventoryTransferInput>(createInventoryTransferSchema),
   });
+  const transferOriginWarehouseId = useWatch({
+    control: transferForm.control,
+    name: "origin_warehouse_id",
+  }) ?? "";
+  const transferDestinationWarehouseId = useWatch({
+    control: transferForm.control,
+    name: "destination_warehouse_id",
+  }) ?? "";
+  const transferProductId = useWatch({
+    control: transferForm.control,
+    name: "product_id",
+  }) ?? "";
+  const transferVariantId = useWatch({
+    control: transferForm.control,
+    name: "product_variant_id",
+  }) ?? "";
+  const transferSelectedProduct = inventoryProducts.find((product) => product.id === transferProductId);
+  const { data: transferProductVariants = [] } = useProductVariantsQuery(
+    transferProductId,
+    transferOpen && canViewVariants && Boolean(transferSelectedProduct?.has_variants),
+  );
+  const transferSelectedVariant = transferProductVariants.find((variant) => variant.id === transferVariantId);
+  const transferRequiresLot = transferSelectedProduct?.has_variants
+    ? Boolean(transferSelectedVariant?.track_lots)
+    : Boolean(transferSelectedProduct?.track_lots);
+  const transferRequiresSerials = transferSelectedProduct?.has_variants
+    ? Boolean(transferSelectedVariant?.track_serials)
+    : Boolean(transferSelectedProduct?.track_serials);
+  const transferOriginLocationsQuery = useWarehouseLocationsQuery(
+    transferOriginWarehouseId,
+    transferOpen && canViewLocations && Boolean(transferOriginWarehouseId),
+  );
+  const transferDestinationLocationsQuery = useWarehouseLocationsQuery(
+    transferDestinationWarehouseId,
+    transferOpen && canViewLocations && Boolean(transferDestinationWarehouseId),
+  );
+  const transferOriginLocations = useMemo(
+    () =>
+      (transferOriginLocationsQuery.data ?? [])
+        .filter((location) => location.is_active)
+        .map((location) => ({
+          id: location.id,
+          name: location.name,
+        })),
+    [transferOriginLocationsQuery.data],
+  );
+  const transferDestinationLocations = useMemo(
+    () =>
+      (transferDestinationLocationsQuery.data ?? [])
+        .filter((location) => location.is_active)
+        .map((location) => ({
+          id: location.id,
+          name: location.name,
+        })),
+    [transferDestinationLocationsQuery.data],
+  );
   const transferMutation = useCreateInventoryTransferMutation({ showErrorToast: false });
   const {
     formError: transferFormError,
@@ -125,18 +221,37 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
       (lotsQuery.data ?? []).filter((lot) => {
         const sameWarehouse = !adjustmentWarehouseId || lot.warehouse.id === adjustmentWarehouseId;
         const sameProduct = !adjustmentProductId || lot.product.id === adjustmentProductId;
-        return sameWarehouse && sameProduct;
+        const sameVariant = !adjustmentVariantId || lot.product_variant?.id === adjustmentVariantId;
+        return lot.is_active && sameWarehouse && sameProduct && sameVariant;
       }),
-    [adjustmentProductId, adjustmentWarehouseId, lotsQuery.data],
+    [adjustmentProductId, adjustmentVariantId, adjustmentWarehouseId, lotsQuery.data],
+  );
+  const transferFilteredLots = useMemo(
+    () =>
+      (lotsQuery.data ?? []).filter((lot) => {
+        const sameWarehouse =
+          !transferOriginWarehouseId || lot.warehouse.id === transferOriginWarehouseId;
+        const sameProduct = !transferProductId || lot.product.id === transferProductId;
+        const sameVariant =
+          !transferVariantId || lot.product_variant?.id === transferVariantId;
+        return lot.is_active && sameWarehouse && sameProduct && sameVariant;
+      }),
+    [lotsQuery.data, transferOriginWarehouseId, transferProductId, transferVariantId],
   );
 
   async function handleAdjustmentSubmit(values: CreateInventoryAdjustmentInput) {
     resetAdjustmentBackendErrors();
 
-    const selectedProduct = inventoryProducts.find((product) => product.id === values.product_id);
-    if (selectedProduct?.track_lots && !values.inventory_lot_id) {
+    if (adjustmentSelectedProduct?.has_variants && !values.product_variant_id) {
+      adjustmentForm.setError("product_variant_id", {
+        message: t("inventory.error.VARIANT_REQUIRED_FOR_MULTI_VARIANT_PRODUCT"),
+      });
+      return;
+    }
+
+    if (adjustmentRequiresLot && !values.inventory_lot_id) {
       adjustmentForm.setError("inventory_lot_id", {
-        message: t("inventory.inventory_movements.inventory_lot_required"),
+        message: t("inventory.error.INVENTORY_LOT_REQUIRED"),
       });
       return;
     }
@@ -154,6 +269,43 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   async function handleTransferSubmit(values: CreateInventoryTransferInput) {
     resetTransferBackendErrors();
 
+    if (transferSelectedProduct?.has_variants && !values.product_variant_id) {
+      transferForm.setError("product_variant_id", {
+        message: t("inventory.error.VARIANT_REQUIRED_FOR_MULTI_VARIANT_PRODUCT"),
+      });
+      return;
+    }
+
+    if (transferRequiresLot && !values.inventory_lot_id) {
+      transferForm.setError("inventory_lot_id", {
+        message: t("inventory.error.INVENTORY_LOT_REQUIRED"),
+      });
+      return;
+    }
+
+    if (transferRequiresSerials) {
+      if (!values.serial_ids?.length) {
+        transferForm.setError("serial_ids", {
+          message: t("inventory.error.SERIALS_REQUIRED_FOR_SERIAL_TRACKED_VARIANT"),
+        });
+        return;
+      }
+
+      if (!Number.isInteger(values.quantity)) {
+        transferForm.setError("quantity", {
+          message: t("inventory.error.SERIAL_TRANSFER_INTEGER_QUANTITY_REQUIRED"),
+        });
+        return;
+      }
+
+      if (values.serial_ids.length !== values.quantity) {
+        transferForm.setError("serial_ids", {
+          message: t("inventory.error.SERIAL_TRANSFER_QUANTITY_MISMATCH"),
+        });
+        return;
+      }
+    }
+
     try {
       await transferMutation.mutateAsync(values);
       setTransferOpen(false);
@@ -167,7 +319,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const columns = useMemo(
     () =>
       getInventoryMovementsColumns({
-        canAdjust,
+        canCancel,
         canView,
         t,
         onCancel: (m) => {
@@ -175,7 +327,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
           setCancelOpen(true);
         },
       }),
-    [canAdjust, canView, t],
+    [canCancel, canView, t],
   );
 
   if (!canView) {
@@ -186,16 +338,20 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
     <>
       <CatalogSectionCard
         action={
-          canAdjust ? (
+          canOpenAdjustmentForm || canOpenTransferForm ? (
             <div className="flex flex-wrap gap-2">
-              <Button onClick={() => setAdjustmentOpen(true)} variant="outline">
-                <Plus className="size-4" />
-                {t("inventory.inventory_movements.new_adjustment")}
-              </Button>
-              <Button onClick={() => setTransferOpen(true)}>
-                <ArrowRightLeft className="size-4" />
-                {t("inventory.inventory_movements.new_transfer")}
-              </Button>
+              {canOpenAdjustmentForm ? (
+                <Button onClick={() => setAdjustmentOpen(true)} variant="outline">
+                  <Plus className="size-4" />
+                  {t("inventory.inventory_movements.new_adjustment")}
+                </Button>
+              ) : null}
+              {canOpenTransferForm ? (
+                <Button onClick={() => setTransferOpen(true)}>
+                  <ArrowRightLeft className="size-4" />
+                  {t("inventory.inventory_movements.new_transfer")}
+                </Button>
+              ) : null}
             </div>
           ) : null
         }
@@ -242,10 +398,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
             form={adjustmentForm}
             formError={adjustmentFormError}
             isPending={adjustmentMutation.isPending}
-            locations={(adjustmentLocationsQuery.data ?? []).map((location) => ({
-              id: location.id,
-              name: location.name,
-            }))}
+            locations={adjustmentLocations}
             lots={filteredLots}
             onSubmit={handleAdjustmentSubmit}
             products={inventoryProducts}
@@ -264,10 +417,13 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
             </DialogDescription>
           </DialogHeader>
           <InventoryTransferForm
+            destinationLocations={transferDestinationLocations}
             form={transferForm}
             formError={transferFormError}
             isPending={transferMutation.isPending}
+            lots={transferFilteredLots}
             onSubmit={handleTransferSubmit}
+            originLocations={transferOriginLocations}
             products={inventoryProducts}
             submitLabel={t("inventory.inventory_movements.create_transfer")}
             warehouses={warehousesQuery.data ?? []}

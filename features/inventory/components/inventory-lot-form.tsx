@@ -56,13 +56,26 @@ function InventoryLotForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
-  const watchedProductId = form.watch("product_id");
+  const watchedProductId = form.watch("product_id") ?? "";
+  const selectedProduct = products.find((product) => product.id === watchedProductId);
+  const operationalProducts = products.filter(
+    (product) =>
+      product.is_active &&
+      product.type === "product" &&
+      product.track_inventory &&
+      (product.track_lots || product.has_variants),
+  );
 
   useEffect(() => {
     if (!isEditing) {
-      form.setValue("product_variant_id", "", { shouldDirty: true });
+      const defaultVariantId =
+        selectedProduct?.has_variants === false
+          ? selectedProduct.variants.find((variant) => variant.is_default)?.id ?? ""
+          : "";
+
+      form.setValue("product_variant_id", defaultVariantId, { shouldDirty: true });
     }
-  }, [form, watchedProductId, isEditing]);
+  }, [form, isEditing, selectedProduct, watchedProductId]);
 
   return (
     <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
@@ -90,7 +103,7 @@ function InventoryLotForm({
                   <SelectValue placeholder={t("inventory.form.select_warehouse")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {warehouses.map((warehouse) => (
+                  {warehouses.filter((warehouse) => warehouse.is_active).map((warehouse) => (
                     <SelectItem key={warehouse.id} value={warehouse.id}>
                       {warehouse.name}
                     </SelectItem>
@@ -117,7 +130,7 @@ function InventoryLotForm({
                   <SelectValue placeholder={t("inventory.form.select_product")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {products.map((product) => (
+                  {operationalProducts.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       {product.name}
                     </SelectItem>

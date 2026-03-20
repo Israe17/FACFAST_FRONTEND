@@ -22,9 +22,9 @@ import type {
   CreateInventoryAdjustmentInput,
   InventoryLot,
   Product,
-  ProductVariant,
   Warehouse,
 } from "../types";
+import { useProductVariantsQuery } from "../queries";
 import { FormFieldError } from "./form-field-error";
 import { VariantPicker } from "./variant-picker";
 
@@ -57,22 +57,39 @@ export function InventoryAdjustmentForm({
   const {
     formState: { errors },
   } = form;
-  const watchedProductId = form.watch("product_id");
+  const watchedProductId = form.watch("product_id") ?? "";
+  const watchedVariantId = form.watch("product_variant_id") ?? "";
   const selectedProduct = products.find((product) => product.id === watchedProductId);
   const movementType = form.watch("movement_type");
+  const operationalProducts = products.filter(
+    (product) => product.is_active && product.type === "product" && product.track_inventory,
+  );
+  const { data: productVariants = [] } = useProductVariantsQuery(
+    watchedProductId,
+    Boolean(selectedProduct?.has_variants),
+  );
+  const selectedVariant = productVariants.find((variant) => variant.id === watchedVariantId);
+  const requiresLot = selectedProduct?.has_variants
+    ? Boolean(selectedVariant?.track_lots)
+    : Boolean(selectedProduct?.track_lots);
 
   useEffect(() => {
-    form.setValue("product_variant_id", "", { shouldDirty: true });
+    const defaultVariantId =
+      selectedProduct?.has_variants === false
+        ? selectedProduct.variants.find((variant) => variant.is_default)?.id ?? ""
+        : "";
+
+    form.setValue("product_variant_id", defaultVariantId, { shouldDirty: true });
     if (form.getValues("inventory_lot_id")) {
       form.setValue("inventory_lot_id", "", { shouldDirty: true });
     }
-  }, [form, watchedProductId]);
+  }, [form, selectedProduct, watchedProductId]);
 
   useEffect(() => {
-    if (!selectedProduct?.track_lots && form.getValues("inventory_lot_id")) {
+    if (!requiresLot && form.getValues("inventory_lot_id")) {
       form.setValue("inventory_lot_id", "", { shouldDirty: true });
     }
-  }, [form, selectedProduct?.track_lots]);
+  }, [form, requiresLot]);
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -90,7 +107,7 @@ export function InventoryAdjustmentForm({
                   <SelectValue placeholder={t("inventory.form.select_warehouse")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {warehouses.map((warehouse) => (
+                  {warehouses.filter((warehouse) => warehouse.is_active).map((warehouse) => (
                     <SelectItem key={warehouse.id} value={warehouse.id}>
                       {warehouse.name}
                     </SelectItem>
@@ -140,7 +157,7 @@ export function InventoryAdjustmentForm({
                   <SelectValue placeholder={t("inventory.form.select_product")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {products.map((product) => (
+                  {operationalProducts.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       {product.name}
                     </SelectItem>
@@ -188,7 +205,7 @@ export function InventoryAdjustmentForm({
             name="inventory_lot_id"
             render={({ field }) => (
               <Select
-                disabled={!selectedProduct?.track_lots}
+                disabled={!requiresLot}
                 onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)}
                 value={field.value || EMPTY_SELECT_VALUE}
               >
@@ -199,7 +216,7 @@ export function InventoryAdjustmentForm({
                   <SelectItem value={EMPTY_SELECT_VALUE}>
                     {t("inventory.form.no_inventory_lot")}
                   </SelectItem>
-                  {lots.map((lot) => (
+                  {lots.filter((lot) => lot.is_active).map((lot) => (
                     <SelectItem key={lot.id} value={lot.id}>
                       {lot.lot_number}
                     </SelectItem>

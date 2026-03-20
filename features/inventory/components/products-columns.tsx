@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil, Power } from "lucide-react";
+import { Eye, Pencil, Power, RotateCcw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,16 +12,20 @@ import { getInventoryProductRoute } from "@/shared/lib/routes";
 import type { Product } from "../types";
 
 export function getProductsColumns({
+  canDelete,
   canUpdate,
   canView,
   onDeactivate,
   onEdit,
+  onReactivate,
   t,
 }: {
+  canDelete: boolean;
   canUpdate: boolean;
   canView: boolean;
   onDeactivate: (product: Product) => void;
   onEdit: (product: Product) => void;
+  onReactivate: (product: Product) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 }): ColumnDef<Product>[] {
   const baseColumns: ColumnDef<Product>[] = [
@@ -95,21 +99,34 @@ export function getProductsColumns({
               {t("inventory.common.view")}
             </Link>
           </Button>
-          {canUpdate ? (
+          {canUpdate || canDelete ? (
             <TableRowActions
               actions={[
-                {
-                  label: t("inventory.common.edit"),
-                  icon: Pencil,
-                  onClick: () => onEdit(row.original),
-                },
-                ...(row.original.is_active
+                ...(canUpdate
+                  ? [
+                      {
+                        label: t("inventory.common.edit"),
+                        icon: Pencil,
+                        onClick: () => onEdit(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canDelete && row.original.lifecycle.can_deactivate
                   ? [
                       {
                         label: t("inventory.common.deactivate"),
                         icon: Power,
                         variant: "destructive" as const,
                         onClick: () => onDeactivate(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canUpdate && row.original.lifecycle.can_reactivate
+                  ? [
+                      {
+                        label: t("inventory.common.reactivate"),
+                        icon: RotateCcw,
+                        onClick: () => onReactivate(row.original),
                       },
                     ]
                   : []),

@@ -52,19 +52,26 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
   const canView = can("product_prices.view");
   const canCreate = can("product_prices.create");
   const canUpdate = can("product_prices.update");
+  const canDelete = can("product_prices.delete");
+  const canViewProducts = can("products.view");
+  const canViewPriceLists = can("price_lists.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedProductPrice, setSelectedProductPrice] = useState<ProductPrice | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ProductPrice | null>(null);
-  const productsQuery = useProductsQuery(enabled && canView);
-  const priceListsQuery = usePriceListsQuery(enabled && canView);
+  const productsQuery = useProductsQuery(enabled && canViewProducts);
+  const priceListsQuery = usePriceListsQuery(enabled && canViewPriceLists);
+  const activeProducts = useMemo(
+    () =>
+      (productsQuery.data ?? []).filter((product) => product.is_active && product.type === "product"),
+    [productsQuery.data],
+  );
   const resolvedSelectedProductId =
-    selectedProductId && productsQuery.data?.some((product) => product.id === selectedProductId)
+    selectedProductId && activeProducts.some((product) => product.id === selectedProductId)
       ? selectedProductId
-      : (productsQuery.data?.[0]?.id ?? "");
+      : (activeProducts[0]?.id ?? "");
   const productPricesQuery = useProductPricesQuery(resolvedSelectedProductId, enabled && canView);
-  const selectedProduct =
-    productsQuery.data?.find((product) => product.id === resolvedSelectedProductId) ?? null;
+  const selectedProduct = activeProducts.find((product) => product.id === resolvedSelectedProductId) ?? null;
   const deleteMutation = useDeleteProductPriceMutation(resolvedSelectedProductId, {
     showErrorToast: true,
   });
@@ -81,8 +88,15 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
   }, [deleteTarget, deleteMutation]);
 
   const columns = useMemo(
-    () => getProductPricesColumns({ canUpdate, onDelete: setDeleteTarget, onEdit, t }),
-    [canUpdate, onEdit, t],
+    () =>
+      getProductPricesColumns({
+        canDelete,
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit,
+        t,
+      }),
+    [canDelete, canUpdate, onEdit, t],
   );
 
   if (!canView) {
@@ -121,12 +135,12 @@ function ProductPricesSection({ enabled = true }: ProductPricesSectionProps) {
               <SelectValue placeholder={t("inventory.form.select_product")} />
             </SelectTrigger>
             <SelectContent>
-              {(productsQuery.data ?? []).length ? null : (
+              {activeProducts.length ? null : (
                 <SelectItem value={EMPTY_SELECT_VALUE}>
                   {t("inventory.product_prices.no_products_available")}
                 </SelectItem>
               )}
-              {(productsQuery.data ?? []).map((product) => (
+              {activeProducts.map((product) => (
                 <SelectItem key={product.id} value={product.id}>
                   {product.name}
                 </SelectItem>

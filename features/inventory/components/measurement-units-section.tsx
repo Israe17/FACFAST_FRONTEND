@@ -36,6 +36,7 @@ function MeasurementUnitsSection({ enabled = true }: MeasurementUnitsSectionProp
   const canView = can("measurement_units.view");
   const canCreate = can("measurement_units.create");
   const canUpdate = can("measurement_units.update");
+  const canDelete = can("measurement_units.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedMeasurementUnit, setSelectedMeasurementUnit] =
     useState<MeasurementUnit | null>(null);
@@ -57,12 +58,13 @@ function MeasurementUnitsSection({ enabled = true }: MeasurementUnitsSectionProp
   const columns = useMemo(
     () =>
       getMeasurementUnitsColumns({
+        canDelete,
         canUpdate,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         t,
       }),
-    [canUpdate, handleEdit, t],
+    [canDelete, canUpdate, handleEdit, t],
   );
 
   if (!canView) {

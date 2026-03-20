@@ -8,6 +8,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import type { MeasurementUnit } from "../types";
 
 type GetMeasurementUnitsColumnsParams = {
+  canDelete: boolean;
   canUpdate: boolean;
   onDelete: (measurementUnit: MeasurementUnit) => void;
   onEdit: (measurementUnit: MeasurementUnit) => void;
@@ -15,6 +16,7 @@ type GetMeasurementUnitsColumnsParams = {
 };
 
 function getMeasurementUnitsColumns({
+  canDelete,
   canUpdate,
   onDelete,
   onEdit,
@@ -53,24 +55,32 @@ function getMeasurementUnitsColumns({
     },
   ];
 
-  if (canUpdate) {
+  if (canUpdate || canDelete) {
     baseColumns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
         <TableRowActions
           actions={[
-            {
-              label: t("inventory.common.edit"),
-              icon: Pencil,
-              onClick: () => onEdit(row.original),
-            },
-            {
-              label: t("inventory.common.delete"),
-              icon: Trash2,
-              variant: "destructive",
-              onClick: () => onDelete(row.original),
-            },
+            ...(canUpdate
+              ? [
+                  {
+                    label: t("inventory.common.edit"),
+                    icon: Pencil,
+                    onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(canDelete && row.original.lifecycle.can_delete
+              ? [
+                  {
+                    label: t("inventory.common.delete"),
+                    icon: Trash2,
+                    variant: "destructive" as const,
+                    onClick: () => onDelete(row.original),
+                  },
+                ]
+              : []),
           ]}
         />
       ),

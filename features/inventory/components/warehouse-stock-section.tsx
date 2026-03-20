@@ -38,8 +38,9 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
   const canView = can("warehouse_stock.view");
+  const canViewWarehouses = can("warehouses.view");
   const [selectedWarehouseId, setSelectedWarehouseId] = useState(ALL_WAREHOUSES_VALUE);
-  const warehousesQuery = useWarehousesQuery(enabled && canView);
+  const warehousesQuery = useWarehousesQuery(enabled && canViewWarehouses);
   const resolvedSelectedWarehouseId =
     selectedWarehouseId === ALL_WAREHOUSES_VALUE ||
     (warehousesQuery.data ?? []).some((warehouse) => warehouse.id === selectedWarehouseId)
@@ -71,9 +72,11 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
               ) : null}
             </div>
             <p className="text-sm text-muted-foreground">
-              {row.original.product_variant.variant_name ?? t("inventory.common.not_available")}
-              {row.original.product_variant.sku
-                ? ` · SKU ${row.original.product_variant.sku}`
+              {row.original.product_variant?.variant_name ??
+                row.original.product_variant?.sku ??
+                t("inventory.detail.default_variant")}
+              {row.original.product_variant?.sku
+                ? ` - SKU ${row.original.product_variant.sku}`
                 : ""}
             </p>
           </div>

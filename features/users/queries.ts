@@ -3,14 +3,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { sessionQueryKey } from "@/features/auth/queries";
+import { useSession } from "@/shared/hooks/use-session";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
+import { rolesKeys } from "@/features/roles/queries";
 
 import {
   assignUserBranches,
   assignUserRoles,
   changeUserPassword,
   createUser,
+  deleteUser,
   getUserById,
   getUserEffectivePermissions,
   listAssignableBranches,
@@ -37,7 +41,7 @@ export const usersKeys = {
 };
 
 function invalidateUserQueries(queryClient: ReturnType<typeof useQueryClient>, userId?: string) {
-  queryClient.invalidateQueries({ queryKey: usersKeys.list() });
+  queryClient.invalidateQueries({ queryKey: usersKeys.all });
 
   if (userId) {
     queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
@@ -48,6 +52,11 @@ function invalidateUserQueries(queryClient: ReturnType<typeof useQueryClient>, u
 type MutationFeedbackOptions = {
   showErrorToast?: boolean;
 };
+
+function useShouldInvalidateCurrentSession(userId?: string) {
+  const { user } = useSession();
+  return Boolean(userId && user?.id === userId);
+}
 
 export function useUsersQuery(enabled = true) {
   return useQuery({
@@ -104,11 +113,15 @@ export function useCreateUserMutation(options: MutationFeedbackOptions = {}) {
 export function useUpdateUserMutation(userId: string, options: MutationFeedbackOptions = {}) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
 
   return useMutation({
     mutationFn: (payload: UpdateUserInput) => updateUser(userId, payload),
     onSuccess: () => {
       invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
       toast.success(t("common.update_success"));
     },
     onError: (error) => {
@@ -124,11 +137,15 @@ export function useUpdateUserMutation(userId: string, options: MutationFeedbackO
 export function useUpdateUserStatusMutation(userId: string) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
 
   return useMutation({
     mutationFn: (payload: UpdateUserStatusInput) => updateUserStatus(userId, payload),
     onSuccess: () => {
       invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
       toast.success(t("common.update_success"));
     },
     onError: (error) => {
@@ -142,11 +159,15 @@ export function useUpdateUserStatusMutation(userId: string) {
 export function useChangeUserPasswordMutation(userId: string) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
 
   return useMutation({
     mutationFn: (payload: ChangeUserPasswordInput) => changeUserPassword(userId, payload),
     onSuccess: () => {
       invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
       toast.success(t("users.password_updated_success"));
     },
     onError: (error) => {
@@ -163,11 +184,16 @@ export function useAssignUserRolesMutation(
 ) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
 
   return useMutation({
     mutationFn: (payload: AssignUserRolesInput) => assignUserRoles(userId, payload),
     onSuccess: () => {
       invalidateUserQueries(queryClient, userId);
+      queryClient.invalidateQueries({ queryKey: rolesKeys.list() });
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
       toast.success(t("common.saved_successfully"));
     },
     onError: (error) => {
@@ -186,17 +212,48 @@ export function useAssignUserBranchesMutation(
 ) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
 
   return useMutation({
     mutationFn: (payload: AssignUserBranchesInput) => assignUserBranches(userId, payload),
     onSuccess: () => {
       invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
       toast.success(t("common.saved_successfully"));
     },
     onError: (error) => {
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("users.branches_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteUserMutation(
+  userId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
+
+  return useMutation({
+    mutationFn: () => deleteUser(userId),
+    onSuccess: () => {
+      invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("users.delete_error_fallback"),
         });
       }
     },

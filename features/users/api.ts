@@ -140,3 +140,8 @@ export async function listAssignableBranches() {
     branchOptionSchema.parse(branch),
   );
 }
+
+export async function deleteUser(userId: string) {
+  const response = await http.delete(`/users/${userId}`);
+  return extractEntity(response.data);
+}

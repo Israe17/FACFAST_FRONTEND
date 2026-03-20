@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Boxes, LayoutGrid, Package, PackageSearch, ReceiptText, Warehouse } from "lucide-react";
+import { Boxes, LayoutGrid, Package, PackageSearch, ReceiptText, Warehouse } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataCard } from "@/shared/components/data-card";
 import { LoadingState } from "@/shared/components/loading-state";
+import { ModuleEntryCard } from "@/shared/components/module-entry-card";
 import { PageHeader } from "@/shared/components/page-header";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -137,35 +137,24 @@ function InventoryLandingPage() {
           {moduleCards
             .filter((module) => canAny([...module.permissions]))
             .map((module) => {
-            const Icon = module.icon;
-
-            return (
-              <Card key={module.href} className="border-border/70 bg-card/95">
-                <CardHeader className="space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="rounded-2xl border border-primary/20 bg-primary/8 p-3 text-primary">
-                      <Icon className="size-5" />
-                    </div>
+              return (
+                <ModuleEntryCard
+                  key={module.href}
+                  badge={
                     <Badge variant="outline">
-                      {t("inventory.landing.records_badge", { count: String(stats[module.statKey]) })}
+                      {t("inventory.landing.records_badge", {
+                        count: String(stats[module.statKey]),
+                      })}
                     </Badge>
-                  </div>
-                  <div className="space-y-1">
-                    <CardTitle>{t(module.titleKey)}</CardTitle>
-                    <CardDescription>{t(module.descriptionKey)}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Button asChild className="w-full" variant="outline">
-                    <Link href={module.href}>
-                      {t("inventory.landing.open_module")}
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  }
+                  ctaLabel={t("inventory.landing.open_module")}
+                  description={t(module.descriptionKey)}
+                  href={module.href}
+                  icon={module.icon}
+                  title={t(module.titleKey)}
+                />
+              );
+            })}
         </div>
       )}
     </div>

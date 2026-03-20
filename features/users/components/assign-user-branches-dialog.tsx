@@ -21,7 +21,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { useSession } from "@/shared/hooks/use-session";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { assignUserBranchesSchema } from "../schemas";
@@ -120,10 +120,10 @@ function AssignUserBranchesDialog({
         {branchesQuery.isLoading ? <LoadingState description="Loading branches." /> : null}
         {branchesQuery.isError ? (
           <ErrorState
-            description={getBackendErrorMessage(
-              branchesQuery.error,
-              "Unable to load branches.",
-            )}
+            description={getTranslatedBackendErrorMessage(branchesQuery.error, {
+              fallbackMessage: "Unable to load branches.",
+              translateMessage: t,
+            }) ?? undefined}
             onRetry={() => branchesQuery.refetch()}
           />
         ) : null}

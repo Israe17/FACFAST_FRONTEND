@@ -45,10 +45,18 @@ function ProductPriceForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const selectedPriceListId = form.watch("price_list_id");
+  const availablePriceLists = priceLists.filter(
+    (priceList) => priceList.is_active || priceList.id === selectedPriceListId,
+  );
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
+
+      <div className="rounded-xl border border-border/70 bg-muted/20 p-3 text-sm text-muted-foreground">
+        {t("inventory.product_prices.public_contract_note")}
+      </div>
 
       {product && (
         <VariantPicker
@@ -71,7 +79,7 @@ function ProductPriceForm({
                   <SelectValue placeholder={t("inventory.form.select_price_list")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {priceLists.map((priceList) => (
+                  {availablePriceLists.map((priceList) => (
                     <SelectItem key={priceList.id} value={priceList.id}>
                       {priceList.name}
                     </SelectItem>

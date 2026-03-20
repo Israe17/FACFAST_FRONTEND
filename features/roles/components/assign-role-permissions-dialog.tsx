@@ -145,7 +145,14 @@ function AssignRolePermissionsDialog({
                             onCheckedChange={() => togglePermission(permission.id)}
                           />
                           <div className="space-y-1">
-                            <p className="font-medium">{permission.key}</p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-medium">{permission.action ?? permission.key}</p>
+                              {permission.action ? (
+                                <Badge variant="outline" className="text-xs">
+                                  {permission.key}
+                                </Badge>
+                              ) : null}
+                            </div>
                             <p className="text-sm text-muted-foreground">
                               {permission.description || "No description provided."}
                             </p>

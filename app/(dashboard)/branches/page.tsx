@@ -18,7 +18,7 @@ import { PageHeader } from "@/shared/components/page-header";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 
 export default function BranchesPage() {
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
@@ -115,10 +115,9 @@ export default function BranchesPage() {
       {branchesQuery.isLoading ? <LoadingState description="Loading branches." /> : null}
       {branchesQuery.isError ? (
         <ErrorState
-          description={getBackendErrorMessage(
-            branchesQuery.error,
-            "Unable to load branches.",
-          )}
+          description={getTranslatedBackendErrorMessage(branchesQuery.error, {
+            fallbackMessage: "Unable to load branches.",
+          }) ?? undefined}
           onRetry={() => branchesQuery.refetch()}
         />
       ) : null}
@@ -184,10 +183,9 @@ export default function BranchesPage() {
           ) : null}
           {selectedBranchQuery.isError ? (
             <ErrorState
-              description={getBackendErrorMessage(
-                selectedBranchQuery.error,
-                "Unable to load the selected branch.",
-              )}
+              description={getTranslatedBackendErrorMessage(selectedBranchQuery.error, {
+                fallbackMessage: "Unable to load the selected branch.",
+              }) ?? undefined}
               onRetry={() => selectedBranchQuery.refetch()}
             />
           ) : null}

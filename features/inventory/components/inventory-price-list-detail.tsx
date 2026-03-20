@@ -18,6 +18,7 @@ import type { ProductPrice, Promotion } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
 import { InventoryDetailBlock } from "./inventory-detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import { PriceListBranchAssignmentsSection } from "./price-list-branch-assignments-section";
 
 type InventoryPriceListDetailProps = {
   priceListId: string;
@@ -26,6 +27,18 @@ type InventoryPriceListDetailProps = {
 type RelatedProductPriceRow = ProductPrice & {
   product_name: string;
 };
+
+function getCoverageLabel(price: ProductPrice, t: ReturnType<typeof useAppTranslator>["t"]) {
+  if (!price.product_variant || price.product_variant.is_default) {
+    return t("inventory.common.all_variants");
+  }
+
+  return (
+    price.product_variant.variant_name ??
+    price.product_variant.sku ??
+    t("inventory.common.not_available")
+  );
+}
 
 function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps) {
   const { t } = useAppTranslator();
@@ -77,7 +90,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
     }
 
     return query.data
-      .filter((item) => item.price_list.id === priceList.id)
+      .filter((item) => item.price_list?.id === priceList.id)
       .map((item) => ({
         ...item,
         product_name: product.name,
@@ -98,9 +111,14 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
       header: t("inventory.entity.product"),
     },
     {
+      accessorKey: "coverage",
+      header: t("inventory.common.coverage"),
+      cell: ({ row }) => getCoverageLabel(row.original, t),
+    },
+    {
       accessorKey: "price",
       header: t("inventory.form.price"),
-      cell: ({ row }) => `${row.original.price} ${row.original.price_list.currency ?? "CRC"}`,
+      cell: ({ row }) => `${row.original.price} ${row.original.price_list?.currency ?? "CRC"}`,
     },
     {
       accessorKey: "min_quantity",
@@ -226,11 +244,19 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
         </InventoryDetailBlock>
       </div>
 
+      <PriceListBranchAssignmentsSection
+        enabled={canRunTenantQueries}
+        priceList={priceList}
+      />
+
       <div className="grid gap-6 xl:grid-cols-2">
         <InventoryDetailBlock
           description={t("inventory.detail.price_list_prices_block_description")}
           title={t("inventory.entity.product_prices")}
         >
+          <p className="mb-4 text-sm text-muted-foreground">
+            {t("inventory.detail.price_list_public_contract_note")}
+          </p>
           <DataTable
             enablePagination={false}
             columns={priceColumns}

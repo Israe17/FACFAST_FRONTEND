@@ -24,6 +24,7 @@ import { useDeletePromotionMutation, useProductsQuery, usePromotionsQuery } from
 import type { Promotion } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { PromotionDialog } from "./promotion-dialog";
+import { PromotionBranchAssignmentsDialog } from "./promotion-branch-assignments-dialog";
 import { getPromotionsColumns } from "./promotions-columns";
 
 type PromotionsSectionProps = {
@@ -36,11 +37,20 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
   const canView = can("promotions.view");
   const canCreate = can("promotions.create");
   const canUpdate = can("promotions.update");
+  const canDelete = can("promotions.delete");
+  const canManageBranches = can("promotions.view_branch_assignments");
+  const canViewProducts = can("products.view");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [branchAssignmentsTarget, setBranchAssignmentsTarget] = useState<Promotion | null>(null);
   const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Promotion | null>(null);
   const promotionsQuery = usePromotionsQuery(enabled && canView);
-  const productsQuery = useProductsQuery(enabled && canView);
+  const productsQuery = useProductsQuery(enabled && canViewProducts);
+  const activeProducts = useMemo(
+    () =>
+      (productsQuery.data ?? []).filter((product) => product.is_active && product.type === "product"),
+    [productsQuery.data],
+  );
   const deleteMutation = useDeletePromotionMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((promotion: Promotion) => {
@@ -55,8 +65,17 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
   }, [deleteTarget, deleteMutation]);
 
   const columns = useMemo(
-    () => getPromotionsColumns({ canUpdate, onDelete: setDeleteTarget, onEdit: handleEdit, t }),
-    [canUpdate, handleEdit, t],
+    () =>
+      getPromotionsColumns({
+        canDelete,
+        canManageBranches,
+        canUpdate,
+        onDelete: setDeleteTarget,
+        onEdit: handleEdit,
+        onManageBranches: setBranchAssignmentsTarget,
+        t,
+      }),
+    [canDelete, canManageBranches, canUpdate, handleEdit, t],
   );
 
   if (!canView) {
@@ -69,6 +88,7 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
         action={
           canCreate ? (
             <Button
+              disabled={activeProducts.length === 0}
               onClick={() => {
                 setSelectedPromotion(null);
                 setDialogOpen(true);
@@ -116,9 +136,21 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
           }
         }}
         open={dialogOpen}
-        products={productsQuery.data ?? []}
+        products={activeProducts}
         promotion={selectedPromotion}
       />
+
+      {branchAssignmentsTarget ? (
+        <PromotionBranchAssignmentsDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              setBranchAssignmentsTarget(null);
+            }
+          }}
+          open={branchAssignmentsTarget !== null}
+          promotion={branchAssignmentsTarget}
+        />
+      ) : null}
 
       <AlertDialog
         onOpenChange={(open) => {

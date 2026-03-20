@@ -21,6 +21,7 @@ function formatPrice(value: number | undefined, currency = "CRC") {
 }
 
 type GetProductPricesColumnsParams = {
+  canDelete: boolean;
   canUpdate: boolean;
   onDelete: (productPrice: ProductPrice) => void;
   onEdit: (productPrice: ProductPrice) => void;
@@ -28,6 +29,7 @@ type GetProductPricesColumnsParams = {
 };
 
 export function getProductPricesColumns({
+  canDelete,
   canUpdate,
   onDelete,
   onEdit,
@@ -39,9 +41,11 @@ export function getProductPricesColumns({
       header: t("inventory.entity.price_list"),
       cell: ({ row }) => (
         <div className="space-y-1">
-          <p className="font-medium">{row.original.price_list.name}</p>
+          <p className="font-medium">
+            {row.original.price_list?.name ?? t("inventory.common.not_available")}
+          </p>
           <Badge variant="outline">
-            {row.original.price_list.kind
+            {row.original.price_list?.kind
               ? t(`inventory.enum.price_list_kind.${row.original.price_list.kind}` as const)
               : t("inventory.common.not_available")}
           </Badge>
@@ -50,7 +54,7 @@ export function getProductPricesColumns({
     },
     {
       accessorKey: "product_variant",
-      header: t("inventory.form.product_variant"),
+      header: t("inventory.common.coverage"),
       cell: ({ row }) =>
         row.original.product_variant && !row.original.product_variant.is_default
           ? row.original.product_variant.variant_name ?? row.original.product_variant.sku
@@ -60,7 +64,7 @@ export function getProductPricesColumns({
       accessorKey: "price",
       header: t("inventory.form.price"),
       cell: ({ row }) =>
-        formatPrice(row.original.price, row.original.price_list.currency ?? "CRC"),
+        formatPrice(row.original.price, row.original.price_list?.currency ?? "CRC"),
     },
     {
       accessorKey: "min_quantity",
@@ -86,24 +90,32 @@ export function getProductPricesColumns({
     },
   ];
 
-  if (canUpdate) {
+  if (canUpdate || canDelete) {
     baseColumns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
         <TableRowActions
           actions={[
-            {
-              label: t("inventory.common.edit"),
-              icon: Pencil,
-              onClick: () => onEdit(row.original),
-            },
-            {
-              label: t("inventory.common.delete"),
-              icon: Trash2,
-              variant: "destructive",
-              onClick: () => onDelete(row.original),
-            },
+            ...(canUpdate
+              ? [
+                  {
+                    label: t("inventory.common.edit"),
+                    icon: Pencil,
+                    onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(canDelete && row.original.lifecycle.can_delete
+              ? [
+                  {
+                    label: t("inventory.common.delete"),
+                    icon: Trash2,
+                    variant: "destructive" as const,
+                    onClick: () => onDelete(row.original),
+                  },
+                ]
+              : []),
           ]}
         />
       ),

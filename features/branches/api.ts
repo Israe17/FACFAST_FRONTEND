@@ -117,3 +117,13 @@ export async function updateTerminal(terminalId: string, payload: UpdateTerminal
   const response = await http.patch(`/terminals/${terminalId}`, buildTerminalPayload(payload));
   return terminalSchema.parse(extractEntity(response.data, "terminal"));
 }
+
+export async function deleteBranch(branchId: string) {
+  const response = await http.delete(`/branches/${branchId}`);
+  return extractEntity(response.data);
+}
+
+export async function deleteTerminal(terminalId: string) {
+  const response = await http.delete(`/terminals/${terminalId}`);
+  return extractEntity(response.data);
+}

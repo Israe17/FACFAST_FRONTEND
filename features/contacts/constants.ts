@@ -22,6 +22,12 @@ const identificationTypeLabelMap: Record<string, string> = {
   "03": "DIMEX",
   "04": "NITE",
   "05": "Extranjero",
+  dimex: "DIMEX",
+  extranjero: "Extranjero",
+  fisica: "Cedula fisica",
+  juridica: "Cedula juridica",
+  legal: "Cedula juridica",
+  nite: "NITE",
 };
 
 const contactTypeLabelMap: Record<string, string> = {

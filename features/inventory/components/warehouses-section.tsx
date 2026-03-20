@@ -22,7 +22,11 @@ import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import { useBranchesQuery } from "@/features/branches/queries";
 
-import { useDeactivateWarehouseMutation, useWarehousesQuery } from "../queries";
+import {
+  useDeactivateWarehouseMutation,
+  useReactivateWarehouseMutation,
+  useWarehousesQuery,
+} from "../queries";
 import type { Warehouse } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { WarehouseDialog } from "./warehouse-dialog";
@@ -38,12 +42,15 @@ function WarehousesSection({ enabled = true }: WarehousesSectionProps) {
   const canView = can("warehouses.view");
   const canCreate = can("warehouses.create");
   const canUpdate = can("warehouses.update");
+  const canDelete = can("warehouses.delete");
+  const canViewBranches = can("branches.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Warehouse | null>(null);
   const warehousesQuery = useWarehousesQuery(enabled && canView);
-  const branchesQuery = useBranchesQuery(enabled && canView);
+  const branchesQuery = useBranchesQuery(enabled && canViewBranches);
   const deactivateMutation = useDeactivateWarehouseMutation({ showErrorToast: true });
+  const reactivateMutation = useReactivateWarehouseMutation({ showErrorToast: true });
 
   const branchNameById = useMemo(
     () =>
@@ -66,13 +73,17 @@ function WarehousesSection({ enabled = true }: WarehousesSectionProps) {
     () =>
       getWarehousesColumns({
         branchNameById,
+        canDelete,
         canUpdate,
         canView,
         onDeactivate: setDeactivateTarget,
         onEdit: handleEdit,
+        onReactivate: (warehouse) => {
+          void reactivateMutation.mutateAsync(warehouse.id);
+        },
         t,
       }),
-    [branchNameById, canUpdate, canView, handleEdit, t],
+    [branchNameById, canDelete, canUpdate, canView, handleEdit, reactivateMutation, t],
   );
 
   if (!canView) {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,18 +12,24 @@ import { getInventoryPriceListRoute } from "@/shared/lib/routes";
 import type { PriceList } from "../types";
 
 type GetPriceListsColumnsParams = {
+  canDelete: boolean;
   canUpdate: boolean;
   canView: boolean;
   onDelete: (priceList: PriceList) => void;
+  onDeactivate: (priceList: PriceList) => void;
   onEdit: (priceList: PriceList) => void;
+  onReactivate: (priceList: PriceList) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
 function getPriceListsColumns({
+  canDelete,
   canUpdate,
   canView,
   onDelete,
+  onDeactivate,
   onEdit,
+  onReactivate,
   t,
 }: GetPriceListsColumnsParams): ColumnDef<PriceList>[] {
   const baseColumns: ColumnDef<PriceList>[] = [
@@ -35,6 +41,9 @@ function getPriceListsColumns({
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-medium">{row.original.name}</p>
             {row.original.is_default ? <Badge>{t("inventory.form.default_price_list")}</Badge> : null}
+            {!row.original.is_active ? (
+              <Badge variant="outline">{t("inventory.common.inactive")}</Badge>
+            ) : null}
           </div>
           <p className="text-sm text-muted-foreground">
             {row.original.code
@@ -79,15 +88,40 @@ function getPriceListsColumns({
               {t("inventory.common.view")}
             </Link>
           </Button>
-          {canUpdate ? (
+          {canUpdate || canDelete ? (
             <TableRowActions
               actions={[
-                {
-                  label: t("inventory.common.edit"),
-                  icon: Pencil,
-                  onClick: () => onEdit(row.original),
-                },
-                ...(!row.original.is_default
+                ...(canUpdate
+                  ? [
+                      {
+                        label: t("inventory.common.edit"),
+                        icon: Pencil,
+                        onClick: () => onEdit(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canUpdate && row.original.lifecycle.can_deactivate
+                  ? [
+                      {
+                        label: t("inventory.common.deactivate"),
+                        icon: Power,
+                        variant: "destructive" as const,
+                        onClick: () => onDeactivate(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canUpdate && row.original.lifecycle.can_reactivate
+                  ? [
+                      {
+                        label: t("inventory.common.reactivate"),
+                        icon: RotateCcw,
+                        onClick: () => onReactivate(row.original),
+                      },
+                    ]
+                  : []),
+                ...(canDelete &&
+                !row.original.is_default &&
+                row.original.lifecycle.can_delete
                   ? [
                       {
                         label: t("inventory.common.delete"),

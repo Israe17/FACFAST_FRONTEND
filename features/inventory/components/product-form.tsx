@@ -66,6 +66,7 @@ export function ProductForm({
   const isActive = form.watch("is_active");
   const trackInventory = form.watch("track_inventory");
   const trackLots = form.watch("track_lots");
+  const trackSerials = form.watch("track_serials");
   const allowNegativeStock = form.watch("allow_negative_stock");
   const trackExpiration = form.watch("track_expiration");
   const isProductType = productType === "product";
@@ -74,6 +75,7 @@ export function ProductForm({
     if (productType === "service") {
       form.setValue("track_inventory", false, { shouldDirty: true });
       form.setValue("track_lots", false, { shouldDirty: true });
+      form.setValue("track_serials", false, { shouldDirty: true });
       form.setValue("track_expiration", false, { shouldDirty: true });
       form.setValue("allow_negative_stock", false, { shouldDirty: true });
     }
@@ -82,6 +84,7 @@ export function ProductForm({
   useEffect(() => {
     if (!trackInventory) {
       form.setValue("track_lots", false, { shouldDirty: true });
+      form.setValue("track_serials", false, { shouldDirty: true });
       form.setValue("track_expiration", false, { shouldDirty: true });
     }
   }, [form, trackInventory]);
@@ -218,7 +221,7 @@ export function ProductForm({
                     <SelectItem value={EMPTY_SELECT_VALUE}>
                       {t("inventory.form.no_category")}
                     </SelectItem>
-                    {categories.map((category) => (
+                    {categories.filter((category) => category.is_active).map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
                       </SelectItem>
@@ -247,7 +250,7 @@ export function ProductForm({
                     <SelectItem value={EMPTY_SELECT_VALUE}>
                       {t("inventory.form.no_brand")}
                     </SelectItem>
-                    {brands.map((brand) => (
+                    {brands.filter((brand) => brand.is_active).map((brand) => (
                       <SelectItem key={brand.id} value={brand.id}>
                         {brand.name}
                       </SelectItem>
@@ -270,7 +273,7 @@ export function ProductForm({
                     <SelectValue placeholder={t("inventory.form.select_tax_profile")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {compatibleTaxProfiles.map((taxProfile) => (
+                    {compatibleTaxProfiles.filter((taxProfile) => taxProfile.is_active).map((taxProfile) => (
                       <SelectItem key={taxProfile.id} value={taxProfile.id}>
                         {taxProfile.name}
                       </SelectItem>
@@ -299,7 +302,7 @@ export function ProductForm({
                     <SelectItem value={EMPTY_SELECT_VALUE}>
                       {t("inventory.form.no_stock_unit")}
                     </SelectItem>
-                    {measurementUnits.map((unit) => (
+                    {measurementUnits.filter((unit) => unit.is_active).map((unit) => (
                       <SelectItem key={unit.id} value={unit.id}>
                         {unit.name} ({unit.symbol})
                       </SelectItem>
@@ -328,7 +331,7 @@ export function ProductForm({
                     <SelectItem value={EMPTY_SELECT_VALUE}>
                       {t("inventory.form.no_sale_unit")}
                     </SelectItem>
-                    {measurementUnits.map((unit) => (
+                    {measurementUnits.filter((unit) => unit.is_active).map((unit) => (
                       <SelectItem key={unit.id} value={unit.id}>
                         {unit.name} ({unit.symbol})
                       </SelectItem>
@@ -358,7 +361,7 @@ export function ProductForm({
                     <SelectItem value={EMPTY_SELECT_VALUE}>
                       {t("inventory.form.no_warranty_profile")}
                     </SelectItem>
-                    {warrantyProfiles.map((profile) => (
+                    {warrantyProfiles.filter((profile) => profile.is_active).map((profile) => (
                       <SelectItem key={profile.id} value={profile.id}>
                         {profile.name}
                       </SelectItem>
@@ -420,6 +423,20 @@ export function ProductForm({
             <div className="space-y-1">
               <p className="font-medium">{t("inventory.form.track_expiration")}</p>
               <p className="text-sm text-muted-foreground">{t("inventory.form.track_expiration_description")}</p>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
+            <Checkbox
+              checked={Boolean(trackSerials)}
+              disabled={!isProductType || !trackInventory}
+              onCheckedChange={(checked) => {
+                form.setValue("track_serials", checked === true, { shouldDirty: true });
+              }}
+            />
+            <div className="space-y-1">
+              <p className="font-medium">{t("inventory.form.track_serials")}</p>
+              <p className="text-sm text-muted-foreground">{t("inventory.form.track_serials_description")}</p>
             </div>
           </label>
 

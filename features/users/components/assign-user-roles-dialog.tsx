@@ -18,7 +18,7 @@ import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 import { useRolesQuery } from "@/features/roles/queries";
 
@@ -96,7 +96,10 @@ function AssignUserRolesDialog({
         {rolesQuery.isLoading ? <LoadingState description="Loading available roles." /> : null}
         {rolesQuery.isError ? (
           <ErrorState
-            description={getBackendErrorMessage(rolesQuery.error, "Unable to load roles.")}
+            description={getTranslatedBackendErrorMessage(rolesQuery.error, {
+              fallbackMessage: "Unable to load roles.",
+              translateMessage: t,
+            }) ?? undefined}
             onRetry={() => rolesQuery.refetch()}
           />
         ) : null}

@@ -185,6 +185,7 @@ export const emptyProductFormValues: CreateProductInput = {
   track_expiration: false,
   track_inventory: false,
   track_lots: false,
+  track_serials: false,
   type: "product",
   warranty_profile_id: "",
 };
@@ -208,6 +209,7 @@ export function getProductFormValues(product: Product): CreateProductInput {
     track_expiration: product.track_expiration,
     track_inventory: product.track_inventory,
     track_lots: product.track_lots,
+    track_serials: product.track_serials,
     type: product.type ?? "product",
     warranty_profile_id: product.warranty_profile?.id ?? "",
   };
@@ -248,7 +250,7 @@ export function getProductPriceFormValues(productPrice: ProductPrice): CreatePro
     is_active: productPrice.is_active,
     min_quantity: productPrice.min_quantity,
     price: productPrice.price ?? 0,
-    price_list_id: productPrice.price_list.id,
+    price_list_id: productPrice.price_list?.id ?? "",
     product_variant_id: productPrice.product_variant?.id ?? "",
     valid_from: toDateTimeLocalValue(productPrice.valid_from),
     valid_to: toDateTimeLocalValue(productPrice.valid_to),
@@ -275,6 +277,7 @@ export function getPromotionFormValues(promotion: Promotion): CreatePromotionInp
       min_quantity: item.min_quantity ?? undefined,
       override_price: item.override_price ?? undefined,
       product_id: item.product.id,
+      product_variant_id: item.product_variant?.id ?? "",
     })),
     name: promotion.name,
     type: promotion.type ?? "percentage",
@@ -390,13 +393,17 @@ export const emptyInventoryAdjustmentFormValues: CreateInventoryAdjustmentInput 
 
 export const emptyInventoryTransferFormValues: CreateInventoryTransferInput = {
   destination_warehouse_id: "",
+  destination_location_id: "",
+  inventory_lot_id: "",
   notes: "",
+  origin_location_id: "",
   origin_warehouse_id: "",
   product_id: "",
   product_variant_id: "",
   quantity: 1,
   reference_id: undefined,
   reference_type: "",
+  serial_ids: [],
   unit_cost: undefined,
 };
 

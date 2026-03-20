@@ -24,10 +24,17 @@ import {
   usePromotionsQuery,
   useWarehouseStockQuery,
 } from "../queries";
-import type { InventoryLot, InventoryMovementRow, ProductPrice, Promotion, WarehouseStockRow } from "../types";
+import type {
+  InventoryLot,
+  InventoryMovementHeader,
+  ProductPrice,
+  Promotion,
+  WarehouseStockRow,
+} from "../types";
 import { useInventoryModule } from "../use-inventory-module";
 import { InventoryDetailBlock } from "./inventory-detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import { ProductSerialsSection } from "./product-serials-section";
 import { ProductVariantsSection } from "./product-variants-section";
 
 type InventoryProductDetailProps = {
@@ -77,7 +84,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
   const stockRows = (stockQuery.data ?? []).filter((row) => row.product.id === product.id);
   const lotRows = (lotsQuery.data ?? []).filter((lot) => lot.product.id === product.id);
   const movementRows = (movementsQuery.data ?? [])
-    .filter((row) => row.product.id === product.id)
+    .filter((movement) => movement.lines.some((line) => line.product.id === product.id))
     .sort((a, b) => {
       const aDate = a.occurred_at ? new Date(a.occurred_at).getTime() : 0;
       const bDate = b.occurred_at ? new Date(b.occurred_at).getTime() : 0;
@@ -91,12 +98,12 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
     {
       accessorKey: "price_list",
       header: t("inventory.entity.price_list"),
-      cell: ({ row }) => row.original.price_list.name,
+      cell: ({ row }) => row.original.price_list?.name ?? t("inventory.common.not_available"),
     },
     {
       accessorKey: "price",
       header: t("inventory.form.price"),
-      cell: ({ row }) => `${row.original.price} ${row.original.price_list.currency ?? "CRC"}`,
+      cell: ({ row }) => `${row.original.price} ${row.original.price_list?.currency ?? "CRC"}`,
     },
     {
       accessorKey: "valid_from",
@@ -115,7 +122,10 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
     {
       accessorKey: "product_variant",
       header: t("inventory.detail.variant_label"),
-      cell: ({ row }) => row.original.product_variant.variant_name ?? t("inventory.detail.default_variant"),
+      cell: ({ row }) =>
+        row.original.product_variant?.variant_name ??
+        row.original.product_variant?.sku ??
+        t("inventory.detail.default_variant"),
     },
     {
       accessorKey: "quantity",
@@ -151,11 +161,11 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
     },
   ];
 
-  const movementColumns: ColumnDef<InventoryMovementRow>[] = [
+  const movementColumns: ColumnDef<InventoryMovementHeader>[] = [
     {
       accessorKey: "code",
       header: t("inventory.entity.inventory_movement"),
-      cell: ({ row }) => row.original.code ?? row.original.header_id ?? row.original.id,
+      cell: ({ row }) => row.original.code ?? row.original.id,
     },
     {
       accessorKey: "movement_type",
@@ -166,14 +176,14 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
           : t("inventory.common.not_available"),
     },
     {
-      accessorKey: "warehouse",
+      accessorKey: "lines",
       header: t("inventory.entity.warehouse"),
-      cell: ({ row }) => row.original.warehouse.name,
+      cell: ({ row }) => row.original.lines[0]?.warehouse.name ?? t("inventory.common.not_available"),
     },
     {
-      accessorKey: "quantity",
+      accessorKey: "line_count",
       header: t("inventory.form.quantity"),
-      cell: ({ row }) => row.original.quantity ?? 0,
+      cell: ({ row }) => row.original.line_count ?? row.original.lines.length,
     },
     {
       accessorKey: "occurred_at",
@@ -312,6 +322,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
       </InventoryDetailBlock>
 
       <ProductVariantsSection product={product} />
+      <ProductSerialsSection product={product} />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <InventoryDetailBlock
@@ -381,20 +392,18 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
         <DataTable
           enablePagination={false}
           columns={movementColumns}
-          data={movementRows}
-          emptyMessage={t("inventory.detail.no_recent_movements")}
+            data={movementRows}
+            emptyMessage={t("inventory.detail.no_recent_movements")}
         />
         {movementRows.length ? (
           <div className="mt-3 flex flex-wrap gap-2">
-            {movementRows.slice(0, 4).map((row) =>
-              row.header_id ? (
-                <Badge key={`${row.id}-link`} variant="outline">
-                  <Link href={getInventoryMovementRoute(row.header_id)}>
-                    {row.code ?? `${t("inventory.form.header_id")} ${row.header_id}`}
-                  </Link>
-                </Badge>
-              ) : null,
-            )}
+            {movementRows.slice(0, 4).map((row) => (
+              <Badge key={`${row.id}-link`} variant="outline">
+                <Link href={getInventoryMovementRoute(row.id)}>
+                  {row.code ?? `${t("inventory.form.header_id")} ${row.id}`}
+                </Link>
+              </Badge>
+            ))}
           </div>
         ) : null}
       </InventoryDetailBlock>

@@ -55,6 +55,20 @@ function ProductVariantForm({
   const { t } = useAppTranslator();
   const trackInventory = form.watch("track_inventory");
   const trackLots = form.watch("track_lots");
+  const selectedTaxProfileId = form.watch("fiscal_profile_id");
+  const selectedStockUnitId = form.watch("stock_unit_measure_id");
+  const selectedSaleUnitId = form.watch("sale_unit_measure_id");
+  const selectedWarrantyProfileId = form.watch("default_warranty_profile_id");
+  const availableTaxProfiles = taxProfiles.filter(
+    (profile) => profile.is_active || profile.id === selectedTaxProfileId,
+  );
+  const availableMeasurementUnits = measurementUnits.filter(
+    (unit) =>
+      unit.is_active || unit.id === selectedStockUnitId || unit.id === selectedSaleUnitId,
+  );
+  const availableWarrantyProfiles = warrantyProfiles.filter(
+    (profile) => profile.is_active || profile.id === selectedWarrantyProfileId,
+  );
 
   useEffect(() => {
     if (!trackInventory) {
@@ -110,7 +124,7 @@ function ProductVariantForm({
                   <SelectValue placeholder={t("inventory.form.select_tax_profile")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {taxProfiles.map((tp) => (
+                  {availableTaxProfiles.map((tp) => (
                     <SelectItem key={tp.id} value={tp.id}>
                       {tp.name}
                     </SelectItem>
@@ -141,7 +155,7 @@ function ProductVariantForm({
                   <SelectItem value={EMPTY_SELECT_VALUE}>
                     {t("inventory.form.no_stock_unit")}
                   </SelectItem>
-                  {measurementUnits.map((u) => (
+                  {availableMeasurementUnits.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.name} ({u.symbol})
                     </SelectItem>
@@ -170,7 +184,7 @@ function ProductVariantForm({
                   <SelectItem value={EMPTY_SELECT_VALUE}>
                     {t("inventory.form.no_sale_unit")}
                   </SelectItem>
-                  {measurementUnits.map((u) => (
+                  {availableMeasurementUnits.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.name} ({u.symbol})
                     </SelectItem>
@@ -199,7 +213,7 @@ function ProductVariantForm({
                   <SelectItem value={EMPTY_SELECT_VALUE}>
                     {t("inventory.form.no_warranty_profile")}
                   </SelectItem>
-                  {warrantyProfiles.map((wp) => (
+                  {availableWarrantyProfiles.map((wp) => (
                     <SelectItem key={wp.id} value={wp.id}>
                       {wp.name}
                     </SelectItem>

@@ -23,7 +23,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { formatDateTime } from "@/shared/lib/utils";
 
 export default function ContactsPage() {
@@ -141,10 +141,13 @@ export default function ContactsPage() {
                 {lookupQuery.isError ? (
                   <ErrorState
                     className="min-h-0 p-6"
-                    description={getBackendErrorMessage(
+                    description={getTranslatedBackendErrorMessage(
                       lookupQuery.error,
-                      t("contacts.lookup_error_fallback"),
-                    )}
+                      {
+                        fallbackMessage: t("contacts.lookup_error_fallback"),
+                        translateMessage: t,
+                      },
+                    ) ?? undefined}
                     onRetry={() => lookupQuery.refetch()}
                   />
                 ) : null}
@@ -192,10 +195,10 @@ export default function ContactsPage() {
       {contactsQuery.isLoading ? <LoadingState description="Loading contacts." /> : null}
       {contactsQuery.isError ? (
         <ErrorState
-          description={getBackendErrorMessage(
-            contactsQuery.error,
-            t("common.load_failed"),
-          )}
+          description={getTranslatedBackendErrorMessage(contactsQuery.error, {
+            fallbackMessage: t("common.load_failed"),
+            translateMessage: t,
+          }) ?? undefined}
           onRetry={() => contactsQuery.refetch()}
         />
       ) : null}

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DataTable } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
@@ -12,6 +13,7 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { Terminal } from "../types";
+import { useDeleteTerminalMutation, useUpdateTerminalMutation } from "../queries";
 import { EditTerminalDialog } from "./edit-terminal-dialog";
 
 type TerminalsTableProps = {
@@ -38,22 +40,95 @@ function TerminalStatusBadge({ isActive }: { isActive: boolean }) {
 
 function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal: Terminal }) {
   const { can } = usePermissions();
-  const [editOpen, setEditOpen] = useState(false);
+  const [activeDialog, setActiveDialog] = useState<"deactivate" | "delete" | "edit" | "reactivate" | null>(null);
+  const updateTerminalMutation = useUpdateTerminalMutation(branchId, terminal.id);
+  const deleteTerminalMutation = useDeleteTerminalMutation(branchId, terminal.id);
 
   const actions: TableAction[] = [];
   if (can("branches.update_terminal")) {
-    actions.push({ icon: Pencil, label: "Edit terminal", onClick: () => setEditOpen(true) });
+    actions.push({ icon: Pencil, label: "Edit terminal", onClick: () => setActiveDialog("edit") });
+    actions.push(
+      terminal.is_active
+        ? {
+            icon: Power,
+            label: "Deactivate",
+            onClick: () => setActiveDialog("deactivate"),
+            variant: "destructive",
+          }
+        : {
+            icon: RotateCcw,
+            label: "Reactivate",
+            onClick: () => setActiveDialog("reactivate"),
+          },
+    );
   }
+  if (can("branches.delete_terminal")) {
+    actions.push({
+      icon: Trash2,
+      label: "Delete permanently",
+      onClick: () => setActiveDialog("delete"),
+      variant: "destructive",
+    });
+  }
+
+  async function handleConfirm() {
+    try {
+      if (activeDialog === "delete") {
+        await deleteTerminalMutation.mutateAsync();
+      } else if (activeDialog === "deactivate") {
+        await updateTerminalMutation.mutateAsync({ is_active: false });
+      } else if (activeDialog === "reactivate") {
+        await updateTerminalMutation.mutateAsync({ is_active: true });
+      }
+
+      setActiveDialog(null);
+    } catch {}
+  }
+
+  const dialogCopy =
+    activeDialog === "delete"
+      ? {
+          confirmLabel: "Delete permanently",
+          description: `This permanently deletes terminal ${terminal.name}. This action cannot be undone.`,
+          title: "Delete terminal permanently",
+        }
+      : activeDialog === "deactivate"
+        ? {
+            confirmLabel: "Deactivate",
+            description: `${terminal.name} will remain registered, but it should stop being used operationally.`,
+            title: "Deactivate terminal",
+          }
+        : activeDialog === "reactivate"
+          ? {
+              confirmLabel: "Reactivate",
+              description: `${terminal.name} will become available again for operational use.`,
+              title: "Reactivate terminal",
+            }
+          : null;
 
   return (
     <>
       <TableRowActions actions={actions} />
       <EditTerminalDialog
         branchId={branchId}
-        onOpenChange={setEditOpen}
-        open={editOpen}
+        onOpenChange={(open) => setActiveDialog(open ? "edit" : null)}
+        open={activeDialog === "edit"}
         terminal={terminal}
       />
+      {dialogCopy ? (
+        <ConfirmDialog
+          confirmLabel={dialogCopy.confirmLabel}
+          description={dialogCopy.description}
+          onConfirm={handleConfirm}
+          onOpenChange={(open) => {
+            if (!open) {
+              setActiveDialog(null);
+            }
+          }}
+          open={activeDialog === "deactivate" || activeDialog === "delete" || activeDialog === "reactivate"}
+          title={dialogCopy.title}
+        />
+      ) : null}
     </>
   );
 }

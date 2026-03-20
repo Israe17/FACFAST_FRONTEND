@@ -8,6 +8,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import type { ProductCategory } from "../types";
 
 type GetProductCategoriesColumnsParams = {
+  canDelete: boolean;
   canUpdate: boolean;
   onDelete: (category: ProductCategory) => void;
   onEdit: (category: ProductCategory) => void;
@@ -16,6 +17,7 @@ type GetProductCategoriesColumnsParams = {
 };
 
 function getProductCategoriesColumns({
+  canDelete,
   canUpdate,
   onDelete,
   onEdit,
@@ -57,24 +59,32 @@ function getProductCategoriesColumns({
     },
   ];
 
-  if (canUpdate) {
+  if (canUpdate || canDelete) {
     baseColumns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
         <TableRowActions
           actions={[
-            {
-              label: t("inventory.common.edit"),
-              icon: Pencil,
-              onClick: () => onEdit(row.original),
-            },
-            {
-              label: t("inventory.common.delete"),
-              icon: Trash2,
-              variant: "destructive",
-              onClick: () => onDelete(row.original),
-            },
+            ...(canUpdate
+              ? [
+                  {
+                    label: t("inventory.common.edit"),
+                    icon: Pencil,
+                    onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(canDelete && row.original.lifecycle.can_delete
+              ? [
+                  {
+                    label: t("inventory.common.delete"),
+                    icon: Trash2,
+                    variant: "destructive" as const,
+                    onClick: () => onDelete(row.original),
+                  },
+                ]
+              : []),
           ]}
         />
       ),

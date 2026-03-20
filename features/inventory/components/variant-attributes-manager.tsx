@@ -23,7 +23,6 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 
 import {
   useGenerateVariantsMutation,
-  useProductVariantsQuery,
   useSetVariantAttributesMutation,
   useVariantAttributesQuery,
 } from "../queries";
@@ -43,16 +42,13 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
   const { t } = useAppTranslator();
   const { canRunTenantQueries } = useInventoryModule();
   const { can } = usePermissions();
-  const canUpdate = can("products.update");
-  const canCreate = can("products.create");
+  const canView = can("variant_attributes.view");
+  const canConfigure = can("variant_attributes.configure");
+  const canGenerate = can("variant_attributes.generate");
 
   const attributesQuery = useVariantAttributesQuery(
     product.id,
-    canRunTenantQueries && can("products.view"),
-  );
-  const variantsQuery = useProductVariantsQuery(
-    product.id,
-    canRunTenantQueries && can("products.view"),
+    canRunTenantQueries && canView,
   );
   const saveAttributesMutation = useSetVariantAttributesMutation(product.id);
   const generateVariantsMutation = useGenerateVariantsMutation(product.id);
@@ -140,14 +136,14 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
   }, [attributes, saveAttributesMutation]);
 
   const handleGenerateClick = useCallback(() => {
-    const existingVariants = variantsQuery.data ?? [];
+    const existingVariants = product.variants ?? [];
     const nonDefaultCount = existingVariants.filter((v) => !v.is_default).length;
     if (nonDefaultCount > 0) {
       setShowGenerateConfirm(true);
     } else {
       generateVariantsMutation.mutateAsync();
     }
-  }, [variantsQuery.data, generateVariantsMutation]);
+  }, [product.variants, generateVariantsMutation]);
 
   const handleGenerateConfirm = useCallback(async () => {
     await generateVariantsMutation.mutateAsync();
@@ -155,6 +151,10 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
   }, [generateVariantsMutation]);
 
   const existingAttributes = attributesQuery.data ?? [];
+
+  if (!canView && !canConfigure && !canGenerate) {
+    return null;
+  }
 
   if (editing) {
     return (
@@ -273,14 +273,14 @@ function VariantAttributesManager({ product }: VariantAttributesManagerProps) {
             </p>
           </div>
           <div className="flex gap-2">
-            {canUpdate ? (
+            {canConfigure ? (
               <Button onClick={startEditing} size="sm" variant="outline">
                 {existingAttributes.length > 0
                   ? t("inventory.variants.edit_attributes")
                   : t("inventory.variants.define_attributes")}
               </Button>
             ) : null}
-            {canCreate && existingAttributes.length > 0 ? (
+            {canGenerate && existingAttributes.length > 0 ? (
               <ActionButton
                 icon={Wand2}
                 isLoading={generateVariantsMutation.isPending}

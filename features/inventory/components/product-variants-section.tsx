@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Plus, Power } from "lucide-react";
+import { Pencil, Plus, Power, RotateCcw, Trash2 } from "lucide-react";
 
 import {
   AlertDialog,
@@ -17,14 +17,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
-import { TableRowActions } from "@/shared/components/table-row-actions";
+import { TableRowActions, type TableAction } from "@/shared/components/table-row-actions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 
 import {
+  useDeleteProductVariantPermanentMutation,
   useDeactivateProductVariantMutation,
   useMeasurementUnitsQuery,
   useProductVariantsQuery,
+  useReactivateProductVariantMutation,
   useTaxProfilesQuery,
   useWarrantyProfilesQuery,
 } from "../queries";
@@ -42,16 +44,21 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
   const { t } = useAppTranslator();
   const { canRunTenantQueries } = useInventoryModule();
   const { can } = usePermissions();
-  const canCreate = can("products.create");
-  const canUpdate = can("products.update");
+  const canViewVariants = can("product_variants.view");
+  const canCreate = can("product_variants.create");
+  const canUpdate = can("product_variants.update");
+  const canDelete = can("product_variants.delete");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [deactivateTarget, setDeactivateTarget] = useState<ProductVariant | null>(null);
+  const [variantActionTarget, setVariantActionTarget] = useState<{
+    type: "deactivate" | "delete";
+    variant: ProductVariant;
+  } | null>(null);
 
   const variantsQuery = useProductVariantsQuery(
     product.id,
-    canRunTenantQueries && can("products.view"),
+    canRunTenantQueries && canViewVariants,
   );
   const taxProfilesQuery = useTaxProfilesQuery(canRunTenantQueries && can("tax_profiles.view"));
   const measurementUnitsQuery = useMeasurementUnitsQuery(
@@ -61,6 +68,8 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
     canRunTenantQueries && can("warranty_profiles.view"),
   );
   const deactivateMutation = useDeactivateProductVariantMutation(product.id);
+  const deletePermanentMutation = useDeleteProductVariantPermanentMutation(product.id);
+  const reactivateMutation = useReactivateProductVariantMutation(product.id);
 
   const handleCreate = useCallback(() => {
     setSelectedVariant(null);
@@ -72,14 +81,19 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
     setDialogOpen(true);
   }, []);
 
-  const handleDeactivateConfirm = useCallback(async () => {
-    if (!deactivateTarget) return;
-    await deactivateMutation.mutateAsync(deactivateTarget.id);
-    setDeactivateTarget(null);
-  }, [deactivateTarget, deactivateMutation]);
+  const handleVariantActionConfirm = useCallback(async () => {
+    if (!variantActionTarget) return;
+
+    if (variantActionTarget.type === "delete") {
+      await deletePermanentMutation.mutateAsync(variantActionTarget.variant.id);
+    } else {
+      await deactivateMutation.mutateAsync(variantActionTarget.variant.id);
+    }
+
+    setVariantActionTarget(null);
+  }, [deactivateMutation, deletePermanentMutation, variantActionTarget]);
 
   const variants = variantsQuery.data ?? [];
-  const activeVariantCount = variants.filter((v) => v.is_active).length;
 
   const columns = useMemo<ColumnDef<ProductVariant>[]>(
     () => [
@@ -158,7 +172,7 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
           );
         },
       },
-      ...(canUpdate
+      ...(canUpdate || canDelete
         ? [
             {
               id: "actions",
@@ -168,19 +182,39 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
                   return null;
                 }
 
-                const actions = [
-                  {
+                const actions: TableAction[] = [];
+
+                if (canUpdate) {
+                  actions.push({
                     icon: Pencil,
                     label: t("inventory.common.edit"),
                     onClick: () => handleEdit(v),
-                  },
-                ];
+                  });
+                }
 
-                if (!v.is_default && v.is_active && activeVariantCount > 1) {
+                if (canDelete && v.lifecycle.can_delete) {
+                  actions.push({
+                    icon: Trash2,
+                    label: t("inventory.common.delete"),
+                    onClick: () => setVariantActionTarget({ type: "delete", variant: v }),
+                    variant: "destructive",
+                  });
+                } else if (canDelete && v.lifecycle.can_deactivate) {
                   actions.push({
                     icon: Power,
                     label: t("inventory.variants.deactivate"),
-                    onClick: () => setDeactivateTarget(v),
+                    onClick: () => setVariantActionTarget({ type: "deactivate", variant: v }),
+                    variant: "destructive",
+                  });
+                }
+
+                if (canUpdate && v.lifecycle.can_reactivate) {
+                  actions.push({
+                    icon: RotateCcw,
+                    label: t("inventory.common.reactivate"),
+                    onClick: () => {
+                      void reactivateMutation.mutateAsync(v.id);
+                    },
                   });
                 }
 
@@ -190,8 +224,12 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
           ]
         : []),
     ],
-    [t, canUpdate, product.has_variants, handleEdit, activeVariantCount],
+    [t, canDelete, canUpdate, product.has_variants, handleEdit, reactivateMutation],
   );
+
+  if (!canViewVariants && !canCreate && !canUpdate && !canDelete) {
+    return null;
+  }
 
   return (
     <>
@@ -228,34 +266,50 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
       </InventoryDetailBlock>
 
       <ProductVariantDialog
-        measurementUnits={measurementUnitsQuery.data ?? []}
+        measurementUnits={(measurementUnitsQuery.data ?? []).filter((unit) => unit.is_active)}
         onOpenChange={setDialogOpen}
         open={dialogOpen}
         productId={product.id}
-        taxProfiles={taxProfilesQuery.data ?? []}
+        taxProfiles={(taxProfilesQuery.data ?? []).filter((profile) => profile.is_active)}
         variant={selectedVariant}
-        warrantyProfiles={warrantyProfilesQuery.data ?? []}
+        warrantyProfiles={(warrantyProfilesQuery.data ?? []).filter((profile) => profile.is_active)}
       />
 
       <AlertDialog
         onOpenChange={(open) => {
-          if (!open) setDeactivateTarget(null);
+          if (!open) setVariantActionTarget(null);
         }}
-        open={deactivateTarget !== null}
+        open={variantActionTarget !== null}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("inventory.variants.deactivate_title")}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {variantActionTarget?.type === "delete"
+                ? t("inventory.variants.delete_title")
+                : t("inventory.variants.deactivate_title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("inventory.variants.deactivate_description", {
-                name: deactivateTarget?.variant_name ?? deactivateTarget?.sku ?? "",
-              })}
+              {variantActionTarget?.type === "delete"
+                ? t("inventory.variants.delete_description", {
+                    name:
+                      variantActionTarget.variant.variant_name ??
+                      variantActionTarget.variant.sku ??
+                      "",
+                  })
+                : t("inventory.variants.deactivate_description", {
+                    name:
+                      variantActionTarget?.variant.variant_name ??
+                      variantActionTarget?.variant.sku ??
+                      "",
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeactivateConfirm}>
-              {t("inventory.variants.deactivate_confirm")}
+            <AlertDialogAction onClick={handleVariantActionConfirm}>
+              {variantActionTarget?.type === "delete"
+                ? t("inventory.variants.delete_confirm")
+                : t("inventory.variants.deactivate_confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

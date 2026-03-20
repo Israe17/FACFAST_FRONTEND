@@ -15,7 +15,7 @@ import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { updateUserSchema } from "../schemas";
@@ -85,7 +85,10 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
         {userQuery.isLoading ? <LoadingState description="Loading user details." /> : null}
         {userQuery.isError ? (
           <ErrorState
-            description={getBackendErrorMessage(userQuery.error, t("common.load_failed"))}
+            description={getTranslatedBackendErrorMessage(userQuery.error, {
+              fallbackMessage: t("common.load_failed"),
+              translateMessage: t,
+            }) ?? undefined}
             onRetry={() => userQuery.refetch()}
           />
         ) : null}

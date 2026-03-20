@@ -20,7 +20,11 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useDeletePriceListMutation, usePriceListsQuery } from "../queries";
+import {
+  useDeletePriceListMutation,
+  usePriceListsQuery,
+  useSetPriceListActiveMutation,
+} from "../queries";
 import type { PriceList } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
 import { PriceListDialog } from "./price-list-dialog";
@@ -36,11 +40,13 @@ function PriceListsSection({ enabled = true }: PriceListsSectionProps) {
   const canView = can("price_lists.view");
   const canCreate = can("price_lists.create");
   const canUpdate = can("price_lists.update");
+  const canDelete = can("price_lists.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPriceList, setSelectedPriceList] = useState<PriceList | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PriceList | null>(null);
   const priceListsQuery = usePriceListsQuery(enabled && canView);
   const deleteMutation = useDeletePriceListMutation({ showErrorToast: true });
+  const setActiveMutation = useSetPriceListActiveMutation({ showErrorToast: true });
 
   const handleEdit = useCallback((priceList: PriceList) => {
     setSelectedPriceList(priceList);
@@ -56,13 +62,20 @@ function PriceListsSection({ enabled = true }: PriceListsSectionProps) {
   const columns = useMemo(
     () =>
       getPriceListsColumns({
+        canDelete,
         canUpdate,
         canView,
         onDelete: setDeleteTarget,
+        onDeactivate: (priceList) => {
+          void setActiveMutation.mutateAsync({ isActive: false, priceListId: priceList.id });
+        },
         onEdit: handleEdit,
+        onReactivate: (priceList) => {
+          void setActiveMutation.mutateAsync({ isActive: true, priceListId: priceList.id });
+        },
         t,
       }),
-    [canUpdate, canView, handleEdit, t],
+    [canDelete, canUpdate, canView, handleEdit, setActiveMutation, t],
   );
 
   if (!canView) {

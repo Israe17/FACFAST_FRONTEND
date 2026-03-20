@@ -38,12 +38,16 @@ function WarehouseLocationsSection({ enabled = true }: WarehouseLocationsSection
   const canView = can("warehouse_locations.view");
   const canCreate = can("warehouse_locations.create");
   const canUpdate = can("warehouse_locations.update");
+  const canViewWarehouses = can("warehouses.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<WarehouseLocation | null>(null);
-  const warehousesQuery = useWarehousesQuery(enabled && canView);
+  const warehousesQuery = useWarehousesQuery(enabled && canViewWarehouses);
   const warehouseOptions = useMemo(
-    () => (warehousesQuery.data ?? []).filter((warehouse) => warehouse.uses_locations),
+    () =>
+      (warehousesQuery.data ?? []).filter(
+        (warehouse) => warehouse.is_active && warehouse.uses_locations,
+      ),
     [warehousesQuery.data],
   );
   const resolvedSelectedWarehouseId =

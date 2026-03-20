@@ -2,21 +2,29 @@ import { http } from "@/shared/lib/http";
 
 import {
   brandSchema,
+  hardDeleteResponseSchema,
   inventoryAdjustmentResponseSchema,
   inventoryLotSchema,
   inventoryMovementCancellationResponseSchema,
-  inventoryMovementRowSchema,
+  inventoryMovementHeaderSchema,
   inventoryTransferResponseSchema,
   measurementUnitSchema,
   priceListSchema,
+  priceListBranchAssignmentSchema,
+  priceListBranchAssignmentsResponseSchema,
   productCategorySchema,
   productCategoryTreeSchema,
   productPriceSchema,
+  productSerialSchema,
   productSchema,
   productVariantSchema,
   promotionSchema,
+  promotionBranchAssignmentSchema,
+  promotionBranchAssignmentsResponseSchema,
   taxProfileSchema,
   variantAttributeSchema,
+  branchPriceListsResponseSchema,
+  branchPromotionsResponseSchema,
   warehouseLocationSchema,
   warehouseSchema,
   warehouseStockRowSchema,
@@ -30,11 +38,14 @@ import type {
   CreateInventoryTransferInput,
   CreateMeasurementUnitInput,
   CreatePriceListInput,
+  CreatePriceListBranchAssignmentInput,
   CreateProductCategoryInput,
   CreateProductInput,
   CreateProductPriceInput,
+  CreateProductSerialsInput,
   CreateProductVariantInput,
   CreatePromotionInput,
+  CreatePromotionBranchAssignmentInput,
   CreateTaxProfileInput,
   CreateWarehouseInput,
   CreateWarehouseLocationInput,
@@ -43,11 +54,14 @@ import type {
   UpdateInventoryLotInput,
   UpdateMeasurementUnitInput,
   UpdatePriceListInput,
+  UpdatePriceListBranchAssignmentInput,
   UpdateProductCategoryInput,
   UpdateProductInput,
   UpdateProductPriceInput,
+  UpdateProductSerialStatusInput,
   UpdateProductVariantInput,
   UpdatePromotionInput,
+  UpdatePromotionBranchAssignmentInput,
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
@@ -93,6 +107,12 @@ function extractEntity(data: unknown, explicitKeys: string[] = []) {
 function compactRecord<T extends Record<string, unknown>>(record: T) {
   return Object.fromEntries(
     Object.entries(record).filter(([, value]) => value !== undefined && value !== null && value !== ""),
+  );
+}
+
+function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
+  return Object.fromEntries(
+    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
   );
 }
 
@@ -209,6 +229,7 @@ function buildProductPayload(payload: CreateProductInput | UpdateProductInput) {
     track_expiration: isProduct ? payload.track_expiration : false,
     track_inventory: isProduct ? payload.track_inventory : false,
     track_lots: isProduct ? payload.track_lots : false,
+    track_serials: isProduct ? payload.track_serials : false,
     type: payload.type,
     warranty_profile_id: payload.has_warranty
       ? toOptionalNumberId(payload.warranty_profile_id)
@@ -239,6 +260,17 @@ function buildProductPricePayload(payload: CreateProductPriceInput | UpdateProdu
   });
 }
 
+function buildPriceListBranchAssignmentPayload(
+  payload: CreatePriceListBranchAssignmentInput | UpdatePriceListBranchAssignmentInput,
+) {
+  return compactNullableRecord({
+    branch_id: "branch_id" in payload ? toOptionalNumberId(payload.branch_id) : undefined,
+    is_active: payload.is_active,
+    is_default: payload.is_default,
+    notes: payload.notes === "" ? null : payload.notes,
+  });
+}
+
 function buildPromotionPayload(payload: CreatePromotionInput | UpdatePromotionInput) {
   return compactRecord({
     code: payload.code,
@@ -250,6 +282,7 @@ function buildPromotionPayload(payload: CreatePromotionInput | UpdatePromotionIn
         min_quantity: item.min_quantity,
         override_price: item.override_price,
         product_id: toOptionalNumberId(item.product_id),
+        product_variant_id: toOptionalNumberId(item.product_variant_id),
       }),
     ),
     name: payload.name,
@@ -341,14 +374,28 @@ function buildInventoryAdjustmentPayload(payload: CreateInventoryAdjustmentInput
 function buildInventoryTransferPayload(payload: CreateInventoryTransferInput) {
   return compactRecord({
     destination_warehouse_id: toOptionalNumberId(payload.destination_warehouse_id),
+    destination_location_id: toOptionalNumberId(payload.destination_location_id),
+    inventory_lot_id: toOptionalNumberId(payload.inventory_lot_id),
     notes: payload.notes,
+    origin_location_id: toOptionalNumberId(payload.origin_location_id),
     origin_warehouse_id: toOptionalNumberId(payload.origin_warehouse_id),
     product_id: toOptionalNumberId(payload.product_id),
     product_variant_id: toOptionalNumberId(payload.product_variant_id),
     quantity: payload.quantity,
     reference_id: payload.reference_id,
     reference_type: payload.reference_type,
+    serial_ids: payload.serial_ids,
     unit_cost: payload.unit_cost,
+  });
+}
+
+function buildPromotionBranchAssignmentPayload(
+  payload: CreatePromotionBranchAssignmentInput | UpdatePromotionBranchAssignmentInput,
+) {
+  return compactNullableRecord({
+    branch_id: "branch_id" in payload ? toOptionalNumberId(payload.branch_id) : undefined,
+    is_active: payload.is_active,
+    notes: payload.notes === "" ? null : payload.notes,
   });
 }
 
@@ -551,6 +598,47 @@ export async function deletePriceList(priceListId: string) {
   await http.delete(`/price-lists/${priceListId}`);
 }
 
+export async function listPriceListBranchAssignments(priceListId: string) {
+  const response = await http.get(`/price-lists/${priceListId}/branches`);
+  return priceListBranchAssignmentsResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function listBranchPriceLists(branchId: string) {
+  const response = await http.get(`/branches/${branchId}/price-lists`);
+  return branchPriceListsResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function createPriceListBranchAssignment(
+  priceListId: string,
+  payload: CreatePriceListBranchAssignmentInput,
+) {
+  const response = await http.post(
+    `/price-lists/${priceListId}/branches`,
+    buildPriceListBranchAssignmentPayload(payload),
+  );
+  return priceListBranchAssignmentSchema.parse(extractEntity(response.data, ["assignment"]));
+}
+
+export async function updatePriceListBranchAssignment(
+  priceListId: string,
+  assignmentId: string,
+  payload: CreatePriceListBranchAssignmentInput | UpdatePriceListBranchAssignmentInput,
+) {
+  const response = await http.patch(
+    `/price-lists/${priceListId}/branches/${assignmentId}`,
+    buildPriceListBranchAssignmentPayload(payload),
+  );
+  return priceListBranchAssignmentSchema.parse(extractEntity(response.data, ["assignment"]));
+}
+
+export async function deletePriceListBranchAssignment(
+  priceListId: string,
+  assignmentId: string,
+) {
+  const response = await http.delete(`/price-lists/${priceListId}/branches/${assignmentId}`);
+  return hardDeleteResponseSchema.parse(extractEntity(response.data));
+}
+
 export async function listProductPrices(productId: string) {
   const response = await http.get(`/products/${productId}/prices`);
   return extractCollection(response.data, ["product_prices", "productPrices"]).map((item) =>
@@ -604,6 +692,47 @@ export async function updatePromotion(
 
 export async function deletePromotion(promotionId: string) {
   await http.delete(`/promotions/${promotionId}`);
+}
+
+export async function listPromotionBranchAssignments(promotionId: string) {
+  const response = await http.get(`/promotions/${promotionId}/branches`);
+  return promotionBranchAssignmentsResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function listBranchPromotions(branchId: string) {
+  const response = await http.get(`/branches/${branchId}/promotions`);
+  return branchPromotionsResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function createPromotionBranchAssignment(
+  promotionId: string,
+  payload: CreatePromotionBranchAssignmentInput,
+) {
+  const response = await http.post(
+    `/promotions/${promotionId}/branches`,
+    buildPromotionBranchAssignmentPayload(payload),
+  );
+  return promotionBranchAssignmentSchema.parse(extractEntity(response.data, ["assignment"]));
+}
+
+export async function updatePromotionBranchAssignment(
+  promotionId: string,
+  assignmentId: string,
+  payload: CreatePromotionBranchAssignmentInput | UpdatePromotionBranchAssignmentInput,
+) {
+  const response = await http.patch(
+    `/promotions/${promotionId}/branches/${assignmentId}`,
+    buildPromotionBranchAssignmentPayload(payload),
+  );
+  return promotionBranchAssignmentSchema.parse(extractEntity(response.data, ["assignment"]));
+}
+
+export async function deletePromotionBranchAssignment(
+  promotionId: string,
+  assignmentId: string,
+) {
+  const response = await http.delete(`/promotions/${promotionId}/branches/${assignmentId}`);
+  return hardDeleteResponseSchema.parse(extractEntity(response.data));
 }
 
 export async function listWarehouses() {
@@ -711,9 +840,14 @@ export async function deactivateInventoryLot(inventoryLotId: string) {
 
 export async function listInventoryMovements() {
   const response = await http.get("/inventory-movements");
-  return extractCollection(response.data, ["inventory_movements", "inventoryMovements"]).map((item) =>
-    inventoryMovementRowSchema.parse(item),
+  return extractCollection(response.data).map((item) =>
+    inventoryMovementHeaderSchema.parse(item),
   );
+}
+
+export async function getInventoryMovement(movementHeaderId: string) {
+  const response = await http.get(`/inventory-movements/${movementHeaderId}`);
+  return inventoryMovementHeaderSchema.parse(extractEntity(response.data));
 }
 
 export async function createInventoryAdjustment(payload: CreateInventoryAdjustmentInput) {
@@ -731,7 +865,7 @@ export async function createInventoryTransfer(payload: CreateInventoryTransferIn
     "/inventory-movements/transfer",
     buildInventoryTransferPayload(payload),
   );
-  return inventoryTransferResponseSchema.parse(extractEntity(response.data, ["movement"]));
+  return inventoryTransferResponseSchema.parse(extractEntity(response.data));
 }
 
 export async function cancelInventoryMovement(
@@ -795,12 +929,12 @@ export async function listInventoryLotsPaginated(
 
 export async function listInventoryMovementsPaginated(
   params: PaginatedQueryParams,
-): Promise<PaginatedResponse<ReturnType<typeof inventoryMovementRowSchema.parse>>> {
+): Promise<PaginatedResponse<ReturnType<typeof inventoryMovementHeaderSchema.parse>>> {
   const response = await http.get("/inventory-movements", { params });
   const raw = response.data;
   return {
-    data: extractCollection(raw, ["inventory_movements", "inventoryMovements"]).map((item) =>
-      inventoryMovementRowSchema.parse(item),
+    data: extractCollection(raw).map((item) =>
+      inventoryMovementHeaderSchema.parse(item),
     ),
     total: raw?.total ?? 0,
     page: raw?.page ?? 1,
@@ -886,4 +1020,58 @@ export async function generateVariantsFromAttributes(productId: string) {
 export async function deactivateProductVariant(productId: string, variantId: string) {
   const response = await http.delete(`/products/${productId}/variants/${variantId}`);
   return productVariantSchema.parse(extractEntity(response.data, ["variant"]));
+}
+
+export async function deleteProductVariantPermanent(productId: string, variantId: string) {
+  const response = await http.delete(`/products/${productId}/variants/${variantId}/permanent`);
+  return hardDeleteResponseSchema.parse(extractEntity(response.data));
+}
+
+export async function listProductSerials(
+  productId: string,
+  variantId: string,
+  params: { status?: string; warehouse_id?: string } = {},
+) {
+  const response = await http.get(`/products/${productId}/variants/${variantId}/serials`, {
+    params: compactRecord({
+      status: params.status,
+      warehouse_id: toOptionalNumberId(params.warehouse_id),
+    }),
+  });
+
+  return extractCollection(response.data, ["serials", "product_serials", "productSerials"]).map(
+    (item) => productSerialSchema.parse(item),
+  );
+}
+
+export async function createProductSerials(
+  productId: string,
+  variantId: string,
+  payload: CreateProductSerialsInput,
+) {
+  const response = await http.post(`/products/${productId}/variants/${variantId}/serials`, {
+    serial_numbers: payload.serial_numbers,
+    warehouse_id: toOptionalNumberId(payload.warehouse_id),
+  });
+
+  return extractCollection(response.data, ["serials", "product_serials", "productSerials"]).map(
+    (item) => productSerialSchema.parse(item),
+  );
+}
+
+export async function updateProductSerial(
+  serialId: string,
+  payload: UpdateProductSerialStatusInput,
+) {
+  const response = await http.patch(
+    `/product-serials/${serialId}`,
+    compactRecord({
+      notes: payload.notes,
+      status: payload.status,
+    }),
+  );
+
+  return productSerialSchema.parse(
+    extractEntity(response.data, ["serial", "product_serial", "productSerial"]),
+  );
 }

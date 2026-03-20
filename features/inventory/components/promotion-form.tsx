@@ -22,6 +22,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { CreatePromotionInput, Product } from "../types";
 import { FormFieldError } from "./form-field-error";
+import { VariantPicker } from "./variant-picker";
 
 type PromotionFormProps = {
   form: UseFormReturn<CreatePromotionInput>;
@@ -48,6 +49,10 @@ function PromotionForm({
   } = form;
   const isActive = watch("is_active");
   const promotionType = watch("type");
+  const activeProducts = useMemo(
+    () => products.filter((product) => product.is_active && product.type === "product"),
+    [products],
+  );
   const { append, fields, remove } = useFieldArray({
     control,
     name: "items",
@@ -148,6 +153,7 @@ function PromotionForm({
                 min_quantity: undefined,
                 override_price: undefined,
                 product_id: "",
+                product_variant_id: "",
               })
             }
             size="sm"
@@ -165,8 +171,21 @@ function PromotionForm({
           </div>
         )}
 
-        {fields.map((field, index) => (
-          <div key={field.id} className="space-y-4 rounded-xl border border-border/70 p-4">
+        {fields.map((field, index) => {
+          const selectedProductId = watch(`items.${index}.product_id`) ?? "";
+          const productOptions = activeProducts.some((product) => product.id === selectedProductId)
+            ? activeProducts
+            : [
+                ...activeProducts,
+                ...products.filter(
+                  (product) =>
+                    product.id === selectedProductId &&
+                    !activeProducts.some((activeProduct) => activeProduct.id === product.id),
+                ),
+              ];
+
+          return (
+            <div key={field.id} className="space-y-4 rounded-xl border border-border/70 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="font-medium">
                 {t("inventory.promotions.item_label", { index: String(index + 1) })}
@@ -187,7 +206,7 @@ function PromotionForm({
                       <SelectValue placeholder={t("inventory.form.select_product")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {products.map((product) => (
+                      {productOptions.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
                           {product.name}
                         </SelectItem>
@@ -198,6 +217,13 @@ function PromotionForm({
               />
               <FormFieldError message={errors.items?.[index]?.product_id?.message} />
             </div>
+
+            <VariantPicker
+              form={form}
+              name={`items.${index}.product_variant_id` as const}
+              productId={selectedProductId}
+              products={productOptions}
+            />
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div className="space-y-2">
@@ -267,8 +293,9 @@ function PromotionForm({
                 <FormFieldError message={errors.items?.[index]?.bonus_quantity?.message} />
               </div>
             </div>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </section>
 
       <div className="flex justify-end">

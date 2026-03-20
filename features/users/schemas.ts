@@ -44,12 +44,14 @@ export const branchOptionSchema = z
 export const userSchema = z
   .object({
     allow_login: z.boolean().optional(),
+    business_id: idSchema.optional().catch(undefined),
     branch_ids: z.array(idSchema).optional().default([]),
     branches: z.array(branchOptionSchema).optional().default([]),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
     email: z.string().catch(""),
     id: idSchema,
+    effective_permissions: z.array(z.string()).optional().default([]),
     is_platform_admin: z.boolean().optional().default(false),
     last_login_at: z.string().nullable().optional(),
     max_sale_discount: z.coerce.number().optional().catch(undefined),
@@ -74,6 +76,7 @@ export const userSchema = z
       code: user.code,
       created_at: user.created_at,
       email: user.email,
+      effective_permissions: user.effective_permissions,
       id: user.id,
       is_platform_admin: user.is_platform_admin,
       last_login_at: user.last_login_at,

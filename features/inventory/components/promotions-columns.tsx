@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Trash2 } from "lucide-react";
+import { Building2, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -9,14 +9,20 @@ import { formatDateTime } from "@/shared/lib/utils";
 import type { Promotion } from "../types";
 
 export function getPromotionsColumns({
+  canDelete,
+  canManageBranches,
   canUpdate,
   onDelete,
   onEdit,
+  onManageBranches,
   t,
 }: {
+  canDelete: boolean;
+  canManageBranches: boolean;
   canUpdate: boolean;
   onDelete: (promotion: Promotion) => void;
   onEdit: (promotion: Promotion) => void;
+  onManageBranches: (promotion: Promotion) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 }): ColumnDef<Promotion>[] {
   const columns: ColumnDef<Promotion>[] = [
@@ -72,24 +78,41 @@ export function getPromotionsColumns({
     },
   ];
 
-  if (canUpdate) {
+  if (canUpdate || canDelete || canManageBranches) {
     columns.push({
       id: "actions",
       header: t("inventory.common.actions"),
       cell: ({ row }) => (
         <TableRowActions
           actions={[
-            {
-              label: t("inventory.common.edit"),
-              icon: Pencil,
-              onClick: () => onEdit(row.original),
-            },
-            {
-              label: t("inventory.common.delete"),
-              icon: Trash2,
-              variant: "destructive",
-              onClick: () => onDelete(row.original),
-            },
+            ...(canManageBranches
+              ? [
+                  {
+                    label: t("inventory.promotion_branch_assignments.manage_action"),
+                    icon: Building2,
+                    onClick: () => onManageBranches(row.original),
+                  },
+                ]
+              : []),
+            ...(canUpdate
+              ? [
+                  {
+                    label: t("inventory.common.edit"),
+                    icon: Pencil,
+                    onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(canDelete && row.original.lifecycle.can_delete
+              ? [
+                  {
+                    label: t("inventory.common.delete"),
+                    icon: Trash2,
+                    variant: "destructive" as const,
+                    onClick: () => onDelete(row.original),
+                  },
+                ]
+              : []),
           ]}
         />
       ),

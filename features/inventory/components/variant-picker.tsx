@@ -37,8 +37,12 @@ export function VariantPicker<TForm extends FieldValues>({
   const selectedProduct = products.find((p) => p.id === productId);
   const hasVariants = selectedProduct?.has_variants === true;
 
-  const { data: variants = [] } = useProductVariantsQuery(productId, hasVariants);
-  const activeVariants = (variants as ProductVariant[]).filter((v) => v.is_active);
+  const embeddedVariants = selectedProduct?.variants ?? [];
+  const shouldQueryVariants = hasVariants && embeddedVariants.length === 0;
+  const { data: variants = [] } = useProductVariantsQuery(productId, shouldQueryVariants);
+  const variantOptions = (embeddedVariants.length ? embeddedVariants : (variants as ProductVariant[])).filter(
+    (variant) => variant.is_active,
+  );
 
   useEffect(() => {
     if (!hasVariants) {
@@ -65,7 +69,7 @@ export function VariantPicker<TForm extends FieldValues>({
               <SelectValue placeholder={t("inventory.form.select_variant")} />
             </SelectTrigger>
             <SelectContent>
-              {activeVariants.map((variant) => (
+              {variantOptions.map((variant) => (
                 <SelectItem key={variant.id} value={variant.id}>
                   {variant.variant_name ?? variant.sku}
                   {variant.variant_name ? ` (${variant.sku})` : ""}

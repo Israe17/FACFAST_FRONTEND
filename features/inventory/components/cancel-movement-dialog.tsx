@@ -20,17 +20,17 @@ import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { useCancelInventoryMovementMutation } from "../queries";
 import { cancelInventoryMovementSchema } from "../schemas";
-import type { CancelInventoryMovementInput, InventoryMovementRow } from "../types";
+import type { CancelInventoryMovementInput, InventoryMovementHeader } from "../types";
 import { FormFieldError } from "./form-field-error";
 
 export type CancelMovementDialogProps = {
-  movement?: InventoryMovementRow | null;
+  movement?: InventoryMovementHeader | null;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
 export function CancelMovementDialog({ movement, onOpenChange, open }: CancelMovementDialogProps) {
-  const headerId = movement?.header_id ?? "";
+  const headerId = movement?.id ?? "";
   const cancelMutation = useCancelInventoryMovementMutation(headerId, { showErrorToast: false });
   const { t } = useAppTranslator();
   const form = useForm<CancelInventoryMovementInput>({

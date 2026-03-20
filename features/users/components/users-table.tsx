@@ -2,16 +2,27 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, KeyRound, Pencil, ShieldCheck, ToggleLeft, Waypoints } from "lucide-react";
+import {
+  Eye,
+  KeyRound,
+  Pencil,
+  ShieldCheck,
+  ToggleLeft,
+  Trash2,
+  Waypoints,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DataTable } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useSession } from "@/shared/hooks/use-session";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { User } from "../types";
+import { useDeleteUserMutation } from "../queries";
 import { AssignUserBranchesDialog } from "./assign-user-branches-dialog";
 import { AssignUserRolesDialog } from "./assign-user-roles-dialog";
 import { ChangeUserPasswordDialog } from "./change-user-password-dialog";
@@ -40,9 +51,12 @@ function StatusBadge({ status }: { status: User["status"] }) {
   );
 }
 
-function UserRowActions({ user }: { user: User }) {
+function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }) {
   const { can } = usePermissions();
+  const { user: sessionUser } = useSession();
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
+  const deleteUserMutation = useDeleteUserMutation(user.id);
+  const isLastKnownOwner = user.user_type === "owner" && ownerCount <= 1;
 
   const actions: TableAction[] = [];
   if (can("users.update")) {
@@ -62,6 +76,26 @@ function UserRowActions({ user }: { user: User }) {
   }
   if (can("users.view")) {
     actions.push({ icon: Eye, label: "Effective permissions", onClick: () => setActiveDialog("permissions") });
+  }
+  if (
+    can("users.delete") &&
+    user.id !== sessionUser?.id &&
+    !user.is_platform_admin &&
+    !isLastKnownOwner
+  ) {
+    actions.push({
+      icon: Trash2,
+      label: "Delete permanently",
+      onClick: () => setActiveDialog("delete"),
+      variant: "destructive",
+    });
+  }
+
+  async function handleDeleteConfirm() {
+    try {
+      await deleteUserMutation.mutateAsync();
+      setActiveDialog(null);
+    } catch {}
   }
 
   return (
@@ -99,11 +133,24 @@ function UserRowActions({ user }: { user: User }) {
         userId={user.id}
         userName={user.name}
       />
+      <ConfirmDialog
+        confirmLabel="Delete permanently"
+        description={`This permanently deletes ${user.name}. Use status changes for regular administration and reserve delete for cleanup of users without operational history.`}
+        onConfirm={handleDeleteConfirm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveDialog(null);
+          }
+        }}
+        open={activeDialog === "delete"}
+        title="Delete user permanently"
+      />
     </>
   );
 }
 
 function UsersTable({ data }: UsersTableProps) {
+  const ownerCount = data.filter((user) => user.user_type === "owner").length;
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "name",
@@ -157,7 +204,7 @@ function UsersTable({ data }: UsersTableProps) {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => <UserRowActions user={row.original} />,
+      cell: ({ row }) => <UserRowActions ownerCount={ownerCount} user={row.original} />,
     },
   ];
 

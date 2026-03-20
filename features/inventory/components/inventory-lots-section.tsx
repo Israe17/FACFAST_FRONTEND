@@ -26,6 +26,7 @@ import { useContactsQuery } from "@/features/contacts/queries";
 import {
   useDeactivateInventoryLotMutation,
   useInventoryLotsPaginatedQuery,
+  useReactivateInventoryLotMutation,
   useProductsQuery,
   useWarehousesQuery,
 } from "../queries";
@@ -44,19 +45,30 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
   const canView = can("inventory_lots.view");
   const canCreate = can("inventory_lots.create");
   const canUpdate = can("inventory_lots.update");
+  const canDelete = can("inventory_lots.delete");
   const canViewContacts = can("contacts.view");
+  const canViewProducts = can("products.view");
+  const canViewWarehouses = can("warehouses.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState<InventoryLot | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<InventoryLot | null>(null);
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_order: "DESC" });
   const inventoryLotsQuery = useInventoryLotsPaginatedQuery(queryParams, enabled && canView);
-  const warehousesQuery = useWarehousesQuery(enabled && canView);
-  const productsQuery = useProductsQuery(enabled && canView);
+  const warehousesQuery = useWarehousesQuery(enabled && canViewWarehouses);
+  const productsQuery = useProductsQuery(enabled && canViewProducts);
   const contactsQuery = useContactsQuery(enabled && canView && canViewContacts);
   const deactivateMutation = useDeactivateInventoryLotMutation({ showErrorToast: true });
+  const reactivateMutation = useReactivateInventoryLotMutation({ showErrorToast: true });
 
   const lotEnabledProducts = useMemo(
-    () => (productsQuery.data ?? []).filter((product) => product.track_lots),
+    () =>
+      (productsQuery.data ?? []).filter(
+        (product) =>
+          product.is_active &&
+          product.type === "product" &&
+          product.track_inventory &&
+          (product.track_lots || product.has_variants),
+      ),
     [productsQuery.data],
   );
   const supplierContacts = useMemo(
@@ -81,12 +93,16 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
   const columns = useMemo(
     () =>
       getInventoryLotsColumns({
+        canDelete,
         canUpdate,
         onDeactivate: setDeactivateTarget,
         onEdit,
+        onReactivate: (lot) => {
+          void reactivateMutation.mutateAsync(lot.id);
+        },
         t,
       }),
-    [canUpdate, onEdit, t],
+    [canDelete, canUpdate, onEdit, reactivateMutation, t],
   );
 
   if (!canView) {
@@ -97,7 +113,7 @@ function InventoryLotsSection({ enabled = true }: InventoryLotsSectionProps) {
     <>
       <CatalogSectionCard
         action={
-          canCreate ? (
+          canCreate && canViewProducts && canViewWarehouses ? (
             <Button
               onClick={() => {
                 setSelectedLot(null);

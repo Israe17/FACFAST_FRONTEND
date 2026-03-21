@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { identificationTypeValues } from "@/shared/lib/validation";
 
 type BranchFormValues = {
@@ -70,6 +71,7 @@ function BranchForm({
   secretState,
   submitLabel,
 }: BranchFormProps) {
+  const { t } = useAppTranslator();
   const {
     formState: { errors },
   } = form;
@@ -78,26 +80,26 @@ function BranchForm({
   const canConfigure = can("branches.configure");
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
         <div className="space-y-1">
-          <h3 className="font-semibold">Branch identity</h3>
+          <h3 className="font-semibold">{t("branches.form.identity_title")}</h3>
           <p className="text-sm text-muted-foreground">
-            Main branch data required by the backend contract.
+            {t("branches.form.identity_description")}
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-code">Code</Label>
+            <Label htmlFor="branch-code">{t("branches.form.code")}</Label>
             <Input id="branch-code" placeholder="BR-0001" {...form.register("code")} />
             <FieldError message={errors.code?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-number">Branch number</Label>
+            <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
             <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
             <FieldError message={errors.branch_number?.message} />
           </div>
@@ -105,7 +107,7 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-business-name">Business name</Label>
+            <Label htmlFor="branch-business-name">{t("branches.form.business_name")}</Label>
             <Input
               id="branch-business-name"
               placeholder="FastFact Escazu"
@@ -115,7 +117,7 @@ function BranchForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-legal-name">Legal name</Label>
+            <Label htmlFor="branch-legal-name">{t("branches.form.legal_name")}</Label>
             <Input
               id="branch-legal-name"
               placeholder="FastFact Sociedad Anonima"
@@ -127,13 +129,13 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-name">Branch name</Label>
+            <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
             <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />
             <FieldError message={errors.name?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-cedula">Cedula juridica</Label>
+            <Label htmlFor="branch-cedula">{t("branches.form.cedula_juridica")}</Label>
             <Input
               id="branch-cedula"
               placeholder="3101123456"
@@ -145,14 +147,14 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-identification-type">Identification type</Label>
+            <Label htmlFor="branch-identification-type">{t("branches.form.identification_type")}</Label>
             <Controller
               control={form.control}
               name="identification_type"
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value ?? ""}>
                   <SelectTrigger id="branch-identification-type">
-                    <SelectValue placeholder="Select a type" />
+                    <SelectValue placeholder={t("branches.form.select_type")} />
                   </SelectTrigger>
                   <SelectContent>
                     {identificationTypeValues.map((value) => (
@@ -168,7 +170,7 @@ function BranchForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-identification-number">Identification number</Label>
+            <Label htmlFor="branch-identification-number">{t("branches.form.identification_number")}</Label>
             <Input
               id="branch-identification-number"
               placeholder="3101123456"
@@ -181,14 +183,14 @@ function BranchForm({
 
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
         <div className="space-y-1">
-          <h3 className="font-semibold">Location and contact</h3>
+          <h3 className="font-semibold">{t("branches.form.location_title")}</h3>
           <p className="text-sm text-muted-foreground">
-            Branch address plus optional communication channels.
+            {t("branches.form.location_description")}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="branch-address">Address</Label>
+          <Label htmlFor="branch-address">{t("branches.form.address")}</Label>
           <Textarea
             id="branch-address"
             placeholder="Centro Comercial Plaza, Local 5"
@@ -199,25 +201,25 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
-            <Label htmlFor="branch-province">Province</Label>
+            <Label htmlFor="branch-province">{t("branches.form.province")}</Label>
             <Input id="branch-province" placeholder="San Jose" {...form.register("province")} />
             <FieldError message={errors.province?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-canton">Canton</Label>
+            <Label htmlFor="branch-canton">{t("branches.form.canton")}</Label>
             <Input id="branch-canton" placeholder="Escazu" {...form.register("canton")} />
             <FieldError message={errors.canton?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-district">District</Label>
+            <Label htmlFor="branch-district">{t("branches.form.district")}</Label>
             <Input id="branch-district" placeholder="San Rafael" {...form.register("district")} />
             <FieldError message={errors.district?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-city">City</Label>
+            <Label htmlFor="branch-city">{t("branches.form.city")}</Label>
             <Input id="branch-city" placeholder="San Jose" {...form.register("city")} />
             <FieldError message={errors.city?.message} />
           </div>
@@ -225,13 +227,13 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-phone">Phone</Label>
+            <Label htmlFor="branch-phone">{t("branches.form.phone")}</Label>
             <Input id="branch-phone" placeholder="2222-3333" {...form.register("phone")} />
             <FieldError message={errors.phone?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="branch-email">Email</Label>
+            <Label htmlFor="branch-email">{t("branches.form.email")}</Label>
             <Input id="branch-email" placeholder="sucursal@empresa.com" {...form.register("email")} />
             <FieldError message={errors.email?.message} />
           </div>
@@ -241,15 +243,15 @@ function BranchForm({
       {canConfigure ? (
         <section className="space-y-4 rounded-xl border border-border/70 p-4">
           <div className="space-y-1">
-            <h3 className="font-semibold">Configuration</h3>
+            <h3 className="font-semibold">{t("branches.form.configuration_title")}</h3>
             <p className="text-sm text-muted-foreground">
-              Sensitive configuration fields only visible with `branches.configure`.
+              {t("branches.form.configuration_description")}
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="branch-activity-code">Activity code</Label>
+              <Label htmlFor="branch-activity-code">{t("branches.form.activity_code")}</Label>
               <Input
                 id="branch-activity-code"
                 placeholder="123456"
@@ -259,7 +261,7 @@ function BranchForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="branch-provider-code">Provider code</Label>
+              <Label htmlFor="branch-provider-code">{t("branches.form.provider_code")}</Label>
               <Input
                 id="branch-provider-code"
                 placeholder="PROV-01"
@@ -271,7 +273,7 @@ function BranchForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="branch-cert-path">Cert path</Label>
+              <Label htmlFor="branch-cert-path">{t("branches.form.cert_path")}</Label>
               <Input
                 id="branch-cert-path"
                 placeholder="C:/certs/sucursal.p12"
@@ -281,7 +283,7 @@ function BranchForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="branch-signature-type">Signature type</Label>
+              <Label htmlFor="branch-signature-type">{t("branches.form.signature_type")}</Label>
               <Input
                 id="branch-signature-type"
                 placeholder="p12"
@@ -293,7 +295,7 @@ function BranchForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="branch-crypto-key">Crypto key</Label>
+              <Label htmlFor="branch-crypto-key">{t("branches.form.crypto_key")}</Label>
               <Input
                 id="branch-crypto-key"
                 placeholder="clave-privada"
@@ -304,7 +306,7 @@ function BranchForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="branch-mail-key">Mail key</Label>
+              <Label htmlFor="branch-mail-key">{t("branches.form.mail_key")}</Label>
               <Input
                 id="branch-mail-key"
                 placeholder="mail-secret"
@@ -317,7 +319,7 @@ function BranchForm({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="branch-hacienda-username">Hacienda username</Label>
+              <Label htmlFor="branch-hacienda-username">{t("branches.form.hacienda_username")}</Label>
               <Input
                 id="branch-hacienda-username"
                 placeholder="usuario_hacienda"
@@ -327,7 +329,7 @@ function BranchForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="branch-hacienda-password">Hacienda password</Label>
+              <Label htmlFor="branch-hacienda-password">{t("branches.form.hacienda_password")}</Label>
               <Input
                 id="branch-hacienda-password"
                 placeholder="password_hacienda"
@@ -340,13 +342,13 @@ function BranchForm({
 
           {secretState ? (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-              Existing backend secret flags:
+              {t("branches.form.secret_flags_label")}:
               {" "}
-              crypto key {secretState.has_crypto_key ? "configured" : "empty"},
+              {t("branches.form.crypto_key")} {secretState.has_crypto_key ? t("branches.form.configured") : t("branches.form.empty")},
               {" "}
-              Hacienda password {secretState.has_hacienda_password ? "configured" : "empty"},
+              {t("branches.form.hacienda_password")} {secretState.has_hacienda_password ? t("branches.form.configured") : t("branches.form.empty")},
               {" "}
-              mail key {secretState.has_mail_key ? "configured" : "empty"}.
+              {t("branches.form.mail_key")} {secretState.has_mail_key ? t("branches.form.configured") : t("branches.form.empty")}.
             </div>
           ) : null}
         </section>
@@ -360,15 +362,15 @@ function BranchForm({
           }}
         />
         <div className="space-y-1">
-          <p className="font-medium">Active branch</p>
+          <p className="font-medium">{t("branches.form.active_branch")}</p>
           <p className="text-sm text-muted-foreground">
-            Inactive branches remain registered but should not be used operationally.
+            {t("branches.form.active_branch_description")}
           </p>
         </div>
       </label>
 
       <div className="flex justify-end">
-        <ActionButton isLoading={isPending} loadingText="Saving" type="submit">
+        <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">
           {submitLabel}
         </ActionButton>
       </div>

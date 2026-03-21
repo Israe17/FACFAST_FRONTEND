@@ -120,7 +120,7 @@ export function ProductForm({
   );
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
       <section className="space-y-4 rounded-xl border border-border/70 p-4">

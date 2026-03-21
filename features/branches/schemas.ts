@@ -15,13 +15,13 @@ import {
 const stringIdSchema = z.union([z.string(), z.number()]).transform(String);
 const optionalTextSchema = optionalTrimmedString(z.string());
 const optionalCodeSchema = optionalTrimmedString(
-  z.string().regex(branchCodePattern, "Use format BR-0000 or longer."),
+  z.string().regex(branchCodePattern, "Usa el formato BR-0000 o mas largo."),
 );
 const optionalTerminalCodeSchema = optionalTrimmedString(
-  z.string().regex(terminalCodePattern, "Use format TR-0000 or longer."),
+  z.string().regex(terminalCodePattern, "Usa el formato TR-0000 o mas largo."),
 );
 const optionalEmailSchema = optionalTrimmedString(
-  z.string().email("Enter a valid email."),
+  z.string().email("Ingresa un correo valido."),
 );
 
 export const terminalSchema = z
@@ -75,41 +75,41 @@ export const branchSchema = z
 
 export const createBranchSchema = z.object({
   activity_code: optionalTextSchema,
-  address: requiredTrimmedString("Address must contain at least 5 characters.", 5),
+  address: requiredTrimmedString("La direccion debe tener al menos 5 caracteres.", 5),
   branch_number: z
     .string()
     .trim()
-    .regex(branchNumberPattern, "Branch number must be exactly 3 digits."),
-  business_name: z.string().trim().min(2, "Business name must contain at least 2 characters."),
-  canton: requiredTrimmedString("Canton is required."),
+    .regex(branchNumberPattern, "El numero de sucursal debe ser exactamente 3 digitos."),
+  business_name: z.string().trim().min(2, "El nombre comercial debe tener al menos 2 caracteres."),
+  canton: requiredTrimmedString("El canton es requerido."),
   cedula_juridica: z
     .string()
     .trim()
-    .regex(digitsPattern, "Cedula juridica must contain only digits."),
+    .regex(digitsPattern, "La cedula juridica debe contener solo digitos."),
   cert_path: optionalTextSchema,
   city: optionalTextSchema,
   code: optionalCodeSchema,
   crypto_key: optionalTextSchema,
-  district: requiredTrimmedString("District is required."),
+  district: requiredTrimmedString("El distrito es requerido."),
   email: optionalEmailSchema,
   hacienda_password: optionalTextSchema,
   hacienda_username: optionalTextSchema,
   identification_number: optionalTrimmedString(
-    z.string().min(2, "Identification number must contain at least 2 characters."),
+    z.string().min(2, "El numero de identificacion debe tener al menos 2 caracteres."),
   ),
   identification_type: z.preprocess(
     normalizeIdentificationTypeValue,
     identificationTypeSchema.optional(),
   ),
   is_active: z.boolean().default(true),
-  legal_name: z.string().trim().min(2, "Legal name must contain at least 2 characters."),
+  legal_name: z.string().trim().min(2, "La razon social debe tener al menos 2 caracteres."),
   mail_key: optionalTextSchema,
   name: optionalTrimmedString(
-    z.string().min(2, "Branch name must contain at least 2 characters."),
+    z.string().min(2, "El nombre de la sucursal debe tener al menos 2 caracteres."),
   ),
   phone: optionalTextSchema,
   provider_code: optionalTextSchema,
-  province: requiredTrimmedString("Province is required."),
+  province: requiredTrimmedString("La provincia es requerida."),
   signature_type: optionalTextSchema,
 });
 
@@ -120,11 +120,11 @@ export const updateBranchSchema = createBranchSchema.partial().extend({
 export const createTerminalSchema = z.object({
   code: optionalTerminalCodeSchema,
   is_active: z.boolean().default(true),
-  name: z.string().trim().min(2, "Name must contain at least 2 characters."),
+  name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres."),
   terminal_number: z
     .string()
     .trim()
-    .regex(terminalNumberPattern, "Terminal number must be exactly 5 digits."),
+    .regex(terminalNumberPattern, "El numero de terminal debe ser exactamente 5 digitos."),
 });
 
 export const updateTerminalSchema = createTerminalSchema.partial().extend({

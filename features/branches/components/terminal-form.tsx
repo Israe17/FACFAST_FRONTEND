@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 type TerminalFormValues = {
   code?: string;
@@ -30,24 +31,25 @@ function TerminalForm({
   onSubmit,
   submitLabel,
 }: TerminalFormProps) {
+  const { t } = useAppTranslator();
   const {
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="terminal-name">Name</Label>
+          <Label htmlFor="terminal-name">{t("branches.terminal_form.name")}</Label>
           <Input id="terminal-name" placeholder="POS Front Desk" {...form.register("name")} />
           {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="terminal-number">Terminal number</Label>
+          <Label htmlFor="terminal-number">{t("branches.terminal_form.number")}</Label>
           <Input
             id="terminal-number"
             placeholder="00001"
@@ -60,7 +62,7 @@ function TerminalForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="terminal-code">Code</Label>
+        <Label htmlFor="terminal-code">{t("branches.terminal_form.code")}</Label>
         <Input id="terminal-code" placeholder="TR-0001" {...form.register("code")} />
         {errors.code ? <p className="text-sm text-destructive">{errors.code.message}</p> : null}
       </div>
@@ -73,15 +75,15 @@ function TerminalForm({
           }}
         />
         <div className="space-y-1">
-          <p className="font-medium">Active terminal</p>
+          <p className="font-medium">{t("branches.terminal_form.active_terminal")}</p>
           <p className="text-sm text-muted-foreground">
-            Use this state to control which terminals remain operational.
+            {t("branches.terminal_form.active_terminal_description")}
           </p>
         </div>
       </label>
 
       <div className="flex justify-end">
-        <ActionButton isLoading={isPending} loadingText="Saving" type="submit">
+        <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">
           {submitLabel}
         </ActionButton>
       </div>

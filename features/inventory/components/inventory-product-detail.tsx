@@ -100,6 +100,18 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
       header: t("inventory.entity.price_list"),
       cell: ({ row }) => row.original.price_list?.name ?? t("inventory.common.not_available"),
     },
+    ...(product.has_variants
+      ? [
+          {
+            accessorKey: "product_variant",
+            header: t("inventory.detail.variant_label"),
+            cell: ({ row }: { row: { original: ProductPrice } }) =>
+              row.original.product_variant?.variant_name ??
+              row.original.product_variant?.sku ??
+              t("inventory.detail.default_variant"),
+          } satisfies ColumnDef<ProductPrice>,
+        ]
+      : []),
     {
       accessorKey: "price",
       header: t("inventory.form.price"),

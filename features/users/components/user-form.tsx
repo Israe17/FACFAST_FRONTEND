@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 type UserFormValues = {
   email: string;
@@ -34,6 +35,7 @@ function UserForm({
   const {
     formState: { errors },
   } = form;
+  const { t } = useAppTranslator();
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -41,13 +43,13 @@ function UserForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="user-name">Name</Label>
-          <Input id="user-name" placeholder="User name" {...form.register("name")} />
+          <Label htmlFor="user-name">{t("users.form.name")}</Label>
+          <Input id="user-name" placeholder={t("users.form.name_placeholder")} {...form.register("name")} />
           {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="user-email">Email</Label>
+          <Label htmlFor="user-email">{t("users.form.email")}</Label>
           <Input id="user-email" placeholder="user@company.com" {...form.register("email")} />
           {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
         </div>
@@ -55,10 +57,10 @@ function UserForm({
 
       {includePassword ? (
         <div className="space-y-2">
-          <Label htmlFor="user-password">Password</Label>
+          <Label htmlFor="user-password">{t("users.form.password")}</Label>
           <Input
             id="user-password"
-            placeholder="Temporary password"
+            placeholder={t("users.form.password_placeholder")}
             type="password"
             {...form.register("password")}
           />
@@ -69,7 +71,7 @@ function UserForm({
       ) : null}
 
       <div className="space-y-2">
-        <Label htmlFor="user-discount">Max sale discount (%)</Label>
+        <Label htmlFor="user-discount">{t("users.form.max_discount")}</Label>
         <Input
           id="user-discount"
           min={0}
@@ -83,7 +85,7 @@ function UserForm({
       </div>
 
       <div className="flex justify-end">
-        <ActionButton isLoading={isPending} loadingText="Saving" type="submit">
+        <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">
           {submitLabel}
         </ActionButton>
       </div>

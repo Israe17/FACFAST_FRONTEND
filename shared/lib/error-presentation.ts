@@ -44,6 +44,9 @@ export function resolveTranslatedBackendMessage(
     backendError.messageKey,
     `error.${backendError.code}`,
     `inventory.error.${backendError.code}`,
+    `contacts.error.${backendError.code}`,
+    `branches.error.${backendError.code}`,
+    `users.error.${backendError.code}`,
   ].filter((value): value is string => Boolean(value));
 
   for (const candidate of candidateKeys) {

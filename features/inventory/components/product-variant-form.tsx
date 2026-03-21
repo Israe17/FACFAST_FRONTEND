@@ -85,7 +85,7 @@ function ProductVariantForm({
   }, [form, trackLots]);
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -236,6 +236,7 @@ function ProductVariantForm({
           />
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.track_inventory")}</p>
+            <p className="text-sm text-muted-foreground">{t("inventory.form.track_inventory_description")}</p>
           </div>
         </label>
 
@@ -249,6 +250,7 @@ function ProductVariantForm({
           />
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.track_lots")}</p>
+            <p className="text-sm text-muted-foreground">{t("inventory.form.track_lots_description")}</p>
           </div>
         </label>
 
@@ -262,6 +264,7 @@ function ProductVariantForm({
           />
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.track_expiration")}</p>
+            <p className="text-sm text-muted-foreground">{t("inventory.form.track_expiration_description")}</p>
           </div>
         </label>
 
@@ -275,6 +278,7 @@ function ProductVariantForm({
           />
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.track_serials")}</p>
+            <p className="text-sm text-muted-foreground">{t("inventory.form.track_serials_description")}</p>
           </div>
         </label>
 
@@ -287,6 +291,7 @@ function ProductVariantForm({
           />
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.allow_negative_stock")}</p>
+            <p className="text-sm text-muted-foreground">{t("inventory.form.allow_negative_stock_description")}</p>
           </div>
         </label>
 

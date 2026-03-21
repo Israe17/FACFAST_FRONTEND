@@ -36,7 +36,7 @@ const nullableOptionalTextSchema = z.preprocess((value) => {
 
 function makeOptionalTrimmedTextSchema(minLength?: number, message?: string) {
   const baseSchema = minLength
-    ? z.string().min(minLength, message ?? `Must be at least ${minLength} characters.`)
+    ? z.string().min(minLength, message ?? `Debe tener al menos ${minLength} caracteres.`)
     : z.string();
 
   return z.preprocess((value) => {
@@ -56,7 +56,7 @@ const optionalCodeSchema = z.preprocess((value) => {
 
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
-}, z.string().regex(/^CT-\d{4,}$/, "Use a code like CT-0001.").optional());
+}, z.string().regex(/^CT-\d{4,}$/, "Usa un codigo como CT-0001.").optional());
 
 const optionalEmailSchema = z.preprocess((value) => {
   if (typeof value !== "string") {
@@ -65,7 +65,7 @@ const optionalEmailSchema = z.preprocess((value) => {
 
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
-}, z.string().email("Enter a valid email.").optional());
+}, z.string().email("Ingresa un correo valido.").optional());
 
 const optionalPercentageSchema = z.preprocess((value) => {
   if (value === "" || value === null || value === undefined) {
@@ -73,7 +73,7 @@ const optionalPercentageSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.coerce.number().min(0, "Must be at least 0.").max(100, "Cannot exceed 100.").optional());
+}, z.coerce.number().min(0, "Debe ser al menos 0.").max(100, "No puede exceder 100.").optional());
 
 const optionalNumberSchema = z.preprocess((value) => {
   if (value === "" || value === null || value === undefined) {
@@ -81,7 +81,7 @@ const optionalNumberSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.coerce.number().min(0, "Must be at least 0.").optional());
+}, z.coerce.number().min(0, "Debe ser al menos 0.").optional());
 
 const nullableOptionalNumberSchema = z.preprocess((value) => {
   if (value === "") {
@@ -93,7 +93,7 @@ const nullableOptionalNumberSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.union([z.coerce.number().min(0, "Must be at least 0."), z.null()]).optional());
+}, z.union([z.coerce.number().min(0, "Debe ser al menos 0."), z.null()]).optional());
 
 const optionalIsoDateSchema = z.preprocess((value) => {
   if (typeof value !== "string") {
@@ -102,7 +102,7 @@ const optionalIsoDateSchema = z.preprocess((value) => {
 
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
-}, z.string().refine((value) => !Number.isNaN(Date.parse(value)), "Enter a valid ISO date.").optional());
+}, z.string().refine((value) => !Number.isNaN(Date.parse(value)), "Ingresa una fecha ISO valida.").optional());
 
 export const contactSchema = z
   .object({
@@ -136,10 +136,10 @@ export const contactSchema = z
   .passthrough();
 
 export const createContactSchema = z.object({
-  address: makeOptionalTrimmedTextSchema(5, "Address must be at least 5 characters."),
+  address: makeOptionalTrimmedTextSchema(5, "La direccion debe tener al menos 5 caracteres."),
   canton: optionalTextSchema,
   code: optionalCodeSchema,
-  commercial_name: makeOptionalTrimmedTextSchema(2, "Commercial name must be at least 2 characters."),
+  commercial_name: makeOptionalTrimmedTextSchema(2, "El nombre comercial debe tener al menos 2 caracteres."),
   district: optionalTextSchema,
   economic_activity_code: optionalTextSchema,
   email: optionalEmailSchema,
@@ -148,7 +148,7 @@ export const createContactSchema = z.object({
   exoneration_issue_date: optionalIsoDateSchema,
   exoneration_percentage: optionalPercentageSchema,
   exoneration_type: optionalTextSchema,
-  identification_number: z.string().trim().min(2, "Identification number must be at least 2 characters."),
+  identification_number: z.string().trim().min(2, "El numero de identificacion debe tener al menos 2 caracteres."),
   identification_type: z.preprocess((value) => {
     if (typeof value === "string" && value.trim() === "") {
       return undefined;
@@ -157,7 +157,7 @@ export const createContactSchema = z.object({
     return normalizeIdentificationTypeValue(value);
   }, identificationTypeSchema),
   is_active: z.boolean().default(true),
-  name: z.string().trim().min(2, "Name must be at least 2 characters."),
+  name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres."),
   phone: optionalTextSchema,
   province: optionalTextSchema,
   tax_condition: optionalTextSchema,
@@ -171,10 +171,10 @@ export const createContactSchema = z.object({
 });
 
 export const updateContactSchema = z.object({
-  address: makeOptionalTrimmedTextSchema(5, "Address must be at least 5 characters."),
+  address: makeOptionalTrimmedTextSchema(5, "La direccion debe tener al menos 5 caracteres."),
   canton: optionalTextSchema,
   code: optionalCodeSchema,
-  commercial_name: makeOptionalTrimmedTextSchema(2, "Commercial name must be at least 2 characters."),
+  commercial_name: makeOptionalTrimmedTextSchema(2, "El nombre comercial debe tener al menos 2 caracteres."),
   district: optionalTextSchema,
   economic_activity_code: optionalTextSchema,
   email: optionalEmailSchema,
@@ -185,7 +185,7 @@ export const updateContactSchema = z.object({
   exoneration_type: optionalTextSchema,
   identification_number: makeOptionalTrimmedTextSchema(
     2,
-    "Identification number must be at least 2 characters.",
+    "El numero de identificacion debe tener al menos 2 caracteres.",
   ),
   identification_type: z.preprocess((value) => {
     if (typeof value === "string" && value.trim() === "") {
@@ -195,7 +195,7 @@ export const updateContactSchema = z.object({
     return normalizeIdentificationTypeValue(value);
   }, identificationTypeSchema.optional()),
   is_active: z.boolean().optional(),
-  name: makeOptionalTrimmedTextSchema(2, "Name must be at least 2 characters."),
+  name: makeOptionalTrimmedTextSchema(2, "El nombre debe tener al menos 2 caracteres."),
   phone: optionalTextSchema,
   province: optionalTextSchema,
   tax_condition: optionalTextSchema,
@@ -290,15 +290,15 @@ export const createContactBranchAssignmentSchema = z.object({
   account_manager_user_id: z
     .string()
     .trim()
-    .regex(/^\d+$/, "Select a valid account manager.")
+    .regex(/^\d+$/, "Selecciona un gestor de cuenta valido.")
     .optional(),
-  branch_id: z.string().trim().regex(/^\d+$/, "Select a valid branch."),
+  branch_id: z.string().trim().regex(/^\d+$/, "Selecciona una sucursal valida."),
   credit_enabled: z.boolean().default(false),
   custom_credit_limit: optionalNumberSchema,
   custom_price_list_id: z
     .string()
     .trim()
-    .regex(/^\d+$/, "Select a valid price list.")
+    .regex(/^\d+$/, "Selecciona una lista de precios valida.")
     .optional(),
   is_active: z.boolean().default(true),
   is_default: z.boolean().default(false),

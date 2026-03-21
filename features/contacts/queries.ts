@@ -217,7 +217,7 @@ export function useCreateContactBranchAssignmentMutation(
     mutationFn: (payload: CreateContactBranchAssignmentInput) =>
       createContactBranchAssignment(contactId, payload),
     onSuccess: () => {
-      invalidateContactQueries(queryClient, contactId);
+      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) });
       queryClient.invalidateQueries({ queryKey: contactsKeys.branchContext(contactId) });
       toast.success(t("common.create_success"));
     },
@@ -243,7 +243,7 @@ export function useUpdateContactBranchAssignmentMutation(
     mutationFn: (payload: UpdateContactBranchAssignmentInput) =>
       updateContactBranchAssignment(contactId, assignmentId, payload),
     onSuccess: () => {
-      invalidateContactQueries(queryClient, contactId);
+      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) });
       queryClient.invalidateQueries({ queryKey: contactsKeys.branchContext(contactId) });
       toast.success(t("common.update_success"));
     },
@@ -268,7 +268,7 @@ export function useDeleteContactBranchAssignmentMutation(
   return useMutation({
     mutationFn: () => deleteContactBranchAssignment(contactId, assignmentId),
     onSuccess: () => {
-      invalidateContactQueries(queryClient, contactId);
+      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) });
       queryClient.invalidateQueries({ queryKey: contactsKeys.branchContext(contactId) });
       toast.success(t("common.delete_success"));
     },

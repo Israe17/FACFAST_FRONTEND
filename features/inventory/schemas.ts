@@ -46,7 +46,7 @@ const optionalDateSchema = optionalTrimmedString(z.string());
 
 function makeOptionalCodeSchema(prefix: string) {
   return optionalTrimmedString(
-    z.string().regex(new RegExp(`^${prefix}-\\d{4,}$`), `Use a code like ${prefix}-0001.`),
+    z.string().regex(new RegExp(`^${prefix}-\\d{4,}$`), `Usa un codigo como ${prefix}-0001.`),
   );
 }
 
@@ -689,9 +689,9 @@ export const serialEventSchema = z
 
 export const createProductSerialsSchema = z.object({
   serial_numbers: z
-    .array(requiredTrimmedString("Serial number is required."))
-    .min(1, "At least one serial number is required."),
-  warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid warehouse."),
+    .array(requiredTrimmedString("El numero de serie es requerido."))
+    .min(1, "Se requiere al menos un numero de serie."),
+  warehouse_id: z.string().regex(positiveIntegerPattern, "Selecciona un almacen valido."),
 });
 
 export const updateProductSerialStatusSchema = z.object({
@@ -703,7 +703,7 @@ export const createBrandSchema = z.object({
   code: makeOptionalCodeSchema("MK"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
 });
 
 export const updateBrandSchema = createBrandSchema.partial().extend({
@@ -713,8 +713,8 @@ export const updateBrandSchema = createBrandSchema.partial().extend({
 export const createMeasurementUnitSchema = z.object({
   code: makeOptionalCodeSchema("MU"),
   is_active: z.boolean().default(true),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
-  symbol: requiredTrimmedString("Symbol is required."),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  symbol: requiredTrimmedString("El simbolo es requerido."),
 });
 
 export const updateMeasurementUnitSchema = createMeasurementUnitSchema.partial().extend({
@@ -725,8 +725,8 @@ export const createProductCategorySchema = z.object({
   code: makeOptionalCodeSchema("CG"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
-  parent_id: makeOptionalIdSchema("Select a valid parent category."),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  parent_id: makeOptionalIdSchema("Selecciona una categoria padre valida."),
 });
 
 export const updateProductCategorySchema = createProductCategorySchema.partial().extend({
@@ -738,7 +738,7 @@ const taxProfileFormObjectSchema = z.object({
   cabys_code: z
     .string()
     .trim()
-    .regex(digitsPattern, "CABYS code must contain only digits."),
+    .regex(digitsPattern, "El codigo CABYS debe contener solo digitos."),
   code: makeOptionalCodeSchema("TF"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
@@ -746,15 +746,15 @@ const taxProfileFormObjectSchema = z.object({
   iva_rate: optionalNumberSchema(
     z.coerce
       .number()
-      .min(0, "IVA rate must be at least 0.")
-      .max(100, "IVA rate cannot exceed 100."),
+      .min(0, "La tasa de IVA debe ser al menos 0.")
+      .max(100, "La tasa de IVA no puede exceder 100."),
   ),
   iva_rate_code: optionalTextSchema,
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   requires_cabys: z.boolean().default(false),
   specific_tax_name: optionalTextSchema,
   specific_tax_rate: optionalNumberSchema(
-    z.coerce.number().min(0, "Specific tax rate must be at least 0."),
+    z.coerce.number().min(0, "La tasa de impuesto especifico debe ser al menos 0."),
   ),
   tax_type: taxTypeSchema,
 });
@@ -766,7 +766,7 @@ function applyTaxProfileRules(
   if (values.tax_type === "iva" && values.iva_rate === undefined) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "IVA rate is required when tax type is IVA.",
+      message: "La tasa de IVA es requerida cuando el tipo de impuesto es IVA.",
       path: ["iva_rate"],
     });
   }
@@ -775,7 +775,7 @@ function applyTaxProfileRules(
     if (!values.specific_tax_name) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Specific tax name is required.",
+        message: "El nombre del impuesto especifico es requerido.",
         path: ["specific_tax_name"],
       });
     }
@@ -783,7 +783,7 @@ function applyTaxProfileRules(
     if (values.specific_tax_rate === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Specific tax rate is required.",
+        message: "La tasa de impuesto especifico es requerida.",
         path: ["specific_tax_rate"],
       });
     }
@@ -803,9 +803,9 @@ export const createWarrantyProfileSchema = z.object({
   code: makeOptionalCodeSchema("WP"),
   coverage_notes: optionalTextSchema,
   duration_unit: warrantyDurationUnitSchema,
-  duration_value: z.coerce.number().int().min(1, "Duration value must be at least 1."),
+  duration_value: z.coerce.number().int().min(1, "El valor de duracion debe ser al menos 1."),
   is_active: z.boolean().default(true),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
 });
 
 export const updateWarrantyProfileSchema = createWarrantyProfileSchema.partial().extend({
@@ -815,24 +815,24 @@ export const updateWarrantyProfileSchema = createWarrantyProfileSchema.partial()
 const productFormObjectSchema = z.object({
   allow_negative_stock: z.boolean().default(false),
   barcode: optionalTextSchema,
-  brand_id: makeOptionalIdSchema("Select a valid brand."),
-  category_id: makeOptionalIdSchema("Select a valid category."),
+  brand_id: makeOptionalIdSchema("Selecciona una marca valida."),
+  category_id: makeOptionalIdSchema("Selecciona una categoria valida."),
   code: makeOptionalCodeSchema("PD"),
   description: optionalTextSchema,
   has_variants: z.boolean().default(false),
   has_warranty: z.boolean().default(false),
   is_active: z.boolean().default(true),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
-  sale_unit_id: makeOptionalIdSchema("Select a valid sale unit."),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  sale_unit_id: makeOptionalIdSchema("Selecciona una unidad de venta valida."),
   sku: optionalTextSchema,
-  stock_unit_id: makeOptionalIdSchema("Select a valid stock unit."),
-  tax_profile_id: z.string().regex(positiveIntegerPattern, "Select a valid tax profile."),
+  stock_unit_id: makeOptionalIdSchema("Selecciona una unidad de inventario valida."),
+  tax_profile_id: z.string().regex(positiveIntegerPattern, "Selecciona un perfil fiscal valido."),
   track_expiration: z.boolean().default(false),
   track_inventory: z.boolean().default(false),
   track_lots: z.boolean().default(false),
   track_serials: z.boolean().default(false),
   type: productTypeSchema,
-  warranty_profile_id: makeOptionalIdSchema("Select a valid warranty profile."),
+  warranty_profile_id: makeOptionalIdSchema("Selecciona un perfil de garantia valido."),
 });
 
 function applyProductRules(
@@ -846,7 +846,7 @@ function applyProductRules(
   if (values.track_lots && !values.track_inventory) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Lot tracking requires inventory tracking.",
+      message: "El rastreo de lotes requiere rastreo de inventario.",
       path: ["track_lots"],
     });
   }
@@ -854,7 +854,7 @@ function applyProductRules(
   if (values.track_expiration && !values.track_lots) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Expiration tracking requires lot tracking.",
+      message: "El rastreo de vencimiento requiere rastreo de lotes.",
       path: ["track_expiration"],
     });
   }
@@ -862,7 +862,7 @@ function applyProductRules(
   if (values.track_serials && !values.track_inventory) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Serial tracking requires inventory tracking.",
+      message: "El rastreo de seriales requiere rastreo de inventario.",
       path: ["track_serials"],
     });
   }
@@ -870,7 +870,7 @@ function applyProductRules(
   if (values.has_warranty && !values.warranty_profile_id) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Warranty profile is required when warranty is enabled.",
+      message: "El perfil de garantia es requerido cuando la garantia esta habilitada.",
       path: ["warranty_profile_id"],
     });
   }
@@ -878,7 +878,7 @@ function applyProductRules(
   if (values.sale_unit_id && values.stock_unit_id && values.sale_unit_id !== values.stock_unit_id) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Sale unit and stock unit must match in the MVP.",
+      message: "La unidad de venta y la unidad de inventario deben coincidir en el MVP.",
       path: ["sale_unit_id"],
     });
   }
@@ -898,11 +898,11 @@ export const createPriceListSchema = z.object({
   currency: z
     .string()
     .trim()
-    .regex(currencyCodePattern, "Currency must use 3 uppercase letters."),
+    .regex(currencyCodePattern, "La moneda debe usar 3 letras mayusculas."),
   is_active: z.boolean().default(true),
   is_default: z.boolean().default(false),
   kind: priceListKindSchema,
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
 });
 
 export const updatePriceListSchema = createPriceListSchema.partial().extend({
@@ -911,7 +911,7 @@ export const updatePriceListSchema = createPriceListSchema.partial().extend({
 });
 
 export const createPriceListBranchAssignmentSchema = z.object({
-  branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
+  branch_id: z.string().regex(positiveIntegerPattern, "Selecciona una sucursal valida."),
   is_active: z.boolean().default(true),
   is_default: z.boolean().default(false),
   notes: optionalTextSchema,
@@ -930,10 +930,10 @@ export const updatePriceListBranchAssignmentSchema = createPriceListBranchAssign
 
 const productPriceFormObjectSchema = z.object({
   is_active: z.boolean().default(true),
-  min_quantity: optionalNumberSchema(z.coerce.number().min(0, "Minimum quantity must be at least 0.")),
-  price: z.coerce.number().min(0, "Price must be at least 0."),
-  price_list_id: z.string().regex(positiveIntegerPattern, "Select a valid price list."),
-  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
+  min_quantity: optionalNumberSchema(z.coerce.number().min(0, "La cantidad minima debe ser al menos 0.")),
+  price: z.coerce.number().min(0, "El precio debe ser al menos 0."),
+  price_list_id: z.string().regex(positiveIntegerPattern, "Selecciona una lista de precios valida."),
+  product_variant_id: makeOptionalIdSchema("Selecciona una variante valida."),
   valid_from: optionalDateTimeSchema,
   valid_to: optionalDateTimeSchema,
 });
@@ -941,7 +941,7 @@ const productPriceFormObjectSchema = z.object({
 const refineProductPriceDateRange = createDateRangeRefiner(
   "valid_from",
   "valid_to",
-  "Valid to cannot be before valid from.",
+  "La fecha de fin no puede ser anterior a la fecha de inicio.",
 );
 
 export const createProductPriceSchema = productPriceFormObjectSchema.superRefine(
@@ -956,22 +956,22 @@ export const updateProductPriceSchema = productPriceFormObjectSchema
   .superRefine(refineProductPriceDateRange);
 
 const promotionItemFormSchema = z.object({
-  bonus_quantity: optionalNumberSchema(z.coerce.number().min(0, "Bonus quantity must be at least 0.")),
-  discount_value: optionalNumberSchema(z.coerce.number().min(0, "Discount value must be at least 0.")),
-  min_quantity: optionalNumberSchema(z.coerce.number().min(0, "Minimum quantity must be at least 0.")),
-  override_price: optionalNumberSchema(z.coerce.number().min(0, "Override price must be at least 0.")),
-  product_id: makeOptionalIdSchema("Select a valid product."),
-  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
+  bonus_quantity: optionalNumberSchema(z.coerce.number().min(0, "La cantidad de bonificacion debe ser al menos 0.")),
+  discount_value: optionalNumberSchema(z.coerce.number().min(0, "El valor de descuento debe ser al menos 0.")),
+  min_quantity: optionalNumberSchema(z.coerce.number().min(0, "La cantidad minima debe ser al menos 0.")),
+  override_price: optionalNumberSchema(z.coerce.number().min(0, "El precio de sobreescritura debe ser al menos 0.")),
+  product_id: makeOptionalIdSchema("Selecciona un producto valido."),
+  product_variant_id: makeOptionalIdSchema("Selecciona una variante valida."),
 });
 
 const promotionFormObjectSchema = z.object({
   code: makeOptionalCodeSchema("PN"),
   is_active: z.boolean().default(true),
   items: z.array(promotionItemFormSchema).default([]),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   type: promotionTypeSchema,
-  valid_from: requiredTrimmedString("Valid from is required."),
-  valid_to: requiredTrimmedString("Valid to is required."),
+  valid_from: requiredTrimmedString("La fecha de inicio es requerida."),
+  valid_to: requiredTrimmedString("La fecha de fin es requerida."),
 });
 
 function applyPromotionRules(
@@ -988,7 +988,7 @@ function applyPromotionRules(
     if (!item.product_id && !item.product_variant_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Product or variant is required.",
+        message: "El producto o variante es requerido.",
         path: ["items", index, "product_id"],
       });
     }
@@ -996,7 +996,7 @@ function applyPromotionRules(
     if (itemKeys.has(itemKey)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Product or variant cannot repeat inside the same promotion.",
+        message: "El producto o variante no puede repetirse dentro de la misma promocion.",
         path: ["items", index, "product_variant_id"],
       });
     }
@@ -1009,7 +1009,7 @@ function applyPromotionRules(
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Discount value is required for this promotion type.",
+        message: "El valor de descuento es requerido para este tipo de promocion.",
         path: ["items", index, "discount_value"],
       });
     }
@@ -1017,7 +1017,7 @@ function applyPromotionRules(
     if (values.type === "price_override" && item.override_price === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Override price is required for this promotion type.",
+        message: "El precio de sobreescritura es requerido para este tipo de promocion.",
         path: ["items", index, "override_price"],
       });
     }
@@ -1026,7 +1026,7 @@ function applyPromotionRules(
       if (item.min_quantity === undefined) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Minimum quantity is required for buy X get Y promotions.",
+          message: "La cantidad minima es requerida para promociones de compra X lleva Y.",
           path: ["items", index, "min_quantity"],
         });
       }
@@ -1034,7 +1034,7 @@ function applyPromotionRules(
       if (item.bonus_quantity === undefined) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Bonus quantity is required for buy X get Y promotions.",
+          message: "La cantidad de bonificacion es requerida para promociones de compra X lleva Y.",
           path: ["items", index, "bonus_quantity"],
         });
       }
@@ -1055,7 +1055,7 @@ export const updatePromotionSchema = promotionFormObjectSchema
   .superRefine(applyPromotionRules);
 
 export const createPromotionBranchAssignmentSchema = z.object({
-  branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
+  branch_id: z.string().regex(positiveIntegerPattern, "Selecciona una sucursal valida."),
   is_active: z.boolean().default(true),
   notes: optionalTextSchema,
 });
@@ -1071,12 +1071,12 @@ export const updatePromotionBranchAssignmentSchema = createPromotionBranchAssign
   });
 
 export const createWarehouseSchema = z.object({
-  branch_id: z.string().regex(positiveIntegerPattern, "Select a valid branch."),
+  branch_id: z.string().regex(positiveIntegerPattern, "Selecciona una sucursal valida."),
   code: makeOptionalCodeSchema("WH"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
   is_default: z.boolean().default(false),
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   uses_locations: z.boolean().default(false),
 });
 
@@ -1096,7 +1096,7 @@ export const createWarehouseLocationSchema = z.object({
   is_picking_area: z.boolean().default(false),
   is_receiving_area: z.boolean().default(false),
   level: optionalTextSchema,
-  name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   position: optionalTextSchema,
   rack: optionalTextSchema,
   zone: optionalTextSchema,
@@ -1112,23 +1112,23 @@ export const updateWarehouseLocationSchema = createWarehouseLocationSchema.parti
 const inventoryLotDateRangeRefiner = createDateRangeRefiner(
   "manufacturing_date",
   "expiration_date",
-  "Expiration date cannot be before manufacturing date.",
+  "La fecha de vencimiento no puede ser anterior a la fecha de fabricacion.",
 );
 
 const inventoryLotCreateFormObjectSchema = z.object({
   code: makeOptionalCodeSchema("LT"),
   expiration_date: optionalDateSchema,
-  initial_quantity: z.coerce.number().min(0, "Initial quantity must be at least 0."),
+  initial_quantity: z.coerce.number().min(0, "La cantidad inicial debe ser al menos 0."),
   is_active: z.boolean().default(true),
-  location_id: makeOptionalIdSchema("Select a valid warehouse location."),
-  lot_number: requiredTrimmedString("Lot number must contain at least 2 characters.", 2),
+  location_id: makeOptionalIdSchema("Selecciona una ubicacion de almacen valida."),
+  lot_number: requiredTrimmedString("El numero de lote debe tener al menos 2 caracteres.", 2),
   manufacturing_date: optionalDateSchema,
-  product_id: makeOptionalIdSchema("Select a valid product."),
-  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
+  product_id: makeOptionalIdSchema("Selecciona un producto valido."),
+  product_variant_id: makeOptionalIdSchema("Selecciona una variante valida."),
   received_at: optionalDateTimeSchema,
-  supplier_contact_id: makeOptionalIdSchema("Select a valid supplier contact."),
-  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "Unit cost must be at least 0.")),
-  warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid warehouse."),
+  supplier_contact_id: makeOptionalIdSchema("Selecciona un proveedor valido."),
+  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "El costo unitario debe ser al menos 0.")),
+  warehouse_id: z.string().regex(positiveIntegerPattern, "Selecciona un almacen valido."),
 });
 
 export const createInventoryLotSchema = inventoryLotCreateFormObjectSchema.superRefine(
@@ -1138,7 +1138,7 @@ export const createInventoryLotSchema = inventoryLotCreateFormObjectSchema.super
     if (!values.product_id && !values.product_variant_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Product or variant is required.",
+        message: "El producto o variante es requerido.",
         path: ["product_id"],
       });
     }
@@ -1149,12 +1149,12 @@ const inventoryLotUpdateFormObjectSchema = z.object({
   code: makeOptionalCodeSchema("LT"),
   expiration_date: optionalDateSchema,
   is_active: z.boolean().default(true),
-  location_id: makeOptionalIdSchema("Select a valid warehouse location."),
-  lot_number: requiredTrimmedString("Lot number must contain at least 2 characters.", 2),
+  location_id: makeOptionalIdSchema("Selecciona una ubicacion de almacen valida."),
+  lot_number: requiredTrimmedString("El numero de lote debe tener al menos 2 caracteres.", 2),
   manufacturing_date: optionalDateSchema,
   received_at: optionalDateTimeSchema,
-  supplier_contact_id: makeOptionalIdSchema("Select a valid supplier contact."),
-  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "Unit cost must be at least 0.")),
+  supplier_contact_id: makeOptionalIdSchema("Selecciona un proveedor valido."),
+  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "El costo unitario debe ser al menos 0.")),
 });
 
 export const updateInventoryLotSchema = inventoryLotUpdateFormObjectSchema
@@ -1165,23 +1165,23 @@ export const updateInventoryLotSchema = inventoryLotUpdateFormObjectSchema
   .superRefine(inventoryLotDateRangeRefiner);
 
 export const createInventoryAdjustmentSchema = z.object({
-  inventory_lot_id: makeOptionalIdSchema("Select a valid inventory lot."),
-  location_id: makeOptionalIdSchema("Select a valid warehouse location."),
+  inventory_lot_id: makeOptionalIdSchema("Selecciona un lote de inventario valido."),
+  location_id: makeOptionalIdSchema("Selecciona una ubicacion de almacen valida."),
   movement_type: inventoryAdjustmentTypeSchema,
   notes: optionalTextSchema,
-  product_id: makeOptionalIdSchema("Select a valid product."),
-  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
-  quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
+  product_id: makeOptionalIdSchema("Selecciona un producto valido."),
+  product_variant_id: makeOptionalIdSchema("Selecciona una variante valida."),
+  quantity: z.coerce.number().min(0.0001, "La cantidad debe ser mayor que 0."),
   reference_id: optionalNumberSchema(
-    z.coerce.number().int().positive("Reference id must be a positive integer."),
+    z.coerce.number().int().positive("El id de referencia debe ser un entero positivo."),
   ),
   reference_type: optionalTextSchema,
-  warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid warehouse."),
+  warehouse_id: z.string().regex(positiveIntegerPattern, "Selecciona un almacen valido."),
 }).superRefine((values, ctx) => {
   if (!values.product_id && !values.product_variant_id) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Product or variant is required.",
+      message: "El producto o variante es requerido.",
       path: ["product_id"],
     });
   }
@@ -1190,22 +1190,22 @@ export const createInventoryAdjustmentSchema = z.object({
 const inventoryTransferFormObjectSchema = z.object({
   destination_warehouse_id: z.string().regex(
     positiveIntegerPattern,
-    "Select a valid destination warehouse.",
+    "Selecciona un almacen de destino valido.",
   ),
-  destination_location_id: makeOptionalIdSchema("Select a valid destination warehouse location."),
-  inventory_lot_id: makeOptionalIdSchema("Select a valid inventory lot."),
+  destination_location_id: makeOptionalIdSchema("Selecciona una ubicacion de almacen de destino valida."),
+  inventory_lot_id: makeOptionalIdSchema("Selecciona un lote de inventario valido."),
   notes: optionalTextSchema,
-  origin_location_id: makeOptionalIdSchema("Select a valid origin warehouse location."),
-  origin_warehouse_id: z.string().regex(positiveIntegerPattern, "Select a valid origin warehouse."),
-  product_id: makeOptionalIdSchema("Select a valid product."),
-  product_variant_id: makeOptionalIdSchema("Select a valid variant."),
-  quantity: z.coerce.number().min(0.0001, "Quantity must be greater than 0."),
+  origin_location_id: makeOptionalIdSchema("Selecciona una ubicacion de almacen de origen valida."),
+  origin_warehouse_id: z.string().regex(positiveIntegerPattern, "Selecciona un almacen de origen valido."),
+  product_id: makeOptionalIdSchema("Selecciona un producto valido."),
+  product_variant_id: makeOptionalIdSchema("Selecciona una variante valida."),
+  quantity: z.coerce.number().min(0.0001, "La cantidad debe ser mayor que 0."),
   reference_id: optionalNumberSchema(
-    z.coerce.number().int().positive("Reference id must be a positive integer."),
+    z.coerce.number().int().positive("El id de referencia debe ser un entero positivo."),
   ),
   reference_type: optionalTextSchema,
   serial_ids: z.array(z.coerce.number().int().positive()).optional().default([]),
-  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "Unit cost must be at least 0.")),
+  unit_cost: optionalNumberSchema(z.coerce.number().min(0, "El costo unitario debe ser al menos 0.")),
 });
 
 export const createInventoryTransferSchema = inventoryTransferFormObjectSchema.superRefine(
@@ -1213,7 +1213,7 @@ export const createInventoryTransferSchema = inventoryTransferFormObjectSchema.s
     if (!values.product_id && !values.product_variant_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Product or variant is required.",
+        message: "El producto o variante es requerido.",
         path: ["product_id"],
       });
     }
@@ -1221,7 +1221,7 @@ export const createInventoryTransferSchema = inventoryTransferFormObjectSchema.s
     if (values.origin_warehouse_id === values.destination_warehouse_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Origin and destination warehouses must be different.",
+        message: "Los almacenes de origen y destino deben ser diferentes.",
         path: ["destination_warehouse_id"],
       });
     }
@@ -1286,17 +1286,17 @@ export const variantAttributeSchema = z
 const productVariantFormObjectSchema = z.object({
   allow_negative_stock: z.boolean().default(false),
   barcode: optionalTextSchema,
-  default_warranty_profile_id: makeOptionalIdSchema("Select a valid warranty profile."),
-  fiscal_profile_id: z.string().regex(positiveIntegerPattern, "Select a valid tax profile."),
+  default_warranty_profile_id: makeOptionalIdSchema("Selecciona un perfil de garantia valido."),
+  fiscal_profile_id: z.string().regex(positiveIntegerPattern, "Selecciona un perfil fiscal valido."),
   is_active: z.boolean().default(true),
-  sale_unit_measure_id: makeOptionalIdSchema("Select a valid sale unit."),
-  sku: requiredTrimmedString("SKU is required."),
-  stock_unit_measure_id: makeOptionalIdSchema("Select a valid stock unit."),
+  sale_unit_measure_id: makeOptionalIdSchema("Selecciona una unidad de venta valida."),
+  sku: requiredTrimmedString("El SKU es requerido."),
+  stock_unit_measure_id: makeOptionalIdSchema("Selecciona una unidad de inventario valida."),
   track_expiration: z.boolean().default(false),
   track_inventory: z.boolean().default(true),
   track_lots: z.boolean().default(false),
   track_serials: z.boolean().default(false),
-  variant_name: requiredTrimmedString("Variant name is required."),
+  variant_name: requiredTrimmedString("El nombre de la variante es requerido."),
 });
 
 function applyVariantRules(
@@ -1306,7 +1306,7 @@ function applyVariantRules(
   if (values.track_lots && !values.track_inventory) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Lot tracking requires inventory tracking.",
+      message: "El rastreo de lotes requiere rastreo de inventario.",
       path: ["track_lots"],
     });
   }
@@ -1314,7 +1314,7 @@ function applyVariantRules(
   if (values.track_expiration && !values.track_lots) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Expiration tracking requires lot tracking.",
+      message: "El rastreo de vencimiento requiere rastreo de lotes.",
       path: ["track_expiration"],
     });
   }
@@ -1322,7 +1322,7 @@ function applyVariantRules(
   if (values.track_serials && !values.track_inventory) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Serial tracking requires inventory tracking.",
+      message: "El rastreo de seriales requiere rastreo de inventario.",
       path: ["track_serials"],
     });
   }

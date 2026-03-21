@@ -8,7 +8,7 @@ const userTypeSchema = z.enum(["owner", "staff", "system"]);
 const positiveIntegerStringSchema = z
   .string()
   .trim()
-  .regex(positiveIntegerPattern, "Use a positive integer id.");
+  .regex(positiveIntegerPattern, "Usa un identificador entero positivo.");
 const uniquePositiveIntegerStringArraySchema = z
   .array(positiveIntegerStringSchema)
   .default([])
@@ -112,11 +112,11 @@ export const createUserSchema = z.object({
 
     const trimmed = value.trim();
     return trimmed === "" ? undefined : trimmed;
-  }, z.string().regex(entityCodePattern, "Use a code like AA-0001.").optional()),
-  email: z.string().trim().email("Enter a valid email."),
+  }, z.string().regex(entityCodePattern, "Usa un codigo como AA-0001.").optional()),
+  email: z.string().trim().email("Ingresa un correo valido."),
   max_sale_discount: z.coerce.number().min(0).max(100).default(0),
-  name: z.string().trim().min(2, "Name must contain at least 2 characters."),
-  password: z.string().min(10, "Password must contain at least 10 characters."),
+  name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres."),
+  password: z.string().min(10, "La contrasena debe tener al menos 10 caracteres."),
   role_ids: uniquePositiveIntegerStringArraySchema.optional().default([]),
   status: userStatusSchema.optional(),
   user_type: userTypeSchema.optional(),
@@ -131,11 +131,11 @@ export const updateUserStatusSchema = z.object({
 
 export const changeUserPasswordSchema = z
   .object({
-    password: z.string().min(10, "Password must contain at least 10 characters."),
-    confirmPassword: z.string().min(1, "Confirm the password."),
+    password: z.string().min(10, "La contrasena debe tener al menos 10 caracteres."),
+    confirmPassword: z.string().min(1, "Confirma la contrasena."),
   })
   .refine((values) => values.password === values.confirmPassword, {
-    message: "Passwords do not match.",
+    message: "Las contrasenas no coinciden.",
     path: ["confirmPassword"],
   });
 

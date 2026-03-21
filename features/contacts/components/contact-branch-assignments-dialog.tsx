@@ -33,6 +33,7 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { FormFieldError } from "@/features/inventory/components/form-field-error";
 import { TableRowActions } from "@/shared/components/table-row-actions";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
@@ -96,6 +97,7 @@ function ContactBranchAssignmentForm({
   submitLabel: string;
   users: User[];
 }) {
+  const { t } = useAppTranslator();
   const {
     control,
     formState: { errors },
@@ -119,12 +121,12 @@ function ContactBranchAssignmentForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="contact-branch-assignment-branch">Branch</Label>
+          <Label htmlFor="contact-branch-assignment-branch">{t("contacts.branch_assignments.branch")}</Label>
           {isEditing ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 px-3 py-2 text-sm">
-              <p className="font-medium">{assignmentBranch?.name ?? "Unknown branch"}</p>
+              <p className="font-medium">{assignmentBranch?.name ?? t("contacts.branch_assignments.unknown_branch")}</p>
               <p className="text-muted-foreground">
-                {assignmentBranch?.code ?? assignmentBranch?.branch_number ?? "No code"}
+                {assignmentBranch?.code ?? assignmentBranch?.branch_number ?? t("contacts.branch_assignments.no_code")}
               </p>
             </div>
           ) : (
@@ -135,7 +137,7 @@ function ContactBranchAssignmentForm({
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger id="contact-branch-assignment-branch">
-                      <SelectValue placeholder="Select a branch" />
+                      <SelectValue placeholder={t("contacts.branch_assignments.select_branch")} />
                     </SelectTrigger>
                     <SelectContent>
                       {branches.map((branch) => (
@@ -153,7 +155,7 @@ function ContactBranchAssignmentForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contact-branch-assignment-credit-limit">Custom credit limit</Label>
+          <Label htmlFor="contact-branch-assignment-credit-limit">{t("contacts.branch_assignments.custom_credit_limit")}</Label>
           <Input
             disabled={!creditEnabled}
             id="contact-branch-assignment-credit-limit"
@@ -171,7 +173,7 @@ function ContactBranchAssignmentForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="contact-branch-assignment-price-list">Custom price list</Label>
+          <Label htmlFor="contact-branch-assignment-price-list">{t("contacts.branch_assignments.custom_price_list")}</Label>
           <Controller
             control={control}
             name="custom_price_list_id"
@@ -183,10 +185,10 @@ function ContactBranchAssignmentForm({
                 value={field.value ?? NONE_OPTION}
               >
                 <SelectTrigger id="contact-branch-assignment-price-list">
-                  <SelectValue placeholder="No custom price list" />
+                  <SelectValue placeholder={t("contacts.branch_assignments.no_custom_price_list")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NONE_OPTION}>No custom price list</SelectItem>
+                  <SelectItem value={NONE_OPTION}>{t("contacts.branch_assignments.no_custom_price_list")}</SelectItem>
                   {availablePriceLists.map((priceList) => (
                     <SelectItem key={priceList.id} value={priceList.id}>
                       {priceList.name}
@@ -200,7 +202,7 @@ function ContactBranchAssignmentForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contact-branch-assignment-account-manager">Account manager</Label>
+          <Label htmlFor="contact-branch-assignment-account-manager">{t("contacts.branch_assignments.account_manager")}</Label>
           <Controller
             control={control}
             name="account_manager_user_id"
@@ -212,10 +214,10 @@ function ContactBranchAssignmentForm({
                 value={field.value ?? NONE_OPTION}
               >
                 <SelectTrigger id="contact-branch-assignment-account-manager">
-                  <SelectValue placeholder="No account manager" />
+                  <SelectValue placeholder={t("contacts.branch_assignments.no_account_manager")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NONE_OPTION}>No account manager</SelectItem>
+                  <SelectItem value={NONE_OPTION}>{t("contacts.branch_assignments.no_account_manager")}</SelectItem>
                   {availableUsers.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name}
@@ -238,8 +240,8 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Active</p>
-            <p className="text-sm text-muted-foreground">Allow this branch context to operate.</p>
+            <p className="font-medium">{t("contacts.branch_assignments.active")}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.branch_assignments.active_description")}</p>
           </div>
         </label>
 
@@ -251,8 +253,8 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Default</p>
-            <p className="text-sm text-muted-foreground">Marks this branch context as default.</p>
+            <p className="font-medium">{t("contacts.branch_assignments.default")}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.branch_assignments.default_description")}</p>
           </div>
         </label>
 
@@ -264,8 +266,8 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Preferred</p>
-            <p className="text-sm text-muted-foreground">Advisory preference for this branch.</p>
+            <p className="font-medium">{t("contacts.branch_assignments.preferred")}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.branch_assignments.preferred_description")}</p>
           </div>
         </label>
 
@@ -277,8 +279,8 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Exclusive</p>
-            <p className="text-sm text-muted-foreground">Restricts the contact to one branch.</p>
+            <p className="font-medium">{t("contacts.branch_assignments.exclusive")}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.branch_assignments.exclusive_description")}</p>
           </div>
         </label>
 
@@ -290,8 +292,8 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Sales enabled</p>
-            <p className="text-sm text-muted-foreground">Allows future sales usage in this branch.</p>
+            <p className="font-medium">{t("contacts.branch_assignments.sales_enabled")}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.branch_assignments.sales_enabled_description")}</p>
           </div>
         </label>
 
@@ -303,9 +305,9 @@ function ContactBranchAssignmentForm({
             }
           />
           <div>
-            <p className="font-medium">Purchases enabled</p>
+            <p className="font-medium">{t("contacts.branch_assignments.purchases_enabled")}</p>
             <p className="text-sm text-muted-foreground">
-              Allows future purchases usage in this branch.
+              {t("contacts.branch_assignments.purchases_enabled_description")}
             </p>
           </div>
         </label>
@@ -319,15 +321,15 @@ function ContactBranchAssignmentForm({
           }
         />
         <div>
-          <p className="font-medium">Credit enabled</p>
+          <p className="font-medium">{t("contacts.branch_assignments.credit_enabled")}</p>
           <p className="text-sm text-muted-foreground">
-            Stores branch-level credit policy metadata for future commercial flows.
+            {t("contacts.branch_assignments.credit_enabled_description")}
           </p>
         </div>
       </label>
 
       <div className="space-y-2">
-        <Label htmlFor="contact-branch-assignment-notes">Notes</Label>
+        <Label htmlFor="contact-branch-assignment-notes">{t("contacts.branch_assignments.notes")}</Label>
         <Textarea
           id="contact-branch-assignment-notes"
           {...form.register("notes", {
@@ -338,7 +340,7 @@ function ContactBranchAssignmentForm({
       </div>
 
       <div className="flex justify-end">
-        <ActionButton isLoading={isPending} loadingText="Saving" type="submit">
+        <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">
           {submitLabel}
         </ActionButton>
       </div>
@@ -396,6 +398,7 @@ function ContactBranchAssignmentEditorDialog({
   priceLists: PriceList[];
   users: User[];
 }) {
+  const { t } = useAppTranslator();
   const isEditing = Boolean(assignment);
   const createMutation = useCreateContactBranchAssignmentMutation(contactId, {
     showErrorToast: false,
@@ -428,8 +431,8 @@ function ContactBranchAssignmentEditorDialog({
     } catch (error) {
       handleBackendFormError(error, {
         fallbackMessage: isEditing
-          ? "Unable to update the branch commercial context."
-          : "Unable to create the branch commercial context.",
+          ? t("contacts.branch_assignments.update_error")
+          : t("contacts.branch_assignments.create_error"),
       });
     }
   }
@@ -447,11 +450,10 @@ function ContactBranchAssignmentEditorDialog({
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Edit branch commercial context" : "Add branch commercial context"}
+            {isEditing ? t("contacts.branch_assignments.edit_title") : t("contacts.branch_assignments.add_title")}
           </DialogTitle>
           <DialogDescription>
-            Store branch-specific commercial preferences for this contact without duplicating the
-            global contact record.
+            {t("contacts.branch_assignments.editor_description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -464,7 +466,7 @@ function ContactBranchAssignmentEditorDialog({
           isPending={mutation.isPending}
           onSubmit={handleSubmit}
           priceLists={priceLists}
-          submitLabel={isEditing ? "Save changes" : "Create assignment"}
+          submitLabel={isEditing ? t("contacts.branch_assignments.save_changes") : t("contacts.branch_assignments.create_assignment")}
           users={users}
         />
       </DialogContent>
@@ -477,6 +479,7 @@ function ContactBranchAssignmentsDialog({
   onOpenChange,
   open,
 }: ContactBranchAssignmentsDialogProps) {
+  const { t } = useAppTranslator();
   const { can } = usePermissions();
   const canViewAssignments = can("contacts.view_branch_assignments");
   const canCreateAssignments = can("contacts.create_branch_assignment");
@@ -514,55 +517,55 @@ function ContactBranchAssignmentsDialog({
     () => [
       {
         accessorKey: "branch",
-        header: "Branch",
+        header: t("contacts.branch_assignments.branch"),
         cell: ({ row }) => (
           <div className="space-y-1">
             <p className="font-medium">{row.original.branch.name}</p>
             <p className="text-sm text-muted-foreground">
-              {row.original.branch.code ?? row.original.branch.branch_number ?? "No code"}
+              {row.original.branch.code ?? row.original.branch.branch_number ?? t("contacts.branch_assignments.no_code")}
             </p>
           </div>
         ),
       },
       {
         accessorKey: "flags",
-        header: "Commercial flags",
+        header: t("contacts.branch_assignments.commercial_flags"),
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-2">
-            {row.original.is_default ? <Badge>Default</Badge> : null}
-            {row.original.is_preferred ? <Badge variant="outline">Preferred</Badge> : null}
-            {row.original.is_exclusive ? <Badge variant="outline">Exclusive</Badge> : null}
-            {row.original.sales_enabled ? <Badge variant="outline">Sales</Badge> : null}
-            {row.original.purchases_enabled ? <Badge variant="outline">Purchases</Badge> : null}
-            {row.original.credit_enabled ? <Badge variant="outline">Credit</Badge> : null}
+            {row.original.is_default ? <Badge>{t("contacts.branch_assignments.default")}</Badge> : null}
+            {row.original.is_preferred ? <Badge variant="outline">{t("contacts.branch_assignments.preferred")}</Badge> : null}
+            {row.original.is_exclusive ? <Badge variant="outline">{t("contacts.branch_assignments.exclusive")}</Badge> : null}
+            {row.original.sales_enabled ? <Badge variant="outline">{t("contacts.branch_assignments.sales")}</Badge> : null}
+            {row.original.purchases_enabled ? <Badge variant="outline">{t("contacts.branch_assignments.purchases")}</Badge> : null}
+            {row.original.credit_enabled ? <Badge variant="outline">{t("contacts.branch_assignments.credit")}</Badge> : null}
           </div>
         ),
       },
       {
         accessorKey: "custom_price_list",
-        header: "Commercial defaults",
+        header: t("contacts.branch_assignments.commercial_defaults"),
         cell: ({ row }) => (
           <div className="space-y-1 text-sm">
             <p>
-              Price list: {row.original.custom_price_list?.name ?? "No custom price list"}
+              {t("contacts.branch_assignments.price_list_label")}: {row.original.custom_price_list?.name ?? t("contacts.branch_assignments.no_custom_price_list")}
             </p>
             <p className="text-muted-foreground">
-              Manager: {row.original.account_manager?.name ?? "No account manager"}
+              {t("contacts.branch_assignments.manager_label")}: {row.original.account_manager?.name ?? t("contacts.branch_assignments.no_account_manager")}
             </p>
             <p className="text-muted-foreground">
-              Credit limit:{" "}
-              {row.original.custom_credit_limit != null ? row.original.custom_credit_limit : "N/A"}
+              {t("contacts.branch_assignments.credit_limit_label")}:{" "}
+              {row.original.custom_credit_limit != null ? row.original.custom_credit_limit : t("contacts.branch_assignments.not_available")}
             </p>
           </div>
         ),
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: t("contacts.branch_assignments.status"),
         cell: ({ row }) => (
           <div className="space-y-1">
             <Badge variant={row.original.is_active ? "default" : "outline"}>
-              {row.original.is_active ? "Active" : "Inactive"}
+              {row.original.is_active ? t("contacts.branch_assignments.active") : t("contacts.branch_assignments.inactive")}
             </Badge>
             <p className="text-xs text-muted-foreground">{formatDateTime(row.original.updated_at)}</p>
           </div>
@@ -570,19 +573,19 @@ function ContactBranchAssignmentsDialog({
       },
       {
         accessorKey: "notes",
-        header: "Notes",
-        cell: ({ row }) => row.original.notes || "No notes",
+        header: t("contacts.branch_assignments.notes"),
+        cell: ({ row }) => row.original.notes || t("contacts.branch_assignments.no_notes"),
       },
       {
         id: "actions",
-        header: "Actions",
+        header: t("contacts.branch_assignments.actions"),
         cell: ({ row }) => (
           <TableRowActions
             actions={[
               ...(canUpdateAssignments
                 ? [
                     {
-                      label: "Edit assignment",
+                      label: t("contacts.branch_assignments.edit_assignment"),
                       icon: Pencil,
                       onClick: () => {
                         setSelectedAssignment(row.original);
@@ -594,7 +597,7 @@ function ContactBranchAssignmentsDialog({
               ...(canUpdateAssignments && row.original.lifecycle.can_deactivate
                 ? [
                     {
-                      label: "Deactivate",
+                      label: t("contacts.branch_assignments.deactivate"),
                       icon: Power,
                       onClick: () =>
                         setPendingAction({ assignment: row.original, type: "deactivate" }),
@@ -605,7 +608,7 @@ function ContactBranchAssignmentsDialog({
               ...(canUpdateAssignments && row.original.lifecycle.can_reactivate
                 ? [
                     {
-                      label: "Reactivate",
+                      label: t("contacts.branch_assignments.reactivate"),
                       icon: RotateCcw,
                       onClick: () =>
                         setPendingAction({ assignment: row.original, type: "reactivate" }),
@@ -615,7 +618,7 @@ function ContactBranchAssignmentsDialog({
               ...(canDeleteAssignments && row.original.lifecycle.can_delete
                 ? [
                     {
-                      label: "Delete assignment",
+                      label: t("contacts.branch_assignments.delete_assignment"),
                       icon: Trash2,
                       onClick: () => setPendingAction({ assignment: row.original, type: "delete" }),
                       variant: "destructive" as const,
@@ -659,26 +662,25 @@ function ContactBranchAssignmentsDialog({
       <Dialog onOpenChange={onOpenChange} open={open}>
         <DialogContent className="max-w-6xl">
           <DialogHeader>
-            <DialogTitle>Branch commercial context</DialogTitle>
+            <DialogTitle>{t("contacts.branch_assignments.dialog_title")}</DialogTitle>
             <DialogDescription>
-              Manage branch-specific commercial assignments for {contact.name} while keeping the
-              contact itself global at business level.
+              {t("contacts.branch_assignments.dialog_description")}
             </DialogDescription>
           </DialogHeader>
 
           {!canViewAssignments ? (
             <p className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
-              You do not have permission to review branch commercial assignments for this contact.
+              {t("contacts.branch_assignments.no_permission")}
             </p>
           ) : (
             <QueryStateWrapper
               errorDescription={getBackendErrorMessage(
                 contextQuery.error,
-                "Unable to load the branch commercial context for this contact.",
+                t("contacts.branch_assignments.load_error"),
               )}
               isError={contextQuery.isError}
               isLoading={contextQuery.isLoading}
-              loadingDescription="Loading branch commercial context."
+              loadingDescription={t("contacts.branch_assignments.loading")}
               onRetry={() => contextQuery.refetch()}
             >
               <div className="space-y-4">
@@ -686,19 +688,19 @@ function ContactBranchAssignmentsDialog({
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline">
-                        Mode: {contextQuery.data?.mode === "scoped" ? "Scoped" : "Global"}
+                        {t("contacts.branch_assignments.mode_label")}: {contextQuery.data?.mode === "scoped" ? t("contacts.branch_assignments.mode_scoped") : t("contacts.branch_assignments.mode_global")}
                       </Badge>
                       {contextQuery.data?.global_applies_to_all_branches ? (
-                        <Badge variant="outline">Applies to all branches</Badge>
+                        <Badge variant="outline">{t("contacts.branch_assignments.applies_to_all")}</Badge>
                       ) : null}
-                      <Badge variant="outline">{assignments.length} assignment(s)</Badge>
+                      <Badge variant="outline">{assignments.length} {t("contacts.branch_assignments.assignment_count")}</Badge>
                     </div>
                      <p className="text-sm text-muted-foreground">
                       {scopedAssignmentsHidden
-                        ? "This contact is branch-scoped, but there are no assignments visible inside your current branch scope."
+                        ? t("contacts.branch_assignments.scoped_no_visible")
                         : contextQuery.data?.mode === "scoped"
-                          ? "This contact already has branch-specific commercial context."
-                          : "No branch assignments exist yet, so the contact still behaves as a company-wide commercial record."}
+                          ? t("contacts.branch_assignments.has_branch_context")
+                          : t("contacts.branch_assignments.no_branch_context")}
                     </p>
                   </div>
 
@@ -710,15 +712,14 @@ function ContactBranchAssignmentsDialog({
                       }}
                     >
                       <Building2 className="size-4" />
-                      Add branch context
+                      {t("contacts.branch_assignments.add_branch_context")}
                     </Button>
                   ) : null}
                 </div>
 
                 {canCreateAssignments && !canViewBranches ? (
                   <p className="rounded-xl border border-border/70 bg-muted/20 p-3 text-sm text-muted-foreground">
-                    Branch creation and edition require visible branch options. Grant branch access
-                    to enable this form.
+                    {t("contacts.branch_assignments.branch_access_required")}
                   </p>
                 ) : null}
 
@@ -727,8 +728,8 @@ function ContactBranchAssignmentsDialog({
                   data={assignments}
                   emptyMessage={
                     scopedAssignmentsHidden
-                      ? "This contact has branch assignments, but none are visible in your current scope."
-                      : "This contact does not have branch commercial assignments yet."
+                      ? t("contacts.branch_assignments.empty_scoped")
+                      : t("contacts.branch_assignments.empty")
                   }
                   enablePagination={false}
                 />
@@ -756,17 +757,17 @@ function ContactBranchAssignmentsDialog({
       <ConfirmDialog
         confirmLabel={
           pendingAction?.type === "delete"
-            ? "Delete assignment"
+            ? t("contacts.branch_assignments.delete_assignment")
             : pendingAction?.type === "reactivate"
-              ? "Reactivate"
-              : "Deactivate"
+              ? t("contacts.branch_assignments.reactivate")
+              : t("contacts.branch_assignments.deactivate")
         }
         description={
           pendingAction?.type === "delete"
-            ? `This will permanently remove the assignment for ${pendingAction.assignment.branch.name}. The contact itself will remain untouched.`
+            ? t("contacts.branch_assignments.confirm_delete_description")
             : pendingAction?.type === "reactivate"
-              ? `This branch assignment will become operative again for ${pendingAction.assignment.branch.name}.`
-              : `This branch assignment will remain visible for history, but it should no longer be used operationally in ${pendingAction?.assignment.branch.name}.`
+              ? t("contacts.branch_assignments.confirm_reactivate_description")
+              : t("contacts.branch_assignments.confirm_deactivate_description")
         }
         onConfirm={handleLifecycleConfirm}
         onOpenChange={(nextOpen) => {
@@ -777,10 +778,10 @@ function ContactBranchAssignmentsDialog({
         open={pendingAction !== null}
         title={
           pendingAction?.type === "delete"
-            ? "Delete branch assignment"
+            ? t("contacts.branch_assignments.confirm_delete_title")
             : pendingAction?.type === "reactivate"
-              ? "Reactivate branch assignment"
-              : "Deactivate branch assignment"
+              ? t("contacts.branch_assignments.confirm_reactivate_title")
+              : t("contacts.branch_assignments.confirm_deactivate_title")
         }
       />
     </>

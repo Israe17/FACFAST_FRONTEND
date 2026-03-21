@@ -1945,3 +1945,226 @@ export function useSetPriceListActiveMutation(options: MutationFeedbackOptions =
     },
   });
 }
+
+export function useDeactivateBrandMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (brandId: string) => updateBrand(brandId, { is_active: false }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.brands()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.brand_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useReactivateBrandMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (brandId: string) => updateBrand(brandId, { is_active: true }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.brands()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.brand_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateProductCategoryMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (categoryId: string) => updateProductCategory(categoryId, { is_active: false }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productCategories(),
+        inventoryKeys.productCategoryTree(),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.category_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useReactivateProductCategoryMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (categoryId: string) => updateProductCategory(categoryId, { is_active: true }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.productCategories(),
+        inventoryKeys.productCategoryTree(),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.category_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateMeasurementUnitMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (measurementUnitId: string) =>
+      updateMeasurementUnit(measurementUnitId, { is_active: false }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.measurementUnits()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.measurement_unit_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useReactivateMeasurementUnitMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (measurementUnitId: string) =>
+      updateMeasurementUnit(measurementUnitId, { is_active: true }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.measurementUnits()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.measurement_unit_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivateTaxProfileMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (taxProfileId: string) => updateTaxProfile(taxProfileId, { is_active: false }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.taxProfiles()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.tax_profile_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useReactivateTaxProfileMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (taxProfileId: string) => updateTaxProfile(taxProfileId, { is_active: true }),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.taxProfiles()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.tax_profile_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
+export function useDeactivatePriceListMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (priceListId: string) => updatePriceList(priceListId, { is_active: false }),
+    onSuccess: (_data, priceListId) => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.priceLists(),
+        inventoryKeys.priceList(priceListId),
+        inventoryKeys.priceListBranches(priceListId),
+        inventoryKeys.branchPriceListsRoot(),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.price_list_deactivate_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useReactivatePriceListMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (priceListId: string) => updatePriceList(priceListId, { is_active: true }),
+    onSuccess: (_data, priceListId) => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.priceLists(),
+        inventoryKeys.priceList(priceListId),
+        inventoryKeys.priceListBranches(priceListId),
+        inventoryKeys.branchPriceListsRoot(),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.price_list_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}

@@ -9,6 +9,10 @@ import {
 } from "@/shared/lib/validation";
 
 import {
+  dispatchExpenseTypeValues,
+  dispatchOrderStatusValues,
+  dispatchStopStatusValues,
+  dispatchTypeValues,
   inventoryAdjustmentTypeValues,
   inventoryMovementStatusValues,
   ledgerInventoryMovementHeaderTypeValues,
@@ -1453,3 +1457,119 @@ export const createRouteSchema = z.object({
 export const updateRouteSchema = createRouteSchema.partial().extend({
   is_active: z.boolean().optional(),
 });
+
+// --- Dispatch Stop ---
+export const dispatchStopSchema = z.object({
+  id: idSchema,
+  dispatch_order_id: z.union([z.number(), z.string()]).optional(),
+  sale_order_id: z.union([z.number(), z.string()]).optional(),
+  sale_order: z.object({ id: idSchema, code: z.string().nullable().optional() }).optional().catch(undefined),
+  customer_contact: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  delivery_sequence: z.number(),
+  delivery_address: z.string().nullable().optional().catch(null),
+  delivery_province: z.string().nullable().optional().catch(null),
+  delivery_canton: z.string().nullable().optional().catch(null),
+  delivery_district: z.string().nullable().optional().catch(null),
+  status: z.enum(dispatchStopStatusValues).catch("pending"),
+  delivered_at: z.string().nullable().optional().catch(null),
+  received_by: z.string().nullable().optional().catch(null),
+  failure_reason: z.string().nullable().optional().catch(null),
+  notes: z.string().nullable().optional().catch(null),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+}).passthrough();
+
+export const createDispatchStopSchema = z.object({
+  sale_order_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : String(v)),
+    z.string().regex(positiveIntegerPattern, "Selecciona una orden de venta."),
+  ),
+  delivery_sequence: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? 1 : Number(v)),
+    z.number().int().positive().default(1),
+  ),
+  notes: optionalTextSchema,
+});
+
+// --- Dispatch Expense ---
+export const dispatchExpenseSchema = z.object({
+  id: idSchema,
+  dispatch_order_id: z.union([z.number(), z.string()]).optional(),
+  expense_type: z.string(),
+  description: z.string().nullable().optional().catch(null),
+  amount: z.number(),
+  receipt_number: z.string().nullable().optional().catch(null),
+  notes: z.string().nullable().optional().catch(null),
+  created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+}).passthrough();
+
+export const createDispatchExpenseSchema = z.object({
+  expense_type: z.enum(dispatchExpenseTypeValues),
+  description: optionalTextSchema,
+  amount: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(0, "El monto debe ser 0 o mayor."),
+  ),
+  receipt_number: optionalTextSchema,
+  notes: optionalTextSchema,
+});
+
+// --- Dispatch Order ---
+export const dispatchOrderSchema = z.object({
+  id: idSchema,
+  code: z.string().optional().catch(undefined),
+  business_id: idSchema.optional().catch(undefined),
+  branch: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  dispatch_type: z.enum(dispatchTypeValues).catch("individual"),
+  status: z.enum(dispatchOrderStatusValues).catch("draft"),
+  route: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+  vehicle: z.object({ id: idSchema, name: z.string(), plate_number: z.string().optional() }).nullable().optional().catch(null),
+  driver_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+  origin_warehouse: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+  scheduled_date: z.string().nullable().optional().catch(null),
+  dispatched_at: z.string().nullable().optional().catch(null),
+  completed_at: z.string().nullable().optional().catch(null),
+  notes: z.string().nullable().optional().catch(null),
+  created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  stops: z.array(dispatchStopSchema).optional().catch([]),
+  expenses: z.array(dispatchExpenseSchema).optional().catch([]),
+  lifecycle: z.object({
+    can_edit: z.boolean().optional().catch(false),
+    can_dispatch: z.boolean().optional().catch(false),
+    can_complete: z.boolean().optional().catch(false),
+    can_cancel: z.boolean().optional().catch(false),
+    reasons: z.array(z.string()).optional().catch([]),
+  }).optional().catch({}),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+}).passthrough();
+
+// Helper for optional IDs (same as in sales schemas)
+function makeDispatchOptionalIdSchema(message: string) {
+  return z.preprocess((value) => {
+    if (typeof value === "string" && value.trim() === "") {
+      return undefined;
+    }
+    return value;
+  }, z.string().regex(positiveIntegerPattern, message).optional());
+}
+
+export const createDispatchOrderSchema = z.object({
+  branch_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : String(v)),
+    z.string().regex(positiveIntegerPattern, "Selecciona una sucursal."),
+  ),
+  code: optionalTrimmedString(z.string().regex(/^DO-\d{4,}$/, "Usa un codigo como DO-0001.")),
+  dispatch_type: z.enum(dispatchTypeValues).default("individual"),
+  route_id: makeDispatchOptionalIdSchema("Selecciona una ruta."),
+  vehicle_id: makeDispatchOptionalIdSchema("Selecciona un vehículo."),
+  driver_user_id: makeDispatchOptionalIdSchema("Selecciona un chofer."),
+  origin_warehouse_id: makeDispatchOptionalIdSchema("Selecciona una bodega."),
+  scheduled_date: optionalTextSchema,
+  notes: optionalTextSchema,
+  stop_sale_order_ids: z.array(z.string()).optional().default([]),
+});
+
+export const updateDispatchOrderSchema = createDispatchOrderSchema.partial();

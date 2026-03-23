@@ -10,13 +10,17 @@ import {
   cancelSaleOrder,
   confirmSaleOrder,
   createSaleOrder,
+  emitElectronicDocument,
+  getElectronicDocument,
   getSaleOrder,
+  listElectronicDocuments,
   listSaleOrders,
   updateSaleOrder,
 } from "./api";
 import type {
   CancelSaleOrderInput,
   CreateSaleOrderInput,
+  EmitElectronicDocumentInput,
   UpdateSaleOrderInput,
 } from "./types";
 
@@ -24,6 +28,8 @@ export const salesKeys = {
   all: ["sales"] as const,
   orders: () => [...salesKeys.all, "orders"] as const,
   order: (orderId: string) => [...salesKeys.orders(), orderId] as const,
+  documents: () => [...salesKeys.all, "documents"] as const,
+  document: (id: string) => [...salesKeys.documents(), id] as const,
 };
 
 type MutationFeedbackOptions = {
@@ -138,6 +144,44 @@ export function useCancelSaleOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("sales.order_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+// --- Electronic Documents ---
+
+export function useElectronicDocumentsQuery(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: salesKeys.documents(),
+    queryFn: listElectronicDocuments,
+  });
+}
+
+export function useElectronicDocumentQuery(id: string) {
+  return useQuery({
+    enabled: !!id,
+    queryKey: salesKeys.document(id),
+    queryFn: () => getElectronicDocument(id),
+  });
+}
+
+export function useEmitElectronicDocumentMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: EmitElectronicDocumentInput) => emitElectronicDocument(payload),
+    onSuccess: () => {
+      invalidateSalesQueries(queryClient, [salesKeys.documents()]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("sales.document_emit_error_fallback"),
         });
       }
     },

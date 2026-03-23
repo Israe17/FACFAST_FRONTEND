@@ -1,7 +1,7 @@
 import { http } from "@/shared/lib/http";
 
-import { saleOrderSchema } from "./schemas";
-import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput } from "./types";
+import { electronicDocumentSchema, saleOrderSchema } from "./schemas";
+import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput, EmitElectronicDocumentInput } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isRecord(value: unknown): value is Record<string, any> {
@@ -94,4 +94,23 @@ export async function confirmSaleOrder(orderId: string) {
 export async function cancelSaleOrder(orderId: string, payload: CancelSaleOrderInput) {
   const response = await http.post(`/sale-orders/${orderId}/cancel`, payload);
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
+}
+
+// --- Electronic Documents ---
+
+export async function listElectronicDocuments() {
+  const response = await http.get("/electronic-documents");
+  return extractCollection(response.data, ["electronic_documents"]).map((item) =>
+    electronicDocumentSchema.parse(item),
+  );
+}
+
+export async function getElectronicDocument(documentId: string) {
+  const response = await http.get(`/electronic-documents/${documentId}`);
+  return electronicDocumentSchema.parse(extractEntity(response.data, ["electronic_document"]));
+}
+
+export async function emitElectronicDocument(payload: EmitElectronicDocumentInput) {
+  const response = await http.post("/electronic-documents/emit", payload);
+  return electronicDocumentSchema.parse(extractEntity(response.data, ["electronic_document"]));
 }

@@ -76,6 +76,13 @@ import {
   routeSchema,
   createRouteSchema,
   updateRouteSchema,
+  dispatchStopSchema,
+  createDispatchStopSchema,
+  dispatchExpenseSchema,
+  createDispatchExpenseSchema,
+  dispatchOrderSchema,
+  createDispatchOrderSchema,
+  updateDispatchOrderSchema,
 } from "./schemas";
 
 export type Brand = z.infer<typeof brandSchema>;
@@ -169,3 +176,10 @@ export type UpdateVehicleInput = z.infer<typeof updateVehicleSchema>;
 export type Route = z.infer<typeof routeSchema>;
 export type CreateRouteInput = z.infer<typeof createRouteSchema>;
 export type UpdateRouteInput = z.infer<typeof updateRouteSchema>;
+export type DispatchStop = z.infer<typeof dispatchStopSchema>;
+export type CreateDispatchStopInput = z.infer<typeof createDispatchStopSchema>;
+export type DispatchExpense = z.infer<typeof dispatchExpenseSchema>;
+export type CreateDispatchExpenseInput = z.infer<typeof createDispatchExpenseSchema>;
+export type DispatchOrder = z.infer<typeof dispatchOrderSchema>;
+export type CreateDispatchOrderInput = z.infer<typeof createDispatchOrderSchema>;
+export type UpdateDispatchOrderInput = z.infer<typeof updateDispatchOrderSchema>;

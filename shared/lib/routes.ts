@@ -7,6 +7,8 @@ import {
   Layers3,
   PlusSquare,
   ShieldCheck,
+  ShoppingCart,
+  Truck,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -34,6 +36,8 @@ export const APP_ROUTES = {
   inventoryOperationsStock: "/inventory/operations/stock",
   inventoryOperationsLots: "/inventory/operations/lots",
   inventoryOperationsMovements: "/inventory/operations/movements",
+  sales: "/sales",
+  dispatch: "/dispatch",
 } as const;
 
 export function getSuperadminBusinessDetailRoute(businessId: string) {
@@ -131,6 +135,20 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
       "inventory_lots.view",
       "inventory_movements.view",
     ],
+  },
+  {
+    title: "Ventas",
+    href: APP_ROUTES.sales,
+    icon: ShoppingCart,
+    description: "Ordenes de venta y facturacion electronica.",
+    requiredAnyPermissions: ["sale_orders.view", "electronic_documents.view"],
+  },
+  {
+    title: "Despachos",
+    href: APP_ROUTES.dispatch,
+    icon: Truck,
+    description: "Ordenes de despacho y logistica.",
+    requiredAnyPermissions: ["dispatch_orders.view"],
   },
 ];
 

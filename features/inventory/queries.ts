@@ -100,6 +100,17 @@ import {
   listRoutes,
   updateRoute,
   deleteRoute,
+  listDispatchOrders,
+  getDispatchOrder,
+  createDispatchOrder,
+  updateDispatchOrder,
+  addDispatchStop,
+  removeDispatchStop,
+  addDispatchExpense,
+  removeDispatchExpense,
+  markDispatchDispatched,
+  markDispatchCompleted,
+  cancelDispatchOrder,
 } from "./api";
 import type { PaginatedQueryParams } from "./api";
 import type {
@@ -144,6 +155,10 @@ import type {
   UpdateVehicleInput,
   CreateRouteInput,
   UpdateRouteInput,
+  CreateDispatchOrderInput,
+  UpdateDispatchOrderInput,
+  CreateDispatchStopInput,
+  CreateDispatchExpenseInput,
 } from "./types";
 
 export const inventoryKeys = {
@@ -195,6 +210,8 @@ export const inventoryKeys = {
   zones: () => [...inventoryKeys.all, "zones"] as const,
   vehicles: () => [...inventoryKeys.all, "vehicles"] as const,
   routes: () => [...inventoryKeys.all, "routes"] as const,
+  dispatchOrders: () => [...inventoryKeys.all, "dispatch-orders"] as const,
+  dispatchOrder: (id: string) => [...inventoryKeys.dispatchOrders(), id] as const,
 };
 
 type MutationFeedbackOptions = {
@@ -2404,6 +2421,252 @@ export function useDeleteRouteMutation(options: MutationFeedbackOptions = {}) {
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.route_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+// --- Dispatch Orders ---
+
+export function useDispatchOrdersQuery(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: inventoryKeys.dispatchOrders(),
+    queryFn: listDispatchOrders,
+  });
+}
+
+export function useDispatchOrderQuery(id: string) {
+  return useQuery({
+    enabled: !!id,
+    queryKey: inventoryKeys.dispatchOrder(id),
+    queryFn: () => getDispatchOrder(id),
+  });
+}
+
+export function useCreateDispatchOrderMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateDispatchOrderInput) => createDispatchOrder(payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateDispatchOrderMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: UpdateDispatchOrderInput) => updateDispatchOrder(orderId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useAddDispatchStopMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateDispatchStopInput) => addDispatchStop(orderId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_stop_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useRemoveDispatchStopMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (stopId: string) => removeDispatchStop(orderId, stopId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_stop_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useAddDispatchExpenseMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateDispatchExpenseInput) => addDispatchExpense(orderId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_expense_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useRemoveDispatchExpenseMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (expenseId: string) => removeDispatchExpense(orderId, expenseId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_expense_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useMarkDispatchDispatchedMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => markDispatchDispatched(orderId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_dispatch_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useMarkDispatchCompletedMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => markDispatchCompleted(orderId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_complete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useCancelDispatchOrderMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => cancelDispatchOrder(orderId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_cancel_error_fallback"),
         });
       }
     },

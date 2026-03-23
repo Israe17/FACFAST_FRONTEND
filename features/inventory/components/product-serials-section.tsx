@@ -94,14 +94,15 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
   const warehousesQuery = useWarehousesQuery(canRunTenantQueries && canViewWarehouses);
 
   const serialTrackedVariants = useMemo(() => {
+    if (!product.track_serials) return [];
     const resolvedVariants = variantsQuery.data?.length ? variantsQuery.data : product.variants;
 
     if (product.has_variants) {
-      return resolvedVariants.filter((variant) => variant.track_serials);
+      return resolvedVariants;
     }
 
     const defaultVariant = resolvedVariants.find((variant) => variant.is_default) ?? resolvedVariants[0];
-    return product.track_serials && defaultVariant ? [defaultVariant] : [];
+    return defaultVariant ? [defaultVariant] : [];
   }, [product.has_variants, product.track_serials, product.variants, variantsQuery.data]);
 
   const effectiveVariantId = useMemo(() => {

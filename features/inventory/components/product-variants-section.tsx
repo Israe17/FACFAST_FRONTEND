@@ -159,7 +159,6 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
           const flags: string[] = [];
           if (v.track_inventory) flags.push(t("inventory.variants.flag_inventory"));
           if (v.track_lots) flags.push(t("inventory.variants.flag_lots"));
-          if (v.track_serials) flags.push(t("inventory.variants.flag_serials"));
           if (!flags.length) return t("inventory.common.not_available");
           return (
             <div className="flex flex-wrap gap-1">

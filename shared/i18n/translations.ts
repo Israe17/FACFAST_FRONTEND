@@ -1134,6 +1134,11 @@ const esTranslations = {
     "El producto o la variante operativa estan inactivos. Puedes consultar seriales existentes, pero no registrar ni actualizar estados desde esta vista.",
   "inventory.serials.register_no_stock_hint":
     "Registrar seriales no incrementa stock automaticamente. Este flujo solo crea seriales usando el contrato oficial del backend.",
+  "inventory.serials.select_origin_warehouse_hint":
+    "Selecciona una bodega de origen para ver los seriales disponibles.",
+  "inventory.serials.no_available_serials":
+    "No hay seriales disponibles en la bodega de origen para esta variante.",
+  "inventory.serials.selected_count": "{count} serial(es) seleccionado(s)",
   "inventory.serials.no_serials":
     "No hay seriales para la variante seleccionada con los filtros actuales.",
   "inventory.serials.register_dialog_title": "Registrar seriales",
@@ -2489,6 +2494,11 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The product or operational variant is inactive. You can review existing serials, but you cannot register or update statuses from this view.",
     "inventory.serials.register_no_stock_hint":
       "Registering serials does not increase stock automatically. This flow only creates serials using the official backend contract.",
+    "inventory.serials.select_origin_warehouse_hint":
+      "Select an origin warehouse to see available serials.",
+    "inventory.serials.no_available_serials":
+      "No available serials in the origin warehouse for this variant.",
+    "inventory.serials.selected_count": "{count} serial(s) selected",
     "inventory.serials.no_serials":
       "There are no serials for the selected variant with the current filters.",
     "inventory.serials.register_dialog_title": "Register serials",

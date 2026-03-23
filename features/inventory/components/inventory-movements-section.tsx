@@ -164,9 +164,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
   const transferRequiresLot = transferSelectedProduct?.has_variants
     ? Boolean(transferSelectedVariant?.track_lots)
     : Boolean(transferSelectedProduct?.track_lots);
-  const transferRequiresSerials = transferSelectedProduct?.has_variants
-    ? Boolean(transferSelectedVariant?.track_serials)
-    : Boolean(transferSelectedProduct?.track_serials);
+  const transferRequiresSerials = Boolean(transferSelectedProduct?.track_serials);
   const transferOriginLocationsQuery = useWarehouseLocationsQuery(
     transferOriginWarehouseId,
     transferOpen && canViewLocations && Boolean(transferOriginWarehouseId),

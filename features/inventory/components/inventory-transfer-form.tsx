@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -24,7 +25,7 @@ import type {
   Product,
   Warehouse,
 } from "../types";
-import { useProductVariantsQuery } from "../queries";
+import { useProductSerialsQuery, useProductVariantsQuery } from "../queries";
 import { FormFieldError } from "./form-field-error";
 import { EMPTY_SELECT_VALUE } from "./inventory-adjustment-form";
 import { VariantPicker } from "./variant-picker";
@@ -74,9 +75,26 @@ export function InventoryTransferForm({
   const requiresLot = selectedProduct?.has_variants
     ? Boolean(selectedVariant?.track_lots)
     : Boolean(selectedProduct?.track_lots);
-  const requiresSerials = selectedProduct?.has_variants
-    ? Boolean(selectedVariant?.track_serials)
-    : Boolean(selectedProduct?.track_serials);
+  const requiresSerials = Boolean(selectedProduct?.track_serials);
+  const originWarehouseId = form.watch("origin_warehouse_id") ?? "";
+
+  const effectiveVariantId = watchedVariantId || (
+    selectedProduct?.has_variants === false
+      ? selectedProduct.variants.find((v) => v.is_default)?.id ?? ""
+      : ""
+  );
+
+  const serialsQuery = useProductSerialsQuery(
+    watchedProductId,
+    effectiveVariantId,
+    { status: "available", warehouse_id: originWarehouseId },
+    requiresSerials && Boolean(watchedProductId) && Boolean(effectiveVariantId) && Boolean(originWarehouseId),
+  );
+
+  const availableSerials = useMemo(
+    () => serialsQuery.data ?? [],
+    [serialsQuery.data],
+  );
 
   useEffect(() => {
     const defaultVariantId =
@@ -323,29 +341,57 @@ export function InventoryTransferForm({
 
       {requiresSerials ? (
         <div className="space-y-2">
-          <Label htmlFor="inventory-transfer-serial-ids">{t("inventory.form.serial_ids")}</Label>
-          <Controller
-            control={form.control}
-            name="serial_ids"
-            render={({ field }) => (
-              <Input
-                id="inventory-transfer-serial-ids"
-                placeholder={t("inventory.form.serial_ids_placeholder")}
-                value={(field.value ?? []).join(", ")}
-                onChange={(event) => {
-                  const nextValue = event.target.value
-                    .split(",")
-                    .map((value) => value.trim())
-                    .filter(Boolean)
-                    .map((value) => Number(value))
-                    .filter((value) => Number.isInteger(value) && value > 0);
-
-                  field.onChange(nextValue);
-                }}
-              />
-            )}
-          />
+          <Label>{t("inventory.form.serial_ids")}</Label>
+          {!originWarehouseId ? (
+            <p className="text-sm text-muted-foreground">
+              {t("inventory.serials.select_origin_warehouse_hint")}
+            </p>
+          ) : serialsQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
+          ) : availableSerials.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {t("inventory.serials.no_available_serials")}
+            </p>
+          ) : (
+            <Controller
+              control={form.control}
+              name="serial_ids"
+              render={({ field }) => {
+                const selectedIds = new Set(field.value ?? []);
+                return (
+                  <div className="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-border/70 p-3">
+                    {availableSerials.map((serial) => (
+                      <label key={serial.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={selectedIds.has(Number(serial.id))}
+                          onCheckedChange={(checked) => {
+                            const numId = Number(serial.id);
+                            const next = checked
+                              ? [...(field.value ?? []), numId]
+                              : (field.value ?? []).filter((id: number) => id !== numId);
+                            field.onChange(next);
+                            form.setValue("quantity", next.length || 1, { shouldDirty: true });
+                          }}
+                        />
+                        <span className="font-mono">{serial.serial_number}</span>
+                        {serial.warehouse?.name ? (
+                          <span className="text-muted-foreground">— {serial.warehouse.name}</span>
+                        ) : null}
+                      </label>
+                    ))}
+                  </div>
+                );
+              }}
+            />
+          )}
           <FormFieldError message={errors.serial_ids?.message} />
+          {(form.watch("serial_ids")?.length ?? 0) > 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {t("inventory.serials.selected_count", {
+                count: form.watch("serial_ids")?.length ?? 0,
+              })}
+            </p>
+          ) : null}
         </div>
       ) : null}
 

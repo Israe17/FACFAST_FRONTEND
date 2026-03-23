@@ -419,7 +419,6 @@ export const emptyProductVariantFormValues: CreateProductVariantInput = {
   track_expiration: false,
   track_inventory: true,
   track_lots: false,
-  track_serials: false,
   variant_name: "",
 };
 
@@ -438,7 +437,6 @@ export function getProductVariantFormValues(
     track_expiration: variant.track_expiration,
     track_inventory: variant.track_inventory,
     track_lots: variant.track_lots,
-    track_serials: variant.track_serials,
     variant_name: variant.variant_name ?? "",
   };
 }

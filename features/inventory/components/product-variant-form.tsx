@@ -74,7 +74,6 @@ function ProductVariantForm({
     if (!trackInventory) {
       form.setValue("track_lots", false, { shouldDirty: true });
       form.setValue("track_expiration", false, { shouldDirty: true });
-      form.setValue("track_serials", false, { shouldDirty: true });
     }
   }, [form, trackInventory]);
 
@@ -265,20 +264,6 @@ function ProductVariantForm({
           <div className="space-y-1">
             <p className="font-medium">{t("inventory.form.track_expiration")}</p>
             <p className="text-sm text-muted-foreground">{t("inventory.form.track_expiration_description")}</p>
-          </div>
-        </label>
-
-        <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
-          <Checkbox
-            checked={Boolean(form.watch("track_serials"))}
-            disabled={!trackInventory}
-            onCheckedChange={(checked) => {
-              form.setValue("track_serials", checked === true, { shouldDirty: true });
-            }}
-          />
-          <div className="space-y-1">
-            <p className="font-medium">{t("inventory.form.track_serials")}</p>
-            <p className="text-sm text-muted-foreground">{t("inventory.form.track_serials_description")}</p>
           </div>
         </label>
 

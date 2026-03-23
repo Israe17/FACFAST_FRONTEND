@@ -32,6 +32,7 @@ import {
   zoneSchema,
   vehicleSchema,
   routeSchema,
+  dispatchOrderSchema,
 } from "./schemas";
 import type {
   CancelInventoryMovementInput,
@@ -75,6 +76,10 @@ import type {
   UpdateVehicleInput,
   CreateRouteInput,
   UpdateRouteInput,
+  CreateDispatchOrderInput,
+  UpdateDispatchOrderInput,
+  CreateDispatchStopInput,
+  CreateDispatchExpenseInput,
 } from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -1186,4 +1191,77 @@ export async function updateRoute(routeId: string, payload: CreateRouteInput | U
 
 export async function deleteRoute(routeId: string) {
   await http.delete(`/routes/${routeId}`);
+}
+
+// --- Dispatch Orders ---
+
+function buildDispatchOrderPayload(payload: CreateDispatchOrderInput | UpdateDispatchOrderInput) {
+  return compactRecord({
+    branch_id: payload.branch_id,
+    code: payload.code,
+    dispatch_type: payload.dispatch_type,
+    driver_user_id: payload.driver_user_id,
+    notes: payload.notes,
+    origin_warehouse_id: payload.origin_warehouse_id,
+    route_id: payload.route_id,
+    scheduled_date: payload.scheduled_date,
+    stop_sale_order_ids: payload.stop_sale_order_ids,
+    vehicle_id: payload.vehicle_id,
+  });
+}
+
+export async function listDispatchOrders() {
+  const response = await http.get("/dispatch-orders");
+  return extractCollection(response.data, ["dispatch_orders"]).map((item) =>
+    dispatchOrderSchema.parse(item),
+  );
+}
+
+export async function getDispatchOrder(orderId: string) {
+  const response = await http.get(`/dispatch-orders/${orderId}`);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function createDispatchOrder(payload: CreateDispatchOrderInput) {
+  const response = await http.post("/dispatch-orders", buildDispatchOrderPayload(payload));
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function updateDispatchOrder(orderId: string, payload: UpdateDispatchOrderInput) {
+  const response = await http.patch(`/dispatch-orders/${orderId}`, buildDispatchOrderPayload(payload));
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function addDispatchStop(orderId: string, payload: CreateDispatchStopInput) {
+  const response = await http.post(`/dispatch-orders/${orderId}/stops`, payload);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function removeDispatchStop(orderId: string, stopId: string) {
+  const response = await http.delete(`/dispatch-orders/${orderId}/stops/${stopId}`);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function addDispatchExpense(orderId: string, payload: CreateDispatchExpenseInput) {
+  const response = await http.post(`/dispatch-orders/${orderId}/expenses`, payload);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function removeDispatchExpense(orderId: string, expenseId: string) {
+  await http.delete(`/dispatch-orders/${orderId}/expenses/${expenseId}`);
+}
+
+export async function markDispatchDispatched(orderId: string) {
+  const response = await http.post(`/dispatch-orders/${orderId}/dispatch`);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function markDispatchCompleted(orderId: string) {
+  const response = await http.post(`/dispatch-orders/${orderId}/complete`);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function cancelDispatchOrder(orderId: string) {
+  const response = await http.post(`/dispatch-orders/${orderId}/cancel`);
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }

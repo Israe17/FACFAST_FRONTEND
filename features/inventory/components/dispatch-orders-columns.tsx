@@ -1,0 +1,180 @@
+import type { ColumnDef } from "@tanstack/react-table";
+import { CheckCircle, Pencil, Send, XCircle } from "lucide-react";
+
+import type { FrontendTranslationKey } from "@/shared/i18n/translations";
+import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { TableRowActions } from "@/shared/components/table-row-actions";
+import { formatDateTime } from "@/shared/lib/utils";
+
+import type { DispatchOrder } from "../types";
+
+type GetDispatchOrdersColumnsParams = {
+  canUpdate: boolean;
+  canCancel: boolean;
+  onEdit: (order: DispatchOrder) => void;
+  onDispatch: (order: DispatchOrder) => void;
+  onComplete: (order: DispatchOrder) => void;
+  onCancel: (order: DispatchOrder) => void;
+  t: ReturnType<typeof useAppTranslator>["t"];
+};
+
+const statusColorMap: Record<string, string> = {
+  draft: "bg-yellow-100 text-yellow-800",
+  ready: "bg-blue-100 text-blue-800",
+  dispatched: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+const statusTranslationMap: Record<string, FrontendTranslationKey> = {
+  draft: "inventory.dispatch.status_draft",
+  ready: "inventory.dispatch.status_ready",
+  dispatched: "inventory.dispatch.status_dispatched",
+  in_transit: "inventory.dispatch.status_in_transit",
+  completed: "inventory.dispatch.status_completed",
+  cancelled: "inventory.dispatch.status_cancelled",
+};
+
+const typeTranslationMap: Record<string, FrontendTranslationKey> = {
+  individual: "inventory.dispatch.type_individual",
+  consolidated: "inventory.dispatch.type_consolidated",
+};
+
+function getDispatchOrdersColumns({
+  canUpdate,
+  canCancel,
+  onEdit,
+  onDispatch,
+  onComplete,
+  onCancel,
+  t,
+}: GetDispatchOrdersColumnsParams): ColumnDef<DispatchOrder>[] {
+  const baseColumns: ColumnDef<DispatchOrder>[] = [
+    {
+      accessorKey: "code",
+      header: t("inventory.entity.dispatch_order"),
+      cell: ({ row }) => (
+        <div className="space-y-1">
+          <p className="font-medium">{row.original.code ?? "-"}</p>
+          <p className="text-sm text-muted-foreground">
+            {row.original.scheduled_date
+              ? formatDateTime(row.original.scheduled_date)
+              : "-"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "dispatch_type",
+      header: t("inventory.dispatch.dispatch_type"),
+      cell: ({ row }) => (
+        <span className="text-sm">
+          {t(typeTranslationMap[row.original.dispatch_type] ?? "inventory.dispatch.type_individual")}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: t("inventory.dispatch.status"),
+      cell: ({ row }) => (
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[row.original.status] ?? ""}`}
+        >
+          {t(statusTranslationMap[row.original.status] ?? "inventory.dispatch.status_draft")}
+        </span>
+      ),
+    },
+    {
+      id: "route",
+      header: t("inventory.dispatch.route"),
+      cell: ({ row }) => (
+        <span className="text-sm">{row.original.route?.name ?? "-"}</span>
+      ),
+    },
+    {
+      id: "vehicle",
+      header: t("inventory.dispatch.vehicle"),
+      cell: ({ row }) => (
+        <span className="text-sm">{row.original.vehicle?.name ?? "-"}</span>
+      ),
+    },
+    {
+      id: "driver",
+      header: t("inventory.dispatch.driver"),
+      cell: ({ row }) => (
+        <span className="text-sm">{row.original.driver_user?.name ?? "-"}</span>
+      ),
+    },
+    {
+      id: "stops",
+      header: t("inventory.dispatch.stops"),
+      cell: ({ row }) => (
+        <span className="text-sm tabular-nums">
+          {(row.original.stops ?? []).length}
+        </span>
+      ),
+    },
+  ];
+
+  const hasActions = canUpdate || canCancel;
+
+  if (hasActions) {
+    baseColumns.push({
+      id: "actions",
+      header: t("inventory.common.actions"),
+      cell: ({ row }) => {
+        const order = row.original;
+        const lifecycle = order.lifecycle ?? {};
+
+        return (
+          <TableRowActions
+            actions={[
+              ...(canUpdate && lifecycle.can_edit
+                ? [
+                    {
+                      label: t("inventory.common.edit"),
+                      icon: Pencil,
+                      onClick: () => onEdit(order),
+                    },
+                  ]
+                : []),
+              ...(canUpdate && lifecycle.can_dispatch
+                ? [
+                    {
+                      label: t("inventory.dispatch.mark_dispatched"),
+                      icon: Send,
+                      onClick: () => onDispatch(order),
+                    },
+                  ]
+                : []),
+              ...(canUpdate && lifecycle.can_complete
+                ? [
+                    {
+                      label: t("inventory.dispatch.mark_completed"),
+                      icon: CheckCircle,
+                      onClick: () => onComplete(order),
+                    },
+                  ]
+                : []),
+              ...(canCancel && lifecycle.can_cancel
+                ? [
+                    {
+                      label: t("inventory.dispatch.cancel"),
+                      icon: XCircle,
+                      variant: "destructive" as const,
+                      onClick: () => onCancel(order),
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        );
+      },
+    });
+  }
+
+  return baseColumns;
+}
+
+export { getDispatchOrdersColumns };

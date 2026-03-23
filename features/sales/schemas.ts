@@ -8,7 +8,9 @@ import {
 
 import {
   deliveryChargeTypeValues,
+  electronicDocumentTypeValues,
   fulfillmentModeValues,
+  haciendaStatusValues,
   saleDispatchStatusValues,
   saleModeValues,
   saleOrderStatusValues,
@@ -201,4 +203,51 @@ export const updateSaleOrderSchema = createSaleOrderSchema.partial();
 
 export const cancelSaleOrderSchema = z.object({
   reason: optionalTextSchema,
+});
+
+// --- Electronic Document ---
+
+export const electronicDocumentSchema = z
+  .object({
+    id: idSchema,
+    code: z.string().optional().catch(undefined),
+    business_id: idSchema.optional().catch(undefined),
+    branch: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+    sale_order: z.object({ id: idSchema, code: z.string().nullable().optional() }).nullable().optional().catch(null),
+    document_type: z.enum(electronicDocumentTypeValues).catch("factura_electronica"),
+    document_key: z.string().nullable().optional().catch(null),
+    consecutive: z.string().nullable().optional().catch(null),
+    emission_date: z.string().optional(),
+    currency: z.string().optional().catch("CRC"),
+    subtotal: z.number().optional().catch(0),
+    tax_total: z.number().optional().catch(0),
+    discount_total: z.number().optional().catch(0),
+    total: z.number().optional().catch(0),
+    receiver_name: z.string().optional().catch(""),
+    receiver_identification_type: z.string().nullable().optional().catch(null),
+    receiver_identification_number: z.string().nullable().optional().catch(null),
+    receiver_email: z.string().nullable().optional().catch(null),
+    hacienda_status: z.enum(haciendaStatusValues).catch("pending"),
+    hacienda_message: z.string().nullable().optional().catch(null),
+    submitted_at: z.string().nullable().optional().catch(null),
+    accepted_at: z.string().nullable().optional().catch(null),
+    lifecycle: z.object({
+      can_resubmit: z.boolean().optional().catch(false),
+      reasons: z.array(z.string()).optional().catch([]),
+    }).optional().catch({}),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
+  })
+  .passthrough();
+
+export const emitElectronicDocumentSchema = z.object({
+  sale_order_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : String(v)),
+    z.string().regex(positiveIntegerPattern, "Selecciona una orden de venta."),
+  ),
+  document_type: z.enum(electronicDocumentTypeValues).default("factura_electronica"),
+  receiver_name: optionalTrimmedString(z.string()),
+  receiver_identification_type: optionalTrimmedString(z.string()),
+  receiver_identification_number: optionalTrimmedString(z.string()),
+  receiver_email: optionalTrimmedString(z.string()),
 });

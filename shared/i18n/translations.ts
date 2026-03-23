@@ -1496,6 +1496,78 @@ const esTranslations = {
   "users.status_update_error_fallback":
     "No fue posible actualizar el estado del usuario.",
   "users.update_error_fallback": "No fue posible actualizar el usuario.",
+  "inventory.dispatch_order_create_error_fallback":
+    "Error al crear la orden de despacho.",
+  "inventory.dispatch_order_update_error_fallback":
+    "Error al actualizar la orden de despacho.",
+  "inventory.dispatch_order_dispatch_error_fallback":
+    "Error al despachar la orden.",
+  "inventory.dispatch_order_complete_error_fallback":
+    "Error al completar la orden de despacho.",
+  "inventory.dispatch_order_cancel_error_fallback":
+    "Error al cancelar la orden de despacho.",
+  "inventory.dispatch_stop_create_error_fallback":
+    "Error al agregar la parada.",
+  "inventory.dispatch_stop_delete_error_fallback":
+    "Error al eliminar la parada.",
+  "inventory.dispatch_expense_create_error_fallback":
+    "Error al agregar el gasto.",
+  "inventory.dispatch_expense_delete_error_fallback":
+    "Error al eliminar el gasto.",
+  "inventory.entity.dispatch_order": "Orden de Despacho",
+  "inventory.entity.dispatch_orders": "Órdenes de Despacho",
+  "inventory.dispatch.section_description": "Gestiona las órdenes de despacho y logística.",
+  "inventory.dispatch.dialog_description":
+    "Completa los campos para la orden de despacho.",
+  "inventory.dispatch.dispatch_type": "Tipo de despacho",
+  "inventory.dispatch.status": "Estado",
+  "inventory.dispatch.scheduled_date": "Fecha programada",
+  "inventory.dispatch.route": "Ruta",
+  "inventory.dispatch.vehicle": "Vehículo",
+  "inventory.dispatch.driver": "Chofer",
+  "inventory.dispatch.origin_warehouse": "Bodega de origen",
+  "inventory.dispatch.stops": "Paradas",
+  "inventory.dispatch.expenses": "Gastos",
+  "inventory.dispatch.add_stop": "Agregar parada",
+  "inventory.dispatch.add_expense": "Agregar gasto",
+  "inventory.dispatch.mark_dispatched": "Despachar",
+  "inventory.dispatch.mark_completed": "Completar",
+  "inventory.dispatch.cancel": "Cancelar despacho",
+  "inventory.dispatch.status_draft": "Borrador",
+  "inventory.dispatch.status_ready": "Listo",
+  "inventory.dispatch.status_dispatched": "Despachado",
+  "inventory.dispatch.status_in_transit": "En tránsito",
+  "inventory.dispatch.status_completed": "Completado",
+  "inventory.dispatch.status_cancelled": "Cancelado",
+  "inventory.dispatch.type_individual": "Individual",
+  "inventory.dispatch.type_consolidated": "Consolidado",
+  "inventory.dispatch.stop_pending": "Pendiente",
+  "inventory.dispatch.stop_delivered": "Entregado",
+  "inventory.dispatch.stop_failed": "Fallido",
+  "inventory.dispatch.expense_type": "Tipo de gasto",
+  "inventory.dispatch.amount": "Monto",
+  "inventory.dispatch.total_expenses": "Total gastos",
+  "sales.document_emit_error_fallback":
+    "Error al emitir el documento electrónico.",
+  "sales.entity.electronic_document": "Documento Electrónico",
+  "sales.entity.electronic_documents": "Documentos Electrónicos",
+  "sales.documents.section_description":
+    "Gestiona los documentos electrónicos de Hacienda.",
+  "sales.documents.emit": "Emitir factura",
+  "sales.documents.document_type": "Tipo de documento",
+  "sales.documents.hacienda_status": "Estado Hacienda",
+  "sales.documents.hacienda_pending": "Pendiente",
+  "sales.documents.hacienda_submitted": "Enviado",
+  "sales.documents.hacienda_accepted": "Aceptado",
+  "sales.documents.hacienda_rejected": "Rechazado",
+  "sales.documents.hacienda_error": "Error",
+  "sales.documents.receiver": "Receptor",
+  "sales.documents.document_key": "Clave",
+  "sales.documents.consecutive": "Consecutivo",
+  "sales.documents.type_factura_electronica": "Factura Electrónica",
+  "sales.documents.type_tiquete_electronico": "Tiquete Electrónico",
+  "sales.documents.type_nota_credito": "Nota de Crédito",
+  "sales.documents.type_nota_debito": "Nota de Débito",
 } as const;
 
 export type FrontendTranslationKey = keyof typeof esTranslations;
@@ -3011,6 +3083,78 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "users.roles_update_error_fallback": "Unable to update user roles.",
     "users.status_update_error_fallback": "Unable to update the user status.",
     "users.update_error_fallback": "Unable to update the user.",
+    "inventory.dispatch_order_create_error_fallback":
+      "Error creating the dispatch order.",
+    "inventory.dispatch_order_update_error_fallback":
+      "Error updating the dispatch order.",
+    "inventory.dispatch_order_dispatch_error_fallback":
+      "Error dispatching the order.",
+    "inventory.dispatch_order_complete_error_fallback":
+      "Error completing the dispatch order.",
+    "inventory.dispatch_order_cancel_error_fallback":
+      "Error cancelling the dispatch order.",
+    "inventory.dispatch_stop_create_error_fallback":
+      "Error adding the stop.",
+    "inventory.dispatch_stop_delete_error_fallback":
+      "Error removing the stop.",
+    "inventory.dispatch_expense_create_error_fallback":
+      "Error adding the expense.",
+    "inventory.dispatch_expense_delete_error_fallback":
+      "Error removing the expense.",
+    "inventory.entity.dispatch_order": "Dispatch Order",
+    "inventory.entity.dispatch_orders": "Dispatch Orders",
+    "inventory.dispatch.section_description": "Manage dispatch orders and logistics.",
+    "inventory.dispatch.dialog_description":
+      "Fill in the fields for the dispatch order.",
+    "inventory.dispatch.dispatch_type": "Dispatch type",
+    "inventory.dispatch.status": "Status",
+    "inventory.dispatch.scheduled_date": "Scheduled date",
+    "inventory.dispatch.route": "Route",
+    "inventory.dispatch.vehicle": "Vehicle",
+    "inventory.dispatch.driver": "Driver",
+    "inventory.dispatch.origin_warehouse": "Origin warehouse",
+    "inventory.dispatch.stops": "Stops",
+    "inventory.dispatch.expenses": "Expenses",
+    "inventory.dispatch.add_stop": "Add stop",
+    "inventory.dispatch.add_expense": "Add expense",
+    "inventory.dispatch.mark_dispatched": "Dispatch",
+    "inventory.dispatch.mark_completed": "Complete",
+    "inventory.dispatch.cancel": "Cancel dispatch",
+    "inventory.dispatch.status_draft": "Draft",
+    "inventory.dispatch.status_ready": "Ready",
+    "inventory.dispatch.status_dispatched": "Dispatched",
+    "inventory.dispatch.status_in_transit": "In transit",
+    "inventory.dispatch.status_completed": "Completed",
+    "inventory.dispatch.status_cancelled": "Cancelled",
+    "inventory.dispatch.type_individual": "Individual",
+    "inventory.dispatch.type_consolidated": "Consolidated",
+    "inventory.dispatch.stop_pending": "Pending",
+    "inventory.dispatch.stop_delivered": "Delivered",
+    "inventory.dispatch.stop_failed": "Failed",
+    "inventory.dispatch.expense_type": "Expense type",
+    "inventory.dispatch.amount": "Amount",
+    "inventory.dispatch.total_expenses": "Total expenses",
+    "sales.document_emit_error_fallback":
+      "Error emitting the electronic document.",
+    "sales.entity.electronic_document": "Electronic Document",
+    "sales.entity.electronic_documents": "Electronic Documents",
+    "sales.documents.section_description":
+      "Manage Hacienda electronic documents.",
+    "sales.documents.emit": "Emit invoice",
+    "sales.documents.document_type": "Document type",
+    "sales.documents.hacienda_status": "Hacienda status",
+    "sales.documents.hacienda_pending": "Pending",
+    "sales.documents.hacienda_submitted": "Submitted",
+    "sales.documents.hacienda_accepted": "Accepted",
+    "sales.documents.hacienda_rejected": "Rejected",
+    "sales.documents.hacienda_error": "Error",
+    "sales.documents.receiver": "Receiver",
+    "sales.documents.document_key": "Key",
+    "sales.documents.consecutive": "Consecutive",
+    "sales.documents.type_factura_electronica": "Electronic Invoice",
+    "sales.documents.type_tiquete_electronico": "Electronic Ticket",
+    "sales.documents.type_nota_credito": "Credit Note",
+    "sales.documents.type_nota_debito": "Debit Note",
   },
   es: esTranslations,
 };

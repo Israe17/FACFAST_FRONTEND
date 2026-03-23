@@ -33,6 +33,10 @@ import type {
   CreateVehicleInput,
   Route,
   CreateRouteInput,
+  DispatchOrder,
+  CreateDispatchOrderInput,
+  CreateDispatchStopInput,
+  CreateDispatchExpenseInput,
 } from "./types";
 
 function toDateInputValue(value?: string | null) {
@@ -520,3 +524,45 @@ export function getRouteFormValues(route: Route): CreateRouteInput {
     zone_id: route.zone_id ?? undefined,
   };
 }
+
+export const emptyDispatchOrderFormValues: CreateDispatchOrderInput = {
+  branch_id: "",
+  code: "",
+  dispatch_type: "individual",
+  driver_user_id: undefined,
+  notes: "",
+  origin_warehouse_id: undefined,
+  route_id: undefined,
+  scheduled_date: "",
+  stop_sale_order_ids: [],
+  vehicle_id: undefined,
+};
+
+export function getDispatchOrderFormValues(order: DispatchOrder): CreateDispatchOrderInput {
+  return {
+    branch_id: String(order.branch?.id ?? ""),
+    code: order.code ?? "",
+    dispatch_type: order.dispatch_type,
+    driver_user_id: order.driver_user?.id ?? undefined,
+    notes: order.notes ?? "",
+    origin_warehouse_id: order.origin_warehouse?.id ?? undefined,
+    route_id: order.route?.id ?? undefined,
+    scheduled_date: order.scheduled_date ?? "",
+    stop_sale_order_ids: (order.stops ?? []).map((s) => String(s.sale_order?.id ?? "")),
+    vehicle_id: order.vehicle?.id ?? undefined,
+  };
+}
+
+export const emptyDispatchStopFormValues: CreateDispatchStopInput = {
+  sale_order_id: "",
+  delivery_sequence: 1,
+  notes: "",
+};
+
+export const emptyDispatchExpenseFormValues: CreateDispatchExpenseInput = {
+  expense_type: "fuel",
+  amount: 0,
+  description: "",
+  receipt_number: "",
+  notes: "",
+};

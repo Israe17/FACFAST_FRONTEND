@@ -1,4 +1,4 @@
-import type { CreateSaleOrderInput, CreateSaleOrderLineInput, CreateSaleOrderDeliveryChargeInput, SaleOrder } from "./types";
+import type { CreateSaleOrderInput, CreateSaleOrderLineInput, CreateSaleOrderDeliveryChargeInput, EmitElectronicDocumentInput, SaleOrder } from "./types";
 
 export const emptySaleOrderLineFormValues: CreateSaleOrderLineInput = {
   discount_percent: 0,
@@ -34,6 +34,15 @@ export const emptySaleOrderFormValues: CreateSaleOrderInput = {
   sale_mode: "branch_direct",
   seller_user_id: undefined,
   warehouse_id: undefined,
+};
+
+export const emptyEmitDocumentFormValues: EmitElectronicDocumentInput = {
+  sale_order_id: "",
+  document_type: "factura_electronica",
+  receiver_name: "",
+  receiver_identification_type: "",
+  receiver_identification_number: "",
+  receiver_email: "",
 };
 
 export function getSaleOrderFormValues(order: SaleOrder): CreateSaleOrderInput {

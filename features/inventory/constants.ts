@@ -144,3 +144,8 @@ export const warrantyDurationUnitOptions = [
   { label: "Months", value: "months" },
   { label: "Years", value: "years" },
 ] as const;
+
+export const dispatchTypeValues = ["individual", "consolidated"] as const;
+export const dispatchOrderStatusValues = ["draft", "ready", "dispatched", "in_transit", "completed", "cancelled"] as const;
+export const dispatchStopStatusValues = ["pending", "in_transit", "delivered", "failed", "partial", "skipped"] as const;
+export const dispatchExpenseTypeValues = ["fuel", "tolls", "per_diem", "driver_pay", "helper", "outsource", "maintenance", "other"] as const;

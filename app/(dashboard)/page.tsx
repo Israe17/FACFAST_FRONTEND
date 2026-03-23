@@ -9,6 +9,8 @@ import {
   ContactRound,
   GitBranch,
   ShieldCheck,
+  ShoppingCart,
+  Truck,
   Users,
 } from "lucide-react";
 
@@ -72,6 +74,20 @@ const TENANT_QUICK_LINKS = [
     icon: Boxes,
     requiredAnyPermissions: [...inventoryViewPermissions],
     title: "Inventory",
+  },
+  {
+    description: "Ordenes de venta y facturacion electronica.",
+    href: APP_ROUTES.sales,
+    icon: ShoppingCart,
+    requiredAnyPermissions: ["sale_orders.view", "electronic_documents.view"],
+    title: "Ventas",
+  },
+  {
+    description: "Ordenes de despacho y logistica.",
+    href: APP_ROUTES.dispatch,
+    icon: Truck,
+    requiredAnyPermissions: ["dispatch_orders.view"],
+    title: "Despachos",
   },
 ] as const;
 

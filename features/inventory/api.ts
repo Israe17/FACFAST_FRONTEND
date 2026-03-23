@@ -29,6 +29,9 @@ import {
   warehouseSchema,
   warehouseStockRowSchema,
   warrantyProfileSchema,
+  zoneSchema,
+  vehicleSchema,
+  routeSchema,
 } from "./schemas";
 import type {
   CancelInventoryMovementInput,
@@ -66,6 +69,12 @@ import type {
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
   UpdateWarrantyProfileInput,
+  CreateZoneInput,
+  UpdateZoneInput,
+  CreateVehicleInput,
+  UpdateVehicleInput,
+  CreateRouteInput,
+  UpdateRouteInput,
 } from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -1074,4 +1083,107 @@ export async function updateProductSerial(
   return productSerialSchema.parse(
     extractEntity(response.data, ["serial", "product_serial", "productSerial"]),
   );
+}
+
+// --- Zones ---
+
+function buildZonePayload(payload: CreateZoneInput | UpdateZoneInput) {
+  return compactRecord({
+    canton: payload.canton,
+    code: payload.code,
+    description: payload.description,
+    district: payload.district,
+    is_active: payload.is_active,
+    name: payload.name,
+    province: payload.province,
+  });
+}
+
+export async function listZones() {
+  const response = await http.get("/zones");
+  return extractCollection(response.data, ["zones"]).map((item) => zoneSchema.parse(item));
+}
+
+export async function createZone(payload: CreateZoneInput) {
+  const response = await http.post("/zones", buildZonePayload(payload));
+  return zoneSchema.parse(extractEntity(response.data, ["zone"]));
+}
+
+export async function updateZone(zoneId: string, payload: CreateZoneInput | UpdateZoneInput) {
+  const response = await http.patch(`/zones/${zoneId}`, buildZonePayload(payload));
+  return zoneSchema.parse(extractEntity(response.data, ["zone"]));
+}
+
+export async function deleteZone(zoneId: string) {
+  await http.delete(`/zones/${zoneId}`);
+}
+
+// --- Vehicles ---
+
+function buildVehiclePayload(payload: CreateVehicleInput | UpdateVehicleInput) {
+  return compactRecord({
+    code: payload.code,
+    is_active: payload.is_active,
+    max_volume_m3: payload.max_volume_m3,
+    max_weight_kg: payload.max_weight_kg,
+    name: payload.name,
+    notes: payload.notes,
+    plate_number: payload.plate_number,
+    vehicle_type: payload.vehicle_type,
+  });
+}
+
+export async function listVehicles() {
+  const response = await http.get("/vehicles");
+  return extractCollection(response.data, ["vehicles"]).map((item) => vehicleSchema.parse(item));
+}
+
+export async function createVehicle(payload: CreateVehicleInput) {
+  const response = await http.post("/vehicles", buildVehiclePayload(payload));
+  return vehicleSchema.parse(extractEntity(response.data, ["vehicle"]));
+}
+
+export async function updateVehicle(vehicleId: string, payload: CreateVehicleInput | UpdateVehicleInput) {
+  const response = await http.patch(`/vehicles/${vehicleId}`, buildVehiclePayload(payload));
+  return vehicleSchema.parse(extractEntity(response.data, ["vehicle"]));
+}
+
+export async function deleteVehicle(vehicleId: string) {
+  await http.delete(`/vehicles/${vehicleId}`);
+}
+
+// --- Routes ---
+
+function buildRoutePayload(payload: CreateRouteInput | UpdateRouteInput) {
+  return compactRecord({
+    code: payload.code,
+    day_of_week: payload.day_of_week,
+    default_driver_user_id: payload.default_driver_user_id,
+    default_vehicle_id: payload.default_vehicle_id,
+    description: payload.description,
+    estimated_cost: payload.estimated_cost,
+    frequency: payload.frequency,
+    is_active: payload.is_active,
+    name: payload.name,
+    zone_id: payload.zone_id,
+  });
+}
+
+export async function listRoutes() {
+  const response = await http.get("/routes");
+  return extractCollection(response.data, ["routes"]).map((item) => routeSchema.parse(item));
+}
+
+export async function createRoute(payload: CreateRouteInput) {
+  const response = await http.post("/routes", buildRoutePayload(payload));
+  return routeSchema.parse(extractEntity(response.data, ["route"]));
+}
+
+export async function updateRoute(routeId: string, payload: CreateRouteInput | UpdateRouteInput) {
+  const response = await http.patch(`/routes/${routeId}`, buildRoutePayload(payload));
+  return routeSchema.parse(extractEntity(response.data, ["route"]));
+}
+
+export async function deleteRoute(routeId: string) {
+  await http.delete(`/routes/${routeId}`);
 }

@@ -67,6 +67,15 @@ import {
   warehouseSchema,
   warehouseStockRowSchema,
   warrantyProfileSchema,
+  zoneSchema,
+  createZoneSchema,
+  updateZoneSchema,
+  vehicleSchema,
+  createVehicleSchema,
+  updateVehicleSchema,
+  routeSchema,
+  createRouteSchema,
+  updateRouteSchema,
 } from "./schemas";
 
 export type Brand = z.infer<typeof brandSchema>;
@@ -151,3 +160,12 @@ export type ProductVariant = z.infer<typeof productVariantSchema>;
 export type VariantAttribute = z.infer<typeof variantAttributeSchema>;
 export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>;
 export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>;
+export type Zone = z.infer<typeof zoneSchema>;
+export type CreateZoneInput = z.infer<typeof createZoneSchema>;
+export type UpdateZoneInput = z.infer<typeof updateZoneSchema>;
+export type Vehicle = z.infer<typeof vehicleSchema>;
+export type CreateVehicleInput = z.infer<typeof createVehicleSchema>;
+export type UpdateVehicleInput = z.infer<typeof updateVehicleSchema>;
+export type Route = z.infer<typeof routeSchema>;
+export type CreateRouteInput = z.infer<typeof createRouteSchema>;
+export type UpdateRouteInput = z.infer<typeof updateRouteSchema>;

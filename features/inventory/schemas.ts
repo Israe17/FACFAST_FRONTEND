@@ -1328,3 +1328,128 @@ export const updateProductVariantSchema = productVariantFormObjectSchema
     is_active: z.boolean().optional(),
   })
   .superRefine(applyVariantRules);
+
+// --- Zones ---
+export const zoneSchema = z
+  .object({
+    business_id: idSchema.optional().catch(undefined),
+    canton: z.string().nullable().optional().catch(null),
+    code: z.string().optional().catch(undefined),
+    created_at: z.string().optional(),
+    description: z.string().nullable().optional().catch(undefined),
+    district: z.string().nullable().optional().catch(null),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
+    name: z.string().catch("Zone"),
+    province: z.string().nullable().optional().catch(null),
+    updated_at: z.string().optional(),
+  })
+  .passthrough();
+
+export const createZoneSchema = z.object({
+  code: makeOptionalCodeSchema("ZN"),
+  description: optionalTextSchema,
+  is_active: z.boolean().default(true),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  province: optionalTextSchema,
+  canton: optionalTextSchema,
+  district: optionalTextSchema,
+});
+
+export const updateZoneSchema = createZoneSchema.partial().extend({
+  is_active: z.boolean().optional(),
+});
+
+// --- Vehicles ---
+export const vehicleSchema = z
+  .object({
+    business_id: idSchema.optional().catch(undefined),
+    code: z.string().optional().catch(undefined),
+    created_at: z.string().optional(),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
+    max_volume_m3: z.number().nullable().optional().catch(null),
+    max_weight_kg: z.number().nullable().optional().catch(null),
+    name: z.string().catch("Vehicle"),
+    notes: z.string().nullable().optional().catch(null),
+    plate_number: z.string().catch(""),
+    updated_at: z.string().optional(),
+    vehicle_type: z.string().nullable().optional().catch(null),
+  })
+  .passthrough();
+
+export const createVehicleSchema = z.object({
+  code: makeOptionalCodeSchema("VH"),
+  is_active: z.boolean().default(true),
+  max_volume_m3: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().positive("Debe ser mayor a 0.").optional(),
+  ),
+  max_weight_kg: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().positive("Debe ser mayor a 0.").optional(),
+  ),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  notes: optionalTextSchema,
+  plate_number: requiredTrimmedString("La placa es requerida.", 1),
+  vehicle_type: optionalTextSchema,
+});
+
+export const updateVehicleSchema = createVehicleSchema.partial().extend({
+  is_active: z.boolean().optional(),
+});
+
+// --- Routes ---
+export const routeSchema = z
+  .object({
+    business_id: idSchema.optional().catch(undefined),
+    code: z.string().optional().catch(undefined),
+    created_at: z.string().optional(),
+    day_of_week: z.string().nullable().optional().catch(null),
+    default_driver: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+    default_driver_user_id: z.union([z.number(), z.null()]).optional().catch(null),
+    default_vehicle: z.object({ id: idSchema, name: z.string(), plate_number: z.string() }).nullable().optional().catch(null),
+    default_vehicle_id: z.union([z.number(), z.null()]).optional().catch(null),
+    description: z.string().nullable().optional().catch(undefined),
+    estimated_cost: z.number().nullable().optional().catch(null),
+    frequency: z.string().nullable().optional().catch(null),
+    id: idSchema,
+    is_active: z.boolean().optional().default(true),
+    lifecycle: lifecycleFieldSchema,
+    name: z.string().catch("Route"),
+    updated_at: z.string().optional(),
+    zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+    zone_id: z.union([z.number(), z.null()]).optional().catch(null),
+  })
+  .passthrough();
+
+export const createRouteSchema = z.object({
+  code: makeOptionalCodeSchema("RT"),
+  day_of_week: optionalTextSchema,
+  default_driver_user_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().positive().optional(),
+  ),
+  default_vehicle_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().positive().optional(),
+  ),
+  description: optionalTextSchema,
+  estimated_cost: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().nonnegative("Debe ser 0 o mayor.").optional(),
+  ),
+  frequency: optionalTextSchema,
+  is_active: z.boolean().default(true),
+  name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  zone_id: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().positive().optional(),
+  ),
+});
+
+export const updateRouteSchema = createRouteSchema.partial().extend({
+  is_active: z.boolean().optional(),
+});

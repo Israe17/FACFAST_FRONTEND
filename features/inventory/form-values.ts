@@ -27,6 +27,12 @@ import type {
   WarehouseLocation,
   WarrantyProfile,
   MeasurementUnit,
+  Zone,
+  CreateZoneInput,
+  Vehicle,
+  CreateVehicleInput,
+  Route,
+  CreateRouteInput,
 } from "./types";
 
 function toDateInputValue(value?: string | null) {
@@ -438,5 +444,79 @@ export function getProductVariantFormValues(
     track_inventory: variant.track_inventory,
     track_lots: variant.track_lots,
     variant_name: variant.variant_name ?? "",
+  };
+}
+
+export const emptyZoneFormValues: CreateZoneInput = {
+  canton: "",
+  code: "",
+  description: "",
+  district: "",
+  is_active: true,
+  name: "",
+  province: "",
+};
+
+export function getZoneFormValues(zone: Zone): CreateZoneInput {
+  return {
+    canton: zone.canton ?? "",
+    code: zone.code ?? "",
+    description: zone.description ?? "",
+    district: zone.district ?? "",
+    is_active: zone.is_active,
+    name: zone.name,
+    province: zone.province ?? "",
+  };
+}
+
+export const emptyVehicleFormValues: CreateVehicleInput = {
+  code: "",
+  is_active: true,
+  max_volume_m3: undefined,
+  max_weight_kg: undefined,
+  name: "",
+  notes: "",
+  plate_number: "",
+  vehicle_type: "",
+};
+
+export function getVehicleFormValues(vehicle: Vehicle): CreateVehicleInput {
+  return {
+    code: vehicle.code ?? "",
+    is_active: vehicle.is_active,
+    max_volume_m3: vehicle.max_volume_m3 ?? undefined,
+    max_weight_kg: vehicle.max_weight_kg ?? undefined,
+    name: vehicle.name,
+    notes: vehicle.notes ?? "",
+    plate_number: vehicle.plate_number,
+    vehicle_type: vehicle.vehicle_type ?? "",
+  };
+}
+
+export const emptyRouteFormValues: CreateRouteInput = {
+  code: "",
+  day_of_week: "",
+  default_driver_user_id: undefined,
+  default_vehicle_id: undefined,
+  description: "",
+  estimated_cost: undefined,
+  frequency: "",
+  is_active: true,
+  name: "",
+  zone_id: undefined,
+};
+
+export function getRouteFormValues(route: Route): CreateRouteInput {
+  return {
+    code: route.code ?? "",
+    day_of_week: route.day_of_week ?? "",
+    default_driver_user_id: route.default_driver_user_id ?? undefined,
+    default_vehicle_id: route.default_vehicle_id ?? undefined,
+    description: route.description ?? "",
+    estimated_cost: route.estimated_cost ?? undefined,
+    frequency: route.frequency ?? "",
+    is_active: route.is_active,
+    name: route.name,
+    zone_id: route.zone_id ?? undefined,
   };
 }

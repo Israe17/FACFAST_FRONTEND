@@ -88,6 +88,18 @@ import {
   updateWarehouse,
   updateWarehouseLocation,
   updateWarrantyProfile,
+  createZone,
+  listZones,
+  updateZone,
+  deleteZone,
+  createVehicle,
+  listVehicles,
+  updateVehicle,
+  deleteVehicle,
+  createRoute,
+  listRoutes,
+  updateRoute,
+  deleteRoute,
 } from "./api";
 import type { PaginatedQueryParams } from "./api";
 import type {
@@ -126,6 +138,12 @@ import type {
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
   UpdateWarrantyProfileInput,
+  CreateZoneInput,
+  UpdateZoneInput,
+  CreateVehicleInput,
+  UpdateVehicleInput,
+  CreateRouteInput,
+  UpdateRouteInput,
 } from "./types";
 
 export const inventoryKeys = {
@@ -174,6 +192,9 @@ export const inventoryKeys = {
   variantAttributes: (productId: string) =>
     [...inventoryKeys.all, "variant-attributes", productId] as const,
   warrantyProfiles: () => [...inventoryKeys.all, "warranty-profiles"] as const,
+  zones: () => [...inventoryKeys.all, "zones"] as const,
+  vehicles: () => [...inventoryKeys.all, "vehicles"] as const,
+  routes: () => [...inventoryKeys.all, "routes"] as const,
 };
 
 type MutationFeedbackOptions = {
@@ -2163,6 +2184,226 @@ export function useReactivatePriceListMutation(options: MutationFeedbackOptions 
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.price_list_update_error_fallback"),
           translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
+// --- Zones ---
+
+export function useZonesQuery(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: inventoryKeys.zones(),
+    queryFn: listZones,
+  });
+}
+
+export function useCreateZoneMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateZoneInput) => createZone(payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.zones()]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.zone_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateZoneMutation(
+  zoneId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateZoneInput | UpdateZoneInput) => updateZone(zoneId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.zones()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.zone_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteZoneMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (zoneId: string) => deleteZone(zoneId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.zones()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.zone_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+// --- Vehicles ---
+
+export function useVehiclesQuery(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: inventoryKeys.vehicles(),
+    queryFn: listVehicles,
+  });
+}
+
+export function useCreateVehicleMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateVehicleInput) => createVehicle(payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.vehicles()]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.vehicle_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateVehicleMutation(
+  vehicleId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateVehicleInput | UpdateVehicleInput) =>
+      updateVehicle(vehicleId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.vehicles()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.vehicle_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteVehicleMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (vehicleId: string) => deleteVehicle(vehicleId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.vehicles()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.vehicle_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+// --- Routes ---
+
+export function useRoutesQuery(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: inventoryKeys.routes(),
+    queryFn: listRoutes,
+  });
+}
+
+export function useCreateRouteMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateRouteInput) => createRoute(payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.routes()]);
+      toast.success(t("common.create_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.route_create_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateRouteMutation(
+  routeId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: CreateRouteInput | UpdateRouteInput) => updateRoute(routeId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.routes()]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.route_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteRouteMutation(options: MutationFeedbackOptions = {}) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (routeId: string) => deleteRoute(routeId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.routes()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.route_delete_error_fallback"),
         });
       }
     },

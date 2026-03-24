@@ -41,26 +41,35 @@ function compactRecord<T extends Record<string, unknown>>(record: T) {
   );
 }
 
+function toNumberId(value: string | number | null | undefined): number | undefined {
+  if (value === "" || value === null || value === undefined) return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderInput) {
   return compactRecord({
-    branch_id: payload.branch_id,
+    branch_id: toNumberId(payload.branch_id),
     code: payload.code,
-    customer_contact_id: payload.customer_contact_id,
+    customer_contact_id: toNumberId(payload.customer_contact_id),
     delivery_address: payload.delivery_address,
     delivery_canton: payload.delivery_canton,
     delivery_charges: payload.delivery_charges,
     delivery_district: payload.delivery_district,
     delivery_province: payload.delivery_province,
     delivery_requested_date: payload.delivery_requested_date,
-    delivery_zone_id: payload.delivery_zone_id,
+    delivery_zone_id: toNumberId(payload.delivery_zone_id),
     fulfillment_mode: payload.fulfillment_mode,
     internal_notes: payload.internal_notes,
-    lines: payload.lines,
+    lines: payload.lines?.map((line: { product_variant_id?: string | number | null; [key: string]: unknown }) => ({
+      ...line,
+      product_variant_id: toNumberId(line.product_variant_id),
+    })),
     notes: payload.notes,
     order_date: payload.order_date,
     sale_mode: payload.sale_mode,
-    seller_user_id: payload.seller_user_id,
-    warehouse_id: payload.warehouse_id,
+    seller_user_id: toNumberId(payload.seller_user_id),
+    warehouse_id: toNumberId(payload.warehouse_id),
   });
 }
 

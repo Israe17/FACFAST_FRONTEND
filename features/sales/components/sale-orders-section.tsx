@@ -24,6 +24,7 @@ import {
   useSaleOrdersQuery,
   useConfirmSaleOrderMutation,
   useCancelSaleOrderMutation,
+  useDeleteSaleOrderMutation,
 } from "../queries";
 import type { SaleOrder } from "../types";
 import { SaleOrderDialog } from "./sale-order-dialog";
@@ -42,15 +43,20 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const canUpdate = can("sale_orders.update");
   const canConfirm = can("sale_orders.confirm");
   const canCancel = can("sale_orders.cancel");
+  const canDelete = can("sale_orders.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SaleOrder | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<SaleOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<SaleOrder | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SaleOrder | null>(null);
   const ordersQuery = useSaleOrdersQuery(enabled && canView);
   const confirmMutation = useConfirmSaleOrderMutation(confirmTarget?.id ?? "", {
     showErrorToast: true,
   });
   const cancelMutation = useCancelSaleOrderMutation(cancelTarget?.id ?? "", {
+    showErrorToast: true,
+  });
+  const deleteMutation = useDeleteSaleOrderMutation(deleteTarget?.id ?? "", {
     showErrorToast: true,
   });
 
@@ -71,18 +77,26 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
     setCancelTarget(null);
   }, [cancelTarget, cancelMutation]);
 
+  const handleDeleteAction = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync();
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
     () =>
       getSaleOrdersColumns({
         canUpdate,
         canConfirm,
         canCancel,
+        canDelete,
         onEdit: handleEdit,
         onConfirm: setConfirmTarget,
         onCancel: setCancelTarget,
+        onDelete: setDeleteTarget,
         t,
       }),
-    [canUpdate, canConfirm, canCancel, handleEdit, t],
+    [canUpdate, canConfirm, canCancel, canDelete, handleEdit, t],
   );
 
   if (!canView) {
@@ -182,6 +196,28 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleCancelAction}>
               {t("sales.cancel_order")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("sales.delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("sales.delete_description", { code: deleteTarget?.code ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAction}>
+              {t("inventory.common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -10,6 +10,7 @@ import {
   cancelSaleOrder,
   confirmSaleOrder,
   createSaleOrder,
+  deleteSaleOrder,
   emitElectronicDocument,
   getElectronicDocument,
   getSaleOrder,
@@ -144,6 +145,29 @@ export function useCancelSaleOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("sales.order_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteSaleOrderMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => deleteSaleOrder(orderId),
+    onSuccess: () => {
+      invalidateSalesQueries(queryClient, [salesKeys.orders()]);
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("sales.order_delete_error_fallback"),
         });
       }
     },

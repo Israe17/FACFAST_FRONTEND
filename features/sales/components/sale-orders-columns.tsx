@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, Pencil, XCircle } from "lucide-react";
+import { CheckCircle, Pencil, Trash2, XCircle } from "lucide-react";
 
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -12,9 +12,11 @@ type GetSaleOrdersColumnsParams = {
   canUpdate: boolean;
   canConfirm: boolean;
   canCancel: boolean;
+  canDelete: boolean;
   onEdit: (order: SaleOrder) => void;
   onConfirm: (order: SaleOrder) => void;
   onCancel: (order: SaleOrder) => void;
+  onDelete: (order: SaleOrder) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
@@ -58,9 +60,11 @@ function getSaleOrdersColumns({
   canUpdate,
   canConfirm,
   canCancel,
+  canDelete,
   onEdit,
   onConfirm,
   onCancel,
+  onDelete,
   t,
 }: GetSaleOrdersColumnsParams): ColumnDef<SaleOrder>[] {
   const baseColumns: ColumnDef<SaleOrder>[] = [
@@ -130,7 +134,7 @@ function getSaleOrdersColumns({
     },
   ];
 
-  const hasActions = canUpdate || canConfirm || canCancel;
+  const hasActions = canUpdate || canConfirm || canCancel || canDelete;
 
   if (hasActions) {
     baseColumns.push({
@@ -168,6 +172,16 @@ function getSaleOrdersColumns({
                       icon: XCircle,
                       variant: "destructive" as const,
                       onClick: () => onCancel(order),
+                    },
+                  ]
+                : []),
+              ...(canDelete && lifecycle.can_delete
+                ? [
+                    {
+                      label: t("inventory.common.delete"),
+                      icon: Trash2,
+                      variant: "destructive" as const,
+                      onClick: () => onDelete(order),
                     },
                   ]
                 : []),

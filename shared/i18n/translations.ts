@@ -1411,11 +1411,16 @@ const esTranslations = {
     "Error al confirmar la orden de venta.",
   "sales.order_cancel_error_fallback":
     "Error al cancelar la orden de venta.",
+  "sales.order_delete_error_fallback":
+    "Error al eliminar la orden de venta.",
   "sales.confirm_title": "Confirmar orden",
   "sales.confirm_description":
     "¿Confirmar la orden {{code}}? Esta acción no se puede deshacer.",
   "sales.cancel_title": "Cancelar orden",
   "sales.cancel_description": "¿Cancelar la orden {{code}}?",
+  "sales.delete_title": "Eliminar orden",
+  "sales.delete_description":
+    "¿Eliminar la orden {{code}}? Esta acción no se puede deshacer.",
   "sales.order_date": "Fecha",
   "sales.customer": "Cliente",
   "sales.status": "Estado",
@@ -2999,11 +3004,16 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Error confirming the sale order.",
     "sales.order_cancel_error_fallback":
       "Error cancelling the sale order.",
+    "sales.order_delete_error_fallback":
+      "Error deleting the sale order.",
     "sales.confirm_title": "Confirm order",
     "sales.confirm_description":
       "Confirm order {{code}}? This action cannot be undone.",
     "sales.cancel_title": "Cancel order",
     "sales.cancel_description": "Cancel order {{code}}?",
+    "sales.delete_title": "Delete order",
+    "sales.delete_description":
+      "Delete order {{code}}? This action cannot be undone.",
     "sales.order_date": "Date",
     "sales.customer": "Customer",
     "sales.status": "Status",

@@ -21,7 +21,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
-import type { Product, Warehouse, Zone } from "@/features/inventory/types";
+import type { Product, Warehouse, WarehouseStockRow, Zone } from "@/features/inventory/types";
+import { useWarehouseStockByWarehouseQuery } from "@/features/inventory/queries";
 
 import {
   deliveryChargeTypeValues,
@@ -151,25 +152,49 @@ function SaleOrderForm({
     selectedWarehouseId && selectedWarehouseId !== EMPTY_SELECT_VALUE,
   );
 
+  const { data: warehouseStock = [] } = useWarehouseStockByWarehouseQuery(
+    selectedWarehouseId ?? "",
+    hasWarehouse,
+  );
+
+  const stockByVariantId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const row of warehouseStock) {
+      if (row.product_variant?.id) {
+        map.set(String(row.product_variant.id), row.available_quantity ?? 0);
+      }
+    }
+    return map;
+  }, [warehouseStock]);
+
   const variantOptions = useMemo(
     () =>
       products
         .filter((p) => p.is_active)
         .flatMap((p) =>
           (p.variants ?? [])
-            .filter(
-              (v) =>
-                v.is_active &&
-                (hasWarehouse || v.allow_negative_stock === true),
-            )
-            .map((v) => ({
-              id: v.id,
-              label: p.has_variants
-                ? `${p.name} / ${v.variant_name ?? v.sku ?? v.id}`
-                : p.name,
-            })),
+            .filter((v) => {
+              if (!v.is_active) return false;
+              if (v.allow_negative_stock) return true;
+              if (!hasWarehouse) return false;
+              const available = stockByVariantId.get(String(v.id));
+              return available !== undefined && available > 0;
+            })
+            .map((v) => {
+              const available = stockByVariantId.get(String(v.id));
+              const stockLabel =
+                hasWarehouse && available !== undefined
+                  ? ` (${available} disp.)`
+                  : "";
+              return {
+                id: v.id,
+                label: p.has_variants
+                  ? `${p.name} / ${v.variant_name ?? v.sku ?? v.id}${stockLabel}`
+                  : `${p.name}${stockLabel}`,
+              };
+            }),
         ),
-    [products, hasWarehouse],
+    [products, hasWarehouse, stockByVariantId],
   );
 
   return (

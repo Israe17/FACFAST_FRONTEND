@@ -164,11 +164,13 @@ const warehouseLocationSummarySchema = inventoryEntitySummarySchema.extend({
 
 const productVariantSummarySchema = z
   .object({
+    allow_negative_stock: z.boolean().optional().default(false),
     barcode: z.string().nullable().optional().catch(undefined),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
     is_default: z.boolean().optional().default(false),
     sku: z.string().nullable().optional().catch(undefined),
+    track_inventory: z.boolean().optional().default(true),
     track_serials: z.boolean().optional().default(false),
     variant_name: z.string().optional().catch(undefined),
   })

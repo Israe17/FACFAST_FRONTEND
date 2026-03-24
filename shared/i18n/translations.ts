@@ -1562,6 +1562,8 @@ const esTranslations = {
     "Configura rutas de entrega con zonas, vehículos y choferes por defecto.",
   "inventory.dispatch.landing.vehicles_description":
     "Administra la flota de vehículos disponibles para despachos.",
+  "inventory.dispatch.landing.zones_description":
+    "Configura zonas geográficas para agrupar y organizar rutas de entrega.",
   "inventory.dispatch.landing.open_section": "Abrir",
   "sales.document_emit_error_fallback":
     "Error al emitir el documento electrónico.",
@@ -3165,6 +3167,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Configure delivery routes with zones, default vehicles and drivers.",
     "inventory.dispatch.landing.vehicles_description":
       "Manage the vehicle fleet available for dispatches.",
+    "inventory.dispatch.landing.zones_description":
+      "Configure geographic zones to group and organize delivery routes.",
     "inventory.dispatch.landing.open_section": "Open",
     "sales.document_emit_error_fallback":
       "Error emitting the electronic document.",

@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Route, Truck } from "lucide-react";
+import { Globe, MapPin, Route, Truck } from "lucide-react";
 
 import { ErrorState } from "@/shared/components/error-state";
 import { ModuleEntryCard } from "@/shared/components/module-entry-card";
@@ -31,6 +31,13 @@ const dispatchCards = [
     permissions: ["vehicles.view"],
     titleKey: "inventory.entity.vehicles",
   },
+  {
+    descriptionKey: "inventory.dispatch.landing.zones_description",
+    href: APP_ROUTES.dispatchZones,
+    icon: Globe,
+    permissions: ["zones.view"],
+    titleKey: "inventory.entity.zones",
+  },
 ] as const;
 
 export default function DispatchPage() {
@@ -41,6 +48,7 @@ export default function DispatchPage() {
     "dispatch_orders.view",
     "routes.view",
     "vehicles.view",
+    "zones.view",
   ]);
 
   if (!hasAccess) {
@@ -60,7 +68,7 @@ export default function DispatchPage() {
         title={t("inventory.dispatch.landing.title")}
       />
 
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {dispatchCards
           .filter((card) => canAny([...card.permissions]))
           .map((card) => (

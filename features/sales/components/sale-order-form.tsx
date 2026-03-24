@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -17,10 +18,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import type { Branch } from "@/features/branches/types";
+import type { Contact } from "@/features/contacts/types";
+import type { User } from "@/features/users/types";
+import type { Product, Warehouse, Zone } from "@/features/inventory/types";
 
 import {
-  saleModeValues,
-  fulfillmentModeValues,
   deliveryChargeTypeValues,
 } from "../constants";
 import {
@@ -30,20 +33,51 @@ import {
 import type { CreateSaleOrderInput } from "../types";
 import { FormFieldError } from "@/features/inventory/components/form-field-error";
 
+const EMPTY_SELECT_VALUE = "__none__";
+
+const saleModeLabels: Record<string, string> = {
+  branch_direct: "Venta directa en sucursal",
+  seller_attributed: "Atribuida a vendedor",
+  seller_route: "Ruta de vendedor",
+};
+
+const fulfillmentModeLabels: Record<string, string> = {
+  pickup: "Retiro en sucursal",
+  delivery: "Entrega a domicilio",
+};
+
+const chargeTypeLabels: Record<string, string> = {
+  shipping: "Envío",
+  installation: "Instalación",
+  express: "Express",
+};
+
 type SaleOrderFormProps = {
+  branches: Branch[];
+  contacts: Contact[];
   form: UseFormReturn<CreateSaleOrderInput>;
   formError?: string | null;
   isPending?: boolean;
   onSubmit: (values: CreateSaleOrderInput) => Promise<void> | void;
+  products: Product[];
   submitLabel: string;
+  users: User[];
+  warehouses: Warehouse[];
+  zones: Zone[];
 };
 
 function SaleOrderForm({
+  branches,
+  contacts,
   form,
   formError,
   isPending,
   onSubmit,
+  products,
   submitLabel,
+  users,
+  warehouses,
+  zones,
 }: SaleOrderFormProps) {
   const { t } = useAppTranslator();
   const {
@@ -67,11 +101,53 @@ function SaleOrderForm({
     remove: removeCharge,
   } = useFieldArray({ control, name: "delivery_charges" });
 
+  const activeBranches = useMemo(
+    () => branches.filter((b) => b.is_active),
+    [branches],
+  );
+
+  const activeContacts = useMemo(
+    () => contacts.filter((c) => c.is_active),
+    [contacts],
+  );
+
+  const activeUsers = useMemo(
+    () => users.filter((u) => u.status === "active"),
+    [users],
+  );
+
+  const activeWarehouses = useMemo(
+    () => warehouses.filter((w) => w.is_active),
+    [warehouses],
+  );
+
+  const activeZones = useMemo(
+    () => zones.filter((z) => z.is_active),
+    [zones],
+  );
+
+  const variantOptions = useMemo(
+    () =>
+      products
+        .filter((p) => p.is_active)
+        .flatMap((p) =>
+          (p.variants ?? [])
+            .filter((v) => v.is_active)
+            .map((v) => ({
+              id: v.id,
+              label: p.has_variants
+                ? `${p.name} / ${v.variant_name ?? v.sku ?? v.id}`
+                : p.name,
+            })),
+        ),
+    [products],
+  );
+
   return (
     <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
-      {/* Basic fields */}
+      {/* Código y fecha */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="so-code">{t("sales.form.code")}</Label>
@@ -90,6 +166,7 @@ function SaleOrderForm({
         </div>
       </div>
 
+      {/* Modo de venta y cumplimiento */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="so-sale-mode">{t("sales.form.sale_mode")}</Label>
@@ -102,9 +179,9 @@ function SaleOrderForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {saleModeValues.map((mode) => (
+                  {(["branch_direct", "seller_attributed", "seller_route"] as const).map((mode) => (
                     <SelectItem key={mode} value={mode}>
-                      {mode}
+                      {saleModeLabels[mode]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -127,9 +204,9 @@ function SaleOrderForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {fulfillmentModeValues.map((mode) => (
+                  {(["pickup", "delivery"] as const).map((mode) => (
                     <SelectItem key={mode} value={mode}>
-                      {mode}
+                      {fulfillmentModeLabels[mode]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -140,13 +217,27 @@ function SaleOrderForm({
         </div>
       </div>
 
+      {/* Sucursal y cliente */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="so-branch-id">{t("sales.form.branch_id")}</Label>
-          <Input
-            id="so-branch-id"
-            placeholder="1"
-            {...register("branch_id")}
+          <Controller
+            control={control}
+            name="branch_id"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger id="so-branch-id">
+                  <SelectValue placeholder="Selecciona una sucursal" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeBranches.map((branch) => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
           <FormFieldError message={errors.branch_id?.message} />
         </div>
@@ -155,24 +246,57 @@ function SaleOrderForm({
           <Label htmlFor="so-customer-contact-id">
             {t("sales.form.customer_contact_id")}
           </Label>
-          <Input
-            id="so-customer-contact-id"
-            placeholder="1"
-            {...register("customer_contact_id")}
+          <Controller
+            control={control}
+            name="customer_contact_id"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger id="so-customer-contact-id">
+                  <SelectValue placeholder="Selecciona un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeContacts.map((contact) => (
+                    <SelectItem key={contact.id} value={contact.id}>
+                      {contact.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
           <FormFieldError message={errors.customer_contact_id?.message} />
         </div>
       </div>
 
+      {/* Vendedor y bodega */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="so-seller-user-id">
             {t("sales.form.seller_user_id")}
           </Label>
-          <Input
-            id="so-seller-user-id"
-            placeholder=""
-            {...register("seller_user_id")}
+          <Controller
+            control={control}
+            name="seller_user_id"
+            render={({ field }) => (
+              <Select
+                onValueChange={(value) =>
+                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : value)
+                }
+                value={field.value ?? EMPTY_SELECT_VALUE}
+              >
+                <SelectTrigger id="so-seller-user-id">
+                  <SelectValue placeholder="Sin vendedor asignado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Sin vendedor</SelectItem>
+                  {activeUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name || user.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
           <FormFieldError message={errors.seller_user_id?.message} />
         </div>
@@ -181,16 +305,35 @@ function SaleOrderForm({
           <Label htmlFor="so-warehouse-id">
             {t("sales.form.warehouse_id")}
           </Label>
-          <Input
-            id="so-warehouse-id"
-            placeholder=""
-            {...register("warehouse_id")}
+          <Controller
+            control={control}
+            name="warehouse_id"
+            render={({ field }) => (
+              <Select
+                onValueChange={(value) =>
+                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : value)
+                }
+                value={field.value ?? EMPTY_SELECT_VALUE}
+              >
+                <SelectTrigger id="so-warehouse-id">
+                  <SelectValue placeholder="Sin bodega asignada" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Sin bodega</SelectItem>
+                  {activeWarehouses.map((warehouse) => (
+                    <SelectItem key={warehouse.id} value={warehouse.id}>
+                      {warehouse.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
           <FormFieldError message={errors.warehouse_id?.message} />
         </div>
       </div>
 
-      {/* Delivery fields (conditional) */}
+      {/* Campos de entrega (condicional) */}
       {fulfillmentMode === "delivery" && (
         <div className="space-y-4 rounded-xl border border-border/70 p-4">
           <h3 className="font-medium">{t("sales.fulfillment_delivery")}</h3>
@@ -246,9 +389,29 @@ function SaleOrderForm({
               <Label htmlFor="so-delivery-zone-id">
                 {t("sales.form.delivery_zone_id")}
               </Label>
-              <Input
-                id="so-delivery-zone-id"
-                {...register("delivery_zone_id")}
+              <Controller
+                control={control}
+                name="delivery_zone_id"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === EMPTY_SELECT_VALUE ? undefined : value)
+                    }
+                    value={field.value ?? EMPTY_SELECT_VALUE}
+                  >
+                    <SelectTrigger id="so-delivery-zone-id">
+                      <SelectValue placeholder="Sin zona asignada" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Sin zona</SelectItem>
+                      {activeZones.map((zone) => (
+                        <SelectItem key={zone.id} value={zone.id}>
+                          {zone.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
               <FormFieldError message={errors.delivery_zone_id?.message} />
             </div>
@@ -270,7 +433,7 @@ function SaleOrderForm({
         </div>
       )}
 
-      {/* Notes */}
+      {/* Notas */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="so-notes">{t("sales.form.notes")}</Label>
@@ -287,7 +450,7 @@ function SaleOrderForm({
         </div>
       </div>
 
-      {/* Order Lines */}
+      {/* Líneas de orden */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label>{t("sales.form.lines")}</Label>
@@ -333,10 +496,26 @@ function SaleOrderForm({
                 {lineFields.map((field, index) => (
                   <tr key={field.id} className="border-b last:border-b-0">
                     <td className="px-3 py-2">
-                      <Input
-                        {...register(`lines.${index}.product_variant_id`)}
-                        placeholder="1"
-                        className="h-8"
+                      <Controller
+                        control={control}
+                        name={`lines.${index}.product_variant_id`}
+                        render={({ field: selectField }) => (
+                          <Select
+                            onValueChange={selectField.onChange}
+                            value={selectField.value}
+                          >
+                            <SelectTrigger className="h-8 min-w-[180px]">
+                              <SelectValue placeholder="Selecciona producto" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {variantOptions.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.id}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       />
                       <FormFieldError
                         message={
@@ -416,7 +595,7 @@ function SaleOrderForm({
         )}
       </div>
 
-      {/* Delivery Charges */}
+      {/* Cargos de entrega */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label>{t("sales.form.delivery_charges")}</Label>
@@ -466,7 +645,7 @@ function SaleOrderForm({
                             <SelectContent>
                               {deliveryChargeTypeValues.map((ct) => (
                                 <SelectItem key={ct} value={ct}>
-                                  {ct}
+                                  {chargeTypeLabels[ct] ?? ct}
                                 </SelectItem>
                               ))}
                             </SelectContent>

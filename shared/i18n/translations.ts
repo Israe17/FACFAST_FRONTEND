@@ -1552,6 +1552,17 @@ const esTranslations = {
   "inventory.dispatch.expense_type": "Tipo de gasto",
   "inventory.dispatch.amount": "Monto",
   "inventory.dispatch.total_expenses": "Total gastos",
+  "inventory.dispatch.landing.eyebrow": "Despachos",
+  "inventory.dispatch.landing.title": "Despachos y Logística",
+  "inventory.dispatch.landing.description":
+    "Gestiona órdenes de despacho, rutas y vehículos para la logística de entregas.",
+  "inventory.dispatch.landing.orders_description":
+    "Crea y gestiona órdenes de despacho individuales o consolidadas.",
+  "inventory.dispatch.landing.routes_description":
+    "Configura rutas de entrega con zonas, vehículos y choferes por defecto.",
+  "inventory.dispatch.landing.vehicles_description":
+    "Administra la flota de vehículos disponibles para despachos.",
+  "inventory.dispatch.landing.open_section": "Abrir",
   "sales.document_emit_error_fallback":
     "Error al emitir el documento electrónico.",
   "sales.entity.electronic_document": "Documento Electrónico",
@@ -3144,6 +3155,17 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.dispatch.expense_type": "Expense type",
     "inventory.dispatch.amount": "Amount",
     "inventory.dispatch.total_expenses": "Total expenses",
+    "inventory.dispatch.landing.eyebrow": "Dispatch",
+    "inventory.dispatch.landing.title": "Dispatch & Logistics",
+    "inventory.dispatch.landing.description":
+      "Manage dispatch orders, routes and vehicles for delivery logistics.",
+    "inventory.dispatch.landing.orders_description":
+      "Create and manage individual or consolidated dispatch orders.",
+    "inventory.dispatch.landing.routes_description":
+      "Configure delivery routes with zones, default vehicles and drivers.",
+    "inventory.dispatch.landing.vehicles_description":
+      "Manage the vehicle fleet available for dispatches.",
+    "inventory.dispatch.landing.open_section": "Open",
     "sales.document_emit_error_fallback":
       "Error emitting the electronic document.",
     "sales.entity.electronic_document": "Electronic Document",

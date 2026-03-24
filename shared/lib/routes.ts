@@ -38,6 +38,9 @@ export const APP_ROUTES = {
   inventoryOperationsMovements: "/inventory/operations/movements",
   sales: "/sales",
   dispatch: "/dispatch",
+  dispatchOrders: "/dispatch/orders",
+  dispatchRoutes: "/dispatch/routes",
+  dispatchVehicles: "/dispatch/vehicles",
 } as const;
 
 export function getSuperadminBusinessDetailRoute(businessId: string) {
@@ -148,7 +151,7 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
     href: APP_ROUTES.dispatch,
     icon: Truck,
     description: "Ordenes de despacho y logistica.",
-    requiredAnyPermissions: ["dispatch_orders.view"],
+    requiredAnyPermissions: ["dispatch_orders.view", "routes.view", "vehicles.view"],
   },
 ];
 

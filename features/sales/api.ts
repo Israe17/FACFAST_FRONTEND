@@ -105,6 +105,10 @@ export async function cancelSaleOrder(orderId: string, payload: CancelSaleOrderI
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 
+export async function deleteSaleOrder(orderId: string) {
+  await http.delete(`/sale-orders/${orderId}`);
+}
+
 // --- Electronic Documents ---
 
 export async function listElectronicDocuments() {

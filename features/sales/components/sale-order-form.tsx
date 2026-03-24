@@ -89,8 +89,12 @@ function SaleOrderForm({
   } = form;
 
   const fulfillmentMode = watch("fulfillment_mode");
+  const saleMode = watch("sale_mode");
   const selectedBranchId = watch("branch_id");
   const selectedWarehouseId = watch("warehouse_id");
+
+  const isDelivery = fulfillmentMode === "delivery";
+  const sellerRequired = saleMode === "seller_attributed" || saleMode === "seller_route";
 
   const {
     fields: lineFields,
@@ -131,8 +135,9 @@ function SaleOrderForm({
     [warehouses, selectedBranchId],
   );
 
+  const { setValue, getValues } = form;
+
   // Clear warehouse when branch changes and current warehouse doesn't match
-  const { setValue } = form;
   useEffect(() => {
     if (!selectedWarehouseId || selectedWarehouseId === EMPTY_SELECT_VALUE) return;
     const match = activeWarehouses.find(
@@ -142,6 +147,29 @@ function SaleOrderForm({
       setValue("warehouse_id", undefined);
     }
   }, [activeWarehouses, selectedWarehouseId, setValue]);
+
+  // Clear delivery fields and charges when switching to pickup
+  useEffect(() => {
+    if (fulfillmentMode === "pickup") {
+      setValue("delivery_address", undefined);
+      setValue("delivery_province", undefined);
+      setValue("delivery_canton", undefined);
+      setValue("delivery_district", undefined);
+      setValue("delivery_zone_id", undefined);
+      setValue("delivery_requested_date", undefined);
+      const charges = getValues("delivery_charges");
+      if (charges && charges.length > 0) {
+        setValue("delivery_charges", []);
+      }
+    }
+  }, [fulfillmentMode, setValue, getValues]);
+
+  // Auto-set delivery mode when sale_mode is seller_route
+  useEffect(() => {
+    if (saleMode === "seller_route" && fulfillmentMode !== "delivery") {
+      setValue("fulfillment_mode", "delivery");
+    }
+  }, [saleMode, fulfillmentMode, setValue]);
 
   const activeZones = useMemo(
     () => zones.filter((z) => z.is_active),
@@ -253,7 +281,11 @@ function SaleOrderForm({
             control={control}
             name="fulfillment_mode"
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={saleMode === "seller_route"}
+              >
                 <SelectTrigger id="so-fulfillment-mode">
                   <SelectValue />
                 </SelectTrigger>
@@ -267,6 +299,11 @@ function SaleOrderForm({
               </Select>
             )}
           />
+          {saleMode === "seller_route" && (
+            <p className="text-xs text-muted-foreground">
+              Ruta de vendedor requiere entrega a domicilio.
+            </p>
+          )}
           <FormFieldError message={errors.fulfillment_mode?.message} />
         </div>
       </div>
@@ -327,6 +364,7 @@ function SaleOrderForm({
         <div className="space-y-2">
           <Label htmlFor="so-seller-user-id">
             {t("sales.form.seller_user_id")}
+            {sellerRequired && <span className="text-destructive ml-1">*</span>}
           </Label>
           <Controller
             control={control}
@@ -649,112 +687,114 @@ function SaleOrderForm({
         )}
       </div>
 
-      {/* Cargos de entrega */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Label>{t("sales.form.delivery_charges")}</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => appendCharge(emptySaleOrderDeliveryChargeFormValues)}
-          >
-            <Plus className="size-4" />
-            {t("sales.form.add_charge")}
-          </Button>
-        </div>
-
-        {chargeFields.length > 0 && (
-          <div className="overflow-x-auto rounded-xl border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="px-3 py-2 text-left font-medium">
-                    {t("sales.form.charge_type")}
-                  </th>
-                  <th className="px-3 py-2 text-left font-medium">
-                    {t("sales.form.amount")}
-                  </th>
-                  <th className="px-3 py-2 text-left font-medium">
-                    {t("sales.form.notes")}
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium" />
-                </tr>
-              </thead>
-              <tbody>
-                {chargeFields.map((field, index) => (
-                  <tr key={field.id} className="border-b last:border-b-0">
-                    <td className="px-3 py-2">
-                      <Controller
-                        control={control}
-                        name={`delivery_charges.${index}.charge_type`}
-                        render={({ field: selectField }) => (
-                          <Select
-                            onValueChange={selectField.onChange}
-                            value={selectField.value}
-                          >
-                            <SelectTrigger className="h-8">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {deliveryChargeTypeValues.map((ct) => (
-                                <SelectItem key={ct} value={ct}>
-                                  {chargeTypeLabels[ct] ?? ct}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                      <FormFieldError
-                        message={
-                          errors.delivery_charges?.[index]?.charge_type?.message
-                        }
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Input
-                        {...register(`delivery_charges.${index}.amount`, {
-                          valueAsNumber: true,
-                        })}
-                        type="number"
-                        step="any"
-                        className="h-8"
-                      />
-                      <FormFieldError
-                        message={
-                          errors.delivery_charges?.[index]?.amount?.message
-                        }
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Input
-                        {...register(`delivery_charges.${index}.notes`)}
-                        className="h-8"
-                      />
-                      <FormFieldError
-                        message={
-                          errors.delivery_charges?.[index]?.notes?.message
-                        }
-                      />
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => removeCharge(index)}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Cargos de entrega (solo en modo delivery) */}
+      {isDelivery && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label>{t("sales.form.delivery_charges")}</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => appendCharge(emptySaleOrderDeliveryChargeFormValues)}
+            >
+              <Plus className="size-4" />
+              {t("sales.form.add_charge")}
+            </Button>
           </div>
-        )}
-      </div>
+
+          {chargeFields.length > 0 && (
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t("sales.form.charge_type")}
+                    </th>
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t("sales.form.amount")}
+                    </th>
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t("sales.form.notes")}
+                    </th>
+                    <th className="px-3 py-2 text-right font-medium" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {chargeFields.map((field, index) => (
+                    <tr key={field.id} className="border-b last:border-b-0">
+                      <td className="px-3 py-2">
+                        <Controller
+                          control={control}
+                          name={`delivery_charges.${index}.charge_type`}
+                          render={({ field: selectField }) => (
+                            <Select
+                              onValueChange={selectField.onChange}
+                              value={selectField.value}
+                            >
+                              <SelectTrigger className="h-8">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {deliveryChargeTypeValues.map((ct) => (
+                                  <SelectItem key={ct} value={ct}>
+                                    {chargeTypeLabels[ct] ?? ct}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        <FormFieldError
+                          message={
+                            errors.delivery_charges?.[index]?.charge_type?.message
+                          }
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          {...register(`delivery_charges.${index}.amount`, {
+                            valueAsNumber: true,
+                          })}
+                          type="number"
+                          step="any"
+                          className="h-8"
+                        />
+                        <FormFieldError
+                          message={
+                            errors.delivery_charges?.[index]?.amount?.message
+                          }
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          {...register(`delivery_charges.${index}.notes`)}
+                          className="h-8"
+                        />
+                        <FormFieldError
+                          message={
+                            errors.delivery_charges?.[index]?.notes?.message
+                          }
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => removeCharge(index)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex justify-end">
         <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -88,6 +88,8 @@ function SaleOrderForm({
   } = form;
 
   const fulfillmentMode = watch("fulfillment_mode");
+  const selectedBranchId = watch("branch_id");
+  const selectedWarehouseId = watch("warehouse_id");
 
   const {
     fields: lineFields,
@@ -117,13 +119,36 @@ function SaleOrderForm({
   );
 
   const activeWarehouses = useMemo(
-    () => warehouses.filter((w) => w.is_active),
-    [warehouses],
+    () =>
+      warehouses.filter(
+        (w) =>
+          w.is_active &&
+          (!selectedBranchId ||
+            !w.branch_id ||
+            String(w.branch_id) === String(selectedBranchId)),
+      ),
+    [warehouses, selectedBranchId],
   );
+
+  // Clear warehouse when branch changes and current warehouse doesn't match
+  const { setValue } = form;
+  useEffect(() => {
+    if (!selectedWarehouseId || selectedWarehouseId === EMPTY_SELECT_VALUE) return;
+    const match = activeWarehouses.find(
+      (w) => String(w.id) === String(selectedWarehouseId),
+    );
+    if (!match) {
+      setValue("warehouse_id", undefined);
+    }
+  }, [activeWarehouses, selectedWarehouseId, setValue]);
 
   const activeZones = useMemo(
     () => zones.filter((z) => z.is_active),
     [zones],
+  );
+
+  const hasWarehouse = Boolean(
+    selectedWarehouseId && selectedWarehouseId !== EMPTY_SELECT_VALUE,
   );
 
   const variantOptions = useMemo(
@@ -132,7 +157,11 @@ function SaleOrderForm({
         .filter((p) => p.is_active)
         .flatMap((p) =>
           (p.variants ?? [])
-            .filter((v) => v.is_active)
+            .filter(
+              (v) =>
+                v.is_active &&
+                (hasWarehouse || v.allow_negative_stock === true),
+            )
             .map((v) => ({
               id: v.id,
               label: p.has_variants
@@ -140,7 +169,7 @@ function SaleOrderForm({
                 : p.name,
             })),
         ),
-    [products],
+    [products, hasWarehouse],
   );
 
   return (

@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
+import { useBranchesQuery } from "@/features/branches/queries";
+import { useUsersQuery } from "@/features/users/queries";
 
 import {
   emptyDispatchOrderFormValues,
@@ -17,6 +19,9 @@ import {
 import {
   useCreateDispatchOrderMutation,
   useUpdateDispatchOrderMutation,
+  useRoutesQuery,
+  useVehiclesQuery,
+  useWarehousesQuery,
 } from "../queries";
 import { createDispatchOrderSchema } from "../schemas";
 import type { DispatchOrder, CreateDispatchOrderInput } from "../types";
@@ -34,6 +39,12 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
   const updateMutation = useUpdateDispatchOrderMutation(order?.id ?? "", {
     showErrorToast: false,
   });
+
+  const { data: branches = [] } = useBranchesQuery(open);
+  const { data: warehouses = [] } = useWarehousesQuery(open);
+  const { data: routes = [] } = useRoutesQuery(open);
+  const { data: vehicles = [] } = useVehiclesQuery(open);
+  const { data: users = [] } = useUsersQuery(open);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<
     CreateDispatchOrderInput,
@@ -55,7 +66,7 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {order
@@ -71,10 +82,12 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
           </DialogDescription>
         </DialogHeader>
         <DispatchOrderForm
+          branches={branches}
           form={form}
           formError={formError}
           isPending={isPending}
           onSubmit={handleSubmit}
+          routes={routes}
           submitLabel={
             order
               ? t("inventory.common.save_changes")
@@ -82,6 +95,9 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
                   entity: t("inventory.entity.dispatch_order"),
                 })
           }
+          users={users}
+          vehicles={vehicles}
+          warehouses={warehouses}
         />
       </DialogContent>
     </Dialog>

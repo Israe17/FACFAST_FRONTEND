@@ -85,6 +85,7 @@ import type {
   UpdateDispatchOrderInput,
   CreateDispatchStopInput,
   CreateDispatchExpenseInput,
+  UpdateDispatchStopStatusInput,
 } from "./types";
 
 
@@ -1244,7 +1245,21 @@ export async function markDispatchCompleted(orderId: string) {
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }
 
+export async function markDispatchReady(orderId: string) {
+  const response = await http.post(`/dispatch-orders/${orderId}/ready`, undefined, withIdempotencyKey());
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
 export async function cancelDispatchOrder(orderId: string) {
   const response = await http.post(`/dispatch-orders/${orderId}/cancel`, undefined, withIdempotencyKey());
+  return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export async function updateDispatchStopStatus(
+  orderId: string,
+  stopId: string,
+  payload: UpdateDispatchStopStatusInput,
+) {
+  const response = await http.patch(`/dispatch-orders/${orderId}/stops/${stopId}/status`, payload);
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }

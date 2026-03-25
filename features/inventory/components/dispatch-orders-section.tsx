@@ -22,12 +22,14 @@ import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import {
   useDispatchOrdersQuery,
+  useMarkDispatchReadyMutation,
   useMarkDispatchDispatchedMutation,
   useMarkDispatchCompletedMutation,
   useCancelDispatchOrderMutation,
 } from "../queries";
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
+import { DispatchOrderDetailDialog } from "./dispatch-order-detail-dialog";
 import { getDispatchOrdersColumns } from "./dispatch-orders-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
 
@@ -43,19 +45,25 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const canUpdate = can("dispatch_orders.update");
   const canCancel = can("dispatch_orders.cancel");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<DispatchOrder | null>(null);
+  const [detailOrder, setDetailOrder] = useState<DispatchOrder | null>(null);
+  const [readyTarget, setReadyTarget] = useState<DispatchOrder | null>(null);
   const [dispatchTarget, setDispatchTarget] = useState<DispatchOrder | null>(null);
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
 
   const ordersQuery = useDispatchOrdersQuery(enabled && canView);
-  const dispatchMutation = useMarkDispatchDispatchedMutation(dispatchTarget?.id ?? "", {
+  const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id?.toString() ?? "", {
     showErrorToast: true,
   });
-  const completeMutation = useMarkDispatchCompletedMutation(completeTarget?.id ?? "", {
+  const dispatchMutation = useMarkDispatchDispatchedMutation(dispatchTarget?.id?.toString() ?? "", {
     showErrorToast: true,
   });
-  const cancelMutation = useCancelDispatchOrderMutation(cancelTarget?.id ?? "", {
+  const completeMutation = useMarkDispatchCompletedMutation(completeTarget?.id?.toString() ?? "", {
+    showErrorToast: true,
+  });
+  const cancelMutation = useCancelDispatchOrderMutation(cancelTarget?.id?.toString() ?? "", {
     showErrorToast: true,
   });
 
@@ -63,6 +71,17 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
     setSelectedOrder(order);
     setDialogOpen(true);
   }, []);
+
+  const handleViewDetail = useCallback((order: DispatchOrder) => {
+    setDetailOrder(order);
+    setDetailDialogOpen(true);
+  }, []);
+
+  const handleReadyConfirm = useCallback(async () => {
+    if (!readyTarget) return;
+    await readyMutation.mutateAsync();
+    setReadyTarget(null);
+  }, [readyTarget, readyMutation]);
 
   const handleDispatchConfirm = useCallback(async () => {
     if (!dispatchTarget) return;
@@ -88,12 +107,14 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
         canUpdate,
         canCancel,
         onEdit: handleEdit,
+        onReady: setReadyTarget,
         onDispatch: setDispatchTarget,
         onComplete: setCompleteTarget,
         onCancel: setCancelTarget,
+        onViewDetail: handleViewDetail,
         t,
       }),
-    [canUpdate, canCancel, handleEdit, t],
+    [canUpdate, canCancel, handleEdit, handleViewDetail, t],
   );
 
   if (!canView) {
@@ -155,6 +176,40 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
         }}
         open={dialogOpen}
       />
+
+      <DispatchOrderDetailDialog
+        order={detailOrder}
+        open={detailDialogOpen}
+        onOpenChange={(open) => {
+          setDetailDialogOpen(open);
+          if (!open) setDetailOrder(null);
+        }}
+      />
+
+      {/* Ready confirmation dialog */}
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setReadyTarget(null);
+        }}
+        open={readyTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("inventory.dispatch.mark_ready")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.dispatch.mark_ready_confirm")}: {readyTarget?.code ?? ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReadyConfirm}>
+              {t("inventory.dispatch.mark_ready")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Dispatch confirmation dialog */}
       <AlertDialog

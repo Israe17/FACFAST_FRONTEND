@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, Pencil, Send, XCircle } from "lucide-react";
+import { CheckCircle, ClipboardCheck, Pencil, Send, XCircle } from "lucide-react";
 
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -12,9 +12,11 @@ type GetDispatchOrdersColumnsParams = {
   canUpdate: boolean;
   canCancel: boolean;
   onEdit: (order: DispatchOrder) => void;
+  onReady: (order: DispatchOrder) => void;
   onDispatch: (order: DispatchOrder) => void;
   onComplete: (order: DispatchOrder) => void;
   onCancel: (order: DispatchOrder) => void;
+  onViewDetail: (order: DispatchOrder) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
@@ -45,9 +47,11 @@ function getDispatchOrdersColumns({
   canUpdate,
   canCancel,
   onEdit,
+  onReady,
   onDispatch,
   onComplete,
   onCancel,
+  onViewDetail,
   t,
 }: GetDispatchOrdersColumnsParams): ColumnDef<DispatchOrder>[] {
   const baseColumns: ColumnDef<DispatchOrder>[] = [
@@ -56,7 +60,13 @@ function getDispatchOrdersColumns({
       header: t("inventory.entity.dispatch_order"),
       cell: ({ row }) => (
         <div className="space-y-1">
-          <p className="font-medium">{row.original.code ?? "-"}</p>
+          <button
+            className="font-medium text-primary hover:underline"
+            onClick={() => onViewDetail(row.original)}
+            type="button"
+          >
+            {row.original.code ?? "-"}
+          </button>
           <p className="text-sm text-muted-foreground">
             {row.original.scheduled_date
               ? formatDateTime(row.original.scheduled_date)
@@ -136,6 +146,15 @@ function getDispatchOrdersColumns({
                       label: t("inventory.common.edit"),
                       icon: Pencil,
                       onClick: () => onEdit(order),
+                    },
+                  ]
+                : []),
+              ...(canUpdate && lifecycle.can_ready
+                ? [
+                    {
+                      label: t("inventory.dispatch.mark_ready"),
+                      icon: ClipboardCheck,
+                      onClick: () => onReady(order),
                     },
                   ]
                 : []),

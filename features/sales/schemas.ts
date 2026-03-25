@@ -134,11 +134,14 @@ export const createSaleOrderDeliveryChargeSchema = z.object({
 
 export const saleOrderSchema = z
   .object({
-    branch: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+    branch_id: z.union([z.number(), z.string()]).optional(),
+    branch: z.object({ id: idSchema, name: z.string().nullable() }).optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
+    created_by_user_id: z.union([z.number(), z.string()]).optional(),
     created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+    customer_contact_id: z.union([z.number(), z.string()]).optional(),
     customer_contact: z
       .object({ id: idSchema, name: z.string() })
       .optional()
@@ -209,7 +212,8 @@ export const electronicDocumentSchema = z
     id: idSchema,
     code: z.string().optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
-    branch: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+    branch_id: z.union([z.number(), z.string()]).optional(),
+    branch: z.object({ id: idSchema, name: z.string().nullable() }).nullable().optional().catch(null),
     sale_order: z.object({ id: idSchema, code: z.string().nullable().optional() }).nullable().optional().catch(null),
     document_type: z.enum(electronicDocumentTypeValues).catch("factura_electronica"),
     document_key: z.string().nullable().optional().catch(null),

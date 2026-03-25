@@ -85,6 +85,7 @@ import {
   dispatchOrderSchema,
   createDispatchOrderSchema,
   updateDispatchOrderSchema,
+  updateDispatchStopStatusSchema,
 } from "./schemas";
 
 export type Brand = z.infer<typeof brandSchema>;
@@ -187,3 +188,4 @@ export type CreateDispatchExpenseInput = z.infer<typeof createDispatchExpenseSch
 export type DispatchOrder = z.infer<typeof dispatchOrderSchema>;
 export type CreateDispatchOrderInput = z.infer<typeof createDispatchOrderSchema>;
 export type UpdateDispatchOrderInput = z.infer<typeof updateDispatchOrderSchema>;
+export type UpdateDispatchStopStatusInput = z.infer<typeof updateDispatchStopStatusSchema>;

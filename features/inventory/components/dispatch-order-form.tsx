@@ -16,8 +16,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { Branch } from "@/features/branches/types";
+import type { SaleOrder } from "@/features/sales/types";
 import type { User } from "@/features/users/types";
 
 import { dispatchTypeValues } from "../constants";
@@ -38,6 +40,7 @@ type DispatchOrderFormProps = {
   isPending?: boolean;
   onSubmit: (values: CreateDispatchOrderInput) => Promise<void> | void;
   routes: Route[];
+  saleOrders?: SaleOrder[];
   submitLabel: string;
   users: User[];
   vehicles: Vehicle[];
@@ -51,6 +54,7 @@ function DispatchOrderForm({
   isPending,
   onSubmit,
   routes,
+  saleOrders = [],
   submitLabel,
   users,
   vehicles,
@@ -67,6 +71,20 @@ function DispatchOrderForm({
 
   const selectedBranchId = watch("branch_id");
   const selectedRouteId = watch("route_id");
+  const selectedStopIds = watch("stop_sale_order_ids") ?? [];
+
+  // Filter sale orders: confirmed + delivery fulfillment + pending dispatch status
+  const eligibleSaleOrders = useMemo(
+    () =>
+      saleOrders.filter(
+        (o) =>
+          o.status === "confirmed" &&
+          o.fulfillment_mode === "delivery" &&
+          o.dispatch_status === "pending" &&
+          (!selectedBranchId || String(o.branch_id) === String(selectedBranchId)),
+      ),
+    [saleOrders, selectedBranchId],
+  );
 
   const activeBranches = useMemo(
     () => branches.filter((b) => b.is_active),
@@ -324,6 +342,59 @@ function DispatchOrderForm({
         />
         <FormFieldError message={errors.notes?.message} />
       </div>
+
+      {/* Sale order selector */}
+      {eligibleSaleOrders.length > 0 ? (
+        <div className="space-y-2">
+          <Label>{t("inventory.dispatch.select_sale_orders")}</Label>
+          <p className="text-sm text-muted-foreground">
+            {t("inventory.dispatch.select_sale_orders_description")}
+          </p>
+          <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
+            {eligibleSaleOrders.map((order) => {
+              const orderId = String(order.id);
+              const isChecked = selectedStopIds.includes(orderId);
+              return (
+                <label
+                  key={order.id}
+                  className="flex items-center gap-2 rounded-md p-2 hover:bg-muted/50 cursor-pointer"
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={(checked) => {
+                      const current = selectedStopIds;
+                      if (checked) {
+                        setValue("stop_sale_order_ids", [...current, orderId]);
+                      } else {
+                        setValue(
+                          "stop_sale_order_ids",
+                          current.filter((id) => id !== orderId),
+                        );
+                      }
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium">{order.code ?? `#${order.id}`}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {order.customer_contact?.name ?? ""}
+                    </span>
+                    {order.delivery_address ? (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {order.delivery_address}
+                      </p>
+                    ) : null}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+          {selectedStopIds.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {selectedStopIds.length} {t("inventory.dispatch.orders_selected")}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex justify-end">
         <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">

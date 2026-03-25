@@ -1578,11 +1578,11 @@ export const dispatchOrderSchema = z.object({
   stops: z.array(dispatchStopSchema).optional().catch([]),
   expenses: z.array(dispatchExpenseSchema).optional().catch([]),
   lifecycle: z.object({
+    can_ready: z.boolean().optional().catch(false),
     can_edit: z.boolean().optional().catch(false),
     can_dispatch: z.boolean().optional().catch(false),
     can_complete: z.boolean().optional().catch(false),
     can_cancel: z.boolean().optional().catch(false),
-    reasons: z.array(z.string()).optional().catch([]),
   }).optional().catch({}),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
@@ -1615,3 +1615,10 @@ export const createDispatchOrderSchema = z.object({
 });
 
 export const updateDispatchOrderSchema = createDispatchOrderSchema.partial();
+
+export const updateDispatchStopStatusSchema = z.object({
+  status: z.enum(dispatchStopStatusValues),
+  received_by: optionalTextSchema,
+  failure_reason: optionalTextSchema,
+  notes: optionalTextSchema,
+});

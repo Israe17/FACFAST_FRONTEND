@@ -10,6 +10,7 @@ import {
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useBranchesQuery } from "@/features/branches/queries";
+import { useSaleOrdersQuery } from "@/features/sales/queries";
 import { useUsersQuery } from "@/features/users/queries";
 
 import {
@@ -45,6 +46,7 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
   const { data: routes = [] } = useRoutesQuery(open);
   const { data: vehicles = [] } = useVehiclesQuery(open);
   const { data: users = [] } = useUsersQuery(open);
+  const { data: saleOrders = [] } = useSaleOrdersQuery(open);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<
     CreateDispatchOrderInput,
@@ -88,6 +90,7 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
           isPending={isPending}
           onSubmit={handleSubmit}
           routes={routes}
+          saleOrders={saleOrders}
           submitLabel={
             order
               ? t("inventory.common.save_changes")

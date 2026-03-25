@@ -27,9 +27,13 @@ const statusColorMap: Record<string, string> = {
 };
 
 const dispatchColorMap: Record<string, string> = {
+  not_required: "bg-gray-100 text-gray-800",
   pending: "bg-yellow-100 text-yellow-800",
-  dispatched: "bg-blue-100 text-blue-800",
+  assigned: "bg-blue-100 text-blue-800",
+  out_for_delivery: "bg-indigo-100 text-indigo-800",
   delivered: "bg-green-100 text-green-800",
+  partial: "bg-orange-100 text-orange-800",
+  failed: "bg-red-100 text-red-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -45,9 +49,13 @@ const fulfillmentTranslationMap: Record<string, FrontendTranslationKey> = {
 };
 
 const dispatchTranslationMap: Record<string, FrontendTranslationKey> = {
+  not_required: "sales.dispatch_not_required",
   pending: "sales.dispatch_pending",
-  dispatched: "sales.dispatch_dispatched",
+  assigned: "sales.dispatch_assigned",
+  out_for_delivery: "sales.dispatch_out_for_delivery",
   delivered: "sales.dispatch_delivered",
+  partial: "sales.dispatch_partial",
+  failed: "sales.dispatch_failed",
   cancelled: "sales.dispatch_cancelled",
 };
 
@@ -116,7 +124,7 @@ function getSaleOrdersColumns({
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${dispatchColorMap[row.original.dispatch_status] ?? ""}`}
         >
-          {t(dispatchTranslationMap[row.original.dispatch_status] ?? "sales.dispatch_pending")}
+          {t(dispatchTranslationMap[row.original.dispatch_status] ?? "sales.dispatch_not_required")}
         </span>
       ),
     },

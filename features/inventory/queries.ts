@@ -119,9 +119,11 @@ import {
   removeDispatchStop,
   addDispatchExpense,
   removeDispatchExpense,
+  markDispatchReady,
   markDispatchDispatched,
   markDispatchCompleted,
   cancelDispatchOrder,
+  updateDispatchStopStatus,
 } from "./api";
 import type { PaginatedQueryParams, CursorQueryParams } from "@/shared/lib/api-types";
 import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
@@ -172,6 +174,7 @@ import type {
   UpdateDispatchOrderInput,
   CreateDispatchStopInput,
   CreateDispatchExpenseInput,
+  UpdateDispatchStopStatusInput,
 } from "./types";
 
 export const inventoryKeys = {
@@ -2764,6 +2767,32 @@ export function useRemoveDispatchExpenseMutation(
   });
 }
 
+export function useMarkDispatchReadyMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => markDispatchReady(orderId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_ready_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
 export function useMarkDispatchDispatchedMutation(
   orderId: string,
   options: MutationFeedbackOptions = {},
@@ -2836,6 +2865,34 @@ export function useCancelDispatchOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.dispatch_order_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useUpdateDispatchStopStatusMutation(
+  orderId: string,
+  stopId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: UpdateDispatchStopStatusInput) =>
+      updateDispatchStopStatus(orderId, stopId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.dispatchOrders(),
+        inventoryKeys.dispatchOrder(orderId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_stop_status_error_fallback"),
         });
       }
     },

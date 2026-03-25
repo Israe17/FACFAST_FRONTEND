@@ -1331,9 +1331,33 @@ export const updateProductVariantSchema = productVariantFormObjectSchema
   })
   .superRefine(applyVariantRules);
 
+// --- Branch Assignments (shared view for zones, vehicles, routes) ---
+const branchSummaryInAssignmentSchema = z.object({
+  id: idSchema,
+  name: z.string().nullable().optional().catch(null),
+});
+
+export const branchAssignmentsViewSchema = z
+  .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
+    code: z.string().nullable().optional().catch(null),
+    id: idSchema,
+    is_global: z.boolean().optional().default(true),
+    name: z.string().catch(""),
+  })
+  .passthrough();
+
+export const setBranchAssignmentsSchema = z.object({
+  assigned_branch_ids: z.array(z.number()).optional().default([]),
+  is_global: z.boolean(),
+});
+
 // --- Zones ---
 export const zoneSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     canton: z.string().nullable().optional().catch(null),
     code: z.string().optional().catch(undefined),
@@ -1342,6 +1366,7 @@ export const zoneSchema = z
     district: z.string().nullable().optional().catch(null),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Zone"),
     province: z.string().nullable().optional().catch(null),
@@ -1366,11 +1391,14 @@ export const updateZoneSchema = createZoneSchema.partial().extend({
 // --- Vehicles ---
 export const vehicleSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     max_volume_m3: z.number().nullable().optional().catch(null),
     max_weight_kg: z.number().nullable().optional().catch(null),
@@ -1406,6 +1434,8 @@ export const updateVehicleSchema = createVehicleSchema.partial().extend({
 // --- Routes ---
 export const routeSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
@@ -1419,6 +1449,7 @@ export const routeSchema = z
     frequency: z.string().nullable().optional().catch(null),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Route"),
     updated_at: z.string().optional(),

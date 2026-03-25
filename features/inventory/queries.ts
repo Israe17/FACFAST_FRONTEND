@@ -103,6 +103,12 @@ import {
   listRoutes,
   updateRoute,
   deleteRoute,
+  getZoneBranchAssignments,
+  setZoneBranchAssignments,
+  getVehicleBranchAssignments,
+  setVehicleBranchAssignments,
+  getRouteBranchAssignments,
+  setRouteBranchAssignments,
   listDispatchOrders,
   listDispatchOrdersCursor,
   listDispatchOrdersPaginated,
@@ -159,6 +165,7 @@ import type {
   UpdateZoneInput,
   CreateVehicleInput,
   UpdateVehicleInput,
+  SetBranchAssignmentsInput,
   CreateRouteInput,
   UpdateRouteInput,
   CreateDispatchOrderInput,
@@ -214,8 +221,11 @@ export const inventoryKeys = {
     [...inventoryKeys.all, "variant-attributes", productId] as const,
   warrantyProfiles: () => [...inventoryKeys.all, "warranty-profiles"] as const,
   zones: () => [...inventoryKeys.all, "zones"] as const,
+  zoneBranches: (zoneId: string) => [...inventoryKeys.zones(), zoneId, "branches"] as const,
   vehicles: () => [...inventoryKeys.all, "vehicles"] as const,
+  vehicleBranches: (vehicleId: string) => [...inventoryKeys.vehicles(), vehicleId, "branches"] as const,
   routes: () => [...inventoryKeys.all, "routes"] as const,
+  routeBranches: (routeId: string) => [...inventoryKeys.routes(), routeId, "branches"] as const,
   dispatchOrders: () => [...inventoryKeys.all, "dispatch-orders"] as const,
   dispatchOrder: (id: string) => [...inventoryKeys.dispatchOrders(), id] as const,
 };
@@ -2457,6 +2467,110 @@ export function useDeleteRouteMutation(options: MutationFeedbackOptions = {}) {
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.route_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+// --- Branch Assignments (zones, vehicles, routes) ---
+
+export function useZoneBranchAssignmentsQuery(zoneId: string, enabled = true) {
+  return useQuery({
+    queryKey: inventoryKeys.zoneBranches(zoneId),
+    queryFn: () => getZoneBranchAssignments(zoneId),
+    enabled,
+  });
+}
+
+export function useSetZoneBranchAssignmentsMutation(
+  zoneId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: SetBranchAssignmentsInput) => setZoneBranchAssignments(zoneId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.zones(),
+        inventoryKeys.zoneBranches(zoneId),
+      ]);
+      toast.success(t("common.save_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.branch_assignments_save_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useVehicleBranchAssignmentsQuery(vehicleId: string, enabled = true) {
+  return useQuery({
+    queryKey: inventoryKeys.vehicleBranches(vehicleId),
+    queryFn: () => getVehicleBranchAssignments(vehicleId),
+    enabled,
+  });
+}
+
+export function useSetVehicleBranchAssignmentsMutation(
+  vehicleId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: SetBranchAssignmentsInput) => setVehicleBranchAssignments(vehicleId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.vehicles(),
+        inventoryKeys.vehicleBranches(vehicleId),
+      ]);
+      toast.success(t("common.save_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.branch_assignments_save_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useRouteBranchAssignmentsQuery(routeId: string, enabled = true) {
+  return useQuery({
+    queryKey: inventoryKeys.routeBranches(routeId),
+    queryFn: () => getRouteBranchAssignments(routeId),
+    enabled,
+  });
+}
+
+export function useSetRouteBranchAssignmentsMutation(
+  routeId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (payload: SetBranchAssignmentsInput) => setRouteBranchAssignments(routeId, payload),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.routes(),
+        inventoryKeys.routeBranches(routeId),
+      ]);
+      toast.success(t("common.save_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.branch_assignments_save_error_fallback"),
         });
       }
     },

@@ -20,8 +20,14 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useVehiclesQuery, useDeleteVehicleMutation } from "../queries";
-import type { Vehicle } from "../types";
+import {
+  useVehiclesQuery,
+  useDeleteVehicleMutation,
+  useVehicleBranchAssignmentsQuery,
+  useSetVehicleBranchAssignmentsMutation,
+} from "../queries";
+import type { SetBranchAssignmentsInput, Vehicle } from "../types";
+import { BranchAssignmentsDialog } from "./branch-assignments-dialog";
 import { VehicleDialog } from "./vehicle-dialog";
 import { getVehiclesColumns } from "./vehicles-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -40,8 +46,17 @@ function VehiclesSection({ enabled = true }: VehiclesSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Vehicle | null>(null);
+  const [branchesTarget, setBranchesTarget] = useState<Vehicle | null>(null);
   const vehiclesQuery = useVehiclesQuery(enabled && canView);
   const deleteMutation = useDeleteVehicleMutation({ showErrorToast: true });
+  const branchAssignmentsQuery = useVehicleBranchAssignmentsQuery(
+    branchesTarget?.id ?? "",
+    branchesTarget !== null,
+  );
+  const setBranchAssignmentsMutation = useSetVehicleBranchAssignmentsMutation(
+    branchesTarget?.id ?? "",
+    { showErrorToast: true },
+  );
 
   const handleEdit = useCallback((vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -54,16 +69,29 @@ function VehiclesSection({ enabled = true }: VehiclesSectionProps) {
     setDeleteTarget(null);
   }, [deleteTarget, deleteMutation]);
 
+  const handleBranches = useCallback((vehicle: Vehicle) => {
+    setBranchesTarget(vehicle);
+  }, []);
+
+  const handleSaveBranchAssignments = useCallback(
+    async (payload: SetBranchAssignmentsInput) => {
+      await setBranchAssignmentsMutation.mutateAsync(payload);
+      setBranchesTarget(null);
+    },
+    [setBranchAssignmentsMutation],
+  );
+
   const columns = useMemo(
     () =>
       getVehiclesColumns({
         canDelete,
         canUpdate,
+        onBranches: handleBranches,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         t,
       }),
-    [canDelete, canUpdate, handleEdit, t],
+    [canDelete, canUpdate, handleBranches, handleEdit, t],
   );
 
   if (!canView) {
@@ -145,6 +173,18 @@ function VehiclesSection({ enabled = true }: VehiclesSectionProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BranchAssignmentsDialog
+        assignmentsQuery={branchAssignmentsQuery}
+        entityLabel={t("inventory.entity.vehicle")}
+        entityName={branchesTarget?.name ?? ""}
+        isPending={setBranchAssignmentsMutation.isPending}
+        onOpenChange={(open) => {
+          if (!open) setBranchesTarget(null);
+        }}
+        onSave={handleSaveBranchAssignments}
+        open={branchesTarget !== null}
+      />
     </>
   );
 }

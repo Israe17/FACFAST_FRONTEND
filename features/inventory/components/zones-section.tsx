@@ -20,8 +20,14 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useZonesQuery, useDeleteZoneMutation } from "../queries";
-import type { Zone } from "../types";
+import {
+  useZonesQuery,
+  useDeleteZoneMutation,
+  useZoneBranchAssignmentsQuery,
+  useSetZoneBranchAssignmentsMutation,
+} from "../queries";
+import type { SetBranchAssignmentsInput, Zone } from "../types";
+import { BranchAssignmentsDialog } from "./branch-assignments-dialog";
 import { ZoneDialog } from "./zone-dialog";
 import { getZonesColumns } from "./zones-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -40,8 +46,17 @@ function ZonesSection({ enabled = true }: ZonesSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Zone | null>(null);
+  const [branchesTarget, setBranchesTarget] = useState<Zone | null>(null);
   const zonesQuery = useZonesQuery(enabled && canView);
   const deleteMutation = useDeleteZoneMutation({ showErrorToast: true });
+  const branchAssignmentsQuery = useZoneBranchAssignmentsQuery(
+    branchesTarget?.id ?? "",
+    branchesTarget !== null,
+  );
+  const setBranchAssignmentsMutation = useSetZoneBranchAssignmentsMutation(
+    branchesTarget?.id ?? "",
+    { showErrorToast: true },
+  );
 
   const handleEdit = useCallback((zone: Zone) => {
     setSelectedZone(zone);
@@ -54,16 +69,29 @@ function ZonesSection({ enabled = true }: ZonesSectionProps) {
     setDeleteTarget(null);
   }, [deleteTarget, deleteMutation]);
 
+  const handleBranches = useCallback((zone: Zone) => {
+    setBranchesTarget(zone);
+  }, []);
+
+  const handleSaveBranchAssignments = useCallback(
+    async (payload: SetBranchAssignmentsInput) => {
+      await setBranchAssignmentsMutation.mutateAsync(payload);
+      setBranchesTarget(null);
+    },
+    [setBranchAssignmentsMutation],
+  );
+
   const columns = useMemo(
     () =>
       getZonesColumns({
         canDelete,
         canUpdate,
+        onBranches: handleBranches,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         t,
       }),
-    [canDelete, canUpdate, handleEdit, t],
+    [canDelete, canUpdate, handleBranches, handleEdit, t],
   );
 
   if (!canView) {
@@ -145,6 +173,18 @@ function ZonesSection({ enabled = true }: ZonesSectionProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BranchAssignmentsDialog
+        assignmentsQuery={branchAssignmentsQuery}
+        entityLabel={t("inventory.entity.zone")}
+        entityName={branchesTarget?.name ?? ""}
+        isPending={setBranchAssignmentsMutation.isPending}
+        onOpenChange={(open) => {
+          if (!open) setBranchesTarget(null);
+        }}
+        onSave={handleSaveBranchAssignments}
+        open={branchesTarget !== null}
+      />
     </>
   );
 }

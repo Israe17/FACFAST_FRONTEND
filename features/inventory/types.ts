@@ -67,6 +67,8 @@ import {
   warehouseSchema,
   warehouseStockRowSchema,
   warrantyProfileSchema,
+  branchAssignmentsViewSchema,
+  setBranchAssignmentsSchema,
   zoneSchema,
   createZoneSchema,
   updateZoneSchema,
@@ -167,6 +169,8 @@ export type ProductVariant = z.infer<typeof productVariantSchema>;
 export type VariantAttribute = z.infer<typeof variantAttributeSchema>;
 export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>;
 export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>;
+export type BranchAssignmentsView = z.infer<typeof branchAssignmentsViewSchema>;
+export type SetBranchAssignmentsInput = z.infer<typeof setBranchAssignmentsSchema>;
 export type Zone = z.infer<typeof zoneSchema>;
 export type CreateZoneInput = z.infer<typeof createZoneSchema>;
 export type UpdateZoneInput = z.infer<typeof updateZoneSchema>;

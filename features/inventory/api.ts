@@ -32,6 +32,7 @@ import {
   warehouseSchema,
   warehouseStockRowSchema,
   warrantyProfileSchema,
+  branchAssignmentsViewSchema,
   zoneSchema,
   vehicleSchema,
   routeSchema,
@@ -73,6 +74,7 @@ import type {
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
   UpdateWarrantyProfileInput,
+  SetBranchAssignmentsInput,
   CreateZoneInput,
   UpdateZoneInput,
   CreateVehicleInput,
@@ -1140,6 +1142,38 @@ export async function updateRoute(routeId: string, payload: CreateRouteInput | U
 
 export async function deleteRoute(routeId: string) {
   await http.delete(`/routes/${routeId}`);
+}
+
+// --- Branch Assignments (zones, vehicles, routes) ---
+
+export async function getZoneBranchAssignments(zoneId: string) {
+  const response = await http.get(`/zones/${zoneId}/branches`);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
+}
+
+export async function setZoneBranchAssignments(zoneId: string, payload: SetBranchAssignmentsInput) {
+  const response = await http.put(`/zones/${zoneId}/branches`, payload);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
+}
+
+export async function getVehicleBranchAssignments(vehicleId: string) {
+  const response = await http.get(`/vehicles/${vehicleId}/branches`);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
+}
+
+export async function setVehicleBranchAssignments(vehicleId: string, payload: SetBranchAssignmentsInput) {
+  const response = await http.put(`/vehicles/${vehicleId}/branches`, payload);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
+}
+
+export async function getRouteBranchAssignments(routeId: string) {
+  const response = await http.get(`/routes/${routeId}/branches`);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
+}
+
+export async function setRouteBranchAssignments(routeId: string, payload: SetBranchAssignmentsInput) {
+  const response = await http.put(`/routes/${routeId}/branches`, payload);
+  return branchAssignmentsViewSchema.parse(extractEntity(response.data));
 }
 
 // --- Dispatch Orders ---

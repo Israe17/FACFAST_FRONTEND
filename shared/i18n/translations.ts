@@ -1565,6 +1565,27 @@ const esTranslations = {
   "inventory.dispatch.landing.zones_description":
     "Configura zonas geográficas para agrupar y organizar rutas de entrega.",
   "inventory.dispatch.landing.open_section": "Abrir",
+  "inventory.branch_assignments.column_header": "Sucursales",
+  "inventory.branch_assignments.global": "Global",
+  "inventory.branch_assignments.branch_count": "{{count}} sucursales",
+  "inventory.branch_assignments.manage_action": "Sucursales",
+  "inventory.branch_assignments.dialog_title": "Asignación de sucursales - {{entity}}",
+  "inventory.branch_assignments.dialog_description":
+    "Configura las sucursales asignadas a {{name}}.",
+  "inventory.branch_assignments.load_error":
+    "Error cargando asignaciones de sucursal.",
+  "inventory.branch_assignments.loading": "Cargando asignaciones...",
+  "inventory.branch_assignments.is_global": "Global (todas las sucursales)",
+  "inventory.branch_assignments.is_global_hint":
+    "Si está activo, {{entity}} estará disponible en todas las sucursales.",
+  "inventory.branch_assignments.select_branches": "Seleccionar sucursales",
+  "inventory.branch_assignments.select_all": "Todas",
+  "inventory.branch_assignments.deselect_all": "Ninguna",
+  "inventory.branch_assignments.no_branches": "No hay sucursales activas disponibles.",
+  "inventory.branch_assignments.selected_count": "{{count}} seleccionadas",
+  "inventory.branch_assignments.save_action": "Guardar asignaciones",
+  "inventory.branch_assignments_save_error_fallback":
+    "Error guardando las asignaciones de sucursal.",
   "sales.document_emit_error_fallback":
     "Error al emitir el documento electrónico.",
   "sales.entity.electronic_document": "Documento Electrónico",
@@ -3170,6 +3191,27 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.dispatch.landing.zones_description":
       "Configure geographic zones to group and organize delivery routes.",
     "inventory.dispatch.landing.open_section": "Open",
+    "inventory.branch_assignments.column_header": "Branches",
+    "inventory.branch_assignments.global": "Global",
+    "inventory.branch_assignments.branch_count": "{{count}} branches",
+    "inventory.branch_assignments.manage_action": "Branches",
+    "inventory.branch_assignments.dialog_title": "Branch assignments - {{entity}}",
+    "inventory.branch_assignments.dialog_description":
+      "Configure the branches assigned to {{name}}.",
+    "inventory.branch_assignments.load_error":
+      "Error loading branch assignments.",
+    "inventory.branch_assignments.loading": "Loading assignments...",
+    "inventory.branch_assignments.is_global": "Global (all branches)",
+    "inventory.branch_assignments.is_global_hint":
+      "If enabled, {{entity}} will be available in all branches.",
+    "inventory.branch_assignments.select_branches": "Select branches",
+    "inventory.branch_assignments.select_all": "All",
+    "inventory.branch_assignments.deselect_all": "None",
+    "inventory.branch_assignments.no_branches": "No active branches available.",
+    "inventory.branch_assignments.selected_count": "{{count}} selected",
+    "inventory.branch_assignments.save_action": "Save assignments",
+    "inventory.branch_assignments_save_error_fallback":
+      "Error saving branch assignments.",
     "sales.document_emit_error_fallback":
       "Error emitting the electronic document.",
     "sales.entity.electronic_document": "Electronic Document",

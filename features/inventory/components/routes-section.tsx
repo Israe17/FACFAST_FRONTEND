@@ -20,8 +20,14 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useRoutesQuery, useDeleteRouteMutation } from "../queries";
-import type { Route } from "../types";
+import {
+  useRoutesQuery,
+  useDeleteRouteMutation,
+  useRouteBranchAssignmentsQuery,
+  useSetRouteBranchAssignmentsMutation,
+} from "../queries";
+import type { Route, SetBranchAssignmentsInput } from "../types";
+import { BranchAssignmentsDialog } from "./branch-assignments-dialog";
 import { RouteDialog } from "./route-dialog";
 import { getRoutesColumns } from "./routes-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -40,8 +46,17 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Route | null>(null);
+  const [branchesTarget, setBranchesTarget] = useState<Route | null>(null);
   const routesQuery = useRoutesQuery(enabled && canView);
   const deleteMutation = useDeleteRouteMutation({ showErrorToast: true });
+  const branchAssignmentsQuery = useRouteBranchAssignmentsQuery(
+    branchesTarget?.id ?? "",
+    branchesTarget !== null,
+  );
+  const setBranchAssignmentsMutation = useSetRouteBranchAssignmentsMutation(
+    branchesTarget?.id ?? "",
+    { showErrorToast: true },
+  );
 
   const handleEdit = useCallback((route: Route) => {
     setSelectedRoute(route);
@@ -54,16 +69,29 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
     setDeleteTarget(null);
   }, [deleteTarget, deleteMutation]);
 
+  const handleBranches = useCallback((route: Route) => {
+    setBranchesTarget(route);
+  }, []);
+
+  const handleSaveBranchAssignments = useCallback(
+    async (payload: SetBranchAssignmentsInput) => {
+      await setBranchAssignmentsMutation.mutateAsync(payload);
+      setBranchesTarget(null);
+    },
+    [setBranchAssignmentsMutation],
+  );
+
   const columns = useMemo(
     () =>
       getRoutesColumns({
         canDelete,
         canUpdate,
+        onBranches: handleBranches,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
         t,
       }),
-    [canDelete, canUpdate, handleEdit, t],
+    [canDelete, canUpdate, handleBranches, handleEdit, t],
   );
 
   if (!canView) {
@@ -145,6 +173,18 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BranchAssignmentsDialog
+        assignmentsQuery={branchAssignmentsQuery}
+        entityLabel={t("inventory.entity.route")}
+        entityName={branchesTarget?.name ?? ""}
+        isPending={setBranchAssignmentsMutation.isPending}
+        onOpenChange={(open) => {
+          if (!open) setBranchesTarget(null);
+        }}
+        onSave={handleSaveBranchAssignments}
+        open={branchesTarget !== null}
+      />
     </>
   );
 }

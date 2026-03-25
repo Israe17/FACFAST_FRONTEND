@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Trash2 } from "lucide-react";
+import { Building2, Pencil, Trash2 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
@@ -10,6 +11,7 @@ import type { Zone } from "../types";
 type GetZonesColumnsParams = {
   canDelete: boolean;
   canUpdate: boolean;
+  onBranches?: (zone: Zone) => void;
   onDelete: (zone: Zone) => void;
   onEdit: (zone: Zone) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
@@ -18,6 +20,7 @@ type GetZonesColumnsParams = {
 function getZonesColumns({
   canDelete,
   canUpdate,
+  onBranches,
   onDelete,
   onEdit,
   t,
@@ -54,6 +57,19 @@ function getZonesColumns({
       },
     },
     {
+      id: "branches",
+      header: t("inventory.branch_assignments.column_header"),
+      cell: ({ row }) => (
+        <Badge variant="outline">
+          {row.original.is_global
+            ? t("inventory.branch_assignments.global")
+            : t("inventory.branch_assignments.branch_count", {
+                count: String(row.original.assigned_branch_ids?.length ?? 0),
+              })}
+        </Badge>
+      ),
+    },
+    {
       accessorKey: "is_active",
       header: t("inventory.common.status"),
       cell: ({ row }) =>
@@ -79,6 +95,15 @@ function getZonesColumns({
                     label: t("inventory.common.edit"),
                     icon: Pencil,
                     onClick: () => onEdit(row.original),
+                  },
+                ]
+              : []),
+            ...(onBranches && canUpdate
+              ? [
+                  {
+                    label: t("inventory.branch_assignments.manage_action"),
+                    icon: Building2,
+                    onClick: () => onBranches(row.original),
                   },
                 ]
               : []),

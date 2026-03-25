@@ -1331,9 +1331,33 @@ export const updateProductVariantSchema = productVariantFormObjectSchema
   })
   .superRefine(applyVariantRules);
 
+// --- Branch Assignments (shared view for zones, vehicles, routes) ---
+const branchSummaryInAssignmentSchema = z.object({
+  id: idSchema,
+  name: z.string().nullable().optional().catch(null),
+});
+
+export const branchAssignmentsViewSchema = z
+  .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
+    code: z.string().nullable().optional().catch(null),
+    id: idSchema,
+    is_global: z.boolean().optional().default(true),
+    name: z.string().catch(""),
+  })
+  .passthrough();
+
+export const setBranchAssignmentsSchema = z.object({
+  assigned_branch_ids: z.array(z.number()).optional().default([]),
+  is_global: z.boolean(),
+});
+
 // --- Zones ---
 export const zoneSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     canton: z.string().nullable().optional().catch(null),
     code: z.string().optional().catch(undefined),
@@ -1342,6 +1366,7 @@ export const zoneSchema = z
     district: z.string().nullable().optional().catch(null),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Zone"),
     province: z.string().nullable().optional().catch(null),
@@ -1366,11 +1391,14 @@ export const updateZoneSchema = createZoneSchema.partial().extend({
 // --- Vehicles ---
 export const vehicleSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     max_volume_m3: z.number().nullable().optional().catch(null),
     max_weight_kg: z.number().nullable().optional().catch(null),
@@ -1406,6 +1434,8 @@ export const updateVehicleSchema = createVehicleSchema.partial().extend({
 // --- Routes ---
 export const routeSchema = z
   .object({
+    assigned_branch_ids: z.array(z.number()).optional().default([]),
+    assigned_branches: z.array(branchSummaryInAssignmentSchema).optional().default([]),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
@@ -1419,6 +1449,7 @@ export const routeSchema = z
     frequency: z.string().nullable().optional().catch(null),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
+    is_global: z.boolean().optional().default(true),
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Route"),
     updated_at: z.string().optional(),
@@ -1461,8 +1492,14 @@ export const dispatchStopSchema = z.object({
   id: idSchema,
   dispatch_order_id: z.union([z.number(), z.string()]).optional(),
   sale_order_id: z.union([z.number(), z.string()]).optional(),
-  sale_order: z.object({ id: idSchema, code: z.string().nullable().optional() }).optional().catch(undefined),
-  customer_contact: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  sale_order: z.object({
+    id: idSchema,
+    code: z.string().nullable().optional(),
+    status: z.string().optional(),
+    dispatch_status: z.string().optional(),
+  }).nullable().optional().catch(null),
+  customer_contact_id: z.union([z.number(), z.string()]).optional(),
+  customer_contact: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   delivery_sequence: z.number(),
   delivery_address: z.string().nullable().optional().catch(null),
   delivery_province: z.string().nullable().optional().catch(null),
@@ -1498,7 +1535,8 @@ export const dispatchExpenseSchema = z.object({
   amount: z.number(),
   receipt_number: z.string().nullable().optional().catch(null),
   notes: z.string().nullable().optional().catch(null),
-  created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  created_by_user_id: z.union([z.number(), z.string()]).optional(),
+  created_by_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 }).passthrough();
@@ -1519,18 +1557,24 @@ export const dispatchOrderSchema = z.object({
   id: idSchema,
   code: z.string().optional().catch(undefined),
   business_id: idSchema.optional().catch(undefined),
-  branch: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  branch_id: z.union([z.number(), z.string()]).optional(),
+  branch: z.object({ id: idSchema, name: z.string().nullable() }).nullable().optional().catch(null),
   dispatch_type: z.enum(dispatchTypeValues).catch("individual"),
   status: z.enum(dispatchOrderStatusValues).catch("draft"),
-  route: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-  vehicle: z.object({ id: idSchema, name: z.string(), plate_number: z.string().optional() }).nullable().optional().catch(null),
+  route_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  route: z.object({ id: idSchema, code: z.string().nullable().optional(), name: z.string() }).nullable().optional().catch(null),
+  vehicle_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  vehicle: z.object({ id: idSchema, code: z.string().nullable().optional(), name: z.string(), plate_number: z.string() }).nullable().optional().catch(null),
+  driver_user_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
   driver_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
+  origin_warehouse_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
   origin_warehouse: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   scheduled_date: z.string().nullable().optional().catch(null),
   dispatched_at: z.string().nullable().optional().catch(null),
   completed_at: z.string().nullable().optional().catch(null),
   notes: z.string().nullable().optional().catch(null),
-  created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+  created_by_user_id: z.union([z.number(), z.string()]).optional(),
+  created_by_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   stops: z.array(dispatchStopSchema).optional().catch([]),
   expenses: z.array(dispatchExpenseSchema).optional().catch([]),
   lifecycle: z.object({

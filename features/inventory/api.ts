@@ -1,5 +1,5 @@
 import { http } from "@/shared/lib/http";
-import { extractCollection, extractEntity, compactRecord, toNumberId } from "@/shared/lib/api-helpers";
+import { extractCollection, extractEntity, compactRecord, compactNullableRecord, toNumberId } from "@/shared/lib/api-helpers";
 import { withIdempotencyKey } from "@/shared/lib/idempotency";
 import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQueryParams } from "@/shared/lib/api-types";
 
@@ -85,11 +85,6 @@ import type {
   CreateDispatchExpenseInput,
 } from "./types";
 
-function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
-  );
-}
 
 function toOptionalNumberId(value: string | number | null | undefined) {
   if (value === "" || value === null || value === undefined) {

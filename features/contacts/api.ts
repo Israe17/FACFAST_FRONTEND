@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { z } from "zod/v4";
 
 import { http } from "@/shared/lib/http";
-import { extractCollection, extractEntity, compactRecord } from "@/shared/lib/api-helpers";
+import { extractCollection, extractEntity, compactRecord, compactNullableRecord } from "@/shared/lib/api-helpers";
 import { paginatedSchema, type PaginatedQueryParams } from "@/shared/lib/api-types";
 
 import { contactBranchAssignmentSchema, contactBranchContextSchema, contactSchema } from "./schemas";
@@ -18,11 +18,6 @@ const deleteResponseSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
 });
 
-function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
-  );
-}
 
 function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
   return compactRecord({

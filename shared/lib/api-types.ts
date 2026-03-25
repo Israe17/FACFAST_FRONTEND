@@ -37,6 +37,16 @@ export type CursorQueryParams = {
   sort_order?: "ASC" | "DESC";
 };
 
+// ─── Common Zod Schemas ───
+
+/** Coerces string or number IDs to string. Used across all feature schemas. */
+export const idSchema = z.union([z.string(), z.number()]).transform(String);
+
+/** Nullable variant of idSchema. */
+export const nullableIdSchema = z
+  .union([z.string(), z.number(), z.null(), z.undefined()])
+  .transform((value) => (value == null ? null : String(value)));
+
 // ─── Zod Schema Factories ───
 
 /** Create a Zod schema for a paginated response wrapping the given item schema. */

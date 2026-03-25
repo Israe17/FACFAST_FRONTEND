@@ -1,9 +1,6 @@
 import { z } from "zod/v4";
 
-const idSchema = z.union([z.string(), z.number()]).transform(String);
-const nullableIdSchema = z
-  .union([z.string(), z.number(), z.null(), z.undefined()])
-  .transform((value) => (value == null ? null : String(value)));
+import { idSchema, nullableIdSchema } from "@/shared/lib/api-types";
 const sessionModeSchema = z.enum(["tenant", "platform", "tenant_context"]);
 const userTypeSchema = z.enum(["owner", "staff", "system"]);
 

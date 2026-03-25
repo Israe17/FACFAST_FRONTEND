@@ -1,8 +1,7 @@
 import { z } from "zod/v4";
 
+import { idSchema } from "@/shared/lib/api-types";
 import { entityCodePattern, positiveIntegerPattern } from "@/shared/lib/validation";
-
-const idSchema = z.union([z.string(), z.number()]).transform(String);
 const userStatusSchema = z.enum(["active", "inactive", "suspended", "deleted"]);
 const userTypeSchema = z.enum(["owner", "staff", "system"]);
 const positiveIntegerStringSchema = z

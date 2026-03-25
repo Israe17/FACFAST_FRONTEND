@@ -48,6 +48,16 @@ export function compactRecord<T extends Record<string, unknown>>(record: T) {
 }
 
 /**
+ * Remove entries with undefined or empty string values from an object.
+ * Unlike compactRecord, this preserves null values.
+ */
+export function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
+  return Object.fromEntries(
+    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
+  );
+}
+
+/**
  * Convert a string, number, or null/undefined value to a number, or undefined.
  */
 export function toNumberId(value: string | number | null | undefined): number | undefined {

@@ -20,7 +20,7 @@ import {
   updateContactBranchAssignment,
   updateContact,
 } from "./api";
-import type { PaginatedQueryParams } from "./api";
+import type { PaginatedQueryParams } from "@/shared/lib/api-types";
 import type {
   CreateContactBranchAssignmentInput,
   CreateContactInput,

@@ -1,4 +1,7 @@
 import { http } from "@/shared/lib/http";
+import { extractCollection, extractEntity, compactRecord, compactNullableRecord, toNumberId } from "@/shared/lib/api-helpers";
+import { withIdempotencyKey } from "@/shared/lib/idempotency";
+import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQueryParams } from "@/shared/lib/api-types";
 
 import {
   brandSchema,
@@ -82,53 +85,6 @@ import type {
   CreateDispatchExpenseInput,
 } from "./types";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function extractCollection(data: unknown, explicitKeys: string[] = []) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (!isRecord(data)) {
-    return [];
-  }
-
-  for (const key of [...explicitKeys, "items", "data", "results"]) {
-    if (Array.isArray(data[key])) {
-      return data[key];
-    }
-  }
-
-  return [];
-}
-
-function extractEntity(data: unknown, explicitKeys: string[] = []) {
-  if (!isRecord(data) || Array.isArray(data)) {
-    return data;
-  }
-
-  for (const key of [...explicitKeys, "data", "item", "result"]) {
-    if (data[key] !== undefined) {
-      return data[key];
-    }
-  }
-
-  return data;
-}
-
-function compactRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== null && value !== ""),
-  );
-}
-
-function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== ""),
-  );
-}
 
 function toOptionalNumberId(value: string | number | null | undefined) {
   if (value === "" || value === null || value === undefined) {
@@ -893,68 +849,61 @@ export async function cancelInventoryMovement(
   return inventoryMovementCancellationResponseSchema.parse(extractEntity(response.data));
 }
 
-// --- Paginated API functions ---
+// --- Paginated & Cursor API functions ---
 
-export type PaginatedQueryParams = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sort_by?: string;
-  sort_order?: "ASC" | "DESC";
-};
-
-export type PaginatedResponse<T> = {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-};
-
-export async function listProductsPaginated(
-  params: PaginatedQueryParams,
-): Promise<PaginatedResponse<ReturnType<typeof productSchema.parse>>> {
+export async function listProductsPaginated(params: PaginatedQueryParams) {
   const response = await http.get("/products", { params });
-  const raw = response.data;
-  return {
-    data: extractCollection(raw, ["products"]).map((item) => productSchema.parse(item)),
-    total: raw?.total ?? 0,
-    page: raw?.page ?? 1,
-    limit: raw?.limit ?? 20,
-    total_pages: raw?.total_pages ?? 1,
-  };
+  return paginatedSchema(productSchema).parse(response.data);
 }
 
-export async function listInventoryLotsPaginated(
-  params: PaginatedQueryParams,
-): Promise<PaginatedResponse<ReturnType<typeof inventoryLotSchema.parse>>> {
+export async function listProductsCursor(params: CursorQueryParams) {
+  const response = await http.get("/products/cursor", { params });
+  return cursorSchema(productSchema).parse(response.data);
+}
+
+export async function listInventoryLotsPaginated(params: PaginatedQueryParams) {
   const response = await http.get("/inventory-lots", { params });
-  const raw = response.data;
-  return {
-    data: extractCollection(raw, ["inventory_lots", "inventoryLots"]).map((item) =>
-      inventoryLotSchema.parse(item),
-    ),
-    total: raw?.total ?? 0,
-    page: raw?.page ?? 1,
-    limit: raw?.limit ?? 20,
-    total_pages: raw?.total_pages ?? 1,
-  };
+  return paginatedSchema(inventoryLotSchema).parse(response.data);
 }
 
-export async function listInventoryMovementsPaginated(
-  params: PaginatedQueryParams,
-): Promise<PaginatedResponse<ReturnType<typeof inventoryMovementHeaderSchema.parse>>> {
+export async function listInventoryLotsCursor(params: CursorQueryParams) {
+  const response = await http.get("/inventory-lots/cursor", { params });
+  return cursorSchema(inventoryLotSchema).parse(response.data);
+}
+
+export async function listInventoryMovementsPaginated(params: PaginatedQueryParams) {
   const response = await http.get("/inventory-movements", { params });
-  const raw = response.data;
-  return {
-    data: extractCollection(raw).map((item) =>
-      inventoryMovementHeaderSchema.parse(item),
-    ),
-    total: raw?.total ?? 0,
-    page: raw?.page ?? 1,
-    limit: raw?.limit ?? 20,
-    total_pages: raw?.total_pages ?? 1,
-  };
+  return paginatedSchema(inventoryMovementHeaderSchema).parse(response.data);
+}
+
+export async function listInventoryMovementsCursor(params: CursorQueryParams) {
+  const response = await http.get("/inventory-movements/cursor", { params });
+  return cursorSchema(inventoryMovementHeaderSchema).parse(response.data);
+}
+
+export async function listDispatchOrdersPaginated(params: PaginatedQueryParams) {
+  const response = await http.get("/dispatch-orders", { params });
+  return paginatedSchema(dispatchOrderSchema).parse(response.data);
+}
+
+export async function listDispatchOrdersCursor(params: CursorQueryParams) {
+  const response = await http.get("/dispatch-orders/cursor", { params });
+  return cursorSchema(dispatchOrderSchema).parse(response.data);
+}
+
+export async function listWarehouseStockPaginated(params: PaginatedQueryParams) {
+  const response = await http.get("/warehouse-stock", { params });
+  return paginatedSchema(warehouseStockRowSchema).parse(response.data);
+}
+
+export async function listWarehouseStockCursor(params: CursorQueryParams) {
+  const response = await http.get("/warehouse-stock/cursor", { params });
+  return cursorSchema(warehouseStockRowSchema).parse(response.data);
+}
+
+export async function listWarehouseStockByWarehouseCursor(warehouseId: string, params: CursorQueryParams) {
+  const response = await http.get(`/warehouse-stock/by-warehouse/${warehouseId}/cursor`, { params });
+  return cursorSchema(warehouseStockRowSchema).parse(response.data);
 }
 
 function buildProductVariantPayload(
@@ -1252,16 +1201,16 @@ export async function removeDispatchExpense(orderId: string, expenseId: string) 
 }
 
 export async function markDispatchDispatched(orderId: string) {
-  const response = await http.post(`/dispatch-orders/${orderId}/dispatch`);
+  const response = await http.post(`/dispatch-orders/${orderId}/dispatch`, undefined, withIdempotencyKey());
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }
 
 export async function markDispatchCompleted(orderId: string) {
-  const response = await http.post(`/dispatch-orders/${orderId}/complete`);
+  const response = await http.post(`/dispatch-orders/${orderId}/complete`, undefined, withIdempotencyKey());
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }
 
 export async function cancelDispatchOrder(orderId: string) {
-  const response = await http.post(`/dispatch-orders/${orderId}/cancel`);
+  const response = await http.post(`/dispatch-orders/${orderId}/cancel`, undefined, withIdempotencyKey());
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }

@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 
+import { idSchema, nullableIdSchema } from "@/shared/lib/api-types";
 import {
   optionalTrimmedString,
   positiveIntegerPattern,
@@ -15,11 +16,6 @@ import {
   saleModeValues,
   saleOrderStatusValues,
 } from "./constants";
-
-const idSchema = z.union([z.string(), z.number()]).transform(String);
-const nullableIdSchema = z
-  .union([z.string(), z.number(), z.null(), z.undefined()])
-  .transform((value) => (value == null ? null : String(value)));
 const optionalTextSchema = optionalTrimmedString(z.string());
 
 const lifecycleFieldSchema = z
@@ -235,6 +231,10 @@ export const electronicDocumentSchema = z
     lifecycle: z.object({
       can_resubmit: z.boolean().optional().catch(false),
       reasons: z.array(z.string()).optional().catch([]),
+    }).optional().catch({}),
+    assets: z.object({
+      has_xml: z.boolean().optional().catch(false),
+      has_pdf: z.boolean().optional().catch(false),
     }).optional().catch({}),
     created_at: z.string().optional(),
     updated_at: z.string().optional(),

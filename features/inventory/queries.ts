@@ -49,8 +49,10 @@ import {
   listBranchPromotions,
   listBrands,
   listInventoryLots,
+  listInventoryLotsCursor,
   listInventoryLotsPaginated,
   listInventoryMovements,
+  listInventoryMovementsCursor,
   listInventoryMovementsPaginated,
   listMeasurementUnits,
   listPriceLists,
@@ -60,6 +62,7 @@ import {
   listProductPrices,
   listProductSerials,
   listProducts,
+  listProductsCursor,
   listProductsPaginated,
   listProductVariants,
   listPromotions,
@@ -101,6 +104,8 @@ import {
   updateRoute,
   deleteRoute,
   listDispatchOrders,
+  listDispatchOrdersCursor,
+  listDispatchOrdersPaginated,
   getDispatchOrder,
   createDispatchOrder,
   updateDispatchOrder,
@@ -112,7 +117,8 @@ import {
   markDispatchCompleted,
   cancelDispatchOrder,
 } from "./api";
-import type { PaginatedQueryParams } from "./api";
+import type { PaginatedQueryParams, CursorQueryParams } from "@/shared/lib/api-types";
+import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
 import type {
   CancelInventoryMovementInput,
   CreateBrandInput,
@@ -421,6 +427,16 @@ export function useProductsPaginatedQuery(
     queryKey: [...inventoryKeys.products(), "paginated", params] as const,
     queryFn: () => listProductsPaginated(params),
     placeholderData: (prev) => prev,
+  });
+}
+
+export function useProductsCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: [...inventoryKeys.products(), "cursor", params] as const,
+    queryFn: (cursorParams) => listProductsCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
   });
 }
 
@@ -1074,6 +1090,16 @@ export function useInventoryLotsPaginatedQuery(
   });
 }
 
+export function useInventoryLotsCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: [...inventoryKeys.inventoryLots(), "cursor", params] as const,
+    queryFn: (cursorParams) => listInventoryLotsCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
+  });
+}
+
 export function useCreateInventoryLotMutation(options: MutationFeedbackOptions = {}) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();
@@ -1251,6 +1277,16 @@ export function useInventoryMovementsPaginatedQuery(
     queryKey: [...inventoryKeys.inventoryMovements(), "paginated", params] as const,
     queryFn: () => listInventoryMovementsPaginated(params),
     placeholderData: (prev) => prev,
+  });
+}
+
+export function useInventoryMovementsCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: [...inventoryKeys.inventoryMovements(), "cursor", params] as const,
+    queryFn: (cursorParams) => listInventoryMovementsCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
   });
 }
 
@@ -2434,6 +2470,25 @@ export function useDispatchOrdersQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.dispatchOrders(),
     queryFn: listDispatchOrders,
+  });
+}
+
+export function useDispatchOrdersPaginatedQuery(params: PaginatedQueryParams, enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: [...inventoryKeys.dispatchOrders(), "paginated", params] as const,
+    queryFn: () => listDispatchOrdersPaginated(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useDispatchOrdersCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: [...inventoryKeys.dispatchOrders(), "cursor", params] as const,
+    queryFn: (cursorParams) => listDispatchOrdersCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
   });
 }
 

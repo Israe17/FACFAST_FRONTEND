@@ -1,51 +1,10 @@
 import { http } from "@/shared/lib/http";
+import { extractCollection, extractEntity, compactRecord, toNumberId } from "@/shared/lib/api-helpers";
+import { withIdempotencyKey } from "@/shared/lib/idempotency";
+import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQueryParams } from "@/shared/lib/api-types";
 
 import { electronicDocumentSchema, saleOrderSchema } from "./schemas";
 import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput, EmitElectronicDocumentInput } from "./types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isRecord(value: unknown): value is Record<string, any> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function extractCollection(data: unknown, explicitKeys: string[] = []) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-  if (!isRecord(data)) {
-    return [];
-  }
-  for (const key of [...explicitKeys, "items", "data", "results"]) {
-    if (Array.isArray(data[key])) {
-      return data[key];
-    }
-  }
-  return [];
-}
-
-function extractEntity(data: unknown, explicitKeys: string[] = []) {
-  if (!isRecord(data) || Array.isArray(data)) {
-    return data;
-  }
-  for (const key of [...explicitKeys, "data", "item", "result"]) {
-    if (data[key] !== undefined) {
-      return data[key];
-    }
-  }
-  return data;
-}
-
-function compactRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== null && value !== ""),
-  );
-}
-
-function toNumberId(value: string | number | null | undefined): number | undefined {
-  if (value === "" || value === null || value === undefined) return undefined;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : undefined;
-}
 
 function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderInput) {
   return compactRecord({
@@ -73,11 +32,23 @@ function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderIn
   });
 }
 
+// ─── Sale Orders ───
+
 export async function listSaleOrders() {
   const response = await http.get("/sale-orders");
   return extractCollection(response.data, ["sale_orders", "sale-orders"]).map((item) =>
     saleOrderSchema.parse(item),
   );
+}
+
+export async function listSaleOrdersPaginated(params: PaginatedQueryParams) {
+  const response = await http.get("/sale-orders", { params });
+  return paginatedSchema(saleOrderSchema).parse(response.data);
+}
+
+export async function listSaleOrdersCursor(params: CursorQueryParams) {
+  const response = await http.get("/sale-orders/cursor", { params });
+  return cursorSchema(saleOrderSchema).parse(response.data);
 }
 
 export async function getSaleOrder(orderId: string) {
@@ -96,12 +67,12 @@ export async function updateSaleOrder(orderId: string, payload: UpdateSaleOrderI
 }
 
 export async function confirmSaleOrder(orderId: string) {
-  const response = await http.post(`/sale-orders/${orderId}/confirm`);
+  const response = await http.post(`/sale-orders/${orderId}/confirm`, undefined, withIdempotencyKey());
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 
 export async function cancelSaleOrder(orderId: string, payload: CancelSaleOrderInput) {
-  const response = await http.post(`/sale-orders/${orderId}/cancel`, payload);
+  const response = await http.post(`/sale-orders/${orderId}/cancel`, payload, withIdempotencyKey());
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 
@@ -109,7 +80,7 @@ export async function deleteSaleOrder(orderId: string) {
   await http.delete(`/sale-orders/${orderId}`);
 }
 
-// --- Electronic Documents ---
+// ─── Electronic Documents ───
 
 export async function listElectronicDocuments() {
   const response = await http.get("/electronic-documents");
@@ -118,12 +89,22 @@ export async function listElectronicDocuments() {
   );
 }
 
+export async function listElectronicDocumentsPaginated(params: PaginatedQueryParams) {
+  const response = await http.get("/electronic-documents", { params });
+  return paginatedSchema(electronicDocumentSchema).parse(response.data);
+}
+
+export async function listElectronicDocumentsCursor(params: CursorQueryParams) {
+  const response = await http.get("/electronic-documents/cursor", { params });
+  return cursorSchema(electronicDocumentSchema).parse(response.data);
+}
+
 export async function getElectronicDocument(documentId: string) {
   const response = await http.get(`/electronic-documents/${documentId}`);
   return electronicDocumentSchema.parse(extractEntity(response.data, ["electronic_document"]));
 }
 
 export async function emitElectronicDocument(payload: EmitElectronicDocumentInput) {
-  const response = await http.post("/electronic-documents/emit", payload);
+  const response = await http.post("/electronic-documents/emit", payload, withIdempotencyKey());
   return electronicDocumentSchema.parse(extractEntity(response.data, ["electronic_document"]));
 }

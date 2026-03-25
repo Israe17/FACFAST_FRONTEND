@@ -1,5 +1,5 @@
 import { http } from "@/shared/lib/http";
-import { compactRecord } from "@/shared/lib/utils";
+import { extractCollection, extractEntity, compactRecord } from "@/shared/lib/api-helpers";
 
 import { branchSchema, terminalSchema } from "./schemas";
 import type {
@@ -8,44 +8,6 @@ import type {
   UpdateBranchInput,
   UpdateTerminalInput,
 } from "./types";
-
-function extractCollection(data: unknown, explicitKey?: string) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (!data || typeof data !== "object") {
-    return [];
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "items", "data", "results", "branches", "terminals"];
-
-  for (const key of keys) {
-    if (key && Array.isArray(record[key])) {
-      return record[key];
-    }
-  }
-
-  return [];
-}
-
-function extractEntity(data: unknown, explicitKey?: string) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return data;
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "data", "item", "result", "branch", "terminal"];
-
-  for (const key of keys) {
-    if (key && record[key] !== undefined) {
-      return record[key];
-    }
-  }
-
-  return data;
-}
 
 function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
   return compactRecord({
@@ -87,22 +49,22 @@ function buildTerminalPayload(payload: CreateTerminalInput | UpdateTerminalInput
 
 export async function listBranches() {
   const response = await http.get("/branches");
-  return extractCollection(response.data, "branches").map((branch) => branchSchema.parse(branch));
+  return extractCollection(response.data, ["branches"]).map((branch) => branchSchema.parse(branch));
 }
 
 export async function getBranchById(branchId: string) {
   const response = await http.get(`/branches/${branchId}`);
-  return branchSchema.parse(extractEntity(response.data, "branch"));
+  return branchSchema.parse(extractEntity(response.data, ["branch"]));
 }
 
 export async function createBranch(payload: CreateBranchInput) {
   const response = await http.post("/branches", buildBranchPayload(payload));
-  return branchSchema.parse(extractEntity(response.data, "branch"));
+  return branchSchema.parse(extractEntity(response.data, ["branch"]));
 }
 
 export async function updateBranch(branchId: string, payload: UpdateBranchInput) {
   const response = await http.patch(`/branches/${branchId}`, buildBranchPayload(payload));
-  return branchSchema.parse(extractEntity(response.data, "branch"));
+  return branchSchema.parse(extractEntity(response.data, ["branch"]));
 }
 
 export async function createTerminal(branchId: string, payload: CreateTerminalInput) {
@@ -110,12 +72,12 @@ export async function createTerminal(branchId: string, payload: CreateTerminalIn
     `/branches/${branchId}/terminals`,
     buildTerminalPayload(payload),
   );
-  return terminalSchema.parse(extractEntity(response.data, "terminal"));
+  return terminalSchema.parse(extractEntity(response.data, ["terminal"]));
 }
 
 export async function updateTerminal(terminalId: string, payload: UpdateTerminalInput) {
   const response = await http.patch(`/terminals/${terminalId}`, buildTerminalPayload(payload));
-  return terminalSchema.parse(extractEntity(response.data, "terminal"));
+  return terminalSchema.parse(extractEntity(response.data, ["terminal"]));
 }
 
 export async function deleteBranch(branchId: string) {

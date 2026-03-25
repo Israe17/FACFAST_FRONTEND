@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 
+import { idSchema, nullableIdSchema } from "@/shared/lib/api-types";
 import {
   currencyCodePattern,
   digitsPattern,
@@ -26,11 +27,6 @@ import {
   warehousePurposeValues,
   warrantyDurationUnitValues,
 } from "./constants";
-
-const idSchema = z.union([z.string(), z.number()]).transform(String);
-const nullableIdSchema = z
-  .union([z.string(), z.number(), z.null(), z.undefined()])
-  .transform((value) => (value == null ? null : String(value)));
 
 const optionalTextSchema = optionalTrimmedString(z.string());
 const nullableOptionalTextSchema = z.preprocess((value) => {

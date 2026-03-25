@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 
+import { idSchema } from "@/shared/lib/api-types";
 import {
   businessCodePattern,
   currencyCodePattern,
@@ -9,8 +10,6 @@ import {
   requiredTrimmedString,
   terminalNumberPattern,
 } from "@/shared/lib/validation";
-
-const idSchema = z.union([z.string(), z.number()]).transform(String);
 
 const optionalEmailSchema = optionalTrimmedString(
   z.string().email("Ingresa un correo electronico valido."),

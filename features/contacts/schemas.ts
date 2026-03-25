@@ -1,13 +1,9 @@
 import { z } from "zod/v4";
 
+import { idSchema, nullableIdSchema } from "@/shared/lib/api-types";
 import { normalizeIdentificationTypeValue } from "@/shared/lib/validation";
 
 import { contactTypeValues, identificationTypeValues } from "./constants";
-
-const idSchema = z.union([z.string(), z.number()]).transform(String);
-const nullableIdSchema = z
-  .union([z.string(), z.number(), z.null(), z.undefined()])
-  .transform((value) => (value == null ? null : String(value)));
 
 const contactTypeSchema = z.enum(contactTypeValues);
 const identificationTypeSchema = z.enum(identificationTypeValues);

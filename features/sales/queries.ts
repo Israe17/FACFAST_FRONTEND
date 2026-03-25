@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
 
+import type { CursorQueryParams, PaginatedQueryParams } from "@/shared/lib/api-types";
+import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
+
 import {
   cancelSaleOrder,
   confirmSaleOrder,
@@ -15,7 +18,11 @@ import {
   getElectronicDocument,
   getSaleOrder,
   listElectronicDocuments,
+  listElectronicDocumentsCursor,
+  listElectronicDocumentsPaginated,
   listSaleOrders,
+  listSaleOrdersCursor,
+  listSaleOrdersPaginated,
   updateSaleOrder,
 } from "./api";
 import type {
@@ -28,8 +35,12 @@ import type {
 export const salesKeys = {
   all: ["sales"] as const,
   orders: () => [...salesKeys.all, "orders"] as const,
+  ordersPaginated: (params: PaginatedQueryParams) => [...salesKeys.orders(), "paginated", params] as const,
+  ordersCursor: (params: Omit<CursorQueryParams, "cursor">) => [...salesKeys.orders(), "cursor", params] as const,
   order: (orderId: string) => [...salesKeys.orders(), orderId] as const,
   documents: () => [...salesKeys.all, "documents"] as const,
+  documentsPaginated: (params: PaginatedQueryParams) => [...salesKeys.documents(), "paginated", params] as const,
+  documentsCursor: (params: Omit<CursorQueryParams, "cursor">) => [...salesKeys.documents(), "cursor", params] as const,
   document: (id: string) => [...salesKeys.documents(), id] as const,
 };
 
@@ -51,6 +62,25 @@ export function useSaleOrdersQuery(enabled = true) {
     enabled,
     queryKey: salesKeys.orders(),
     queryFn: listSaleOrders,
+  });
+}
+
+export function useSaleOrdersPaginatedQuery(params: PaginatedQueryParams, enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: salesKeys.ordersPaginated(params),
+    queryFn: () => listSaleOrdersPaginated(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useSaleOrdersCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: salesKeys.ordersCursor(params),
+    queryFn: (cursorParams) => listSaleOrdersCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
   });
 }
 
@@ -181,6 +211,25 @@ export function useElectronicDocumentsQuery(enabled = true) {
     enabled,
     queryKey: salesKeys.documents(),
     queryFn: listElectronicDocuments,
+  });
+}
+
+export function useElectronicDocumentsPaginatedQuery(params: PaginatedQueryParams, enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: salesKeys.documentsPaginated(params),
+    queryFn: () => listElectronicDocumentsPaginated(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useElectronicDocumentsCursorQuery(params: { search?: string; sortOrder?: "ASC" | "DESC" } = {}, enabled = true) {
+  return useCursorQuery({
+    queryKey: salesKeys.documentsCursor(params),
+    queryFn: (cursorParams) => listElectronicDocumentsCursor(cursorParams),
+    search: params.search,
+    sortOrder: params.sortOrder,
+    enabled,
   });
 }
 

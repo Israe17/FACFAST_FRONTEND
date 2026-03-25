@@ -1,25 +1,8 @@
 import { http } from "@/shared/lib/http";
-import { compactRecord } from "@/shared/lib/utils";
+import { extractEntity, compactRecord } from "@/shared/lib/api-helpers";
 
 import { businessSchema } from "./schemas";
 import type { BusinessOnboardingInput, UpdateCurrentBusinessInput } from "./types";
-
-function extractEntity(data: unknown, explicitKey?: string) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return data;
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "data", "item", "result", "business"];
-
-  for (const key of keys) {
-    if (key && record[key] !== undefined) {
-      return record[key];
-    }
-  }
-
-  return data;
-}
 
 function buildCurrentBusinessPayload(payload: UpdateCurrentBusinessInput) {
   return compactRecord({
@@ -65,12 +48,12 @@ export function buildBusinessOnboardingPayload(payload: BusinessOnboardingInput)
 
 export async function getCurrentBusiness() {
   const response = await http.get("/businesses/current");
-  return businessSchema.parse(extractEntity(response.data, "business"));
+  return businessSchema.parse(extractEntity(response.data, ["business"]));
 }
 
 export async function updateCurrentBusiness(payload: UpdateCurrentBusinessInput) {
   const response = await http.patch("/businesses/current", buildCurrentBusinessPayload(payload));
-  return businessSchema.parse(extractEntity(response.data, "business"));
+  return businessSchema.parse(extractEntity(response.data, ["business"]));
 }
 
 export async function onboardBusiness(payload: BusinessOnboardingInput) {

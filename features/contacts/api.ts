@@ -2,6 +2,8 @@ import { AxiosError } from "axios";
 import { z } from "zod/v4";
 
 import { http } from "@/shared/lib/http";
+import { extractCollection, extractEntity, compactRecord } from "@/shared/lib/api-helpers";
+import { paginatedSchema, type PaginatedQueryParams } from "@/shared/lib/api-types";
 
 import { contactBranchAssignmentSchema, contactBranchContextSchema, contactSchema } from "./schemas";
 import type {
@@ -15,50 +17,6 @@ const deleteResponseSchema = z.object({
   deleted: z.boolean().optional().default(true),
   id: z.union([z.string(), z.number()]).transform(String),
 });
-
-function extractCollection(data: unknown, explicitKey?: string) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (!data || typeof data !== "object") {
-    return [];
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "items", "data", "results", "contacts"];
-
-  for (const key of keys) {
-    if (key && Array.isArray(record[key])) {
-      return record[key];
-    }
-  }
-
-  return [];
-}
-
-function extractEntity(data: unknown, explicitKey?: string) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return data;
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "data", "item", "result", "contact"];
-
-  for (const key of keys) {
-    if (key && record[key] !== undefined) {
-      return record[key];
-    }
-  }
-
-  return data;
-}
-
-function compactRecord<T extends Record<string, unknown>>(record: T) {
-  return Object.fromEntries(
-    Object.entries(record).filter(([, value]) => value !== undefined && value !== null && value !== ""),
-  );
-}
 
 function compactNullableRecord<T extends Record<string, unknown>>(record: T) {
   return Object.fromEntries(
@@ -128,12 +86,12 @@ function buildContactBranchAssignmentPayload(
 
 export async function listContacts() {
   const response = await http.get("/contacts");
-  return extractCollection(response.data, "contacts").map((contact) => contactSchema.parse(contact));
+  return extractCollection(response.data, ["contacts"]).map((contact) => contactSchema.parse(contact));
 }
 
 export async function getContactById(contactId: string) {
   const response = await http.get(`/contacts/${contactId}`);
-  return contactSchema.parse(extractEntity(response.data, "contact"));
+  return contactSchema.parse(extractEntity(response.data, ["contact"]));
 }
 
 export async function createContact(payload: CreateContactInput) {
@@ -142,7 +100,7 @@ export async function createContact(payload: CreateContactInput) {
 
 export async function updateContact(contactId: string, payload: UpdateContactInput) {
   const response = await http.patch(`/contacts/${contactId}`, buildContactPayload(payload));
-  return contactSchema.parse(extractEntity(response.data, "contact"));
+  return contactSchema.parse(extractEntity(response.data, ["contact"]));
 }
 
 export async function deleteContact(contactId: string) {
@@ -164,7 +122,7 @@ export async function createContactBranchAssignment(
     buildContactBranchAssignmentPayload(payload),
   );
   return contactBranchAssignmentSchema.parse(
-    extractEntity(response.data, "assignment"),
+    extractEntity(response.data, ["assignment"]),
   );
 }
 
@@ -178,7 +136,7 @@ export async function updateContactBranchAssignment(
     buildContactBranchAssignmentPayload(payload),
   );
   return contactBranchAssignmentSchema.parse(
-    extractEntity(response.data, "assignment"),
+    extractEntity(response.data, ["assignment"]),
   );
 }
 
@@ -187,40 +145,15 @@ export async function deleteContactBranchAssignment(contactId: string, assignmen
   return deleteResponseSchema.parse(extractEntity(response.data));
 }
 
-export type PaginatedQueryParams = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sort_by?: string;
-  sort_order?: "ASC" | "DESC";
-};
-
-export type PaginatedResponse<T> = {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-};
-
-export async function listContactsPaginated(
-  params: PaginatedQueryParams,
-): Promise<PaginatedResponse<ReturnType<typeof contactSchema.parse>>> {
+export async function listContactsPaginated(params: PaginatedQueryParams) {
   const response = await http.get("/contacts", { params });
-  const raw = response.data;
-  return {
-    data: extractCollection(raw, "contacts").map((contact) => contactSchema.parse(contact)),
-    total: raw?.total ?? 0,
-    page: raw?.page ?? 1,
-    limit: raw?.limit ?? 20,
-    total_pages: raw?.total_pages ?? 1,
-  };
+  return paginatedSchema(contactSchema).parse(response.data);
 }
 
 export async function lookupContactByIdentification(identification: string) {
   try {
     const response = await http.get(`/contacts/lookup/${encodeURIComponent(identification)}`);
-    return contactSchema.parse(extractEntity(response.data, "contact"));
+    return contactSchema.parse(extractEntity(response.data, ["contact"]));
   } catch (error) {
     const status = (error as AxiosError | undefined)?.response?.status;
 

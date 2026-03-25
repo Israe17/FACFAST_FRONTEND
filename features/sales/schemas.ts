@@ -236,6 +236,10 @@ export const electronicDocumentSchema = z
       can_resubmit: z.boolean().optional().catch(false),
       reasons: z.array(z.string()).optional().catch([]),
     }).optional().catch({}),
+    assets: z.object({
+      has_xml: z.boolean().optional().catch(false),
+      has_pdf: z.boolean().optional().catch(false),
+    }).optional().catch({}),
     created_at: z.string().optional(),
     updated_at: z.string().optional(),
   })

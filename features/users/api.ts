@@ -1,5 +1,5 @@
 import { http } from "@/shared/lib/http";
-import { compactRecord } from "@/shared/lib/utils";
+import { extractCollection, extractEntity, compactRecord } from "@/shared/lib/api-helpers";
 
 import { branchOptionSchema, effectivePermissionsSchema, userSchema } from "./schemas";
 import type {
@@ -10,53 +10,6 @@ import type {
   UpdateUserInput,
   UpdateUserStatusInput,
 } from "./types";
-
-function extractCollection(data: unknown, explicitKey?: string) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (!data || typeof data !== "object") {
-    return [];
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [
-    explicitKey,
-    "items",
-    "data",
-    "results",
-    "users",
-    "roles",
-    "branches",
-    "permissions",
-  ];
-
-  for (const key of keys) {
-    if (key && Array.isArray(record[key])) {
-      return record[key];
-    }
-  }
-
-  return [];
-}
-
-function extractEntity(data: unknown, explicitKey?: string) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return data;
-  }
-
-  const record = data as Record<string, unknown>;
-  const keys = [explicitKey, "data", "item", "result", "user", "role"];
-
-  for (const key of keys) {
-    if (key && record[key] !== undefined) {
-      return record[key];
-    }
-  }
-
-  return data;
-}
 
 function toUniqueNumberArray(values?: string[]) {
   if (!values?.length) {
@@ -83,22 +36,22 @@ function buildUserMutationPayload(payload: CreateUserInput | UpdateUserInput) {
 
 export async function listUsers() {
   const response = await http.get("/users");
-  return extractCollection(response.data, "users").map((user) => userSchema.parse(user));
+  return extractCollection(response.data, ["users"]).map((user) => userSchema.parse(user));
 }
 
 export async function getUserById(userId: string) {
   const response = await http.get(`/users/${userId}`);
-  return userSchema.parse(extractEntity(response.data, "user"));
+  return userSchema.parse(extractEntity(response.data, ["user"]));
 }
 
 export async function createUser(payload: CreateUserInput) {
   const response = await http.post("/users", buildUserMutationPayload(payload));
-  return userSchema.parse(extractEntity(response.data, "user"));
+  return userSchema.parse(extractEntity(response.data, ["user"]));
 }
 
 export async function updateUser(userId: string, payload: UpdateUserInput) {
   const response = await http.patch(`/users/${userId}`, buildUserMutationPayload(payload));
-  return userSchema.parse(extractEntity(response.data, "user"));
+  return userSchema.parse(extractEntity(response.data, ["user"]));
 }
 
 export async function updateUserStatus(userId: string, payload: UpdateUserStatusInput) {
@@ -110,7 +63,7 @@ export async function updateUserStatus(userId: string, payload: UpdateUserStatus
     }),
   );
 
-  return userSchema.parse(extractEntity(response.data, "user"));
+  return userSchema.parse(extractEntity(response.data, ["user"]));
 }
 
 export async function changeUserPassword(userId: string, payload: ChangeUserPasswordInput) {
@@ -131,12 +84,12 @@ export async function assignUserBranches(userId: string, payload: AssignUserBran
 
 export async function getUserEffectivePermissions(userId: string) {
   const response = await http.get(`/users/${userId}/effective-permissions`);
-  return effectivePermissionsSchema.parse(extractEntity(response.data, "permissions") ?? response.data);
+  return effectivePermissionsSchema.parse(extractEntity(response.data, ["permissions"]) ?? response.data);
 }
 
 export async function listAssignableBranches() {
   const response = await http.get("/branches");
-  return extractCollection(response.data, "branches").map((branch) =>
+  return extractCollection(response.data, ["branches"]).map((branch) =>
     branchOptionSchema.parse(branch),
   );
 }

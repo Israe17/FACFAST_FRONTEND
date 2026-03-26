@@ -54,16 +54,16 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
 
   const ordersQuery = useDispatchOrdersQuery(enabled && canView);
-  const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id?.toString() ?? "", {
+  const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id ?? "", {
     showErrorToast: true,
   });
-  const dispatchMutation = useMarkDispatchDispatchedMutation(dispatchTarget?.id?.toString() ?? "", {
+  const dispatchMutation = useMarkDispatchDispatchedMutation(dispatchTarget?.id ?? "", {
     showErrorToast: true,
   });
-  const completeMutation = useMarkDispatchCompletedMutation(completeTarget?.id?.toString() ?? "", {
+  const completeMutation = useMarkDispatchCompletedMutation(completeTarget?.id ?? "", {
     showErrorToast: true,
   });
-  const cancelMutation = useCancelDispatchOrderMutation(cancelTarget?.id?.toString() ?? "", {
+  const cancelMutation = useCancelDispatchOrderMutation(cancelTarget?.id ?? "", {
     showErrorToast: true,
   });
 

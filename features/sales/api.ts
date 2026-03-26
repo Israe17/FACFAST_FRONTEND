@@ -1,5 +1,5 @@
 import { http } from "@/shared/lib/http";
-import { extractCollection, extractEntity, compactRecord, toNumberId } from "@/shared/lib/api-helpers";
+import { extractCollection, extractEntity, compactNullableRecord, toNumberId } from "@/shared/lib/api-helpers";
 import { withIdempotencyKey } from "@/shared/lib/idempotency";
 import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQueryParams } from "@/shared/lib/api-types";
 
@@ -7,7 +7,7 @@ import { electronicDocumentSchema, saleOrderSchema } from "./schemas";
 import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput, EmitElectronicDocumentInput } from "./types";
 
 function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderInput) {
-  return compactRecord({
+  return compactNullableRecord({
     branch_id: toNumberId(payload.branch_id),
     code: payload.code,
     customer_contact_id: toNumberId(payload.customer_contact_id),
@@ -17,7 +17,7 @@ function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderIn
     delivery_district: payload.delivery_district,
     delivery_province: payload.delivery_province,
     delivery_requested_date: payload.delivery_requested_date,
-    delivery_zone_id: toNumberId(payload.delivery_zone_id),
+    delivery_zone_id: toNumberId(payload.delivery_zone_id) ?? null,
     fulfillment_mode: payload.fulfillment_mode,
     internal_notes: payload.internal_notes,
     lines: payload.lines?.map((line: { product_variant_id?: string | number | null; [key: string]: unknown }) => ({
@@ -27,8 +27,8 @@ function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderIn
     notes: payload.notes,
     order_date: payload.order_date,
     sale_mode: payload.sale_mode,
-    seller_user_id: toNumberId(payload.seller_user_id),
-    warehouse_id: toNumberId(payload.warehouse_id),
+    seller_user_id: toNumberId(payload.seller_user_id) ?? null,
+    warehouse_id: toNumberId(payload.warehouse_id) ?? null,
   });
 }
 

@@ -85,9 +85,9 @@ function RouteForm({
             render={({ field }) => (
               <Select
                 onValueChange={(value) =>
-                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : Number(value))
+                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : value)
                 }
-                value={field.value != null ? String(field.value) : EMPTY_SELECT_VALUE}
+                value={field.value ?? EMPTY_SELECT_VALUE}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t("inventory.routes.select_zone")} />
@@ -116,9 +116,9 @@ function RouteForm({
             render={({ field }) => (
               <Select
                 onValueChange={(value) =>
-                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : Number(value))
+                  field.onChange(value === EMPTY_SELECT_VALUE ? undefined : value)
                 }
-                value={field.value != null ? String(field.value) : EMPTY_SELECT_VALUE}
+                value={field.value ?? EMPTY_SELECT_VALUE}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t("inventory.routes.select_vehicle")} />

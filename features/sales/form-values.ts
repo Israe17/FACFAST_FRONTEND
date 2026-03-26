@@ -60,7 +60,7 @@ export function getSaleOrderFormValues(order: SaleOrder): CreateSaleOrderInput {
     delivery_district: order.delivery_district ?? "",
     delivery_province: order.delivery_province ?? "",
     delivery_requested_date: order.delivery_requested_date ?? "",
-    delivery_zone_id: order.delivery_zone_id ?? undefined,
+    delivery_zone_id: order.delivery_zone_id != null ? String(order.delivery_zone_id) : undefined,
     fulfillment_mode: order.fulfillment_mode,
     internal_notes: order.internal_notes ?? "",
     lines: (order.lines ?? []).map((line) => ({
@@ -74,7 +74,7 @@ export function getSaleOrderFormValues(order: SaleOrder): CreateSaleOrderInput {
     notes: order.notes ?? "",
     order_date: typeof order.order_date === "string" ? order.order_date.split("T")[0] : "",
     sale_mode: order.sale_mode,
-    seller_user_id: order.seller_user_id ?? undefined,
-    warehouse_id: order.warehouse_id ?? undefined,
+    seller_user_id: order.seller_user_id != null ? String(order.seller_user_id) : undefined,
+    warehouse_id: order.warehouse_id != null ? String(order.warehouse_id) : undefined,
   };
 }

@@ -1441,9 +1441,9 @@ export const routeSchema = z
     created_at: z.string().optional(),
     day_of_week: z.string().nullable().optional().catch(null),
     default_driver: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-    default_driver_user_id: z.union([z.number(), z.null()]).optional().catch(null),
+    default_driver_user_id: nullableIdSchema.catch(null),
     default_vehicle: z.object({ id: idSchema, name: z.string(), plate_number: z.string() }).nullable().optional().catch(null),
-    default_vehicle_id: z.union([z.number(), z.null()]).optional().catch(null),
+    default_vehicle_id: nullableIdSchema.catch(null),
     description: z.string().nullable().optional().catch(undefined),
     estimated_cost: z.number().nullable().optional().catch(null),
     frequency: z.string().nullable().optional().catch(null),
@@ -1454,21 +1454,15 @@ export const routeSchema = z
     name: z.string().catch("Route"),
     updated_at: z.string().optional(),
     zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-    zone_id: z.union([z.number(), z.null()]).optional().catch(null),
+    zone_id: nullableIdSchema.catch(null),
   })
   .passthrough();
 
 export const createRouteSchema = z.object({
   code: makeOptionalCodeSchema("RT"),
   day_of_week: optionalTextSchema,
-  default_driver_user_id: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().positive().optional(),
-  ),
-  default_vehicle_id: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().positive().optional(),
-  ),
+  default_driver_user_id: makeOptionalIdSchema("Selecciona un chofer."),
+  default_vehicle_id: makeOptionalIdSchema("Selecciona un vehículo."),
   description: optionalTextSchema,
   estimated_cost: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
@@ -1477,10 +1471,7 @@ export const createRouteSchema = z.object({
   frequency: optionalTextSchema,
   is_active: z.boolean().default(true),
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
-  zone_id: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().positive().optional(),
-  ),
+  zone_id: makeOptionalIdSchema("Selecciona una zona."),
 });
 
 export const updateRouteSchema = createRouteSchema.partial().extend({
@@ -1490,15 +1481,15 @@ export const updateRouteSchema = createRouteSchema.partial().extend({
 // --- Dispatch Stop ---
 export const dispatchStopSchema = z.object({
   id: idSchema,
-  dispatch_order_id: z.union([z.number(), z.string()]).optional(),
-  sale_order_id: z.union([z.number(), z.string()]).optional(),
+  dispatch_order_id: idSchema.optional(),
+  sale_order_id: idSchema.optional(),
   sale_order: z.object({
     id: idSchema,
     code: z.string().nullable().optional(),
     status: z.string().optional(),
     dispatch_status: z.string().optional(),
   }).nullable().optional().catch(null),
-  customer_contact_id: z.union([z.number(), z.string()]).optional(),
+  customer_contact_id: idSchema.optional(),
   customer_contact: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   delivery_sequence: z.number(),
   delivery_address: z.string().nullable().optional().catch(null),
@@ -1529,13 +1520,13 @@ export const createDispatchStopSchema = z.object({
 // --- Dispatch Expense ---
 export const dispatchExpenseSchema = z.object({
   id: idSchema,
-  dispatch_order_id: z.union([z.number(), z.string()]).optional(),
+  dispatch_order_id: idSchema.optional(),
   expense_type: z.string(),
   description: z.string().nullable().optional().catch(null),
   amount: z.number(),
   receipt_number: z.string().nullable().optional().catch(null),
   notes: z.string().nullable().optional().catch(null),
-  created_by_user_id: z.union([z.number(), z.string()]).optional(),
+  created_by_user_id: idSchema.optional(),
   created_by_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
@@ -1557,23 +1548,23 @@ export const dispatchOrderSchema = z.object({
   id: idSchema,
   code: z.string().optional().catch(undefined),
   business_id: idSchema.optional().catch(undefined),
-  branch_id: z.union([z.number(), z.string()]).optional(),
+  branch_id: idSchema.optional(),
   branch: z.object({ id: idSchema, name: z.string().nullable() }).nullable().optional().catch(null),
   dispatch_type: z.enum(dispatchTypeValues).catch("individual"),
   status: z.enum(dispatchOrderStatusValues).catch("draft"),
-  route_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  route_id: nullableIdSchema.catch(null),
   route: z.object({ id: idSchema, code: z.string().nullable().optional(), name: z.string() }).nullable().optional().catch(null),
-  vehicle_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  vehicle_id: nullableIdSchema.catch(null),
   vehicle: z.object({ id: idSchema, code: z.string().nullable().optional(), name: z.string(), plate_number: z.string() }).nullable().optional().catch(null),
-  driver_user_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  driver_user_id: nullableIdSchema.catch(null),
   driver_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-  origin_warehouse_id: z.union([z.number(), z.string(), z.null()]).optional().catch(null),
+  origin_warehouse_id: nullableIdSchema.catch(null),
   origin_warehouse: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   scheduled_date: z.string().nullable().optional().catch(null),
   dispatched_at: z.string().nullable().optional().catch(null),
   completed_at: z.string().nullable().optional().catch(null),
   notes: z.string().nullable().optional().catch(null),
-  created_by_user_id: z.union([z.number(), z.string()]).optional(),
+  created_by_user_id: idSchema.optional(),
   created_by_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   stops: z.array(dispatchStopSchema).optional().catch([]),
   expenses: z.array(dispatchExpenseSchema).optional().catch([]),

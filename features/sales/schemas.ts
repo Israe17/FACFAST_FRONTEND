@@ -70,9 +70,9 @@ export const saleOrderLineSchema = z
       })
       .optional()
       .catch(undefined),
-    product_variant_id: z.union([z.number(), z.string()]).optional(),
+    product_variant_id: idSchema.optional(),
     quantity: z.number(),
-    sale_order_id: z.union([z.number(), z.string()]).optional(),
+    sale_order_id: idSchema.optional(),
     tax_amount: z.number().optional().catch(0),
     unit_price: z.number(),
     updated_at: z.string().optional(),
@@ -116,7 +116,7 @@ export const saleOrderDeliveryChargeSchema = z
     created_at: z.string().optional(),
     id: idSchema,
     notes: z.string().nullable().optional().catch(null),
-    sale_order_id: z.union([z.number(), z.string()]).optional(),
+    sale_order_id: idSchema.optional(),
     updated_at: z.string().optional(),
   })
   .passthrough();
@@ -134,14 +134,14 @@ export const createSaleOrderDeliveryChargeSchema = z.object({
 
 export const saleOrderSchema = z
   .object({
-    branch_id: z.union([z.number(), z.string()]).optional(),
+    branch_id: idSchema.optional(),
     branch: z.object({ id: idSchema, name: z.string().nullable() }).optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
-    created_by_user_id: z.union([z.number(), z.string()]).optional(),
+    created_by_user_id: idSchema.optional(),
     created_by_user: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
-    customer_contact_id: z.union([z.number(), z.string()]).optional(),
+    customer_contact_id: idSchema.optional(),
     customer_contact: z
       .object({ id: idSchema, name: z.string() })
       .optional()
@@ -153,7 +153,7 @@ export const saleOrderSchema = z
     delivery_province: z.string().nullable().optional().catch(null),
     delivery_requested_date: z.string().nullable().optional().catch(null),
     delivery_zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-    delivery_zone_id: z.union([z.number(), z.null()]).optional().catch(null),
+    delivery_zone_id: nullableIdSchema.catch(null),
     dispatch_status: z.enum(saleDispatchStatusValues).catch("pending"),
     fulfillment_mode: z.enum(fulfillmentModeValues).catch("pickup"),
     id: idSchema,
@@ -164,11 +164,11 @@ export const saleOrderSchema = z
     order_date: z.string(),
     sale_mode: z.enum(saleModeValues).catch("branch_direct"),
     seller: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-    seller_user_id: z.union([z.number(), z.null()]).optional().catch(null),
+    seller_user_id: nullableIdSchema.catch(null),
     status: z.enum(saleOrderStatusValues).catch("draft"),
     updated_at: z.string().optional(),
     warehouse: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
-    warehouse_id: z.union([z.number(), z.null()]).optional().catch(null),
+    warehouse_id: nullableIdSchema.catch(null),
   })
   .passthrough();
 
@@ -212,7 +212,7 @@ export const electronicDocumentSchema = z
     id: idSchema,
     code: z.string().optional().catch(undefined),
     business_id: idSchema.optional().catch(undefined),
-    branch_id: z.union([z.number(), z.string()]).optional(),
+    branch_id: idSchema.optional(),
     branch: z.object({ id: idSchema, name: z.string().nullable() }).nullable().optional().catch(null),
     sale_order: z.object({ id: idSchema, code: z.string().nullable().optional() }).nullable().optional().catch(null),
     document_type: z.enum(electronicDocumentTypeValues).catch("factura_electronica"),

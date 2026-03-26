@@ -514,14 +514,14 @@ export function getRouteFormValues(route: Route): CreateRouteInput {
   return {
     code: route.code ?? "",
     day_of_week: route.day_of_week ?? "",
-    default_driver_user_id: route.default_driver_user_id ?? undefined,
-    default_vehicle_id: route.default_vehicle_id ?? undefined,
+    default_driver_user_id: route.default_driver_user_id != null ? String(route.default_driver_user_id) : undefined,
+    default_vehicle_id: route.default_vehicle_id != null ? String(route.default_vehicle_id) : undefined,
     description: route.description ?? "",
     estimated_cost: route.estimated_cost ?? undefined,
     frequency: route.frequency ?? "",
     is_active: route.is_active,
     name: route.name,
-    zone_id: route.zone_id ?? undefined,
+    zone_id: route.zone_id != null ? String(route.zone_id) : undefined,
   };
 }
 
@@ -543,13 +543,13 @@ export function getDispatchOrderFormValues(order: DispatchOrder): CreateDispatch
     branch_id: String(order.branch?.id ?? ""),
     code: order.code ?? "",
     dispatch_type: order.dispatch_type,
-    driver_user_id: order.driver_user?.id ?? undefined,
+    driver_user_id: order.driver_user?.id != null ? String(order.driver_user.id) : undefined,
     notes: order.notes ?? "",
-    origin_warehouse_id: order.origin_warehouse?.id ?? undefined,
-    route_id: order.route?.id ?? undefined,
+    origin_warehouse_id: order.origin_warehouse?.id != null ? String(order.origin_warehouse.id) : undefined,
+    route_id: order.route?.id != null ? String(order.route.id) : undefined,
     scheduled_date: order.scheduled_date ?? "",
     stop_sale_order_ids: (order.stops ?? []).map((s) => String(s.sale_order?.id ?? "")),
-    vehicle_id: order.vehicle?.id ?? undefined,
+    vehicle_id: order.vehicle?.id != null ? String(order.vehicle.id) : undefined,
   };
 }
 

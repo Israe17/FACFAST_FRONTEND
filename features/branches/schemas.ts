@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 
+import { idSchema } from "@/shared/lib/api-types";
 import {
   branchCodePattern,
   branchNumberPattern,
@@ -11,8 +12,6 @@ import {
   terminalCodePattern,
   terminalNumberPattern,
 } from "@/shared/lib/validation";
-
-const stringIdSchema = z.union([z.string(), z.number()]).transform(String);
 const optionalTextSchema = optionalTrimmedString(z.string());
 const optionalCodeSchema = optionalTrimmedString(
   z.string().regex(branchCodePattern, "Usa el formato BR-0000 o mas largo."),
@@ -26,10 +25,10 @@ const optionalEmailSchema = optionalTrimmedString(
 
 export const terminalSchema = z
   .object({
-    branch_id: stringIdSchema.optional().catch(undefined),
+    branch_id: idSchema.optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
-    id: stringIdSchema,
+    id: idSchema,
     is_active: z.boolean().optional().default(true),
     name: z.string().catch("Terminal"),
     terminal_number: z.string().optional().catch(undefined),
@@ -42,7 +41,7 @@ export const branchSchema = z
     activity_code: z.string().optional().catch(undefined),
     address: z.string().optional().catch(undefined),
     branch_number: z.string().optional().catch(undefined),
-    business_id: stringIdSchema.optional().catch(undefined),
+    business_id: idSchema.optional().catch(undefined),
     business_name: z.string().optional().catch(undefined),
     canton: z.string().optional().catch(undefined),
     cedula_juridica: z.string().optional().catch(undefined),
@@ -56,7 +55,7 @@ export const branchSchema = z
     has_crypto_key: z.boolean().optional().default(false),
     has_hacienda_password: z.boolean().optional().default(false),
     has_mail_key: z.boolean().optional().default(false),
-    id: stringIdSchema,
+    id: idSchema,
     identification_number: z.string().optional().catch(undefined),
     identification_type: z
       .preprocess(normalizeIdentificationTypeValue, identificationTypeSchema.optional())

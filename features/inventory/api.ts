@@ -1112,17 +1112,17 @@ export async function deleteVehicle(vehicleId: string) {
 // --- Routes ---
 
 function buildRoutePayload(payload: CreateRouteInput | UpdateRouteInput) {
-  return compactRecord({
+  return compactNullableRecord({
     code: payload.code,
     day_of_week: payload.day_of_week,
-    default_driver_user_id: payload.default_driver_user_id,
-    default_vehicle_id: payload.default_vehicle_id,
+    default_driver_user_id: toOptionalNumberId(payload.default_driver_user_id) ?? null,
+    default_vehicle_id: toOptionalNumberId(payload.default_vehicle_id) ?? null,
     description: payload.description,
     estimated_cost: payload.estimated_cost,
     frequency: payload.frequency,
     is_active: payload.is_active,
     name: payload.name,
-    zone_id: payload.zone_id,
+    zone_id: toOptionalNumberId(payload.zone_id) ?? null,
   });
 }
 
@@ -1180,17 +1180,17 @@ export async function setRouteBranchAssignments(routeId: string, payload: SetBra
 // --- Dispatch Orders ---
 
 function buildDispatchOrderPayload(payload: CreateDispatchOrderInput | UpdateDispatchOrderInput) {
-  return compactRecord({
-    branch_id: payload.branch_id,
+  return compactNullableRecord({
+    branch_id: toOptionalNumberId(payload.branch_id),
     code: payload.code,
     dispatch_type: payload.dispatch_type,
-    driver_user_id: payload.driver_user_id,
+    driver_user_id: toOptionalNumberId(payload.driver_user_id) ?? null,
     notes: payload.notes,
-    origin_warehouse_id: payload.origin_warehouse_id,
-    route_id: payload.route_id,
+    origin_warehouse_id: toOptionalNumberId(payload.origin_warehouse_id) ?? null,
+    route_id: toOptionalNumberId(payload.route_id) ?? null,
     scheduled_date: payload.scheduled_date,
     stop_sale_order_ids: payload.stop_sale_order_ids,
-    vehicle_id: payload.vehicle_id,
+    vehicle_id: toOptionalNumberId(payload.vehicle_id) ?? null,
   });
 }
 

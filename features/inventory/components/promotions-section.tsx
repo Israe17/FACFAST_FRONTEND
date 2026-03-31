@@ -20,6 +20,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+
 import { useDeletePromotionMutation, useProductsQuery, usePromotionsQuery } from "../queries";
 import type { Promotion } from "../types";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -44,6 +46,8 @@ function PromotionsSection({ enabled = true }: PromotionsSectionProps) {
   const [branchAssignmentsTarget, setBranchAssignmentsTarget] = useState<Promotion | null>(null);
   const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Promotion | null>(null);
+  // Prefetch branches for promotion-branch-assignments dialog
+  useBranchesQuery(enabled && canView);
   const promotionsQuery = usePromotionsQuery(enabled && canView);
   const productsQuery = useProductsQuery(enabled && canViewProducts);
   const activeProducts = useMemo(

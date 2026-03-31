@@ -20,6 +20,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+
 import {
   useVehiclesQuery,
   useDeleteVehicleMutation,
@@ -47,6 +49,7 @@ function VehiclesSection({ enabled = true }: VehiclesSectionProps) {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Vehicle | null>(null);
   const [branchesTarget, setBranchesTarget] = useState<Vehicle | null>(null);
+  const branchesQuery = useBranchesQuery(enabled && canView);
   const vehiclesQuery = useVehiclesQuery(enabled && canView);
   const deleteMutation = useDeleteVehicleMutation({ showErrorToast: true });
   const branchAssignmentsQuery = useVehicleBranchAssignmentsQuery(
@@ -176,6 +179,7 @@ function VehiclesSection({ enabled = true }: VehiclesSectionProps) {
 
       <BranchAssignmentsDialog
         assignmentsQuery={branchAssignmentsQuery}
+        branches={branchesQuery.data ?? []}
         entityLabel={t("inventory.entity.vehicle")}
         entityName={branchesTarget?.name ?? ""}
         isPending={setBranchAssignmentsMutation.isPending}

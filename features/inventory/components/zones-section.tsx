@@ -20,6 +20,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+
 import {
   useZonesQuery,
   useDeleteZoneMutation,
@@ -47,6 +49,7 @@ function ZonesSection({ enabled = true }: ZonesSectionProps) {
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Zone | null>(null);
   const [branchesTarget, setBranchesTarget] = useState<Zone | null>(null);
+  const branchesQuery = useBranchesQuery(enabled && canView);
   const zonesQuery = useZonesQuery(enabled && canView);
   const deleteMutation = useDeleteZoneMutation({ showErrorToast: true });
   const branchAssignmentsQuery = useZoneBranchAssignmentsQuery(
@@ -176,6 +179,7 @@ function ZonesSection({ enabled = true }: ZonesSectionProps) {
 
       <BranchAssignmentsDialog
         assignmentsQuery={branchAssignmentsQuery}
+        branches={branchesQuery.data ?? []}
         entityLabel={t("inventory.entity.zone")}
         entityName={branchesTarget?.name ?? ""}
         isPending={setBranchAssignmentsMutation.isPending}

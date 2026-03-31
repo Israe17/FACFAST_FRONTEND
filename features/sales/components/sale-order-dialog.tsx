@@ -10,13 +10,18 @@ import {
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
+import { LoadingState } from "@/shared/components/loading-state";
 import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
 import type { Product, Warehouse, Zone } from "@/features/inventory/types";
 
 import { emptySaleOrderFormValues, getSaleOrderFormValues } from "../form-values";
-import { useCreateSaleOrderMutation, useUpdateSaleOrderMutation } from "../queries";
+import {
+  useCreateSaleOrderMutation,
+  useSaleOrderQuery,
+  useUpdateSaleOrderMutation,
+} from "../queries";
 import { createSaleOrderSchema } from "../schemas";
 import type { SaleOrder, CreateSaleOrderInput } from "../types";
 import { SaleOrderForm } from "./sale-order-form";
@@ -48,21 +53,29 @@ function SaleOrderDialog({
   const createMutation = useCreateSaleOrderMutation({ showErrorToast: false });
   const updateMutation = useUpdateSaleOrderMutation(order?.id ?? "", { showErrorToast: false });
 
+  // Fetch full detail (with lines + delivery_charges) when editing.
+  // The list endpoint does not include lines or charges.
+  const detailQuery = useSaleOrderQuery(
+    order?.id ? String(order.id) : "",
+  );
+  const fullOrder = detailQuery.data ?? order;
+  const isLoadingDetail = Boolean(order) && detailQuery.isLoading;
+
   // Seed current entity selections into catalog arrays so the select
   // can always find a matching option for the current value, even on
   // cold start or when the item has been deactivated.
-  const seededBranches = useSeedEntityOption(branches, order?.branch);
-  const seededContacts = useSeedEntityOption(contacts, order?.customer_contact);
-  const seededUsers = useSeedEntityOption(users, order?.seller);
-  const seededWarehouses = useSeedEntityOption(warehouses, order?.warehouse);
-  const seededZones = useSeedEntityOption(zones, order?.delivery_zone);
+  const seededBranches = useSeedEntityOption(branches, fullOrder?.branch);
+  const seededContacts = useSeedEntityOption(contacts, fullOrder?.customer_contact);
+  const seededUsers = useSeedEntityOption(users, fullOrder?.seller);
+  const seededWarehouses = useSeedEntityOption(warehouses, fullOrder?.warehouse);
+  const seededZones = useSeedEntityOption(zones, fullOrder?.delivery_zone);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<CreateSaleOrderInput, SaleOrder>({
     open,
     onOpenChange,
     schema: createSaleOrderSchema,
     defaultValues: emptySaleOrderFormValues,
-    entity: order,
+    entity: fullOrder,
     mapEntityToForm: getSaleOrderFormValues,
     mutation: order ? updateMutation : createMutation,
     fallbackErrorMessage: t(
@@ -81,23 +94,27 @@ function SaleOrderDialog({
           </DialogTitle>
           <DialogDescription>{t("sales.dialog_description")}</DialogDescription>
         </DialogHeader>
-        <SaleOrderForm
-          branches={seededBranches}
-          contacts={seededContacts}
-          form={form}
-          formError={formError}
-          isPending={isPending}
-          onSubmit={handleSubmit}
-          products={products}
-          submitLabel={
-            order
-              ? t("inventory.common.save_changes")
-              : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })
-          }
-          users={seededUsers}
-          warehouses={seededWarehouses}
-          zones={seededZones}
-        />
+        {isLoadingDetail ? (
+          <LoadingState description={t("sales.loading_order_detail")} />
+        ) : (
+          <SaleOrderForm
+            branches={seededBranches}
+            contacts={seededContacts}
+            form={form}
+            formError={formError}
+            isPending={isPending}
+            onSubmit={handleSubmit}
+            products={products}
+            submitLabel={
+              order
+                ? t("inventory.common.save_changes")
+                : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })
+            }
+            users={seededUsers}
+            warehouses={seededWarehouses}
+            zones={seededZones}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

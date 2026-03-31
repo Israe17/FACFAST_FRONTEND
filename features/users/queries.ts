@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { sessionQueryKey } from "@/features/auth/queries";
 import { useSession } from "@/shared/hooks/use-session";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
 import { rolesKeys } from "@/features/roles/queries";
 
@@ -63,6 +64,7 @@ export function useUsersQuery(enabled = true) {
     enabled,
     queryKey: usersKeys.list(),
     queryFn: listUsers,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -87,6 +89,7 @@ export function useAssignableBranchesQuery(enabled = true) {
     enabled,
     queryKey: usersKeys.branches(),
     queryFn: listAssignableBranches,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 

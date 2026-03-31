@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
+import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
 
 import {
   cancelInventoryMovement,
@@ -251,6 +252,7 @@ export function useBrandsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.brands(),
     queryFn: listBrands,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -302,6 +304,7 @@ export function useMeasurementUnitsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.measurementUnits(),
     queryFn: listMeasurementUnits,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -354,6 +357,7 @@ export function useProductCategoriesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.productCategories(),
     queryFn: listProductCategories,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -420,6 +424,7 @@ export function useTaxProfilesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.taxProfiles(),
     queryFn: listTaxProfiles,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -428,6 +433,7 @@ export function useProductsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.products(),
     queryFn: listProducts,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -468,9 +474,11 @@ export function useCreateProductMutation(options: MutationFeedbackOptions = {}) 
   return useMutation({
     mutationFn: (payload: CreateProductInput) => createProduct(payload),
     onSuccess: (product) => {
+      if (product) {
+        queryClient.setQueryData(inventoryKeys.product(String(product.id)), product);
+      }
       invalidateInventoryQueries(queryClient, [
         inventoryKeys.products(),
-        inventoryKeys.product(product.id),
         inventoryKeys.productVariants(product.id),
         inventoryKeys.productPrices(product.id),
         inventoryKeys.warehouseStock(),
@@ -498,10 +506,12 @@ export function useUpdateProductMutation(
   return useMutation({
     mutationFn: (payload: CreateProductInput | UpdateProductInput) =>
       updateProduct(productId, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response) {
+        queryClient.setQueryData(inventoryKeys.product(productId), response);
+      }
       invalidateInventoryQueries(queryClient, [
         inventoryKeys.products(),
-        inventoryKeys.product(productId),
         inventoryKeys.productVariants(productId),
         inventoryKeys.productPrices(productId),
         inventoryKeys.warehouseStock(),
@@ -524,6 +534,7 @@ export function usePriceListsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.priceLists(),
     queryFn: listPriceLists,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -876,6 +887,7 @@ export function useWarrantyProfilesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.warrantyProfiles(),
     queryFn: listWarrantyProfiles,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -928,6 +940,7 @@ export function useWarehousesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.warehouses(),
     queryFn: listWarehouses,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -2263,6 +2276,7 @@ export function useZonesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.zones(),
     queryFn: listZones,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -2336,6 +2350,7 @@ export function useVehiclesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.vehicles(),
     queryFn: listVehicles,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -2410,6 +2425,7 @@ export function useRoutesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.routes(),
     queryFn: listRoutes,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -2623,7 +2639,10 @@ export function useCreateDispatchOrderMutation(options: MutationFeedbackOptions 
 
   return useMutation({
     mutationFn: (payload: CreateDispatchOrderInput) => createDispatchOrder(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response) {
+        queryClient.setQueryData(inventoryKeys.dispatchOrder(String(response.id)), response);
+      }
       invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
       toast.success(t("common.create_success"));
     },
@@ -2646,11 +2665,11 @@ export function useUpdateDispatchOrderMutation(
 
   return useMutation({
     mutationFn: (payload: UpdateDispatchOrderInput) => updateDispatchOrder(orderId, payload),
-    onSuccess: () => {
-      invalidateInventoryQueries(queryClient, [
-        inventoryKeys.dispatchOrders(),
-        inventoryKeys.dispatchOrder(orderId),
-      ]);
+    onSuccess: (response) => {
+      if (response) {
+        queryClient.setQueryData(inventoryKeys.dispatchOrder(orderId), response);
+      }
+      invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
       toast.success(t("common.update_success"));
     },
     onError: (error) => {

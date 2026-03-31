@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
-import { useBranchesQuery } from "@/features/branches/queries";
-import { useSaleOrdersQuery } from "@/features/sales/queries";
-import { useUsersQuery } from "@/features/users/queries";
+import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
+import type { Branch } from "@/features/branches/types";
+import type { User } from "@/features/users/types";
+import type { SaleOrder } from "@/features/sales/types";
 
 import {
   emptyDispatchOrderFormValues,
@@ -20,33 +21,46 @@ import {
 import {
   useCreateDispatchOrderMutation,
   useUpdateDispatchOrderMutation,
-  useRoutesQuery,
-  useVehiclesQuery,
-  useWarehousesQuery,
 } from "../queries";
 import { createDispatchOrderSchema } from "../schemas";
-import type { DispatchOrder, CreateDispatchOrderInput } from "../types";
+import type { DispatchOrder, CreateDispatchOrderInput, Route, Vehicle, Warehouse } from "../types";
 import { DispatchOrderForm } from "./dispatch-order-form";
 
 type DispatchOrderDialogProps = {
+  branches: Branch[];
+  users: User[];
+  warehouses: Warehouse[];
+  routes: Route[];
+  vehicles: Vehicle[];
+  saleOrders: SaleOrder[];
   order?: DispatchOrder | null;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
-function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogProps) {
+function DispatchOrderDialog({
+  branches,
+  users,
+  warehouses,
+  routes,
+  vehicles,
+  saleOrders,
+  order,
+  onOpenChange,
+  open,
+}: DispatchOrderDialogProps) {
   const { t } = useAppTranslator();
   const createMutation = useCreateDispatchOrderMutation({ showErrorToast: false });
   const updateMutation = useUpdateDispatchOrderMutation(order?.id ?? "", {
     showErrorToast: false,
   });
 
-  const { data: branches = [] } = useBranchesQuery(open);
-  const { data: warehouses = [] } = useWarehousesQuery(open);
-  const { data: routes = [] } = useRoutesQuery(open);
-  const { data: vehicles = [] } = useVehiclesQuery(open);
-  const { data: users = [] } = useUsersQuery(open);
-  const { data: saleOrders = [] } = useSaleOrdersQuery(open);
+  // Seed current entity selections into catalog arrays
+  const seededBranches = useSeedEntityOption(branches, order?.branch);
+  const seededRoutes = useSeedEntityOption(routes, order?.route);
+  const seededVehicles = useSeedEntityOption(vehicles, order?.vehicle);
+  const seededUsers = useSeedEntityOption(users, order?.driver_user);
+  const seededWarehouses = useSeedEntityOption(warehouses, order?.origin_warehouse);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<
     CreateDispatchOrderInput,
@@ -84,12 +98,12 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
           </DialogDescription>
         </DialogHeader>
         <DispatchOrderForm
-          branches={branches}
+          branches={seededBranches}
           form={form}
           formError={formError}
           isPending={isPending}
           onSubmit={handleSubmit}
-          routes={routes}
+          routes={seededRoutes}
           saleOrders={saleOrders}
           submitLabel={
             order
@@ -98,9 +112,9 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
                   entity: t("inventory.entity.dispatch_order"),
                 })
           }
-          users={users}
-          vehicles={vehicles}
-          warehouses={warehouses}
+          users={seededUsers}
+          vehicles={seededVehicles}
+          warehouses={seededWarehouses}
         />
       </DialogContent>
     </Dialog>

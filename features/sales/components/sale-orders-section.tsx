@@ -20,6 +20,15 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+import { useContactsQuery } from "@/features/contacts/queries";
+import { useUsersQuery } from "@/features/users/queries";
+import {
+  useProductsQuery,
+  useWarehousesQuery,
+  useZonesQuery,
+} from "@/features/inventory/queries";
+
 import {
   useSaleOrdersQuery,
   useConfirmSaleOrderMutation,
@@ -49,6 +58,14 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const [confirmTarget, setConfirmTarget] = useState<SaleOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<SaleOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SaleOrder | null>(null);
+  // Prefetch catalogs at section level so they are in cache when dialog opens
+  const branchesQuery = useBranchesQuery(enabled && canView);
+  const contactsQuery = useContactsQuery(enabled && canView);
+  const usersQuery = useUsersQuery(enabled && canView);
+  const warehousesQuery = useWarehousesQuery(enabled && canView);
+  const productsQuery = useProductsQuery(enabled && canView);
+  const zonesQuery = useZonesQuery(enabled && canView);
+
   const ordersQuery = useSaleOrdersQuery(enabled && canView);
   const confirmMutation = useConfirmSaleOrderMutation(confirmTarget?.id ?? "", {
     showErrorToast: true,
@@ -147,6 +164,12 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
       </CatalogSectionCard>
 
       <SaleOrderDialog
+        branches={branchesQuery.data ?? []}
+        contacts={contactsQuery.data ?? []}
+        users={usersQuery.data ?? []}
+        warehouses={warehousesQuery.data ?? []}
+        products={productsQuery.data ?? []}
+        zones={zonesQuery.data ?? []}
         order={selectedOrder}
         onOpenChange={(open) => {
           setDialogOpen(open);

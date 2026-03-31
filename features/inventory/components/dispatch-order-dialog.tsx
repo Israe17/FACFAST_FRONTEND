@@ -20,6 +20,7 @@ import {
 } from "../form-values";
 import {
   useCreateDispatchOrderMutation,
+  useDispatchOrderQuery,
   useUpdateDispatchOrderMutation,
 } from "../queries";
 import { createDispatchOrderSchema } from "../schemas";
@@ -55,12 +56,19 @@ function DispatchOrderDialog({
     showErrorToast: false,
   });
 
+  // Fetch full detail (with stops + expenses) when editing.
+  // The list endpoint does not include stops or expenses.
+  // When detailQuery resolves, fullOrder changes → useDialogForm's
+  // useEffect([open, entity]) fires → form.reset() with complete data.
+  const detailQuery = useDispatchOrderQuery(order?.id ? String(order.id) : "");
+  const fullOrder = detailQuery.data ?? order;
+
   // Seed current entity selections into catalog arrays
-  const seededBranches = useSeedEntityOption(branches, order?.branch);
-  const seededRoutes = useSeedEntityOption(routes, order?.route);
-  const seededVehicles = useSeedEntityOption(vehicles, order?.vehicle);
-  const seededUsers = useSeedEntityOption(users, order?.driver_user);
-  const seededWarehouses = useSeedEntityOption(warehouses, order?.origin_warehouse);
+  const seededBranches = useSeedEntityOption(branches, fullOrder?.branch);
+  const seededRoutes = useSeedEntityOption(routes, fullOrder?.route);
+  const seededVehicles = useSeedEntityOption(vehicles, fullOrder?.vehicle);
+  const seededUsers = useSeedEntityOption(users, fullOrder?.driver_user);
+  const seededWarehouses = useSeedEntityOption(warehouses, fullOrder?.origin_warehouse);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<
     CreateDispatchOrderInput,
@@ -70,7 +78,7 @@ function DispatchOrderDialog({
     onOpenChange,
     schema: createDispatchOrderSchema,
     defaultValues: emptyDispatchOrderFormValues,
-    entity: order,
+    entity: fullOrder,
     mapEntityToForm: getDispatchOrderFormValues,
     mutation: order ? updateMutation : createMutation,
     fallbackErrorMessage: t(

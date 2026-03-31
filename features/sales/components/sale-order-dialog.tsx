@@ -16,7 +16,11 @@ import type { User } from "@/features/users/types";
 import type { Product, Warehouse, Zone } from "@/features/inventory/types";
 
 import { emptySaleOrderFormValues, getSaleOrderFormValues } from "../form-values";
-import { useCreateSaleOrderMutation, useUpdateSaleOrderMutation } from "../queries";
+import {
+  useCreateSaleOrderMutation,
+  useSaleOrderQuery,
+  useUpdateSaleOrderMutation,
+} from "../queries";
 import { createSaleOrderSchema } from "../schemas";
 import type { SaleOrder, CreateSaleOrderInput } from "../types";
 import { SaleOrderForm } from "./sale-order-form";
@@ -48,21 +52,26 @@ function SaleOrderDialog({
   const createMutation = useCreateSaleOrderMutation({ showErrorToast: false });
   const updateMutation = useUpdateSaleOrderMutation(order?.id ?? "", { showErrorToast: false });
 
-  // Seed current entity selections into catalog arrays so the select
-  // can always find a matching option for the current value, even on
-  // cold start or when the item has been deactivated.
-  const seededBranches = useSeedEntityOption(branches, order?.branch);
-  const seededContacts = useSeedEntityOption(contacts, order?.customer_contact);
-  const seededUsers = useSeedEntityOption(users, order?.seller);
-  const seededWarehouses = useSeedEntityOption(warehouses, order?.warehouse);
-  const seededZones = useSeedEntityOption(zones, order?.delivery_zone);
+  // Fetch full detail (with lines + delivery_charges) when editing.
+  // The list endpoint does not include lines or charges.
+  // When detailQuery resolves, fullOrder changes → useDialogForm's
+  // useEffect([open, entity]) fires → form.reset() with complete data.
+  const detailQuery = useSaleOrderQuery(order?.id ? String(order.id) : "");
+  const fullOrder = detailQuery.data ?? order;
+
+  // Seed current entity selections into catalog arrays
+  const seededBranches = useSeedEntityOption(branches, fullOrder?.branch);
+  const seededContacts = useSeedEntityOption(contacts, fullOrder?.customer_contact);
+  const seededUsers = useSeedEntityOption(users, fullOrder?.seller);
+  const seededWarehouses = useSeedEntityOption(warehouses, fullOrder?.warehouse);
+  const seededZones = useSeedEntityOption(zones, fullOrder?.delivery_zone);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<CreateSaleOrderInput, SaleOrder>({
     open,
     onOpenChange,
     schema: createSaleOrderSchema,
     defaultValues: emptySaleOrderFormValues,
-    entity: order,
+    entity: fullOrder,
     mapEntityToForm: getSaleOrderFormValues,
     mutation: order ? updateMutation : createMutation,
     fallbackErrorMessage: t(

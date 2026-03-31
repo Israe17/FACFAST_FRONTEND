@@ -75,16 +75,18 @@ function DispatchOrderForm({
   const selectedStopIds = watch("stop_sale_order_ids") ?? [];
 
   // Filter sale orders: confirmed + delivery fulfillment + pending dispatch status
+  // Also include orders already assigned to THIS dispatch (they have status "assigned"
+  // but should still appear as selected when editing)
   const eligibleSaleOrders = useMemo(
     () =>
       saleOrders.filter(
         (o) =>
           o.status === "confirmed" &&
           o.fulfillment_mode === "delivery" &&
-          o.dispatch_status === "pending" &&
+          (o.dispatch_status === "pending" || selectedStopIds.includes(String(o.id))) &&
           (!selectedBranchId || String(o.branch_id) === String(selectedBranchId)),
       ),
-    [saleOrders, selectedBranchId],
+    [saleOrders, selectedBranchId, selectedStopIds],
   );
 
   const activeBranches = useMemo(

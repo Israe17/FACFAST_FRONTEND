@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
+import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
 
 import {
   assignRolePermissions,
@@ -36,6 +37,7 @@ export function useRolesQuery(enabled = true) {
     enabled,
     queryKey: rolesKeys.list(),
     queryFn: listRoles,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -44,6 +46,7 @@ export function useAvailablePermissionsQuery(enabled = true) {
     enabled,
     queryKey: rolesKeys.permissions(),
     queryFn: listAvailablePermissions,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 

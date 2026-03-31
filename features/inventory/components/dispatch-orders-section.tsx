@@ -20,12 +20,19 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+import { useUsersQuery } from "@/features/users/queries";
+import { useSaleOrdersQuery } from "@/features/sales/queries";
+
 import {
   useDispatchOrdersQuery,
   useMarkDispatchReadyMutation,
   useMarkDispatchDispatchedMutation,
   useMarkDispatchCompletedMutation,
   useCancelDispatchOrderMutation,
+  useRoutesQuery,
+  useVehiclesQuery,
+  useWarehousesQuery,
 } from "../queries";
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
@@ -52,6 +59,14 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [dispatchTarget, setDispatchTarget] = useState<DispatchOrder | null>(null);
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
+
+  // Prefetch catalogs at section level so they are in cache when dialog opens
+  const branchesQuery = useBranchesQuery(enabled && canView);
+  const usersQuery = useUsersQuery(enabled && canView);
+  const warehousesQuery = useWarehousesQuery(enabled && canView);
+  const routesQuery = useRoutesQuery(enabled && canView);
+  const vehiclesQuery = useVehiclesQuery(enabled && canView);
+  const saleOrdersQuery = useSaleOrdersQuery(enabled && canView);
 
   const ordersQuery = useDispatchOrdersQuery(enabled && canView);
   const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id ?? "", {
@@ -167,6 +182,12 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
       </CatalogSectionCard>
 
       <DispatchOrderDialog
+        branches={branchesQuery.data ?? []}
+        users={usersQuery.data ?? []}
+        warehouses={warehousesQuery.data ?? []}
+        routes={routesQuery.data ?? []}
+        vehicles={vehiclesQuery.data ?? []}
+        saleOrders={saleOrdersQuery.data ?? []}
         order={selectedOrder}
         onOpenChange={(open) => {
           setDialogOpen(open);

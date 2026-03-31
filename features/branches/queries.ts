@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
 import { parseBackendError } from "@/shared/lib/backend-error-parser";
+import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
 import { usersKeys } from "@/features/users/queries";
 
 import {
@@ -89,6 +90,7 @@ export function useBranchesQuery(enabled = true) {
     enabled,
     queryKey: branchesKeys.list(),
     queryFn: listBranches,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 

@@ -9,14 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
-import { useBranchesQuery } from "@/features/branches/queries";
-import { useContactsQuery } from "@/features/contacts/queries";
-import { useUsersQuery } from "@/features/users/queries";
-import {
-  useProductsQuery,
-  useWarehousesQuery,
-  useZonesQuery,
-} from "@/features/inventory/queries";
+import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
+import type { Branch } from "@/features/branches/types";
+import type { Contact } from "@/features/contacts/types";
+import type { User } from "@/features/users/types";
+import type { Product, Warehouse, Zone } from "@/features/inventory/types";
 
 import { emptySaleOrderFormValues, getSaleOrderFormValues } from "../form-values";
 import { useCreateSaleOrderMutation, useUpdateSaleOrderMutation } from "../queries";
@@ -25,22 +22,40 @@ import type { SaleOrder, CreateSaleOrderInput } from "../types";
 import { SaleOrderForm } from "./sale-order-form";
 
 type SaleOrderDialogProps = {
+  branches: Branch[];
+  contacts: Contact[];
+  users: User[];
+  warehouses: Warehouse[];
+  products: Product[];
+  zones: Zone[];
   order?: SaleOrder | null;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
-function SaleOrderDialog({ order, onOpenChange, open }: SaleOrderDialogProps) {
+function SaleOrderDialog({
+  branches,
+  contacts,
+  users,
+  warehouses,
+  products,
+  zones,
+  order,
+  onOpenChange,
+  open,
+}: SaleOrderDialogProps) {
   const { t } = useAppTranslator();
   const createMutation = useCreateSaleOrderMutation({ showErrorToast: false });
   const updateMutation = useUpdateSaleOrderMutation(order?.id ?? "", { showErrorToast: false });
 
-  const { data: branches = [] } = useBranchesQuery(open);
-  const { data: contacts = [] } = useContactsQuery(open);
-  const { data: users = [] } = useUsersQuery(open);
-  const { data: warehouses = [] } = useWarehousesQuery(open);
-  const { data: products = [] } = useProductsQuery(open);
-  const { data: zones = [] } = useZonesQuery(open);
+  // Seed current entity selections into catalog arrays so the select
+  // can always find a matching option for the current value, even on
+  // cold start or when the item has been deactivated.
+  const seededBranches = useSeedEntityOption(branches, order?.branch);
+  const seededContacts = useSeedEntityOption(contacts, order?.customer_contact);
+  const seededUsers = useSeedEntityOption(users, order?.seller);
+  const seededWarehouses = useSeedEntityOption(warehouses, order?.warehouse);
+  const seededZones = useSeedEntityOption(zones, order?.delivery_zone);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<CreateSaleOrderInput, SaleOrder>({
     open,
@@ -67,8 +82,8 @@ function SaleOrderDialog({ order, onOpenChange, open }: SaleOrderDialogProps) {
           <DialogDescription>{t("sales.dialog_description")}</DialogDescription>
         </DialogHeader>
         <SaleOrderForm
-          branches={branches}
-          contacts={contacts}
+          branches={seededBranches}
+          contacts={seededContacts}
           form={form}
           formError={formError}
           isPending={isPending}
@@ -79,9 +94,9 @@ function SaleOrderDialog({ order, onOpenChange, open }: SaleOrderDialogProps) {
               ? t("inventory.common.save_changes")
               : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })
           }
-          users={users}
-          warehouses={warehouses}
-          zones={zones}
+          users={seededUsers}
+          warehouses={seededWarehouses}
+          zones={seededZones}
         />
       </DialogContent>
     </Dialog>

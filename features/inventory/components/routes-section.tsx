@@ -20,11 +20,15 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+
 import {
   useRoutesQuery,
   useDeleteRouteMutation,
   useRouteBranchAssignmentsQuery,
   useSetRouteBranchAssignmentsMutation,
+  useZonesQuery,
+  useVehiclesQuery,
 } from "../queries";
 import type { Route, SetBranchAssignmentsInput } from "../types";
 import { BranchAssignmentsDialog } from "./branch-assignments-dialog";
@@ -47,6 +51,11 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Route | null>(null);
   const [branchesTarget, setBranchesTarget] = useState<Route | null>(null);
+  // Prefetch catalogs at section level
+  const zonesQuery = useZonesQuery(enabled && canView);
+  const vehiclesQuery = useVehiclesQuery(enabled && canView);
+  const branchesQuery = useBranchesQuery(enabled && canView);
+
   const routesQuery = useRoutesQuery(enabled && canView);
   const deleteMutation = useDeleteRouteMutation({ showErrorToast: true });
   const branchAssignmentsQuery = useRouteBranchAssignmentsQuery(
@@ -143,6 +152,8 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
 
       <RouteDialog
         route={selectedRoute}
+        zones={zonesQuery.data ?? []}
+        vehicles={vehiclesQuery.data ?? []}
         onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) {
@@ -176,6 +187,7 @@ function RoutesSection({ enabled = true }: RoutesSectionProps) {
 
       <BranchAssignmentsDialog
         assignmentsQuery={branchAssignmentsQuery}
+        branches={branchesQuery.data ?? []}
         entityLabel={t("inventory.entity.route")}
         entityName={branchesTarget?.name ?? ""}
         isPending={setBranchAssignmentsMutation.isPending}

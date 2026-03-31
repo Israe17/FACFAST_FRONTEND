@@ -98,7 +98,10 @@ export function useCreateSaleOrderMutation(options: MutationFeedbackOptions = {}
 
   return useMutation({
     mutationFn: (payload: CreateSaleOrderInput) => createSaleOrder(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response) {
+        queryClient.setQueryData(salesKeys.order(String(response.id)), response);
+      }
       invalidateSalesQueries(queryClient, [salesKeys.orders()]);
       toast.success(t("common.create_success"));
     },
@@ -121,8 +124,11 @@ export function useUpdateSaleOrderMutation(
 
   return useMutation({
     mutationFn: (payload: UpdateSaleOrderInput) => updateSaleOrder(orderId, payload),
-    onSuccess: () => {
-      invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
+    onSuccess: (response) => {
+      if (response) {
+        queryClient.setQueryData(salesKeys.order(orderId), response);
+      }
+      invalidateSalesQueries(queryClient, [salesKeys.orders()]);
       toast.success(t("common.update_success"));
     },
     onError: (error) => {

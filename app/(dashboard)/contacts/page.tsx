@@ -12,7 +12,10 @@ import { CreateContactDialog } from "@/features/contacts/components/create-conta
 import { EditContactDialog } from "@/features/contacts/components/edit-contact-dialog";
 import { ContactTypeBadge } from "@/features/contacts/components/contact-type-badge";
 import { ContactsTable } from "@/features/contacts/components/contacts-table";
+import { useBranchesQuery } from "@/features/branches/queries";
 import { useContactLookupQuery, useContactsPaginatedQuery } from "@/features/contacts/queries";
+import { useUsersQuery } from "@/features/users/queries";
+import { usePriceListsQuery } from "@/features/inventory/queries";
 import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { DataCard } from "@/shared/components/data-card";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -38,6 +41,10 @@ export default function ContactsPage() {
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "name" });
   const contactsQuery = useContactsPaginatedQuery(queryParams, can("contacts.view") && canRunTenantQueries);
+  // Prefetch catalogs for row-action dialogs (branch assignments)
+  useBranchesQuery(can("branches.view") && canRunTenantQueries);
+  usePriceListsQuery(can("contacts.view") && canRunTenantQueries);
+  useUsersQuery(can("users.view") && canRunTenantQueries);
   const lookupQuery = useContactLookupQuery(
     submittedLookup,
     canRunTenantQueries && Boolean(submittedLookup),

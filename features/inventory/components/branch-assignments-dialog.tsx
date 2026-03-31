@@ -18,7 +18,6 @@ import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { useBranchesQuery } from "@/features/branches/queries";
 import type { Branch } from "@/features/branches/types";
 
 import type { BranchAssignmentsView, SetBranchAssignmentsInput } from "../types";
@@ -31,6 +30,7 @@ type BranchAssignmentsDialogProps = {
     isLoading: boolean;
     refetch: () => void;
   };
+  branches: Branch[];
   entityLabel: string;
   entityName: string;
   isPending: boolean;
@@ -41,6 +41,7 @@ type BranchAssignmentsDialogProps = {
 
 function BranchAssignmentsDialog({
   assignmentsQuery,
+  branches,
   entityLabel,
   entityName,
   isPending,
@@ -49,8 +50,6 @@ function BranchAssignmentsDialog({
   open,
 }: BranchAssignmentsDialogProps) {
   const { t } = useAppTranslator();
-  const branchesQuery = useBranchesQuery(open);
-  const branches = branchesQuery.data ?? [];
 
   const [isGlobal, setIsGlobal] = useState(true);
   const [selectedBranchIds, setSelectedBranchIds] = useState<number[]>([]);
@@ -99,15 +98,14 @@ function BranchAssignmentsDialog({
 
         <QueryStateWrapper
           errorDescription={getBackendErrorMessage(
-            assignmentsQuery.error ?? branchesQuery.error,
+            assignmentsQuery.error,
             t("inventory.branch_assignments.load_error"),
           )}
-          isError={assignmentsQuery.isError || branchesQuery.isError}
-          isLoading={assignmentsQuery.isLoading || branchesQuery.isLoading}
+          isError={assignmentsQuery.isError}
+          isLoading={assignmentsQuery.isLoading}
           loadingDescription={t("inventory.branch_assignments.loading")}
           onRetry={() => {
             assignmentsQuery.refetch();
-            branchesQuery.refetch();
           }}
         >
           <div className="space-y-4">

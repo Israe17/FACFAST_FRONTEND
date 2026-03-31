@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CreateUserDialog } from "@/features/users/components/create-user-dialog";
 import { UsersTable } from "@/features/users/components/users-table";
-import { useUsersQuery } from "@/features/users/queries";
+import { useAssignableBranchesQuery, useUsersQuery } from "@/features/users/queries";
+import { useRolesQuery } from "@/features/roles/queries";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -26,6 +27,9 @@ export default function UsersPage() {
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const usersQuery = useUsersQuery(can("users.view") && canRunTenantQueries);
+  // Prefetch catalogs for row-action dialogs (assign roles, assign branches)
+  useRolesQuery(can("roles.view") && canRunTenantQueries);
+  useAssignableBranchesQuery(can("users.view") && canRunTenantQueries);
 
   if (!can("users.view")) {
     return (

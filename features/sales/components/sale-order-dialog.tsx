@@ -10,7 +10,6 @@ import {
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
-import { LoadingState } from "@/shared/components/loading-state";
 import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
@@ -55,15 +54,12 @@ function SaleOrderDialog({
 
   // Fetch full detail (with lines + delivery_charges) when editing.
   // The list endpoint does not include lines or charges.
-  const detailQuery = useSaleOrderQuery(
-    order?.id ? String(order.id) : "",
-  );
+  // When detailQuery resolves, fullOrder changes → useDialogForm's
+  // useEffect([open, entity]) fires → form.reset() with complete data.
+  const detailQuery = useSaleOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
-  const isLoadingDetail = Boolean(order) && detailQuery.isLoading;
 
-  // Seed current entity selections into catalog arrays so the select
-  // can always find a matching option for the current value, even on
-  // cold start or when the item has been deactivated.
+  // Seed current entity selections into catalog arrays
   const seededBranches = useSeedEntityOption(branches, fullOrder?.branch);
   const seededContacts = useSeedEntityOption(contacts, fullOrder?.customer_contact);
   const seededUsers = useSeedEntityOption(users, fullOrder?.seller);
@@ -94,27 +90,23 @@ function SaleOrderDialog({
           </DialogTitle>
           <DialogDescription>{t("sales.dialog_description")}</DialogDescription>
         </DialogHeader>
-        {isLoadingDetail ? (
-          <LoadingState description={t("sales.loading_order_detail")} />
-        ) : (
-          <SaleOrderForm
-            branches={seededBranches}
-            contacts={seededContacts}
-            form={form}
-            formError={formError}
-            isPending={isPending}
-            onSubmit={handleSubmit}
-            products={products}
-            submitLabel={
-              order
-                ? t("inventory.common.save_changes")
-                : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })
-            }
-            users={seededUsers}
-            warehouses={seededWarehouses}
-            zones={seededZones}
-          />
-        )}
+        <SaleOrderForm
+          branches={seededBranches}
+          contacts={seededContacts}
+          form={form}
+          formError={formError}
+          isPending={isPending}
+          onSubmit={handleSubmit}
+          products={products}
+          submitLabel={
+            order
+              ? t("inventory.common.save_changes")
+              : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })
+          }
+          users={seededUsers}
+          warehouses={seededWarehouses}
+          zones={seededZones}
+        />
       </DialogContent>
     </Dialog>
   );

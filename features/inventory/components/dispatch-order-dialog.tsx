@@ -10,7 +10,6 @@ import {
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
-import { LoadingState } from "@/shared/components/loading-state";
 import type { Branch } from "@/features/branches/types";
 import type { User } from "@/features/users/types";
 import type { SaleOrder } from "@/features/sales/types";
@@ -59,11 +58,10 @@ function DispatchOrderDialog({
 
   // Fetch full detail (with stops + expenses) when editing.
   // The list endpoint does not include stops or expenses.
-  const detailQuery = useDispatchOrderQuery(
-    order?.id ? String(order.id) : "",
-  );
+  // When detailQuery resolves, fullOrder changes → useDialogForm's
+  // useEffect([open, entity]) fires → form.reset() with complete data.
+  const detailQuery = useDispatchOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
-  const isLoadingDetail = Boolean(order) && detailQuery.isLoading;
 
   // Seed current entity selections into catalog arrays
   const seededBranches = useSeedEntityOption(branches, fullOrder?.branch);
@@ -107,29 +105,25 @@ function DispatchOrderDialog({
             {t("inventory.dispatch.dialog_description")}
           </DialogDescription>
         </DialogHeader>
-        {isLoadingDetail ? (
-          <LoadingState description={t("inventory.dispatch.loading_detail")} />
-        ) : (
-          <DispatchOrderForm
-            branches={seededBranches}
-            form={form}
-            formError={formError}
-            isPending={isPending}
-            onSubmit={handleSubmit}
-            routes={seededRoutes}
-            saleOrders={saleOrders}
-            submitLabel={
-              order
-                ? t("inventory.common.save_changes")
-                : t("inventory.common.create_entity", {
-                    entity: t("inventory.entity.dispatch_order"),
-                  })
-            }
-            users={seededUsers}
-            vehicles={seededVehicles}
-            warehouses={seededWarehouses}
-          />
-        )}
+        <DispatchOrderForm
+          branches={seededBranches}
+          form={form}
+          formError={formError}
+          isPending={isPending}
+          onSubmit={handleSubmit}
+          routes={seededRoutes}
+          saleOrders={saleOrders}
+          submitLabel={
+            order
+              ? t("inventory.common.save_changes")
+              : t("inventory.common.create_entity", {
+                  entity: t("inventory.entity.dispatch_order"),
+                })
+          }
+          users={seededUsers}
+          vehicles={seededVehicles}
+          warehouses={seededWarehouses}
+        />
       </DialogContent>
     </Dialog>
   );

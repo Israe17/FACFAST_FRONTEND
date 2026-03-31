@@ -1403,8 +1403,6 @@ const esTranslations = {
   "sales.section_description": "Gestiona las órdenes de venta.",
   "sales.dialog_description":
     "Completa los campos para la orden de venta.",
-  "sales.loading_order_detail":
-    "Cargando detalle de la orden...",
   "sales.order_create_error_fallback":
     "Error al crear la orden de venta.",
   "sales.order_update_error_fallback":
@@ -1534,8 +1532,6 @@ const esTranslations = {
   "inventory.dispatch.section_description": "Gestiona las órdenes de despacho y logística.",
   "inventory.dispatch.dialog_description":
     "Completa los campos para la orden de despacho.",
-  "inventory.dispatch.loading_detail":
-    "Cargando detalle de la orden...",
   "inventory.dispatch.dispatch_type": "Tipo de despacho",
   "inventory.dispatch.status": "Estado",
   "inventory.dispatch.scheduled_date": "Fecha programada",
@@ -3059,8 +3055,6 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.section_description": "Manage sale orders.",
     "sales.dialog_description":
       "Fill in the fields for the sale order.",
-    "sales.loading_order_detail":
-      "Loading order detail...",
     "sales.order_create_error_fallback":
       "Error creating the sale order.",
     "sales.order_update_error_fallback":

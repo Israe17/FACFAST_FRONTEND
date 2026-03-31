@@ -470,6 +470,32 @@ export function useUpdateSaleOrderMutation(
 
 ---
 
+## Cross-Module Cache Invalidation Pattern
+
+When a mutation in module A changes data that module B displays, module A's
+mutation must invalidate module B's queries.
+
+### Current cross-module invalidations
+
+| Mutation | Affects | Must invalidate |
+|----------|---------|-----------------|
+| Dispatch: ready, dispatched, completed, cancel | Sale order `dispatch_status` | `salesKeys.orders()` |
+| Sale: confirm, cancel | Dispatch eligibility | `inventoryKeys.dispatchOrders()` |
+
+### Rule
+
+Before writing a mutation's `onSuccess`, ask: **does this backend action
+change data that another module's table/list displays?** If yes, invalidate
+that module's list query.
+
+Common cross-module relationships:
+
+- **dispatch ↔ sales**: dispatch lifecycle changes sale order `dispatch_status`
+- **sales ↔ inventory**: confirming a sale reserves stock (affects balances)
+- **inventory movements ↔ warehouse stock**: movements change stock quantities
+
+---
+
 ## Form Values Pattern
 
 The `form-values.ts` file maps backend response → form state.

@@ -548,7 +548,7 @@ export function getDispatchOrderFormValues(order: DispatchOrder): CreateDispatch
     origin_warehouse_id: order.origin_warehouse?.id != null ? String(order.origin_warehouse.id) : undefined,
     route_id: order.route?.id != null ? String(order.route.id) : undefined,
     scheduled_date: order.scheduled_date ?? "",
-    stop_sale_order_ids: (order.stops ?? []).map((s) => String(s.sale_order?.id ?? "")),
+    stop_sale_order_ids: (order.stops ?? []).map((s) => String(s.sale_order_id ?? s.sale_order?.id ?? "")),
     vehicle_id: order.vehicle?.id != null ? String(order.vehicle.id) : undefined,
   };
 }

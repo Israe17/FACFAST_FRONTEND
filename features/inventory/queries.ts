@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
 import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
+import { salesKeys } from "@/features/sales/queries";
 
 import {
   cancelInventoryMovement,
@@ -2800,6 +2801,7 @@ export function useMarkDispatchReadyMutation(
         inventoryKeys.dispatchOrders(),
         inventoryKeys.dispatchOrder(orderId),
       ]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.update_success"));
     },
     onError: (error) => {
@@ -2826,6 +2828,7 @@ export function useMarkDispatchDispatchedMutation(
         inventoryKeys.dispatchOrders(),
         inventoryKeys.dispatchOrder(orderId),
       ]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.update_success"));
     },
     onError: (error) => {
@@ -2852,6 +2855,7 @@ export function useMarkDispatchCompletedMutation(
         inventoryKeys.dispatchOrders(),
         inventoryKeys.dispatchOrder(orderId),
       ]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.update_success"));
     },
     onError: (error) => {
@@ -2878,6 +2882,7 @@ export function useCancelDispatchOrderMutation(
         inventoryKeys.dispatchOrders(),
         inventoryKeys.dispatchOrder(orderId),
       ]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.update_success"));
     },
     onError: (error) => {

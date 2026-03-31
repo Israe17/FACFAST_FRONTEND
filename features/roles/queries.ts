@@ -36,6 +36,7 @@ export function useRolesQuery(enabled = true) {
     enabled,
     queryKey: rolesKeys.list(),
     queryFn: listRoles,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -44,6 +45,7 @@ export function useAvailablePermissionsQuery(enabled = true) {
     enabled,
     queryKey: rolesKeys.permissions(),
     queryFn: listAvailablePermissions,
+    staleTime: 10 * 60 * 1000,
   });
 }
 

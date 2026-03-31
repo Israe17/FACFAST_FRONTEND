@@ -20,12 +20,17 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+
 import {
   useDispatchOrdersQuery,
   useMarkDispatchReadyMutation,
   useMarkDispatchDispatchedMutation,
   useMarkDispatchCompletedMutation,
   useCancelDispatchOrderMutation,
+  useWarehousesQuery,
+  useRoutesQuery,
+  useVehiclesQuery,
 } from "../queries";
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
@@ -52,6 +57,12 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [dispatchTarget, setDispatchTarget] = useState<DispatchOrder | null>(null);
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
+
+  // Prefetch lightweight catalogs at section level so dialogs open instantly
+  useBranchesQuery();
+  useWarehousesQuery();
+  useRoutesQuery();
+  useVehiclesQuery();
 
   const ordersQuery = useDispatchOrdersQuery(enabled && canView);
   const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id ?? "", {

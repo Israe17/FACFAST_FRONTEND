@@ -63,6 +63,7 @@ export function useUsersQuery(enabled = true) {
     enabled,
     queryKey: usersKeys.list(),
     queryFn: listUsers,
+    staleTime: 10 * 60 * 1000,
   });
 }
 

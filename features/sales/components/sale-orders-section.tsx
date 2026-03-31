@@ -20,6 +20,10 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { useBranchesQuery } from "@/features/branches/queries";
+import { useContactsQuery } from "@/features/contacts/queries";
+import { useWarehousesQuery, useZonesQuery } from "@/features/inventory/queries";
+
 import {
   useSaleOrdersQuery,
   useConfirmSaleOrderMutation,
@@ -49,6 +53,12 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const [confirmTarget, setConfirmTarget] = useState<SaleOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<SaleOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SaleOrder | null>(null);
+  // Prefetch lightweight catalogs at section level so dialogs open instantly
+  useBranchesQuery();
+  useContactsQuery();
+  useWarehousesQuery();
+  useZonesQuery();
+
   const ordersQuery = useSaleOrdersQuery(enabled && canView);
   const confirmMutation = useConfirmSaleOrderMutation(confirmTarget?.id ?? "", {
     showErrorToast: true,

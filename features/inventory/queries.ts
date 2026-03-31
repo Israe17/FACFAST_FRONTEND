@@ -251,6 +251,7 @@ export function useBrandsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.brands(),
     queryFn: listBrands,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -302,6 +303,7 @@ export function useMeasurementUnitsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.measurementUnits(),
     queryFn: listMeasurementUnits,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -354,6 +356,7 @@ export function useProductCategoriesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.productCategories(),
     queryFn: listProductCategories,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -420,6 +423,7 @@ export function useTaxProfilesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.taxProfiles(),
     queryFn: listTaxProfiles,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -428,6 +432,7 @@ export function useProductsQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.products(),
     queryFn: listProducts,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -876,6 +881,7 @@ export function useWarrantyProfilesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.warrantyProfiles(),
     queryFn: listWarrantyProfiles,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -928,6 +934,7 @@ export function useWarehousesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.warehouses(),
     queryFn: listWarehouses,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -2263,6 +2270,7 @@ export function useZonesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.zones(),
     queryFn: listZones,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -2336,6 +2344,7 @@ export function useVehiclesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.vehicles(),
     queryFn: listVehicles,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -2410,6 +2419,7 @@ export function useRoutesQuery(enabled = true) {
     enabled,
     queryKey: inventoryKeys.routes(),
     queryFn: listRoutes,
+    staleTime: 10 * 60 * 1000,
   });
 }
 

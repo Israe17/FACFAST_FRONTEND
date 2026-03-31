@@ -100,6 +100,80 @@ export function getOrderFormValues(order: Order): CreateOrderInput {
 }
 ```
 
+## Response Schema Arrays
+
+Child collections in response schemas MUST use `.default([])`, NEVER `.catch([])`.
+
+- `.default([])` — applies only when the field is `undefined`/missing. If the data is present but malformed, Zod throws a visible error.
+- `.catch([])` — silently replaces the ENTIRE array with `[]` if ANY item fails parsing, hiding data loss.
+
+```typescript
+// CORRECT
+lines: z.array(lineSchema).optional().default([]),
+
+// WRONG — hides parsing failures
+lines: z.array(lineSchema).optional().catch([]),
+```
+
+## Payload Builders — Explicit Field Mapping
+
+Never spread Zod output (`...line`) in payload builders. Spreading includes `undefined` properties that can override backend defaults. Map each field explicitly:
+
+```typescript
+// CORRECT
+lines: payload.lines?.map((line) =>
+  compactNullableRecord({
+    product_variant_id: toNumberId(line.product_variant_id),
+    quantity: line.quantity,
+    unit_price: line.unit_price,
+  }),
+),
+
+// WRONG — includes unwanted undefined fields
+lines: payload.lines?.map((line) => ({
+  ...line,
+  product_variant_id: toNumberId(line.product_variant_id),
+})),
+```
+
+## Catalog Query Strategy
+
+### Classification
+
+- **Lightweight catalogs** (branches, contacts, warehouses, zones, vehicles, routes, brands, categories, tax profiles, warranty profiles, measurement units): Small, stable data. Prefetch at section level. `staleTime: 10 * 60 * 1000`.
+- **Heavy catalogs** (products with variants, users with permissions): Large payload. Lazy-load with `enabled: !!open` only when dialog opens. `staleTime: 10 * 60 * 1000`.
+- **Operational lists** (sale orders, dispatch orders): Frequently changing. Default staleTime. NOT catalogs.
+
+### Prefetch Pattern
+
+Lightweight catalogs are prefetched at the section component level (e.g., `SaleOrdersSection`, `DispatchOrdersSection`) so they are warm in cache when dialogs open:
+
+```typescript
+// In the section component:
+useBranchesQuery();      // prefetch — no enabled guard
+useWarehousesQuery();    // prefetch — no enabled guard
+
+// In the dialog component:
+const { data: branches = [] } = useBranchesQuery();      // reads from cache
+const { data: users = [] } = useUsersQuery(open);         // heavy — lazy load
+```
+
+### staleTime
+
+All stable catalog queries use `staleTime: 10 * 60 * 1000` (10 minutes). This prevents redundant refetches when navigating between sections or opening dialogs.
+
+## useDialogForm — Reset Guard
+
+The `useDialogForm` hook's reset effect MUST guard against `!open` to prevent a race condition where `form.reset()` runs unnecessarily when the dialog closes:
+
+```typescript
+useEffect(() => {
+  if (!open) return;
+  form.reset(entity && mapEntityToForm ? mapEntityToForm(entity) : defaultValues);
+  resetBackendFormErrors();
+}, [open, entity]);
+```
+
 ## Checklist for New Forms
 
 1. **Response schema** — FK required → `idSchema`. FK nullable → `nullableIdSchema.catch(null)`.

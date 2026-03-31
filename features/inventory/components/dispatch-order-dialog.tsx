@@ -41,10 +41,12 @@ function DispatchOrderDialog({ order, onOpenChange, open }: DispatchOrderDialogP
     showErrorToast: false,
   });
 
-  const { data: branches = [] } = useBranchesQuery(open);
-  const { data: warehouses = [] } = useWarehousesQuery(open);
-  const { data: routes = [] } = useRoutesQuery(open);
-  const { data: vehicles = [] } = useVehiclesQuery(open);
+  // Lightweight catalogs: prefetched at section level, always enabled
+  const { data: branches = [] } = useBranchesQuery();
+  const { data: warehouses = [] } = useWarehousesQuery();
+  const { data: routes = [] } = useRoutesQuery();
+  const { data: vehicles = [] } = useVehiclesQuery();
+  // Heavy catalogs: only fetch when dialog is open
   const { data: users = [] } = useUsersQuery(open);
   const { data: saleOrders = [] } = useSaleOrdersQuery(open);
 

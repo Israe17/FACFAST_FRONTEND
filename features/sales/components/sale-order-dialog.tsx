@@ -35,12 +35,14 @@ function SaleOrderDialog({ order, onOpenChange, open }: SaleOrderDialogProps) {
   const createMutation = useCreateSaleOrderMutation({ showErrorToast: false });
   const updateMutation = useUpdateSaleOrderMutation(order?.id ?? "", { showErrorToast: false });
 
-  const { data: branches = [] } = useBranchesQuery(open);
-  const { data: contacts = [] } = useContactsQuery(open);
+  // Lightweight catalogs: prefetched at section level, always enabled
+  const { data: branches = [] } = useBranchesQuery();
+  const { data: contacts = [] } = useContactsQuery();
+  const { data: warehouses = [] } = useWarehousesQuery();
+  const { data: zones = [] } = useZonesQuery();
+  // Heavy catalogs: only fetch when dialog is open
   const { data: users = [] } = useUsersQuery(open);
-  const { data: warehouses = [] } = useWarehousesQuery(open);
   const { data: products = [] } = useProductsQuery(open);
-  const { data: zones = [] } = useZonesQuery(open);
 
   const { form, formError, handleSubmit, isPending } = useDialogForm<CreateSaleOrderInput, SaleOrder>({
     open,

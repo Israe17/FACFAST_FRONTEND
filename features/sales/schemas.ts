@@ -24,10 +24,10 @@ const lifecycleFieldSchema = z
     can_confirm: z.boolean().optional().catch(false),
     can_delete: z.boolean().optional().catch(false),
     can_edit: z.boolean().optional().catch(false),
-    reasons: z.array(z.string()).optional().catch([]),
+    reasons: z.array(z.string()).optional().default([]),
   })
   .optional()
-  .catch({});
+  .catch({ reasons: [] });
 
 function makeOptionalCodeSchema(prefix: string) {
   return optionalTrimmedString(
@@ -148,7 +148,7 @@ export const saleOrderSchema = z
       .catch(undefined),
     delivery_address: z.string().nullable().optional().catch(null),
     delivery_canton: z.string().nullable().optional().catch(null),
-    delivery_charges: z.array(saleOrderDeliveryChargeSchema).optional().catch([]),
+    delivery_charges: z.array(saleOrderDeliveryChargeSchema).optional().default([]),
     delivery_district: z.string().nullable().optional().catch(null),
     delivery_province: z.string().nullable().optional().catch(null),
     delivery_requested_date: z.string().nullable().optional().catch(null),
@@ -159,7 +159,7 @@ export const saleOrderSchema = z
     id: idSchema,
     internal_notes: z.string().nullable().optional().catch(null),
     lifecycle: lifecycleFieldSchema,
-    lines: z.array(saleOrderLineSchema).optional().catch([]),
+    lines: z.array(saleOrderLineSchema).optional().default([]),
     notes: z.string().nullable().optional().catch(null),
     order_date: z.string(),
     sale_mode: z.enum(saleModeValues).catch("branch_direct"),
@@ -234,8 +234,8 @@ export const electronicDocumentSchema = z
     accepted_at: z.string().nullable().optional().catch(null),
     lifecycle: z.object({
       can_resubmit: z.boolean().optional().catch(false),
-      reasons: z.array(z.string()).optional().catch([]),
-    }).optional().catch({}),
+      reasons: z.array(z.string()).optional().default([]),
+    }).optional().catch({ reasons: [] }),
     assets: z.object({
       has_xml: z.boolean().optional().catch(false),
       has_pdf: z.boolean().optional().catch(false),

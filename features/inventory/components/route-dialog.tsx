@@ -33,8 +33,8 @@ function RouteDialog({ route, onOpenChange, open }: RouteDialogProps) {
   const { t } = useAppTranslator();
   const createMutation = useCreateRouteMutation({ showErrorToast: false });
   const updateMutation = useUpdateRouteMutation(route?.id ?? "", { showErrorToast: false });
-  const zonesQuery = useZonesQuery(open);
-  const vehiclesQuery = useVehiclesQuery(open);
+  const zonesQuery = useZonesQuery();
+  const vehiclesQuery = useVehiclesQuery();
 
   const zones = useMemo(
     () =>

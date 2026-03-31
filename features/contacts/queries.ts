@@ -94,6 +94,7 @@ export function useContactsQuery(enabled = true) {
     enabled,
     queryKey: contactsKeys.list(),
     queryFn: listContacts,
+    staleTime: 10 * 60 * 1000,
   });
 }
 

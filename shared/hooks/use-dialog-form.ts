@@ -53,6 +53,7 @@ export function useDialogForm<TInput extends FieldValues, TEntity = unknown>({
     useBackendFormErrors(form);
 
   useEffect(() => {
+    if (!open) return;
     form.reset(entity && mapEntityToForm ? mapEntityToForm(entity) : defaultValues);
     resetBackendFormErrors();
   }, [open, entity]); // eslint-disable-line react-hooks/exhaustive-deps

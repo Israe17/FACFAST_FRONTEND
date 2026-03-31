@@ -89,6 +89,7 @@ export function useBranchesQuery(enabled = true) {
     enabled,
     queryKey: branchesKeys.list(),
     queryFn: listBranches,
+    staleTime: 10 * 60 * 1000,
   });
 }
 

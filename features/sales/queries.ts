@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
+import { inventoryKeys } from "@/features/inventory/queries";
 
 import type { CursorQueryParams, PaginatedQueryParams } from "@/shared/lib/api-types";
 import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
@@ -152,6 +153,7 @@ export function useConfirmSaleOrderMutation(
     mutationFn: () => confirmSaleOrder(orderId),
     onSuccess: () => {
       invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });
       toast.success(t("common.confirm_success"));
     },
     onError: (error) => {
@@ -175,6 +177,7 @@ export function useCancelSaleOrderMutation(
     mutationFn: (payload: CancelSaleOrderInput) => cancelSaleOrder(orderId, payload),
     onSuccess: () => {
       invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });
       toast.success(t("common.cancel_success"));
     },
     onError: (error) => {

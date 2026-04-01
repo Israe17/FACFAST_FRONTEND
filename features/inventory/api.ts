@@ -1255,6 +1255,10 @@ export async function cancelDispatchOrder(orderId: string) {
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }
 
+export async function deleteDispatchOrder(orderId: string) {
+  await http.delete(`/dispatch-orders/${orderId}`);
+}
+
 export async function updateDispatchStopStatus(
   orderId: string,
   stopId: string,

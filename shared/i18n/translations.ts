@@ -1548,6 +1548,10 @@ const esTranslations = {
   "inventory.dispatch.mark_ready_confirm": "¿Marcar esta orden como lista para despacho?",
   "inventory.dispatch.mark_completed": "Completar",
   "inventory.dispatch.cancel": "Cancelar despacho",
+  "inventory.dispatch.delete_confirm":
+    "Esta accion eliminara permanentemente la orden de despacho",
+  "inventory.dispatch_order_delete_error_fallback":
+    "Error al eliminar la orden de despacho.",
   "inventory.dispatch.update_stop_status": "Actualizar estado de parada",
   "inventory.dispatch.detail_description": "Detalle de la orden de despacho.",
   "inventory.dispatch.no_stops": "No hay paradas en esta orden.",
@@ -3199,6 +3203,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.dispatch.mark_ready_confirm": "Mark this order as ready for dispatch?",
     "inventory.dispatch.mark_completed": "Complete",
     "inventory.dispatch.cancel": "Cancel dispatch",
+    "inventory.dispatch.delete_confirm":
+      "This action will permanently delete the dispatch order",
+    "inventory.dispatch_order_delete_error_fallback":
+      "Error deleting the dispatch order.",
     "inventory.dispatch.update_stop_status": "Update stop status",
     "inventory.dispatch.detail_description": "Dispatch order detail.",
     "inventory.dispatch.no_stops": "No stops in this order.",

@@ -30,6 +30,7 @@ import {
   useMarkDispatchDispatchedMutation,
   useMarkDispatchCompletedMutation,
   useCancelDispatchOrderMutation,
+  useDeleteDispatchOrderMutation,
   useRoutesQuery,
   useVehiclesQuery,
   useWarehousesQuery,
@@ -51,6 +52,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const canCreate = can("dispatch_orders.create");
   const canUpdate = can("dispatch_orders.update");
   const canCancel = can("dispatch_orders.cancel");
+  const canDelete = can("dispatch_orders.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<DispatchOrder | null>(null);
@@ -59,6 +61,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [dispatchTarget, setDispatchTarget] = useState<DispatchOrder | null>(null);
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
   const branchesQuery = useBranchesQuery(enabled && canView);
@@ -79,6 +82,9 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
     showErrorToast: true,
   });
   const cancelMutation = useCancelDispatchOrderMutation(cancelTarget?.id ?? "", {
+    showErrorToast: true,
+  });
+  const deleteMutation = useDeleteDispatchOrderMutation(deleteTarget?.id ?? "", {
     showErrorToast: true,
   });
 
@@ -116,20 +122,28 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
     setCancelTarget(null);
   }, [cancelTarget, cancelMutation]);
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync();
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteMutation]);
+
   const columns = useMemo(
     () =>
       getDispatchOrdersColumns({
         canUpdate,
         canCancel,
+        canDelete,
         onEdit: handleEdit,
         onReady: setReadyTarget,
         onDispatch: setDispatchTarget,
         onComplete: setCompleteTarget,
         onCancel: setCancelTarget,
+        onDelete: setDeleteTarget,
         onViewDetail: handleViewDetail,
         t,
       }),
-    [canUpdate, canCancel, handleEdit, handleViewDetail, t],
+    [canUpdate, canCancel, canDelete, handleEdit, handleViewDetail, t],
   );
 
   if (!canView) {
@@ -302,6 +316,31 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleCancelConfirm}>
               {t("inventory.dispatch.cancel")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("inventory.common.delete")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("inventory.dispatch.delete_confirm")}: {deleteTarget?.code ?? ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              {t("inventory.common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

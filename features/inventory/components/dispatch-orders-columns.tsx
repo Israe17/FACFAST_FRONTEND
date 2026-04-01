@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, ClipboardCheck, Pencil, Send, XCircle } from "lucide-react";
+import { CheckCircle, ClipboardCheck, Pencil, Send, Trash2, XCircle } from "lucide-react";
 
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -11,11 +11,13 @@ import type { DispatchOrder } from "../types";
 type GetDispatchOrdersColumnsParams = {
   canUpdate: boolean;
   canCancel: boolean;
+  canDelete: boolean;
   onEdit: (order: DispatchOrder) => void;
   onReady: (order: DispatchOrder) => void;
   onDispatch: (order: DispatchOrder) => void;
   onComplete: (order: DispatchOrder) => void;
   onCancel: (order: DispatchOrder) => void;
+  onDelete: (order: DispatchOrder) => void;
   onViewDetail: (order: DispatchOrder) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
@@ -46,11 +48,13 @@ const typeTranslationMap: Record<string, FrontendTranslationKey> = {
 function getDispatchOrdersColumns({
   canUpdate,
   canCancel,
+  canDelete,
   onEdit,
   onReady,
   onDispatch,
   onComplete,
   onCancel,
+  onDelete,
   onViewDetail,
   t,
 }: GetDispatchOrdersColumnsParams): ColumnDef<DispatchOrder>[] {
@@ -127,7 +131,7 @@ function getDispatchOrdersColumns({
     },
   ];
 
-  const hasActions = canUpdate || canCancel;
+  const hasActions = canUpdate || canCancel || canDelete;
 
   if (hasActions) {
     baseColumns.push({
@@ -183,6 +187,16 @@ function getDispatchOrdersColumns({
                       icon: XCircle,
                       variant: "destructive" as const,
                       onClick: () => onCancel(order),
+                    },
+                  ]
+                : []),
+              ...(canDelete && lifecycle.can_delete
+                ? [
+                    {
+                      label: t("inventory.common.delete"),
+                      icon: Trash2,
+                      variant: "destructive" as const,
+                      onClick: () => onDelete(order),
                     },
                   ]
                 : []),

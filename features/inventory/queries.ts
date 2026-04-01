@@ -2645,6 +2645,7 @@ export function useCreateDispatchOrderMutation(options: MutationFeedbackOptions 
         queryClient.setQueryData(inventoryKeys.dispatchOrder(String(response.id)), response);
       }
       invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.create_success"));
     },
     onError: (error) => {
@@ -2671,6 +2672,7 @@ export function useUpdateDispatchOrderMutation(
         queryClient.setQueryData(inventoryKeys.dispatchOrder(orderId), response);
       }
       invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
       toast.success(t("common.update_success"));
     },
     onError: (error) => {

@@ -479,10 +479,14 @@ mutation must invalidate module B's queries.
 
 | Mutation | Affects | Must invalidate |
 |----------|---------|-----------------|
+| Dispatch: create, update | Sale order `dispatch_status` (ASSIGNED) | `salesKeys.orders()` |
 | Dispatch: ready, dispatched, completed, cancel | Sale order `dispatch_status` | `salesKeys.orders()` |
-| Sale: confirm, cancel | Dispatch eligibility | `inventoryKeys.dispatchOrders()` |
+| Sale: confirm, cancel, delete | Dispatch eligibility / stop references | `inventoryKeys.dispatchOrders()` |
 
 ### Rule
+
+Every mutation that changes data displayed by another module MUST invalidate
+that module's list query. This is not optional.
 
 Before writing a mutation's `onSuccess`, ask: **does this backend action
 change data that another module's table/list displays?** If yes, invalidate
@@ -491,6 +495,7 @@ that module's list query.
 Common cross-module relationships:
 
 - **dispatch ↔ sales**: dispatch lifecycle changes sale order `dispatch_status`
+- **sales ↔ dispatch**: sale order lifecycle affects dispatch stop eligibility
 - **sales ↔ inventory**: confirming a sale reserves stock (affects balances)
 - **inventory movements ↔ warehouse stock**: movements change stock quantities
 

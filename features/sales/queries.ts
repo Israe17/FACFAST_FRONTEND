@@ -201,6 +201,7 @@ export function useDeleteSaleOrderMutation(
     mutationFn: () => deleteSaleOrder(orderId),
     onSuccess: () => {
       invalidateSalesQueries(queryClient, [salesKeys.orders()]);
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });
       toast.success(t("common.delete_success"));
     },
     onError: (error) => {

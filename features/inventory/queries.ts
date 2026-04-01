@@ -125,6 +125,7 @@ import {
   markDispatchDispatched,
   markDispatchCompleted,
   cancelDispatchOrder,
+  deleteDispatchOrder,
   updateDispatchStopStatus,
 } from "./api";
 import type { PaginatedQueryParams, CursorQueryParams } from "@/shared/lib/api-types";
@@ -2891,6 +2892,30 @@ export function useCancelDispatchOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("inventory.dispatch_order_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useDeleteDispatchOrderMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => deleteDispatchOrder(orderId),
+    onSuccess: () => {
+      invalidateInventoryQueries(queryClient, [inventoryKeys.dispatchOrders()]);
+      queryClient.invalidateQueries({ queryKey: salesKeys.orders() });
+      toast.success(t("common.delete_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.dispatch_order_delete_error_fallback"),
         });
       }
     },

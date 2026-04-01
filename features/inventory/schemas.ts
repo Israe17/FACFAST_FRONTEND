@@ -1574,6 +1574,7 @@ export const dispatchOrderSchema = z.object({
     can_dispatch: z.boolean().optional().catch(false),
     can_complete: z.boolean().optional().catch(false),
     can_cancel: z.boolean().optional().catch(false),
+    can_delete: z.boolean().optional().catch(false),
   }).optional().catch({}),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

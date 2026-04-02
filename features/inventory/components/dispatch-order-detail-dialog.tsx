@@ -214,8 +214,8 @@ function DispatchOrderDetailDialog({
                       {stop.notes ? (
                         <p className="text-xs text-muted-foreground">{stop.notes}</p>
                       ) : null}
-                      {/* Show update status button only when dispatch is in transit or dispatched */}
-                      {(lifecycle.can_complete || lifecycle.can_dispatch) &&
+                      {/* Show update status button when order is dispatched/in_transit and stop is not resolved */}
+                      {(order.status === "dispatched" || order.status === "in_transit") &&
                       (stop.status === "pending" || stop.status === "in_transit") ? (
                         <Button
                           size="sm"

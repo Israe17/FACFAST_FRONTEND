@@ -36,6 +36,7 @@ import {
   useDeleteSaleOrderMutation,
 } from "../queries";
 import type { SaleOrder } from "../types";
+import { SaleOrderDetailDialog } from "./sale-order-detail-dialog";
 import { SaleOrderDialog } from "./sale-order-dialog";
 import { getSaleOrdersColumns } from "./sale-orders-columns";
 import { CatalogSectionCard } from "@/features/inventory/components/catalog-section-card";
@@ -54,7 +55,9 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const canCancel = can("sale_orders.cancel");
   const canDelete = can("sale_orders.delete");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SaleOrder | null>(null);
+  const [detailOrder, setDetailOrder] = useState<SaleOrder | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<SaleOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<SaleOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SaleOrder | null>(null);
@@ -80,6 +83,11 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const handleEdit = useCallback((order: SaleOrder) => {
     setSelectedOrder(order);
     setDialogOpen(true);
+  }, []);
+
+  const handleViewDetail = useCallback((order: SaleOrder) => {
+    setDetailOrder(order);
+    setDetailDialogOpen(true);
   }, []);
 
   const handleConfirmAction = useCallback(async () => {
@@ -111,9 +119,10 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
         onConfirm: setConfirmTarget,
         onCancel: setCancelTarget,
         onDelete: setDeleteTarget,
+        onViewDetail: handleViewDetail,
         t,
       }),
-    [canUpdate, canConfirm, canCancel, canDelete, handleEdit, t],
+    [canUpdate, canConfirm, canCancel, canDelete, handleEdit, handleViewDetail, t],
   );
 
   if (!canView) {
@@ -178,6 +187,15 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
           }
         }}
         open={dialogOpen}
+      />
+
+      <SaleOrderDetailDialog
+        order={detailOrder}
+        open={detailDialogOpen}
+        onOpenChange={(open) => {
+          setDetailDialogOpen(open);
+          if (!open) setDetailOrder(null);
+        }}
       />
 
       <AlertDialog

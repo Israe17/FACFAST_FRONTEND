@@ -17,6 +17,7 @@ type GetSaleOrdersColumnsParams = {
   onConfirm: (order: SaleOrder) => void;
   onCancel: (order: SaleOrder) => void;
   onDelete: (order: SaleOrder) => void;
+  onViewDetail: (order: SaleOrder) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
 };
 
@@ -73,6 +74,7 @@ function getSaleOrdersColumns({
   onConfirm,
   onCancel,
   onDelete,
+  onViewDetail,
   t,
 }: GetSaleOrdersColumnsParams): ColumnDef<SaleOrder>[] {
   const baseColumns: ColumnDef<SaleOrder>[] = [
@@ -81,7 +83,13 @@ function getSaleOrdersColumns({
       header: t("sales.entity.sale_order"),
       cell: ({ row }) => (
         <div className="space-y-1">
-          <p className="font-medium">{row.original.code ?? "-"}</p>
+          <button
+            className="font-medium text-primary hover:underline"
+            onClick={() => onViewDetail(row.original)}
+            type="button"
+          >
+            {row.original.code ?? "-"}
+          </button>
           <p className="text-sm text-muted-foreground">
             {formatDateTime(row.original.order_date)}
           </p>

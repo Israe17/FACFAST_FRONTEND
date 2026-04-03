@@ -1403,6 +1403,24 @@ const esTranslations = {
   "sales.section_description": "Gestiona las órdenes de venta.",
   "sales.dialog_description":
     "Completa los campos para la orden de venta.",
+  "sales.detail_description":
+    "Detalle de la orden de venta.",
+  "sales.lines": "Lineas",
+  "sales.no_lines": "No hay lineas en esta orden.",
+  "sales.subtotal": "Subtotal",
+  "sales.delivery_charges": "Cargos de entrega",
+  "sales.delivery_address": "Direccion de entrega",
+  "sales.delivery_zone": "Zona de entrega",
+  "sales.delivery_requested_date": "Fecha de entrega solicitada",
+  "sales.order_date": "Fecha de orden",
+  "sales.sale_mode": "Modo de venta",
+  "sales.branch": "Sucursal",
+  "sales.seller": "Vendedor",
+  "sales.warehouse": "Bodega",
+  "sales.created_by": "Creado por",
+  "sales.mode_branch_direct": "Venta directa en sucursal",
+  "sales.mode_seller_attributed": "Atribuida a vendedor",
+  "sales.mode_seller_route": "Ruta de vendedor",
   "sales.order_create_error_fallback":
     "Error al crear la orden de venta.",
   "sales.order_update_error_fallback":
@@ -3059,6 +3077,24 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.section_description": "Manage sale orders.",
     "sales.dialog_description":
       "Fill in the fields for the sale order.",
+    "sales.detail_description":
+      "Sale order detail.",
+    "sales.lines": "Lines",
+    "sales.no_lines": "No lines in this order.",
+    "sales.subtotal": "Subtotal",
+    "sales.delivery_charges": "Delivery charges",
+    "sales.delivery_address": "Delivery address",
+    "sales.delivery_zone": "Delivery zone",
+    "sales.delivery_requested_date": "Requested delivery date",
+    "sales.order_date": "Order date",
+    "sales.sale_mode": "Sale mode",
+    "sales.branch": "Branch",
+    "sales.seller": "Seller",
+    "sales.warehouse": "Warehouse",
+    "sales.created_by": "Created by",
+    "sales.mode_branch_direct": "Branch direct sale",
+    "sales.mode_seller_attributed": "Seller attributed",
+    "sales.mode_seller_route": "Seller route",
     "sales.order_create_error_fallback":
       "Error creating the sale order.",
     "sales.order_update_error_fallback":

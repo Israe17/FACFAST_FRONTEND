@@ -57,7 +57,9 @@ export function resolveTranslatedBackendMessage(
     }
   }
 
-  return options.fallbackMessage ?? backendError.message;
+  // Prefer the backend message over the fallback when the backend sent a
+  // specific translated message (not a generic internal error).
+  return backendError.message ?? options.fallbackMessage ?? null;
 }
 
 function resolveBannerMessage(

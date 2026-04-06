@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
@@ -90,10 +90,10 @@ function DispatchOrderDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent >
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent >
+        <DrawerHeader>
+          <DrawerTitle>
             {order
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.dispatch_order"),
@@ -101,11 +101,11 @@ function DispatchOrderDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.dispatch_order"),
                 })}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("inventory.dispatch.dialog_description")}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         <DispatchOrderForm
           branches={seededBranches}
           form={form}
@@ -125,8 +125,8 @@ function DispatchOrderDialog({
           vehicles={seededVehicles}
           warehouses={seededWarehouses}
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

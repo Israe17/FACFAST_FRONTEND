@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -48,10 +48,10 @@ function PriceListDialog({ onOpenChange, open, priceList }: PriceListDialogProps
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {priceList
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.price_list"),
@@ -59,9 +59,9 @@ function PriceListDialog({ onOpenChange, open, priceList }: PriceListDialogProps
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.price_list"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.price_lists.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.price_lists.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <PriceListForm
           form={form}
           formError={formError}
@@ -75,8 +75,8 @@ function PriceListDialog({ onOpenChange, open, priceList }: PriceListDialogProps
                 })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

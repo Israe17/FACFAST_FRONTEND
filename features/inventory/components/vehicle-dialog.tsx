@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -46,16 +46,16 @@ function VehicleDialog({ vehicle, onOpenChange, open }: VehicleDialogProps) {
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {vehicle
               ? t("inventory.common.edit_entity", { entity: t("inventory.entity.vehicle") })
               : t("inventory.common.create_entity", { entity: t("inventory.entity.vehicle") })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.vehicles.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.vehicles.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <VehicleForm
           form={form}
           formError={formError}
@@ -67,8 +67,8 @@ function VehicleDialog({ vehicle, onOpenChange, open }: VehicleDialogProps) {
               : t("inventory.common.create_entity", { entity: t("inventory.entity.vehicle") })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

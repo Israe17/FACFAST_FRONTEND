@@ -5,13 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
@@ -67,14 +67,14 @@ function EditTerminalDialog({
   }
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit terminal</SheetTitle>
-          <SheetDescription>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Edit terminal</DrawerTitle>
+          <DrawerDescription>
             Update the terminal configuration for this branch.
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         <TerminalForm
           form={form as unknown as UseFormReturn<TerminalFormValues>}
           formError={formError}
@@ -82,8 +82,8 @@ function EditTerminalDialog({
           onSubmit={(values) => handleSubmit(values as UpdateTerminalInput)}
           submitLabel="Save changes"
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

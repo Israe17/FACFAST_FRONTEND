@@ -5,13 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -84,15 +84,15 @@ function UpdateStopStatusDialog({
   }
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent >
-        <SheetHeader>
-          <SheetTitle>{t("inventory.dispatch.update_stop_status")}</SheetTitle>
-          <SheetDescription>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent >
+        <DrawerHeader>
+          <DrawerTitle>{t("inventory.dispatch.update_stop_status")}</DrawerTitle>
+          <DrawerDescription>
             {stop.sale_order?.code ?? `#${stop.sale_order_id}`} —{" "}
             {stop.customer_contact?.name ?? ""}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -162,8 +162,8 @@ function UpdateStopStatusDialog({
             </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

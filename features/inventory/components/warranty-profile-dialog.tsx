@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -58,10 +58,10 @@ function WarrantyProfileDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {warrantyProfile
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.warranty_profile"),
@@ -69,9 +69,9 @@ function WarrantyProfileDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.warranty_profile"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.warranty_profiles.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.warranty_profiles.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <WarrantyProfileForm
           form={form}
           formError={formError}
@@ -85,8 +85,8 @@ function WarrantyProfileDialog({
                 })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

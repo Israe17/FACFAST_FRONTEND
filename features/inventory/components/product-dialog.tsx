@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -71,10 +71,10 @@ function ProductDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-3xl">
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent className="sm:max-w-3xl">
+        <DrawerHeader>
+          <DrawerTitle>
             {product
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.product"),
@@ -82,9 +82,9 @@ function ProductDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.product"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.products.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.products.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <ProductForm
           brands={brands}
           categories={categories}
@@ -103,8 +103,8 @@ function ProductDialog({
           taxProfiles={taxProfiles}
           warrantyProfiles={warrantyProfiles}
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

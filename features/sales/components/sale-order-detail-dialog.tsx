@@ -11,12 +11,12 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -96,17 +96,17 @@ function SaleOrderDetailDialog({
   const grandTotal = linesTotal + chargesTotal;
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent className="sm:max-w-2xl">
+        <DrawerHeader>
+          <DrawerTitle className="flex items-center gap-2">
             <ShoppingCart className="size-5" />
             {fullOrder.code ?? t("sales.entity.sale_order")}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("sales.detail_description")}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         {/* Order Info */}
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -329,8 +329,8 @@ function SaleOrderDetailDialog({
             {fullOrder.created_at ? ` — ${formatDateTime(fullOrder.created_at)}` : ""}
           </div>
         ) : null}
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

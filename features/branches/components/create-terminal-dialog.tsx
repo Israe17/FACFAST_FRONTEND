@@ -3,13 +3,13 @@
 import type { UseFormReturn } from "react-hook-form";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -44,14 +44,14 @@ function CreateTerminalDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Create terminal</SheetTitle>
-          <SheetDescription>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Create terminal</DrawerTitle>
+          <DrawerDescription>
             Add a new terminal to {branchName}.
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         <TerminalForm
           form={form as unknown as UseFormReturn<TerminalFormValues>}
           formError={formError}
@@ -59,8 +59,8 @@ function CreateTerminalDialog({
           onSubmit={(values) => handleSubmit(values as CreateTerminalInput)}
           submitLabel="Create terminal"
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

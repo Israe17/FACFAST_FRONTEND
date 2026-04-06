@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -65,10 +65,10 @@ function ProductPriceDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {productPrice
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.product_price"),
@@ -76,13 +76,13 @@ function ProductPriceDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.product_price"),
                 })}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("inventory.product_prices.dialog_description", {
               product: product?.name ?? t("inventory.entity.product"),
             })}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         <ProductPriceForm
           form={form}
           formError={formError}
@@ -98,8 +98,8 @@ function ProductPriceDialog({
                 })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

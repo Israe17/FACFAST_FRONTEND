@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -51,10 +51,10 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {warehouse
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.warehouse"),
@@ -62,9 +62,9 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.warehouse"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.warehouses.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.warehouses.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <WarehouseForm
           branches={branches}
           form={form}
@@ -79,8 +79,8 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
                 })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

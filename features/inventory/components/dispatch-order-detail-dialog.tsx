@@ -14,13 +14,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -102,19 +102,19 @@ function DispatchOrderDetailDialog({
 
   return (
     <>
-      <Sheet onOpenChange={onOpenChange} open={open}>
-        <SheetContent className="sm:max-w-2xl">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent className="sm:max-w-2xl">
+          <DrawerHeader>
+            <DrawerTitle className="flex items-center gap-2">
               <Package className="size-5" />
               {order.code ?? t("inventory.entity.dispatch_order")}
-            </SheetTitle>
-            <SheetDescription>
+            </DrawerTitle>
+            <DrawerDescription>
               {t("inventory.dispatch.detail_description")}
-            </SheetDescription>
-          </SheetHeader>
+            </DrawerDescription>
+          </DrawerHeader>
 
-          <SheetBody>
+          <DrawerBody>
           {/* Order Info */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -340,9 +340,9 @@ function DispatchOrderDetailDialog({
               </div>
             </>
           ) : null}
-          </SheetBody>
-        </SheetContent>
-      </Sheet>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
 
       {stopStatusTarget && order ? (
         <UpdateStopStatusDialog

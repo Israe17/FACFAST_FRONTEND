@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -44,10 +44,10 @@ function MeasurementUnitDialog({ measurementUnit, onOpenChange, open }: Measurem
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {measurementUnit
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.measurement_unit"),
@@ -55,10 +55,10 @@ function MeasurementUnitDialog({ measurementUnit, onOpenChange, open }: Measurem
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.measurement_unit"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.measurement_units.dialog_description")}</SheetDescription>
-        </SheetHeader>
-        <SheetBody>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.measurement_units.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
+        <DrawerBody>
           <MeasurementUnitForm
             form={form}
             formError={formError}
@@ -72,9 +72,9 @@ function MeasurementUnitDialog({ measurementUnit, onOpenChange, open }: Measurem
                   })
             }
           />
-        </SheetBody>
-      </SheetContent>
-    </Sheet>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

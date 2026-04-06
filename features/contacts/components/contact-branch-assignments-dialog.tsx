@@ -7,13 +7,13 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -439,7 +439,7 @@ function ContactBranchAssignmentEditorDialog({
   }
 
   return (
-    <Sheet
+    <Drawer
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
           resetForm();
@@ -448,15 +448,15 @@ function ContactBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <SheetContent className="sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>
+      <DrawerContent className="sm:max-w-2xl">
+        <DrawerHeader>
+          <DrawerTitle>
             {isEditing ? t("contacts.branch_assignments.edit_title") : t("contacts.branch_assignments.add_title")}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("contacts.branch_assignments.editor_description")}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         <ContactBranchAssignmentForm
           assignmentBranch={assignment?.branch}
@@ -470,8 +470,8 @@ function ContactBranchAssignmentEditorDialog({
           submitLabel={isEditing ? t("contacts.branch_assignments.save_changes") : t("contacts.branch_assignments.create_assignment")}
           users={users}
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
@@ -660,14 +660,14 @@ function ContactBranchAssignmentsDialog({
 
   return (
     <>
-      <Sheet onOpenChange={onOpenChange} open={open}>
-        <SheetContent className="sm:max-w-3xl">
-          <SheetHeader>
-            <SheetTitle>{t("contacts.branch_assignments.dialog_title")}</SheetTitle>
-            <SheetDescription>
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent className="sm:max-w-3xl">
+          <DrawerHeader>
+            <DrawerTitle>{t("contacts.branch_assignments.dialog_title")}</DrawerTitle>
+            <DrawerDescription>
               {t("contacts.branch_assignments.dialog_description")}
-            </SheetDescription>
-          </SheetHeader>
+            </DrawerDescription>
+          </DrawerHeader>
 
           {!canViewAssignments ? (
             <p className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
@@ -737,8 +737,8 @@ function ContactBranchAssignmentsDialog({
               </div>
             </QueryStateWrapper>
           )}
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
 
       <ContactBranchAssignmentEditorDialog
         assignment={selectedAssignment}

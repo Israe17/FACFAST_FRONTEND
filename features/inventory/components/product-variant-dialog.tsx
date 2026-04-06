@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -77,10 +77,10 @@ function ProductVariantDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent className="sm:max-w-2xl">
+        <DrawerHeader>
+          <DrawerTitle>
             {variant
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.variant"),
@@ -88,11 +88,11 @@ function ProductVariantDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.variant"),
                 })}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("inventory.variants.dialog_description")}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         <ProductVariantForm
           form={form}
           formError={formError}
@@ -109,8 +109,8 @@ function ProductVariantDialog({
           taxProfiles={taxProfiles}
           warrantyProfiles={warrantyProfiles}
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

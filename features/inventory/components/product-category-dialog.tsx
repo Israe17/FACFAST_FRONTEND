@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -57,10 +57,10 @@ function ProductCategoryDialog({
   });
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>
             {category
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.product_category"),
@@ -68,9 +68,9 @@ function ProductCategoryDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.product_category"),
                 })}
-          </SheetTitle>
-          <SheetDescription>{t("inventory.categories.dialog_description")}</SheetDescription>
-        </SheetHeader>
+          </DrawerTitle>
+          <DrawerDescription>{t("inventory.categories.dialog_description")}</DrawerDescription>
+        </DrawerHeader>
         <ProductCategoryForm
           categories={categories}
           currentCategoryId={category?.id}
@@ -86,8 +86,8 @@ function ProductCategoryDialog({
                 })
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
@@ -340,16 +340,16 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         />
       </InventoryDetailBlock>
 
-      <Sheet onOpenChange={setCancelOpen} open={cancelOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t("inventory.inventory_movements.cancel_title")}</SheetTitle>
-            <SheetDescription>
+      <Drawer onOpenChange={setCancelOpen} open={cancelOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("inventory.inventory_movements.cancel_title")}</DrawerTitle>
+            <DrawerDescription>
               {t("inventory.inventory_movements.cancel_description", {
                 code: movement.code ?? headerId,
               })}
-            </SheetDescription>
-          </SheetHeader>
+            </DrawerDescription>
+          </DrawerHeader>
           <form className="space-y-4" onSubmit={cancelForm.handleSubmit(handleCancel)}>
             <FormErrorBanner message={formError} />
             <div className="space-y-2">
@@ -366,8 +366,8 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </ActionButton>
             </div>
           </form>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

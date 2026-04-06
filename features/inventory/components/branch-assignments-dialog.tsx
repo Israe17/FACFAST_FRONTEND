@@ -7,13 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { ActionButton } from "@/shared/components/action-button";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -86,16 +86,16 @@ function BranchAssignmentsDialog({
   const activeBranches = branches.filter((b) => b.is_active);
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent >
-        <SheetHeader>
-          <SheetTitle>
+    <Drawer onOpenChange={onOpenChange} open={open}>
+      <DrawerContent >
+        <DrawerHeader>
+          <DrawerTitle>
             {t("inventory.branch_assignments.dialog_title", { entity: entityLabel })}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("inventory.branch_assignments.dialog_description", { name: entityName })}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         <QueryStateWrapper
           errorDescription={getBackendErrorMessage(
@@ -181,8 +181,8 @@ function BranchAssignmentsDialog({
             </div>
           </div>
         </QueryStateWrapper>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

@@ -9,12 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -237,7 +237,7 @@ function PromotionBranchAssignmentEditorDialog({
   }
 
   return (
-    <Sheet
+    <Drawer
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
           resetForm();
@@ -246,17 +246,17 @@ function PromotionBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <SheetContent className="sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>
+      <DrawerContent className="sm:max-w-2xl">
+        <DrawerHeader>
+          <DrawerTitle>
             {isEditing
               ? t("inventory.promotion_branch_assignments.edit_title")
               : t("inventory.promotion_branch_assignments.create_title")}
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             {t("inventory.promotion_branch_assignments.dialog_description")}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         <PromotionBranchAssignmentForm
           assignmentBranch={assignment?.branch}
@@ -272,8 +272,8 @@ function PromotionBranchAssignmentEditorDialog({
               : t("inventory.promotion_branch_assignments.create_action")
           }
         />
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
@@ -424,16 +424,16 @@ function PromotionBranchAssignmentsDialog({
 
   return (
     <>
-      <Sheet onOpenChange={onOpenChange} open={open}>
-        <SheetContent className="sm:max-w-3xl">
-          <SheetHeader>
-            <SheetTitle>{t("inventory.promotion_branch_assignments.section_title")}</SheetTitle>
-            <SheetDescription>
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent className="sm:max-w-3xl">
+          <DrawerHeader>
+            <DrawerTitle>{t("inventory.promotion_branch_assignments.section_title")}</DrawerTitle>
+            <DrawerDescription>
               {t("inventory.promotion_branch_assignments.section_description", {
                 promotion: promotion.name,
               })}
-            </SheetDescription>
-          </SheetHeader>
+            </DrawerDescription>
+          </DrawerHeader>
 
           {!canViewAssignments ? (
             <p className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
@@ -491,8 +491,8 @@ function PromotionBranchAssignmentsDialog({
               </div>
             </QueryStateWrapper>
           )}
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
 
       <PromotionBranchAssignmentEditorDialog
         assignment={selectedAssignment}

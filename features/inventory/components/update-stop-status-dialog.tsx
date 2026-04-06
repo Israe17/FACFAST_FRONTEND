@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -28,6 +28,7 @@ import { dispatchStopStatusValues } from "../constants";
 import { updateDispatchStopStatusSchema } from "../schemas";
 import type { DispatchStop, UpdateDispatchStopStatusInput } from "../types";
 import { useUpdateDispatchStopStatusMutation } from "../queries";
+import { useSaleOrderQuery } from "@/features/sales/queries";
 import { FormFieldError } from "./form-field-error";
 
 type UpdateStopStatusDialogProps = {
@@ -55,14 +56,33 @@ function UpdateStopStatusDialog({
   const { t } = useAppTranslator();
   const mutation = useUpdateDispatchStopStatusMutation(orderId, String(stop.id));
 
-  const stopLines = stop.lines ?? [];
+  // Fallback: if stop has no lines (created before DispatchStopLine),
+  // load the sale order to get its lines for the partial delivery form
+  const hasNativeLines = (stop.lines?.length ?? 0) > 0;
+  const saleOrderQuery = useSaleOrderQuery(
+    hasNativeLines ? "" : String(stop.sale_order_id),
+  );
+
+  const stopLines = useMemo(() => {
+    if (hasNativeLines) return stop.lines!;
+    // Build stop-line-like objects from sale order lines
+    const soLines = saleOrderQuery.data?.lines ?? [];
+    return soLines.map((line) => ({
+      id: line.id,
+      sale_order_line_id: line.id,
+      product_variant_id: line.product_variant_id ?? 0,
+      product_variant: line.product_variant ?? undefined,
+      ordered_quantity: line.quantity,
+      delivered_quantity: null as number | null,
+    }));
+  }, [hasNativeLines, stop.lines, saleOrderQuery.data]);
 
   const {
     control,
     register,
     handleSubmit,
     watch,
-    setValue,
+    reset,
     formState: { errors },
   } = useForm<UpdateDispatchStopStatusInput>({
     resolver: zodResolver(updateDispatchStopStatusSchema) as any,
@@ -77,6 +97,19 @@ function UpdateStopStatusDialog({
       })),
     },
   });
+
+  // Re-sync delivered_lines when stopLines changes (fallback query loads)
+  useEffect(() => {
+    if (stopLines.length > 0) {
+      reset((prev) => ({
+        ...prev,
+        delivered_lines: stopLines.map((line) => ({
+          sale_order_line_id: Number(line.sale_order_line_id),
+          delivered_quantity: line.delivered_quantity ?? line.ordered_quantity,
+        })),
+      }));
+    }
+  }, [stopLines, reset]);
 
   const watchedStatus = watch("status");
   const showReceivedBy = watchedStatus === "delivered";

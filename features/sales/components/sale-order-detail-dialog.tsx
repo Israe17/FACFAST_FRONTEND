@@ -4,12 +4,14 @@ import {
   ClipboardList,
   MapPin,
   Package,
+  RefreshCw,
   ShoppingCart,
   Truck,
   User,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +24,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
-import { useSaleOrderQuery } from "../queries";
+import { useSaleOrderQuery, useResetSaleOrderDispatchStatusMutation } from "../queries";
 import type { SaleOrder } from "../types";
 
 type SaleOrderDetailDialogProps = {
@@ -86,6 +88,10 @@ function SaleOrderDetailDialog({
   // Fetch full detail (with lines + delivery_charges)
   const detailQuery = useSaleOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
+
+  const resetDispatchMutation = useResetSaleOrderDispatchStatusMutation(
+    order?.id ? String(order.id) : "",
+  );
 
   if (!fullOrder) return null;
 
@@ -328,6 +334,30 @@ function SaleOrderDetailDialog({
             {t("sales.created_by")}: {fullOrder.created_by_user.name}
             {fullOrder.created_at ? ` — ${formatDateTime(fullOrder.created_at)}` : ""}
           </div>
+        ) : null}
+
+        {/* Re-dispatch action */}
+        {fullOrder.lifecycle?.can_reset_dispatch ? (
+          <>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">{t("sales.reset_dispatch_title")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("sales.reset_dispatch_description", { code: fullOrder.code ?? "" })}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => resetDispatchMutation.mutate()}
+                disabled={resetDispatchMutation.isPending}
+              >
+                <RefreshCw className={`size-4 mr-1.5 ${resetDispatchMutation.isPending ? "animate-spin" : ""}`} />
+                {resetDispatchMutation.isPending ? t("common.saving") : t("sales.reset_dispatch_title")}
+              </Button>
+            </div>
+          </>
         ) : null}
       </SheetContent>
     </Sheet>

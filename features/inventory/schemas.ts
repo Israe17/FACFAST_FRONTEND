@@ -1501,6 +1501,19 @@ export const dispatchStopSchema = z.object({
   received_by: z.string().nullable().optional().catch(null),
   failure_reason: z.string().nullable().optional().catch(null),
   notes: z.string().nullable().optional().catch(null),
+  lines: z.array(z.object({
+    id: idSchema,
+    sale_order_line_id: idSchema,
+    product_variant_id: idSchema,
+    product_variant: z.object({
+      id: idSchema,
+      variant_name: z.string().nullable().optional(),
+      sku: z.string().optional(),
+      product: z.object({ id: idSchema, name: z.string() }).optional().catch(undefined),
+    }).optional().catch(undefined),
+    ordered_quantity: z.number(),
+    delivered_quantity: z.number().nullable().optional().catch(null),
+  })).optional().catch([]),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 }).passthrough();
@@ -1615,9 +1628,15 @@ export const createDispatchOrderSchema = z.object({
 
 export const updateDispatchOrderSchema = createDispatchOrderSchema.partial();
 
+const deliveredLineSchema = z.object({
+  sale_order_line_id: z.number(),
+  delivered_quantity: z.number().min(0, "La cantidad debe ser 0 o mayor."),
+});
+
 export const updateDispatchStopStatusSchema = z.object({
   status: z.enum(dispatchStopStatusValues),
   received_by: optionalTextSchema,
   failure_reason: optionalTextSchema,
   notes: optionalTextSchema,
+  delivered_lines: z.array(deliveredLineSchema).optional(),
 });

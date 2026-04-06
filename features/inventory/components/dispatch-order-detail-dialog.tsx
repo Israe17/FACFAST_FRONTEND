@@ -256,6 +256,33 @@ function DispatchOrderDetailDialog({
                             .join(", ")}
                         </p>
                       ) : null}
+                      {/* Stop lines (products) */}
+                      {(stop.lines?.length ?? 0) > 0 ? (
+                        <div className="rounded border bg-muted/30 text-xs">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="px-2 py-1 text-left font-medium">{t("inventory.dispatch.product")}</th>
+                                <th className="px-2 py-1 text-right font-medium w-16">{t("inventory.dispatch.ordered")}</th>
+                                <th className="px-2 py-1 text-right font-medium w-16">{t("inventory.dispatch.delivered")}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {stop.lines!.map((line) => (
+                                <tr key={line.id} className="border-b last:border-b-0">
+                                  <td className="px-2 py-1">
+                                    {line.product_variant?.product?.name ?? line.product_variant?.sku ?? `#${line.product_variant_id}`}
+                                  </td>
+                                  <td className="px-2 py-1 text-right tabular-nums">{line.ordered_quantity}</td>
+                                  <td className="px-2 py-1 text-right tabular-nums">
+                                    {line.delivered_quantity ?? "-"}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : null}
                       {stop.received_by ? (
                         <p className="text-xs text-muted-foreground">
                           {t("inventory.dispatch.received_by")}: {stop.received_by}

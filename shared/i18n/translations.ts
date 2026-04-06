@@ -1668,6 +1668,10 @@ const esTranslations = {
     "La parada ya tiene ese estado.",
   "inventory.dispatch_stop_status_not_supported":
     "El estado indicado no es valido para esta parada.",
+  "inventory.dispatch_stop_delivered_lines_required":
+    "Se requieren las cantidades entregadas por linea para entregas parciales.",
+  "inventory.dispatch_stop_delivered_exceeds_ordered":
+    "La cantidad entregada no puede ser mayor a la cantidad ordenada.",
   "inventory.sale_order_not_found":
     "La orden de venta no existe en el contexto de despacho.",
   "inventory.sale_order_already_assigned_to_dispatch":
@@ -1694,6 +1698,16 @@ const esTranslations = {
     "El documento electronico no puede reenviarse.",
   "sales.electronic_document_sale_order_not_emittable":
     "La orden de venta no es elegible para emitir documento electronico.",
+  "sales.order_dispatch_reset_requires_confirmed":
+    "Solo las ordenes confirmadas pueden resetearse para re-despacho.",
+  "sales.order_dispatch_reset_invalid_status":
+    "Solo las ordenes con despacho fallido o parcial pueden resetearse.",
+  "sales.order_has_active_dispatch_stops":
+    "La orden de venta tiene paradas activas en una orden de despacho.",
+  "sales.reset_dispatch_title": "Habilitar re-despacho",
+  "sales.reset_dispatch_description": "Resetear el estado de despacho de la orden {{code}} a pendiente para permitir un nuevo intento de entrega.",
+  "sales.reset_dispatch_success": "Estado de despacho reseteado correctamente.",
+  "sales.reset_dispatch_error_fallback": "No fue posible resetear el estado de despacho.",
   "rbac.role_access_forbidden":
     "El usuario no tiene acceso al rol indicado.",
   "platform.clear_tenant_error_fallback": "No fue posible salir del contexto de empresa.",
@@ -3589,6 +3603,20 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The electronic document cannot be resubmitted.",
     "sales.electronic_document_sale_order_not_emittable":
       "The sale order is not eligible for electronic document emission.",
+    "sales.order_dispatch_reset_requires_confirmed":
+      "Only confirmed orders can be reset for re-dispatch.",
+    "sales.order_dispatch_reset_invalid_status":
+      "Only orders with failed or partial dispatch can be reset.",
+    "sales.order_has_active_dispatch_stops":
+      "The sale order has active stops in a dispatch order.",
+    "sales.reset_dispatch_title": "Enable re-dispatch",
+    "sales.reset_dispatch_description": "Reset the dispatch status of order {{code}} to pending to allow a new delivery attempt.",
+    "sales.reset_dispatch_success": "Dispatch status reset successfully.",
+    "sales.reset_dispatch_error_fallback": "Unable to reset the dispatch status.",
+    "inventory.dispatch_stop_delivered_lines_required":
+      "Per-line delivered quantities are required for partial deliveries.",
+    "inventory.dispatch_stop_delivered_exceeds_ordered":
+      "The delivered quantity cannot exceed the ordered quantity.",
     "rbac.role_access_forbidden":
       "The user does not have access to the specified role.",
     "platform.clear_tenant_error_fallback":

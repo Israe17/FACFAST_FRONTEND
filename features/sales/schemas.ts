@@ -24,6 +24,7 @@ const lifecycleFieldSchema = z
     can_confirm: z.boolean().optional().catch(false),
     can_delete: z.boolean().optional().catch(false),
     can_edit: z.boolean().optional().catch(false),
+    can_reset_dispatch: z.boolean().optional().catch(false),
     reasons: z.array(z.string()).optional().catch([]),
   })
   .optional()

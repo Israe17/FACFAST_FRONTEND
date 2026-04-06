@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  AlertCircle,
   CheckCircle,
   MapPin,
   Package,
@@ -68,6 +69,21 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   partial: "inventory.dispatch.stop_partial",
   skipped: "inventory.dispatch.stop_skipped",
 };
+
+function ReadinessItem({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      {ok ? (
+        <CheckCircle className="size-4 text-green-600" />
+      ) : (
+        <XCircle className="size-4 text-red-500" />
+      )}
+      <span className={ok ? "text-muted-foreground" : "font-medium"}>
+        {label}
+      </span>
+    </div>
+  );
+}
 
 function DispatchOrderDetailDialog({
   order,
@@ -150,6 +166,37 @@ function DispatchOrderDetailDialog({
               </div>
             ) : null}
           </div>
+
+          {/* Readiness Checklist (draft only) */}
+          {order.status === "draft" && order.lifecycle?.readiness ? (
+            <>
+              <Separator />
+              <div>
+                <h3 className="flex items-center gap-2 text-sm font-semibold mb-3">
+                  <AlertCircle className="size-4" />
+                  {t("inventory.dispatch.readiness_title")}
+                </h3>
+                <div className="space-y-1.5 text-sm">
+                  <ReadinessItem
+                    ok={!order.lifecycle.readiness.missing_scheduled_date}
+                    label={t("inventory.dispatch.readiness_scheduled_date")}
+                  />
+                  <ReadinessItem
+                    ok={!order.lifecycle.readiness.missing_vehicle}
+                    label={t("inventory.dispatch.readiness_vehicle")}
+                  />
+                  <ReadinessItem
+                    ok={!order.lifecycle.readiness.missing_driver}
+                    label={t("inventory.dispatch.readiness_driver")}
+                  />
+                  <ReadinessItem
+                    ok={!order.lifecycle.readiness.missing_stops}
+                    label={t("inventory.dispatch.readiness_stops")}
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
 
           <Separator />
 

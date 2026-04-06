@@ -1,9 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, ClipboardCheck, Pencil, Send, Trash2, XCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, ClipboardCheck, Pencil, Send, Trash2, XCircle } from "lucide-react";
 
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder } from "../types";
@@ -91,13 +92,50 @@ function getDispatchOrdersColumns({
     {
       accessorKey: "status",
       header: t("inventory.dispatch.status"),
-      cell: ({ row }) => (
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[row.original.status] ?? ""}`}
-        >
-          {t(statusTranslationMap[row.original.status] ?? "inventory.dispatch.status_draft")}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const order = row.original;
+        const readiness = order.lifecycle?.readiness;
+        const hasMissing =
+          order.status === "draft" &&
+          readiness &&
+          (readiness.missing_scheduled_date ||
+            readiness.missing_vehicle ||
+            readiness.missing_driver ||
+            readiness.missing_stops);
+
+        const missingItems: string[] = [];
+        if (hasMissing) {
+          if (readiness.missing_scheduled_date) missingItems.push(t("inventory.dispatch.readiness_scheduled_date"));
+          if (readiness.missing_vehicle) missingItems.push(t("inventory.dispatch.readiness_vehicle"));
+          if (readiness.missing_driver) missingItems.push(t("inventory.dispatch.readiness_driver"));
+          if (readiness.missing_stops) missingItems.push(t("inventory.dispatch.readiness_stops"));
+        }
+
+        return (
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[order.status] ?? ""}`}
+            >
+              {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+            </span>
+            {hasMissing ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertCircle className="size-4 text-amber-500 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p className="font-medium mb-1">{t("inventory.dispatch.readiness_title")}</p>
+                  <ul className="text-xs space-y-0.5">
+                    {missingItems.map((item) => (
+                      <li key={item}>- {item}</li>
+                    ))}
+                  </ul>
+                </TooltipContent>
+              </Tooltip>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       id: "route",

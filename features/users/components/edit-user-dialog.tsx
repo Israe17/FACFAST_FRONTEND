@@ -5,13 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -76,12 +76,12 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Edit user</DrawerTitle>
-          <DrawerDescription>Update the main information of this user.</DrawerDescription>
-        </DrawerHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Edit user</SheetTitle>
+          <SheetDescription>Update the main information of this user.</SheetDescription>
+        </SheetHeader>
 
         {userQuery.isLoading ? <LoadingState description="Loading user details." /> : null}
         {userQuery.isError ? (
@@ -102,8 +102,8 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
             submitLabel="Save changes"
           />
         ) : null}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

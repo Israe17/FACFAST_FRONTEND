@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -38,14 +38,14 @@ function EffectiveUserPermissionsDialog({
     }, {}) ?? {};
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>Effective permissions</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Effective permissions</SheetTitle>
+          <SheetDescription>
             Permissions currently resolved for {userName}.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         {permissionsQuery.isLoading ? (
           <LoadingState description="Loading effective permissions." />
@@ -82,8 +82,8 @@ function EffectiveUserPermissionsDialog({
               ))}
           </div>
         ) : null}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

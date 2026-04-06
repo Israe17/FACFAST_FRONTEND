@@ -5,13 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -110,14 +110,14 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>Edit contact</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Edit contact</SheetTitle>
+          <SheetDescription>
             Update the selected contact without leaving the administrative table.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         {contactQuery.isLoading ? <LoadingState description="Loading contact details." /> : null}
         {contactQuery.isError ? (
@@ -138,8 +138,8 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
             submitLabel="Save changes"
           />
         ) : null}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

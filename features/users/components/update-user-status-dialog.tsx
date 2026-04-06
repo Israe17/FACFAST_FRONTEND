@@ -5,13 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -96,15 +96,15 @@ function UpdateUserStatusDialog({
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Change user status</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Change user status</SheetTitle>
+          <SheetDescription>
             Use lifecycle status for non-destructive user administration. Permanent delete remains
             a separate action.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <FormErrorBanner message={formError} />
@@ -161,8 +161,8 @@ function UpdateUserStatusDialog({
             </ActionButton>
           </div>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

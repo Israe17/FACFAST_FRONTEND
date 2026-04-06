@@ -3,13 +3,13 @@
 import type { UseFormReturn } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -41,14 +41,14 @@ function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>Create branch</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Create branch</SheetTitle>
+          <SheetDescription>
             Register a new branch using the current backend contract.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
         <BranchForm
           form={form as unknown as UseFormReturn<BranchFormValues>}
           formError={formError}
@@ -56,8 +56,8 @@ function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
           onSubmit={(values) => handleSubmit(values as CreateBranchInput)}
           submitLabel="Create branch"
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

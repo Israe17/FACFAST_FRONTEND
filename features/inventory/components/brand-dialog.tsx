@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -42,17 +42,17 @@ function BrandDialog({ brand, onOpenChange, open }: BrandDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>
             {brand
               ? t("inventory.common.edit_entity", { entity: t("inventory.entity.brand") })
               : t("inventory.common.create_entity", { entity: t("inventory.entity.brand") })}
-          </DrawerTitle>
-          <DrawerDescription>{t("inventory.brands.dialog_description")}</DrawerDescription>
-        </DrawerHeader>
-        <DrawerBody>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.brands.dialog_description")}</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
           <BrandForm
             form={form}
             formError={formError}
@@ -64,9 +64,9 @@ function BrandDialog({ brand, onOpenChange, open }: BrandDialogProps) {
                 : t("inventory.common.create_entity", { entity: t("inventory.entity.brand") })
             }
           />
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 }
 

@@ -5,13 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { ActionButton } from "@/shared/components/action-button";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -101,15 +101,15 @@ function AssignUserBranchesDialog({
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Assign branches</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Assign branches</SheetTitle>
+          <SheetDescription>
             Update the branch access for {user.name}. The current session branch context is kept in
             sync.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">
@@ -167,8 +167,8 @@ function AssignUserBranchesDialog({
             </div>
           </form>
         ) : null}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

@@ -3,12 +3,12 @@
 import { useMemo } from "react";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
@@ -68,16 +68,16 @@ function RouteDialog({ route, zones: rawZones, vehicles: rawVehicles, onOpenChan
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>
             {route
               ? t("inventory.common.edit_entity", { entity: t("inventory.entity.route") })
               : t("inventory.common.create_entity", { entity: t("inventory.entity.route") })}
-          </DrawerTitle>
-          <DrawerDescription>{t("inventory.routes.dialog_description")}</DrawerDescription>
-        </DrawerHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.routes.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <RouteForm
           form={form}
           formError={formError}
@@ -91,8 +91,8 @@ function RouteDialog({ route, zones: rawZones, vehicles: rawVehicles, onOpenChan
           vehicles={vehicles}
           zones={zones}
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

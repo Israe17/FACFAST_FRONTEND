@@ -3,13 +3,13 @@
 import type { UseFormReturn } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -42,14 +42,14 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Create user</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Create user</SheetTitle>
+          <SheetDescription>
             Create a new user without leaving the administrative table.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
         <UserForm
           form={form as unknown as UseFormReturn<UserFormValues>}
           formError={formError}
@@ -58,8 +58,8 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
           onSubmit={(values) => handleSubmit(values as CreateUserInput)}
           submitLabel="Create user"
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

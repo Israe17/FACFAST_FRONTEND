@@ -3,13 +3,13 @@
 import type { UseFormReturn } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -59,14 +59,14 @@ function CreateContactDialog({ onOpenChange, open }: CreateContactDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>Create contact</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Create contact</SheetTitle>
+          <SheetDescription>
             Register a new customer, supplier or tenant contact record.
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
         <ContactForm
           form={form as unknown as UseFormReturn<ContactFormValues>}
           formError={formError}
@@ -74,8 +74,8 @@ function CreateContactDialog({ onOpenChange, open }: CreateContactDialogProps) {
           onSubmit={(values) => handleSubmit(values as CreateContactInput)}
           submitLabel="Create contact"
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

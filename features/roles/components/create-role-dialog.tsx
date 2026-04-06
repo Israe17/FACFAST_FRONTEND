@@ -3,13 +3,13 @@
 import type { UseFormReturn } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -37,12 +37,12 @@ function CreateRoleDialog({ onOpenChange, open }: CreateRoleDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Create role</DrawerTitle>
-          <DrawerDescription>Create a new role for RBAC administration.</DrawerDescription>
-        </DrawerHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Create role</SheetTitle>
+          <SheetDescription>Create a new role for RBAC administration.</SheetDescription>
+        </SheetHeader>
         <RoleForm
           form={form as unknown as UseFormReturn<RoleFormValues>}
           formError={formError}
@@ -50,8 +50,8 @@ function CreateRoleDialog({ onOpenChange, open }: CreateRoleDialogProps) {
           onSubmit={(values) => handleSubmit(values as CreateRoleInput)}
           submitLabel="Create role"
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

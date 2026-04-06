@@ -4,12 +4,12 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
@@ -59,16 +59,16 @@ export function CancelMovementDialog({ movement, onOpenChange, open }: CancelMov
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>{t("inventory.inventory_movements.cancel_title")}</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t("inventory.inventory_movements.cancel_title")}</SheetTitle>
+          <SheetDescription>
             {t("inventory.inventory_movements.cancel_description", {
               code: movement?.code ?? "",
             })}
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
         <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <FormErrorBanner message={formError} />
           <div className="space-y-2">
@@ -86,7 +86,7 @@ export function CancelMovementDialog({ movement, onOpenChange, open }: CancelMov
             </ActionButton>
           </div>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }

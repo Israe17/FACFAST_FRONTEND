@@ -8,12 +8,12 @@ import { useForm, useWatch } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -458,16 +458,16 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
         />
       </InventoryDetailBlock>
 
-      <Drawer onOpenChange={setRegisterOpen} open={registerOpen}>
-        <DrawerContent >
-          <DrawerHeader>
-            <DrawerTitle>{t("inventory.serials.register_dialog_title")}</DrawerTitle>
-            <DrawerDescription>
+      <Sheet onOpenChange={setRegisterOpen} open={registerOpen}>
+        <SheetContent >
+          <SheetHeader>
+            <SheetTitle>{t("inventory.serials.register_dialog_title")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.serials.register_dialog_description", {
                 variant: selectedVariant?.variant_name ?? selectedVariant?.sku ?? product.name,
               })}
-            </DrawerDescription>
-          </DrawerHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <form className="space-y-4" onSubmit={registerForm.handleSubmit(handleRegisterSubmit)}>
             <FormErrorBanner message={registerFormError} />
@@ -520,10 +520,10 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
               </ActionButton>
             </div>
           </form>
-        </DrawerContent>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
 
-      <Drawer
+      <Sheet
         onOpenChange={(open) => {
           setStatusOpen(open);
           if (!open) {
@@ -532,15 +532,15 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
         }}
         open={statusOpen}
       >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t("inventory.serials.update_status_title")}</DrawerTitle>
-            <DrawerDescription>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t("inventory.serials.update_status_title")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.serials.update_status_description", {
                 serial: selectedSerial?.serial_number ?? "",
               })}
-            </DrawerDescription>
-          </DrawerHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <form className="space-y-4" onSubmit={statusForm.handleSubmit(handleStatusSubmit)}>
             <FormErrorBanner message={statusFormError} />
@@ -585,8 +585,8 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
               </ActionButton>
             </div>
           </form>
-        </DrawerContent>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

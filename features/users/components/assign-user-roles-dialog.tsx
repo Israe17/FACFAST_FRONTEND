@@ -5,13 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ActionButton } from "@/shared/components/action-button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -87,12 +87,12 @@ function AssignUserRolesDialog({
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Assign roles</DrawerTitle>
-          <DrawerDescription>Update the roles assigned to {user.name}.</DrawerDescription>
-        </DrawerHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Assign roles</SheetTitle>
+          <SheetDescription>Update the roles assigned to {user.name}.</SheetDescription>
+        </SheetHeader>
 
         {rolesQuery.isLoading ? <LoadingState description="Loading available roles." /> : null}
         {rolesQuery.isError ? (
@@ -147,8 +147,8 @@ function AssignUserRolesDialog({
             </div>
           </form>
         ) : null}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

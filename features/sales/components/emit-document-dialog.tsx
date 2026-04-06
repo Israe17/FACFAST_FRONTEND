@@ -4,12 +4,12 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -73,14 +73,14 @@ function EmitDocumentDialog({ onOpenChange, open }: EmitDocumentDialogProps) {
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent >
-        <DrawerHeader>
-          <DrawerTitle>{t("sales.documents.emit")}</DrawerTitle>
-          <DrawerDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent >
+        <SheetHeader>
+          <SheetTitle>{t("sales.documents.emit")}</SheetTitle>
+          <SheetDescription>
             {t("sales.documents.section_description")}
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <FormErrorBanner
@@ -184,8 +184,8 @@ function EmitDocumentDialog({ onOpenChange, open }: EmitDocumentDialogProps) {
             </ActionButton>
           </div>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

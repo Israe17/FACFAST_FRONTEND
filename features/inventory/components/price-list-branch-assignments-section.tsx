@@ -8,12 +8,12 @@ import { Controller, useForm, type UseFormReturn } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -259,7 +259,7 @@ function PriceListBranchAssignmentEditorDialog({
   }
 
   return (
-    <Drawer
+    <Sheet
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
           resetForm();
@@ -268,17 +268,17 @@ function PriceListBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {isEditing
               ? t("inventory.price_list_branch_assignments.edit_title")
               : t("inventory.price_list_branch_assignments.create_title")}
-          </DrawerTitle>
-          <DrawerDescription>
+          </SheetTitle>
+          <SheetDescription>
             {t("inventory.price_list_branch_assignments.dialog_description")}
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <PriceListBranchAssignmentForm
           assignmentBranch={assignment?.branch}
@@ -294,8 +294,8 @@ function PriceListBranchAssignmentEditorDialog({
               : t("inventory.price_list_branch_assignments.create_action")
           }
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

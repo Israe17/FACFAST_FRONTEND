@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -41,16 +41,16 @@ function ZoneDialog({ zone, onOpenChange, open }: ZoneDialogProps) {
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>
             {zone
               ? t("inventory.common.edit_entity", { entity: t("inventory.entity.zone") })
               : t("inventory.common.create_entity", { entity: t("inventory.entity.zone") })}
-          </DrawerTitle>
-          <DrawerDescription>{t("inventory.zones.dialog_description")}</DrawerDescription>
-        </DrawerHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.zones.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <ZoneForm
           form={form}
           formError={formError}
@@ -62,8 +62,8 @@ function ZoneDialog({ zone, onOpenChange, open }: ZoneDialogProps) {
               : t("inventory.common.create_entity", { entity: t("inventory.entity.zone") })
           }
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

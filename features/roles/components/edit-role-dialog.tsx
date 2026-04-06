@@ -5,13 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
@@ -59,12 +59,12 @@ function EditRoleDialog({ onOpenChange, open, role }: EditRoleDialogProps) {
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Edit role</DrawerTitle>
-          <DrawerDescription>Update the details of this role.</DrawerDescription>
-        </DrawerHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Edit role</SheetTitle>
+          <SheetDescription>Update the details of this role.</SheetDescription>
+        </SheetHeader>
         <RoleForm
           form={form as unknown as UseFormReturn<RoleFormValues>}
           formError={formError}
@@ -72,8 +72,8 @@ function EditRoleDialog({ onOpenChange, open, role }: EditRoleDialogProps) {
           onSubmit={(values) => handleSubmit(values as UpdateRoleInput)}
           submitLabel="Save changes"
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

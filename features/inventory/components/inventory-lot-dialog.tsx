@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
@@ -94,10 +94,10 @@ function InventoryLotDialog({
   }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-3xl">
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-3xl">
+        <SheetHeader>
+          <SheetTitle>
             {lot
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.inventory_lot"),
@@ -105,9 +105,9 @@ function InventoryLotDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.inventory_lot"),
                 })}
-          </DrawerTitle>
-          <DrawerDescription>{t("inventory.inventory_lots.dialog_description")}</DrawerDescription>
-        </DrawerHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.inventory_lots.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <InventoryLotForm
           form={form}
           formError={formError}
@@ -129,8 +129,8 @@ function InventoryLotDialog({
           suppliers={suppliers}
           warehouses={warehouses}
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

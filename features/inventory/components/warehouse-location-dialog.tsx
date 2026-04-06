@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -63,10 +63,10 @@ function WarehouseLocationDialog({
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {location
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.warehouse_location"),
@@ -74,14 +74,14 @@ function WarehouseLocationDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.warehouse_location"),
                 })}
-          </DrawerTitle>
-          <DrawerDescription>
+          </SheetTitle>
+          <SheetDescription>
             {t("inventory.warehouse_locations.dialog_description", {
               warehouse: warehouse?.name ?? t("inventory.entity.warehouse"),
             })}
-          </DrawerDescription>
-        </DrawerHeader>
-        <DrawerBody>
+          </SheetDescription>
+        </SheetHeader>
+        <SheetBody>
           <WarehouseLocationForm
             form={form}
             formError={formError}
@@ -95,9 +95,9 @@ function WarehouseLocationDialog({
                   })
             }
           />
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 }
 

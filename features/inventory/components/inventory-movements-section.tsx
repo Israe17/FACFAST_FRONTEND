@@ -6,12 +6,12 @@ import { ArrowRightLeft, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -384,14 +384,14 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
         </QueryStateWrapper>
       </CatalogSectionCard>
 
-      <Drawer onOpenChange={setAdjustmentOpen} open={adjustmentOpen}>
-        <DrawerContent className="sm:max-w-3xl">
-          <DrawerHeader>
-            <DrawerTitle>{t("inventory.inventory_movements.new_adjustment")}</DrawerTitle>
-            <DrawerDescription>
+      <Sheet onOpenChange={setAdjustmentOpen} open={adjustmentOpen}>
+        <SheetContent className="sm:max-w-3xl">
+          <SheetHeader>
+            <SheetTitle>{t("inventory.inventory_movements.new_adjustment")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.inventory_movements.adjustment_dialog_description")}
-            </DrawerDescription>
-          </DrawerHeader>
+            </SheetDescription>
+          </SheetHeader>
           <InventoryAdjustmentForm
             form={adjustmentForm}
             formError={adjustmentFormError}
@@ -403,17 +403,17 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
             submitLabel={t("inventory.inventory_movements.create_adjustment")}
             warehouses={warehousesQuery.data ?? []}
           />
-        </DrawerContent>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
 
-      <Drawer onOpenChange={setTransferOpen} open={transferOpen}>
-        <DrawerContent className="sm:max-w-3xl">
-          <DrawerHeader>
-            <DrawerTitle>{t("inventory.inventory_movements.new_transfer")}</DrawerTitle>
-            <DrawerDescription>
+      <Sheet onOpenChange={setTransferOpen} open={transferOpen}>
+        <SheetContent className="sm:max-w-3xl">
+          <SheetHeader>
+            <SheetTitle>{t("inventory.inventory_movements.new_transfer")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.inventory_movements.transfer_dialog_description")}
-            </DrawerDescription>
-          </DrawerHeader>
+            </SheetDescription>
+          </SheetHeader>
           <InventoryTransferForm
             destinationLocations={transferDestinationLocations}
             form={transferForm}
@@ -426,8 +426,8 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
             submitLabel={t("inventory.inventory_movements.create_transfer")}
             warehouses={warehousesQuery.data ?? []}
           />
-        </DrawerContent>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
 
       <CancelMovementDialog
         movement={selectedMovement}

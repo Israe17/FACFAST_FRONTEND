@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -49,10 +49,10 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
   });
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open}>
-      <DrawerContent className="sm:max-w-2xl">
-        <DrawerHeader>
-          <DrawerTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {taxProfile
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.tax_profile"),
@@ -60,9 +60,9 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.tax_profile"),
                 })}
-          </DrawerTitle>
-          <DrawerDescription>{t("inventory.tax_profiles.dialog_description")}</DrawerDescription>
-        </DrawerHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.tax_profiles.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <TaxProfileForm
           form={form}
           formError={formError}
@@ -76,8 +76,8 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
                 })
           }
         />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

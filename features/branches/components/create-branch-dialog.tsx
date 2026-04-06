@@ -42,7 +42,7 @@ function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent size="md">
         <SheetHeader>
           <SheetTitle>Create branch</SheetTitle>
           <SheetDescription>

@@ -111,7 +111,7 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent size="md">
         <SheetHeader>
           <SheetTitle>Edit contact</SheetTitle>
           <SheetDescription>

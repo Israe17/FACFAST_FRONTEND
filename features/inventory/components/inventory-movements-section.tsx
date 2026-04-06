@@ -385,7 +385,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
       </CatalogSectionCard>
 
       <Sheet onOpenChange={setAdjustmentOpen} open={adjustmentOpen}>
-        <SheetContent className="sm:max-w-3xl">
+        <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle>{t("inventory.inventory_movements.new_adjustment")}</SheetTitle>
             <SheetDescription>
@@ -407,7 +407,7 @@ function InventoryMovementsSection({ enabled = true }: InventoryMovementsSection
       </Sheet>
 
       <Sheet onOpenChange={setTransferOpen} open={transferOpen}>
-        <SheetContent className="sm:max-w-3xl">
+        <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle>{t("inventory.inventory_movements.new_transfer")}</SheetTitle>
             <SheetDescription>

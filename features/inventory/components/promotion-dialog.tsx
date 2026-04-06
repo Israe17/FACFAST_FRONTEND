@@ -54,7 +54,7 @@ function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionD
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-3xl">
+      <SheetContent size="lg">
         <SheetHeader>
           <SheetTitle>
             {promotion

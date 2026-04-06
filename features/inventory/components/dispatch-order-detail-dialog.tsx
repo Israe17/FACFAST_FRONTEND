@@ -193,6 +193,12 @@ function DispatchOrderDetailDialog({
                     ok={!order.lifecycle.readiness.missing_stops}
                     label={t("inventory.dispatch.readiness_stops")}
                   />
+                  {order.lifecycle.readiness.has_date_conflicts ? (
+                    <ReadinessItem
+                      ok={false}
+                      label={t("inventory.dispatch.readiness_date_conflicts")}
+                    />
+                  ) : null}
                 </div>
               </div>
             </>

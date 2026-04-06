@@ -101,14 +101,16 @@ function getDispatchOrdersColumns({
           (readiness.missing_scheduled_date ||
             readiness.missing_vehicle ||
             readiness.missing_driver ||
-            readiness.missing_stops);
+            readiness.missing_stops ||
+            readiness.has_date_conflicts);
 
         const missingItems: string[] = [];
-        if (hasMissing) {
+        if (hasMissing && readiness) {
           if (readiness.missing_scheduled_date) missingItems.push(t("inventory.dispatch.readiness_scheduled_date"));
           if (readiness.missing_vehicle) missingItems.push(t("inventory.dispatch.readiness_vehicle"));
           if (readiness.missing_driver) missingItems.push(t("inventory.dispatch.readiness_driver"));
           if (readiness.missing_stops) missingItems.push(t("inventory.dispatch.readiness_stops"));
+          if (readiness.has_date_conflicts) missingItems.push(t("inventory.dispatch.readiness_date_conflicts"));
         }
 
         return (

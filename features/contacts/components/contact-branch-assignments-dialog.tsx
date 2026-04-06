@@ -448,7 +448,7 @@ function ContactBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent size="md">
         <SheetHeader>
           <SheetTitle>
             {isEditing ? t("contacts.branch_assignments.edit_title") : t("contacts.branch_assignments.add_title")}
@@ -661,7 +661,7 @@ function ContactBranchAssignmentsDialog({
   return (
     <>
       <Sheet onOpenChange={onOpenChange} open={open}>
-        <SheetContent className="sm:max-w-3xl">
+        <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle>{t("contacts.branch_assignments.dialog_title")}</SheetTitle>
             <SheetDescription>

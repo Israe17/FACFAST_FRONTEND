@@ -72,7 +72,7 @@ function ProductDialog({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-3xl">
+      <SheetContent size="lg">
         <SheetHeader>
           <SheetTitle>
             {product

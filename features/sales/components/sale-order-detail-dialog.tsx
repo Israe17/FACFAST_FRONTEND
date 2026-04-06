@@ -97,7 +97,7 @@ function SaleOrderDetailDialog({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent size="md">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="size-5" />

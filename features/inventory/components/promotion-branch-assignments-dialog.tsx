@@ -246,7 +246,7 @@ function PromotionBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent size="md">
         <SheetHeader>
           <SheetTitle>
             {isEditing
@@ -425,7 +425,7 @@ function PromotionBranchAssignmentsDialog({
   return (
     <>
       <Sheet onOpenChange={onOpenChange} open={open}>
-        <SheetContent className="sm:max-w-3xl">
+        <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle>{t("inventory.promotion_branch_assignments.section_title")}</SheetTitle>
             <SheetDescription>

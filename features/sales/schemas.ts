@@ -172,7 +172,7 @@ export const saleOrderSchema = z
   })
   .passthrough();
 
-export const createSaleOrderSchema = z.object({
+const saleOrderFormObjectSchema = z.object({
   branch_id: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : String(v)),
     z.string().regex(positiveIntegerPattern, "Selecciona una sucursal."),
@@ -199,7 +199,42 @@ export const createSaleOrderSchema = z.object({
   warehouse_id: makeOptionalIdSchema("Selecciona una bodega."),
 });
 
-export const updateSaleOrderSchema = createSaleOrderSchema.partial();
+function applySaleOrderModeRules(
+  values: z.input<typeof saleOrderFormObjectSchema>,
+  ctx: z.RefinementCtx,
+) {
+  if (values.fulfillment_mode === "delivery") {
+    if (!values.warehouse_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La bodega es requerida para modo entrega.",
+        path: ["warehouse_id"],
+      });
+    }
+    if (!values.delivery_address?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La direccion de entrega es requerida para modo entrega.",
+        path: ["delivery_address"],
+      });
+    }
+  }
+
+  if (
+    (values.sale_mode === "seller_attributed" || values.sale_mode === "seller_route") &&
+    !values.seller_user_id
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "El vendedor es requerido para este modo de venta.",
+      path: ["seller_user_id"],
+    });
+  }
+}
+
+export const createSaleOrderSchema = saleOrderFormObjectSchema.superRefine(applySaleOrderModeRules);
+
+export const updateSaleOrderSchema = saleOrderFormObjectSchema.partial().superRefine(applySaleOrderModeRules);
 
 export const cancelSaleOrderSchema = z.object({
   reason: optionalTextSchema,

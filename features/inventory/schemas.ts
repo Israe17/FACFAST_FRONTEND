@@ -1575,6 +1575,12 @@ export const dispatchOrderSchema = z.object({
     can_complete: z.boolean().optional().catch(false),
     can_cancel: z.boolean().optional().catch(false),
     can_delete: z.boolean().optional().catch(false),
+    readiness: z.object({
+      missing_scheduled_date: z.boolean().optional().catch(true),
+      missing_vehicle: z.boolean().optional().catch(true),
+      missing_driver: z.boolean().optional().catch(true),
+      missing_stops: z.boolean().optional().catch(true),
+    }).optional().catch({}),
   }).optional().catch({}),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

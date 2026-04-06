@@ -5,12 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { ActionButton } from "@/shared/components/action-button";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -100,15 +101,15 @@ function AssignUserBranchesDialog({
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Assign branches</DialogTitle>
-          <DialogDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Assign branches</SheetTitle>
+          <SheetDescription>
             Update the branch access for {user.name}. The current session branch context is kept in
             sync.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">
@@ -137,7 +138,7 @@ function AssignUserBranchesDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormErrorBanner message={formError} />
 
-            <div className="max-h-80 space-y-3 overflow-y-auto rounded-xl border border-border p-4">
+            <div className="max-h-80 space-y-3 rounded-xl border border-border p-4">
               {branches.map((branch) => (
                 <label
                   key={branch.id}
@@ -166,8 +167,8 @@ function AssignUserBranchesDialog({
             </div>
           </form>
         ) : null}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

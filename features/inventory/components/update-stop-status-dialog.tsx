@@ -5,12 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -83,15 +84,15 @@ function UpdateStopStatusDialog({
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t("inventory.dispatch.update_stop_status")}</DialogTitle>
-          <DialogDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent >
+        <SheetHeader>
+          <SheetTitle>{t("inventory.dispatch.update_stop_status")}</SheetTitle>
+          <SheetDescription>
             {stop.sale_order?.code ?? `#${stop.sale_order_id}`} —{" "}
             {stop.customer_contact?.name ?? ""}
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -161,8 +162,8 @@ function UpdateStopStatusDialog({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

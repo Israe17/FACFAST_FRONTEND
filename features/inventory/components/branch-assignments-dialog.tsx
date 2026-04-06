@@ -7,12 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ActionButton } from "@/shared/components/action-button";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -85,16 +86,16 @@ function BranchAssignmentsDialog({
   const activeBranches = branches.filter((b) => b.is_active);
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent >
+        <SheetHeader>
+          <SheetTitle>
             {t("inventory.branch_assignments.dialog_title", { entity: entityLabel })}
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             {t("inventory.branch_assignments.dialog_description", { name: entityName })}
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <QueryStateWrapper
           errorDescription={getBackendErrorMessage(
@@ -140,7 +141,7 @@ function BranchAssignmentsDialog({
                   </div>
                 </div>
 
-                <div className="max-h-64 space-y-1 overflow-y-auto rounded-xl border border-border/70 p-2">
+                <div className="max-h-64 space-y-1 rounded-xl border border-border/70 p-2">
                   {activeBranches.length === 0 ? (
                     <p className="p-3 text-center text-sm text-muted-foreground">
                       {t("inventory.branch_assignments.no_branches")}
@@ -180,8 +181,8 @@ function BranchAssignmentsDialog({
             </div>
           </div>
         </QueryStateWrapper>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

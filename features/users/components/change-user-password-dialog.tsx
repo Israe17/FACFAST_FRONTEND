@@ -4,12 +4,13 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionButton } from "@/shared/components/action-button";
@@ -59,12 +60,12 @@ function ChangeUserPasswordDialog({
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
-          <DialogDescription>Set a new password for this user.</DialogDescription>
-        </DialogHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Change password</SheetTitle>
+          <SheetDescription>Set a new password for this user.</SheetDescription>
+        </SheetHeader>
 
         <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="space-y-2">
@@ -103,8 +104,8 @@ function ChangeUserPasswordDialog({
             </ActionButton>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

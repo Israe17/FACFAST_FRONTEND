@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -62,10 +63,10 @@ function WarehouseLocationDialog({
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {location
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.warehouse_location"),
@@ -73,28 +74,30 @@ function WarehouseLocationDialog({
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.warehouse_location"),
                 })}
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             {t("inventory.warehouse_locations.dialog_description", {
               warehouse: warehouse?.name ?? t("inventory.entity.warehouse"),
             })}
-          </DialogDescription>
-        </DialogHeader>
-        <WarehouseLocationForm
-          form={form}
-          formError={formError}
-          isPending={isPending}
-          onSubmit={handleSubmit}
-          submitLabel={
-            location
-              ? t("inventory.common.save_changes")
-              : t("inventory.common.create_entity", {
-                  entity: t("inventory.entity.warehouse_location"),
-                })
-          }
-        />
-      </DialogContent>
-    </Dialog>
+          </SheetDescription>
+        </SheetHeader>
+        <SheetBody>
+          <WarehouseLocationForm
+            form={form}
+            formError={formError}
+            isPending={isPending}
+            onSubmit={handleSubmit}
+            submitLabel={
+              location
+                ? t("inventory.common.save_changes")
+                : t("inventory.common.create_entity", {
+                    entity: t("inventory.entity.warehouse_location"),
+                  })
+            }
+          />
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 }
 

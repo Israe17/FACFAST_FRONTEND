@@ -5,12 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -67,14 +68,14 @@ function EditBranchDialog({ branch, onOpenChange, open }: EditBranchDialogProps)
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Edit branch</DialogTitle>
-          <DialogDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Edit branch</SheetTitle>
+          <SheetDescription>
             Update the branch using the same backend payload shape.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
         <BranchForm
           form={form as unknown as UseFormReturn<BranchFormValues>}
           formError={formError}
@@ -83,8 +84,8 @@ function EditBranchDialog({ branch, onOpenChange, open }: EditBranchDialogProps)
           secretState={getBranchSecretState(branch)}
           submitLabel="Save changes"
         />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

@@ -14,12 +14,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -101,18 +102,19 @@ function DispatchOrderDetailDialog({
 
   return (
     <>
-      <Dialog onOpenChange={onOpenChange} open={open}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+      <Sheet onOpenChange={onOpenChange} open={open}>
+        <SheetContent className="sm:max-w-2xl">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
               <Package className="size-5" />
               {order.code ?? t("inventory.entity.dispatch_order")}
-            </DialogTitle>
-            <DialogDescription>
+            </SheetTitle>
+            <SheetDescription>
               {t("inventory.dispatch.detail_description")}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
+          <SheetBody>
           {/* Order Info */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -338,8 +340,9 @@ function DispatchOrderDetailDialog({
               </div>
             </>
           ) : null}
-        </DialogContent>
-      </Dialog>
+          </SheetBody>
+        </SheetContent>
+      </Sheet>
 
       {stopStatusTarget && order ? (
         <UpdateStopStatusDialog

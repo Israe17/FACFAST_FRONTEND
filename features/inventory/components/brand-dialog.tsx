@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -41,29 +42,31 @@ function BrandDialog({ brand, onOpenChange, open }: BrandDialogProps) {
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>
             {brand
               ? t("inventory.common.edit_entity", { entity: t("inventory.entity.brand") })
               : t("inventory.common.create_entity", { entity: t("inventory.entity.brand") })}
-          </DialogTitle>
-          <DialogDescription>{t("inventory.brands.dialog_description")}</DialogDescription>
-        </DialogHeader>
-        <BrandForm
-          form={form}
-          formError={formError}
-          isPending={isPending}
-          onSubmit={handleSubmit}
-          submitLabel={
-            brand
-              ? t("inventory.common.save_changes")
-              : t("inventory.common.create_entity", { entity: t("inventory.entity.brand") })
-          }
-        />
-      </DialogContent>
-    </Dialog>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.brands.dialog_description")}</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
+          <BrandForm
+            form={form}
+            formError={formError}
+            isPending={isPending}
+            onSubmit={handleSubmit}
+            submitLabel={
+              brand
+                ? t("inventory.common.save_changes")
+                : t("inventory.common.create_entity", { entity: t("inventory.entity.brand") })
+            }
+          />
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 }
 

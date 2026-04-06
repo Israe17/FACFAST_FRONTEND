@@ -8,12 +8,12 @@ import { Controller, useForm, type UseFormReturn } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -259,7 +259,7 @@ function PriceListBranchAssignmentEditorDialog({
   }
 
   return (
-    <Dialog
+    <Sheet
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
           resetForm();
@@ -268,17 +268,17 @@ function PriceListBranchAssignmentEditorDialog({
       }}
       open={open}
     >
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {isEditing
               ? t("inventory.price_list_branch_assignments.edit_title")
               : t("inventory.price_list_branch_assignments.create_title")}
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             {t("inventory.price_list_branch_assignments.dialog_description")}
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <PriceListBranchAssignmentForm
           assignmentBranch={assignment?.branch}
@@ -294,8 +294,8 @@ function PriceListBranchAssignmentEditorDialog({
               : t("inventory.price_list_branch_assignments.create_action")
           }
         />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

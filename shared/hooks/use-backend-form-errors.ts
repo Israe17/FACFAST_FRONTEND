@@ -44,7 +44,11 @@ export function useBackendFormErrors<TFieldValues extends FieldValues>(
       toastMode: options.toastMode,
     });
 
-    setFormError(presentation.bannerMessage);
+    // Suppress the banner when all errors are already shown on their fields.
+    // The field-level messages are more precise and contextual; the banner
+    // would just repeat the same information in a less user-friendly format
+    // (e.g. showing raw DB field names for unique constraint violations).
+    setFormError(mappedErrors.hasFieldErrors ? null : presentation.bannerMessage);
 
     if (presentation.toastMessage) {
       toast.error(presentation.toastMessage);

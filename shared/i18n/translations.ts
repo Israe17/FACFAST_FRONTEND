@@ -1808,6 +1808,9 @@ const esTranslations = {
   "inventory.dispatch.readiness_driver": "Chofer asignado",
   "inventory.dispatch.readiness_stops": "Al menos una parada agregada",
   "inventory.dispatch.readiness_incomplete": "Incompleta",
+  "inventory.dispatch.readiness_date_conflicts": "Fecha de despacho posterior a fecha de entrega solicitada",
+  "inventory.dispatch_scheduled_date_after_delivery_date":
+    "La fecha programada del despacho es posterior a la fecha de entrega solicitada de una orden de venta asignada.",
   "inventory.dispatch.landing.eyebrow": "Despachos",
   "inventory.dispatch.landing.title": "Despachos y Logística",
   "inventory.dispatch.landing.description":
@@ -3457,6 +3460,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.dispatch.readiness_driver": "Driver assigned",
     "inventory.dispatch.readiness_stops": "At least one stop added",
     "inventory.dispatch.readiness_incomplete": "Incomplete",
+    "inventory.dispatch.readiness_date_conflicts": "Dispatch date is after requested delivery date",
+    "inventory.dispatch_scheduled_date_after_delivery_date":
+      "The dispatch scheduled date is after the requested delivery date of an assigned sale order.",
     "inventory.brand_in_use":
       "The brand cannot be deleted because it is in use.",
     "inventory.category_has_children":

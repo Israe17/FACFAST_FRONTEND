@@ -1580,6 +1580,7 @@ export const dispatchOrderSchema = z.object({
       missing_vehicle: z.boolean().optional().catch(true),
       missing_driver: z.boolean().optional().catch(true),
       missing_stops: z.boolean().optional().catch(true),
+      has_date_conflicts: z.boolean().optional().catch(false),
     }).optional().catch({}),
   }).optional().catch({}),
   created_at: z.string().optional(),

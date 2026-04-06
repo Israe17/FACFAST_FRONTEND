@@ -15,6 +15,7 @@ import {
   confirmSaleOrder,
   createSaleOrder,
   deleteSaleOrder,
+  resetSaleOrderDispatchStatus,
   emitElectronicDocument,
   getElectronicDocument,
   getSaleOrder,
@@ -208,6 +209,30 @@ export function useDeleteSaleOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("sales.order_delete_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useResetSaleOrderDispatchStatusMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: () => resetSaleOrderDispatchStatus(orderId),
+    onSuccess: () => {
+      invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });
+      toast.success(t("sales.reset_dispatch_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("sales.reset_dispatch_error_fallback"),
         });
       }
     },

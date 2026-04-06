@@ -1,12 +1,12 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -55,19 +55,26 @@ function UpdateStopStatusDialog({
   const { t } = useAppTranslator();
   const mutation = useUpdateDispatchStopStatusMutation(orderId, String(stop.id));
 
+  const stopLines = stop.lines ?? [];
+
   const {
     control,
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<UpdateDispatchStopStatusInput>({
-    resolver: zodResolver(updateDispatchStopStatusSchema),
+    resolver: zodResolver(updateDispatchStopStatusSchema) as any,
     defaultValues: {
       status: stop.status as UpdateDispatchStopStatusInput["status"],
       received_by: stop.received_by ?? "",
       failure_reason: stop.failure_reason ?? "",
       notes: stop.notes ?? "",
+      delivered_lines: stopLines.map((line) => ({
+        sale_order_line_id: Number(line.sale_order_line_id),
+        delivered_quantity: line.delivered_quantity ?? line.ordered_quantity,
+      })),
     },
   });
 
@@ -77,15 +84,21 @@ function UpdateStopStatusDialog({
     watchedStatus === "failed" ||
     watchedStatus === "partial" ||
     watchedStatus === "skipped";
+  const showDeliveredLines = watchedStatus === "partial" && stopLines.length > 0;
 
   async function onSubmit(data: UpdateDispatchStopStatusInput) {
-    await mutation.mutateAsync(data);
+    const payload = { ...data };
+    // Only send delivered_lines when status is partial
+    if (data.status !== "partial") {
+      delete payload.delivered_lines;
+    }
+    await mutation.mutateAsync(payload);
     onOpenChange(false);
   }
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent >
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>{t("inventory.dispatch.update_stop_status")}</SheetTitle>
           <SheetDescription>
@@ -140,6 +153,69 @@ function UpdateStopStatusDialog({
                 placeholder={t("inventory.dispatch.failure_reason_placeholder")}
               />
               <FormFieldError message={errors.failure_reason?.message} />
+            </div>
+          ) : null}
+
+          {/* Per-line delivered quantities for partial deliveries */}
+          {showDeliveredLines ? (
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold">
+                {t("inventory.dispatch.delivered_quantities")}
+              </Label>
+              <div className="rounded-lg border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="px-3 py-2 text-left font-medium">
+                        {t("inventory.dispatch.product")}
+                      </th>
+                      <th className="px-3 py-2 text-right font-medium w-24">
+                        {t("inventory.dispatch.ordered")}
+                      </th>
+                      <th className="px-3 py-2 text-right font-medium w-28">
+                        {t("inventory.dispatch.delivered")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stopLines.map((line, index) => (
+                      <tr key={line.id} className="border-b last:border-b-0">
+                        <td className="px-3 py-2">
+                          <span className="font-medium text-xs">
+                            {line.product_variant?.product?.name ?? line.product_variant?.sku ?? `Variante #${line.product_variant_id}`}
+                          </span>
+                          {line.product_variant?.variant_name ? (
+                            <span className="text-muted-foreground text-xs ml-1">
+                              ({line.product_variant.variant_name})
+                            </span>
+                          ) : null}
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {line.ordered_quantity}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            min="0"
+                            max={line.ordered_quantity}
+                            className="w-24 ml-auto text-right tabular-nums"
+                            {...register(`delivered_lines.${index}.delivered_quantity`, {
+                              valueAsNumber: true,
+                            })}
+                          />
+                          <input
+                            type="hidden"
+                            {...register(`delivered_lines.${index}.sale_order_line_id`, {
+                              valueAsNumber: true,
+                            })}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : null}
 

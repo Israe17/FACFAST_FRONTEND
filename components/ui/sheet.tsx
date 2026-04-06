@@ -62,7 +62,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background bg-clip-padding text-sm shadow-lg transition duration-200 ease-in-out",
+          "fixed z-50 flex flex-col gap-4 overflow-y-auto bg-background bg-clip-padding p-6 text-sm shadow-lg transition duration-200 ease-in-out",
           "data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t",
           "data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r",
           "data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-full data-[side=right]:border-l data-[side=right]:sm:max-w-xl",
@@ -99,7 +99,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-1.5 border-b px-6 py-4", className)}
+      className={cn("flex flex-col gap-1.5 pb-4 border-b", className)}
       {...props}
     />
   )
@@ -109,7 +109,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col-reverse gap-2 border-t px-6 py-4 sm:flex-row sm:justify-end", className)}
+      className={cn("mt-auto flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end", className)}
       {...props}
     />
   )

@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -52,10 +53,10 @@ function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionD
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-3xl">
+        <SheetHeader>
+          <SheetTitle>
             {promotion
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.promotion"),
@@ -63,9 +64,9 @@ function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionD
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.promotion"),
                 })}
-          </DialogTitle>
-          <DialogDescription>{t("inventory.promotions.dialog_description")}</DialogDescription>
-        </DialogHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.promotions.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <PromotionForm
           form={form}
           formError={formError}
@@ -80,8 +81,8 @@ function PromotionDialog({ onOpenChange, open, products, promotion }: PromotionD
                 })
           }
         />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

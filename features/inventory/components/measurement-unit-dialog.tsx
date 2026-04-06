@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -43,10 +44,10 @@ function MeasurementUnitDialog({ measurementUnit, onOpenChange, open }: Measurem
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>
             {measurementUnit
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.measurement_unit"),
@@ -54,24 +55,26 @@ function MeasurementUnitDialog({ measurementUnit, onOpenChange, open }: Measurem
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.measurement_unit"),
                 })}
-          </DialogTitle>
-          <DialogDescription>{t("inventory.measurement_units.dialog_description")}</DialogDescription>
-        </DialogHeader>
-        <MeasurementUnitForm
-          form={form}
-          formError={formError}
-          isPending={isPending}
-          onSubmit={handleSubmit}
-          submitLabel={
-            measurementUnit
-              ? t("inventory.common.save_changes")
-              : t("inventory.common.create_entity", {
-                  entity: t("inventory.entity.measurement_unit"),
-                })
-          }
-        />
-      </DialogContent>
-    </Dialog>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.measurement_units.dialog_description")}</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
+          <MeasurementUnitForm
+            form={form}
+            formError={formError}
+            isPending={isPending}
+            onSubmit={handleSubmit}
+            submitLabel={
+              measurementUnit
+                ? t("inventory.common.save_changes")
+                : t("inventory.common.create_entity", {
+                    entity: t("inventory.entity.measurement_unit"),
+                  })
+            }
+          />
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 }
 

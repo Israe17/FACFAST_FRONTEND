@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
@@ -340,16 +340,16 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         />
       </InventoryDetailBlock>
 
-      <Dialog onOpenChange={setCancelOpen} open={cancelOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("inventory.inventory_movements.cancel_title")}</DialogTitle>
-            <DialogDescription>
+      <Sheet onOpenChange={setCancelOpen} open={cancelOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t("inventory.inventory_movements.cancel_title")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.inventory_movements.cancel_description", {
                 code: movement.code ?? headerId,
               })}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           <form className="space-y-4" onSubmit={cancelForm.handleSubmit(handleCancel)}>
             <FormErrorBanner message={formError} />
             <div className="space-y-2">
@@ -366,8 +366,8 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </ActionButton>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -6,12 +6,13 @@ import { useForm } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ActionButton } from "@/shared/components/action-button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -94,14 +95,14 @@ function AssignRolePermissionsDialog({
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Assign permissions</DialogTitle>
-          <DialogDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Assign permissions</SheetTitle>
+          <SheetDescription>
             Update the permission set assigned to {role.name}.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         {permissionsQuery.isLoading ? (
           <LoadingState description="Loading available permissions." />
@@ -125,7 +126,7 @@ function AssignRolePermissionsDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormErrorBanner message={formError} />
 
-            <div className="max-h-[28rem] space-y-4 overflow-y-auto pr-1">
+            <div className="max-h-[28rem] space-y-4 pr-1">
               {Object.entries(groupedPermissions)
                 .sort(([left], [right]) => left.localeCompare(right))
                 .map(([group, permissions]) => (
@@ -175,8 +176,8 @@ function AssignRolePermissionsDialog({
             </div>
           </form>
         ) : null}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

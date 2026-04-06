@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 
@@ -48,10 +49,10 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {taxProfile
               ? t("inventory.common.edit_entity", {
                   entity: t("inventory.entity.tax_profile"),
@@ -59,9 +60,9 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
               : t("inventory.common.create_entity", {
                   entity: t("inventory.entity.tax_profile"),
                 })}
-          </DialogTitle>
-          <DialogDescription>{t("inventory.tax_profiles.dialog_description")}</DialogDescription>
-        </DialogHeader>
+          </SheetTitle>
+          <SheetDescription>{t("inventory.tax_profiles.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <TaxProfileForm
           form={form}
           formError={formError}
@@ -75,8 +76,8 @@ function TaxProfileDialog({ onOpenChange, open, taxProfile }: TaxProfileDialogPr
                 })
           }
         />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

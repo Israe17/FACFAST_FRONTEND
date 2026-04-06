@@ -8,12 +8,12 @@ import { useForm, useWatch } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -458,16 +458,16 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
         />
       </InventoryDetailBlock>
 
-      <Dialog onOpenChange={setRegisterOpen} open={registerOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t("inventory.serials.register_dialog_title")}</DialogTitle>
-            <DialogDescription>
+      <Sheet onOpenChange={setRegisterOpen} open={registerOpen}>
+        <SheetContent >
+          <SheetHeader>
+            <SheetTitle>{t("inventory.serials.register_dialog_title")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.serials.register_dialog_description", {
                 variant: selectedVariant?.variant_name ?? selectedVariant?.sku ?? product.name,
               })}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <form className="space-y-4" onSubmit={registerForm.handleSubmit(handleRegisterSubmit)}>
             <FormErrorBanner message={registerFormError} />
@@ -520,10 +520,10 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
               </ActionButton>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      <Dialog
+      <Sheet
         onOpenChange={(open) => {
           setStatusOpen(open);
           if (!open) {
@@ -532,15 +532,15 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
         }}
         open={statusOpen}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("inventory.serials.update_status_title")}</DialogTitle>
-            <DialogDescription>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t("inventory.serials.update_status_title")}</SheetTitle>
+            <SheetDescription>
               {t("inventory.serials.update_status_description", {
                 serial: selectedSerial?.serial_number ?? "",
               })}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <form className="space-y-4" onSubmit={statusForm.handleSubmit(handleStatusSubmit)}>
             <FormErrorBanner message={statusFormError} />
@@ -585,8 +585,8 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
               </ActionButton>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

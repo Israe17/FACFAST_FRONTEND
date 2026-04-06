@@ -5,12 +5,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ActionButton } from "@/shared/components/action-button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -86,12 +87,12 @@ function AssignUserRolesDialog({
   }
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Assign roles</DialogTitle>
-          <DialogDescription>Update the roles assigned to {user.name}.</DialogDescription>
-        </DialogHeader>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Assign roles</SheetTitle>
+          <SheetDescription>Update the roles assigned to {user.name}.</SheetDescription>
+        </SheetHeader>
 
         {rolesQuery.isLoading ? <LoadingState description="Loading available roles." /> : null}
         {rolesQuery.isError ? (
@@ -113,7 +114,7 @@ function AssignUserRolesDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormErrorBanner message={formError} />
 
-            <div className="max-h-80 space-y-3 overflow-y-auto rounded-xl border border-border p-4">
+            <div className="max-h-80 space-y-3 rounded-xl border border-border p-4">
               {rolesQuery.data.map((role) => (
                 <label
                   key={role.id}
@@ -146,8 +147,8 @@ function AssignUserRolesDialog({
             </div>
           </form>
         ) : null}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

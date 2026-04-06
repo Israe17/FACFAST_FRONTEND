@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -37,14 +38,14 @@ function EffectiveUserPermissionsDialog({
     }, {}) ?? {};
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>Effective permissions</DialogTitle>
-          <DialogDescription>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Effective permissions</SheetTitle>
+          <SheetDescription>
             Permissions currently resolved for {userName}.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         {permissionsQuery.isLoading ? (
           <LoadingState description="Loading effective permissions." />
@@ -62,7 +63,7 @@ function EffectiveUserPermissionsDialog({
           />
         ) : null}
         {permissionsQuery.data?.length ? (
-          <div className="max-h-[26rem] space-y-4 overflow-y-auto pr-1">
+          <div className="max-h-[26rem] space-y-4 pr-1">
             {Object.entries(groupedPermissions)
               .sort(([left], [right]) => left.localeCompare(right))
               .map(([group, permissions]) => (
@@ -81,8 +82,8 @@ function EffectiveUserPermissionsDialog({
               ))}
           </div>
         ) : null}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

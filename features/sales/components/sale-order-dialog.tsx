@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useDialogForm } from "@/shared/hooks/use-dialog-form";
 import { useSeedEntityOption } from "@/shared/hooks/use-seed-entity-option";
@@ -80,16 +80,16 @@ function SaleOrderDialog({
   });
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
+    <Sheet onOpenChange={onOpenChange} open={open}>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>
             {order
               ? t("inventory.common.edit_entity", { entity: t("sales.entity.sale_order") })
               : t("inventory.common.create_entity", { entity: t("sales.entity.sale_order") })}
-          </DialogTitle>
-          <DialogDescription>{t("sales.dialog_description")}</DialogDescription>
-        </DialogHeader>
+          </SheetTitle>
+          <SheetDescription>{t("sales.dialog_description")}</SheetDescription>
+        </SheetHeader>
         <SaleOrderForm
           branches={seededBranches}
           contacts={seededContacts}
@@ -107,8 +107,8 @@ function SaleOrderDialog({
           warehouses={seededWarehouses}
           zones={seededZones}
         />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

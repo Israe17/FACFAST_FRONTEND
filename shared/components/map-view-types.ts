@@ -16,3 +16,12 @@ export type MapPolyline = {
   weight?: number;
   dashArray?: string;
 };
+
+export type MapPolygon = {
+  id: string;
+  points: [number, number][];
+  color?: string;
+  fillColor?: string;
+  fillOpacity?: number;
+  label?: string;
+};

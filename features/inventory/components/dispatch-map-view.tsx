@@ -4,14 +4,15 @@ import { useMemo, useState } from "react";
 import { MapPin, Truck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { MapView, type MapMarker, type MapPolyline } from "@/shared/components/map-view";
+import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
-import type { DispatchOrder, DispatchStop } from "../types";
+import type { DispatchOrder, DispatchStop, Zone } from "../types";
 
 type DispatchMapViewProps = {
   orders: DispatchOrder[];
+  zones?: Zone[];
   onOrderClick?: (order: DispatchOrder) => void;
 };
 
@@ -42,7 +43,7 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   skipped: "inventory.dispatch.stop_skipped",
 };
 
-function DispatchMapView({ orders, onOrderClick }: DispatchMapViewProps) {
+function DispatchMapView({ orders, zones = [], onOrderClick }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -102,6 +103,20 @@ function DispatchMapView({ orders, onOrderClick }: DispatchMapViewProps) {
     if (!selectedOrder) return new Set<string>();
     return new Set((selectedOrder.stops ?? []).map((s) => `${selectedOrder.id}-${s.id}`));
   }, [selectedOrder]);
+
+  // Build zone polygons
+  const zonePolygons = useMemo<MapPolygon[]>(() => {
+    return zones
+      .filter((z) => z.boundary && z.boundary.length >= 3)
+      .map((z) => ({
+        id: `zone-${z.id}`,
+        points: z.boundary as [number, number][],
+        color: "#6366f1",
+        fillColor: "#6366f1",
+        fillOpacity: 0.08,
+        label: z.name,
+      }));
+  }, [zones]);
 
   function handleOrderSelect(orderId: string) {
     setSelectedOrderId((prev) => (prev === orderId ? null : orderId));
@@ -187,6 +202,7 @@ function DispatchMapView({ orders, onOrderClick }: DispatchMapViewProps) {
             color: selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
           }))}
           polylines={polylines}
+          polygons={zonePolygons}
           selectedMarkerId={null}
           className="h-full rounded-none"
         />

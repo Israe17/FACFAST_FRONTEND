@@ -130,12 +130,22 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
     {
       accessorKey: "code",
       header: t("inventory.entity.inventory_movement"),
-      cell: ({ row }) => row.original.code ?? row.original.id,
-    },
-    {
-      accessorKey: "lines",
-      header: t("inventory.entity.product"),
-      cell: ({ row }) => row.original.lines[0]?.product.name ?? t("inventory.common.not_available"),
+      cell: ({ row }) => {
+        const m = row.original;
+        return (
+          <div>
+            <span className="font-medium">{m.code ?? m.id}</span>
+            {m.status ? (
+              <Badge variant={m.status === "posted" ? "default" : "outline"} className="ml-1.5 text-[10px] px-1.5 py-0">
+                {t(`inventory.enum.movement_status.${m.status}` as const)}
+              </Badge>
+            ) : null}
+            {m.notes ? (
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{m.notes}</p>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "movement_type",
@@ -146,9 +156,30 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           : t("inventory.common.not_available"),
     },
     {
-      accessorKey: "line_count",
+      accessorKey: "lines",
+      header: t("inventory.entity.product"),
+      cell: ({ row }) => {
+        const warehouseLines = row.original.lines.filter((l) => l.warehouse?.id === warehouse.id);
+        const line = warehouseLines[0] ?? row.original.lines[0];
+        if (!line) return t("inventory.common.not_available");
+        return (
+          <div>
+            <span>{line.product?.name ?? t("inventory.common.not_available")}</span>
+            {warehouseLines.length > 1 ? (
+              <span className="text-xs text-muted-foreground ml-1">+{warehouseLines.length - 1}</span>
+            ) : null}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "quantity",
       header: t("inventory.form.quantity"),
-      cell: ({ row }) => row.original.line_count ?? row.original.lines.length,
+      cell: ({ row }) => {
+        const warehouseLines = row.original.lines.filter((l) => l.warehouse?.id === warehouse.id);
+        const total = warehouseLines.reduce((sum, l) => sum + (l.quantity ?? 0), 0);
+        return total;
+      },
     },
     {
       accessorKey: "occurred_at",

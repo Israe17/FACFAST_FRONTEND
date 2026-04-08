@@ -223,7 +223,8 @@ export function useResetSaleOrderDispatchStatusMutation(
   const { t } = useAppTranslator();
 
   return useMutation({
-    mutationFn: () => resetSaleOrderDispatchStatus(orderId),
+    mutationFn: (payload?: { delivery_requested_date?: string }) =>
+      resetSaleOrderDispatchStatus(orderId, payload),
     onSuccess: () => {
       invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
       queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });

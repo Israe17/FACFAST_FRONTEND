@@ -76,8 +76,11 @@ export async function cancelSaleOrder(orderId: string, payload: CancelSaleOrderI
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 
-export async function resetSaleOrderDispatchStatus(orderId: string) {
-  const response = await http.post(`/sale-orders/${orderId}/reset-dispatch`);
+export async function resetSaleOrderDispatchStatus(
+  orderId: string,
+  payload?: { delivery_requested_date?: string },
+) {
+  const response = await http.post(`/sale-orders/${orderId}/reset-dispatch`, payload);
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 

@@ -61,7 +61,9 @@ export const branchSchema = z
       .preprocess(normalizeIdentificationTypeValue, identificationTypeSchema.optional())
       .catch(undefined),
     is_active: z.boolean().optional().default(true),
+    latitude: z.number().nullable().optional().catch(null),
     legal_name: z.string().optional().catch(undefined),
+    longitude: z.number().nullable().optional().catch(null),
     name: z.string().catch("Branch"),
     phone: z.string().optional().catch(undefined),
     provider_code: z.string().optional().catch(undefined),
@@ -101,7 +103,9 @@ export const createBranchSchema = z.object({
     identificationTypeSchema.optional(),
   ),
   is_active: z.boolean().default(true),
+  latitude: z.number().nullable().optional().catch(null),
   legal_name: z.string().trim().min(2, "La razon social debe tener al menos 2 caracteres."),
+  longitude: z.number().nullable().optional().catch(null),
   mail_key: optionalTextSchema,
   name: optionalTrimmedString(
     z.string().min(2, "El nombre de la sucursal debe tener al menos 2 caracteres."),

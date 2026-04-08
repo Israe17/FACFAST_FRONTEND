@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
+import { ChevronDown, MapPin } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { LocationPicker } from "@/shared/components/location-picker";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { identificationTypeValues } from "@/shared/lib/validation";
@@ -37,7 +40,9 @@ type BranchFormValues = {
   identification_number?: string;
   identification_type?: string;
   is_active: boolean;
+  latitude?: number | null;
   legal_name: string;
+  longitude?: number | null;
   mail_key?: string;
   name?: string;
   phone?: string;
@@ -61,6 +66,42 @@ type BranchFormProps = {
 
 function FieldError({ message }: { message?: string }) {
   return message ? <p className="text-sm text-destructive">{message}</p> : null;
+}
+
+function LocationPickerSection({ form }: { form: UseFormReturn<BranchFormValues> }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const latitude = form.watch("latitude") ?? null;
+  const longitude = form.watch("longitude") ?? null;
+
+  return (
+    <div className="rounded-lg border border-border/50">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <span className="flex items-center gap-1.5">
+          <MapPin className="size-3.5" />
+          Ubicación en mapa
+        </span>
+        <ChevronDown
+          className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      {isOpen ? (
+        <div className="px-3 pb-3">
+          <LocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            onChange={(lat, lng) => {
+              form.setValue("latitude", lat, { shouldDirty: true });
+              form.setValue("longitude", lng, { shouldDirty: true });
+            }}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function BranchForm({
@@ -238,6 +279,8 @@ function BranchForm({
             <FieldError message={errors.email?.message} />
           </div>
         </div>
+
+        <LocationPickerSection form={form} />
       </section>
 
       {canConfigure ? (

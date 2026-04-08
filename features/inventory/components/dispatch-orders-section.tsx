@@ -222,6 +222,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           ) : (
             <DispatchMapView
               orders={ordersQuery.data ?? []}
+              warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
               onOrderClick={handleViewDetail}
             />

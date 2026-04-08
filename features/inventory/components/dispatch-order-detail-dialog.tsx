@@ -27,6 +27,7 @@ import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder, DispatchStop } from "../types";
+import { useDispatchOrderQuery } from "../queries";
 import { UpdateStopStatusDialog } from "./update-stop-status-dialog";
 
 type DispatchOrderDetailDialogProps = {
@@ -94,11 +95,16 @@ function DispatchOrderDetailDialog({
   const { t } = useAppTranslator();
   const [stopStatusTarget, setStopStatusTarget] = useState<DispatchStop | null>(null);
 
-  if (!order) return null;
+  // Fetch full detail (with stops.lines, stops.sale_order, etc.)
+  // The list endpoint only loads basic stop data without nested relations.
+  const detailQuery = useDispatchOrderQuery(order?.id ? String(order.id) : "");
+  const fullOrder = detailQuery.data ?? order;
 
-  const stops = order.stops ?? [];
-  const expenses = order.expenses ?? [];
-  const lifecycle = order.lifecycle ?? {};
+  if (!fullOrder) return null;
+
+  const stops = fullOrder.stops ?? [];
+  const expenses = fullOrder.expenses ?? [];
+  const lifecycle = fullOrder.lifecycle ?? {};
 
   return (
     <>
@@ -107,7 +113,7 @@ function DispatchOrderDetailDialog({
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Package className="size-5" />
-              {order.code ?? t("inventory.entity.dispatch_order")}
+              {fullOrder.code ?? t("inventory.entity.dispatch_order")}
             </SheetTitle>
             <SheetDescription>
               {t("inventory.dispatch.detail_description")}
@@ -120,57 +126,57 @@ function DispatchOrderDetailDialog({
             <div>
               <p className="text-muted-foreground">{t("inventory.dispatch.status")}</p>
               <span
-                className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[order.status] ?? ""}`}
+                className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[fullOrder.status] ?? ""}`}
               >
-                {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+                {t(statusTranslationMap[fullOrder.status] ?? "inventory.dispatch.status_draft")}
               </span>
             </div>
             <div>
               <p className="text-muted-foreground">{t("inventory.dispatch.dispatch_type")}</p>
-              <p className="font-medium capitalize">{order.dispatch_type}</p>
+              <p className="font-medium capitalize">{fullOrder.dispatch_type}</p>
             </div>
-            {order.route ? (
+            {fullOrder.route ? (
               <div>
                 <p className="text-muted-foreground">{t("inventory.dispatch.route")}</p>
-                <p className="font-medium">{order.route.name}</p>
+                <p className="font-medium">{fullOrder.route.name}</p>
               </div>
             ) : null}
-            {order.vehicle ? (
+            {fullOrder.vehicle ? (
               <div>
                 <p className="text-muted-foreground">{t("inventory.dispatch.vehicle")}</p>
                 <p className="font-medium">
-                  {order.vehicle.name} ({order.vehicle.plate_number})
+                  {fullOrder.vehicle.name} ({fullOrder.vehicle.plate_number})
                 </p>
               </div>
             ) : null}
-            {order.driver_user ? (
+            {fullOrder.driver_user ? (
               <div>
                 <p className="text-muted-foreground">{t("inventory.dispatch.driver")}</p>
-                <p className="font-medium">{order.driver_user.name}</p>
+                <p className="font-medium">{fullOrder.driver_user.name}</p>
               </div>
             ) : null}
-            {order.origin_warehouse ? (
+            {fullOrder.origin_warehouse ? (
               <div>
                 <p className="text-muted-foreground">{t("inventory.dispatch.origin_warehouse")}</p>
-                <p className="font-medium">{order.origin_warehouse.name}</p>
+                <p className="font-medium">{fullOrder.origin_warehouse.name}</p>
               </div>
             ) : null}
-            {order.scheduled_date ? (
+            {fullOrder.scheduled_date ? (
               <div>
                 <p className="text-muted-foreground">{t("inventory.dispatch.scheduled_date")}</p>
-                <p className="font-medium">{formatDateTime(order.scheduled_date)}</p>
+                <p className="font-medium">{formatDateTime(fullOrder.scheduled_date)}</p>
               </div>
             ) : null}
-            {order.notes ? (
+            {fullOrder.notes ? (
               <div className="col-span-2">
                 <p className="text-muted-foreground">{t("inventory.common.notes")}</p>
-                <p>{order.notes}</p>
+                <p>{fullOrder.notes}</p>
               </div>
             ) : null}
           </div>
 
           {/* Readiness Checklist (draft only) */}
-          {order.status === "draft" && order.lifecycle?.readiness ? (
+          {fullOrder.status === "draft" && fullOrder.lifecycle?.readiness ? (
             <>
               <Separator />
               <div>
@@ -180,22 +186,22 @@ function DispatchOrderDetailDialog({
                 </h3>
                 <div className="space-y-1.5 text-sm">
                   <ReadinessItem
-                    ok={!order.lifecycle.readiness.missing_scheduled_date}
+                    ok={!fullOrder.lifecycle.readiness.missing_scheduled_date}
                     label={t("inventory.dispatch.readiness_scheduled_date")}
                   />
                   <ReadinessItem
-                    ok={!order.lifecycle.readiness.missing_vehicle}
+                    ok={!fullOrder.lifecycle.readiness.missing_vehicle}
                     label={t("inventory.dispatch.readiness_vehicle")}
                   />
                   <ReadinessItem
-                    ok={!order.lifecycle.readiness.missing_driver}
+                    ok={!fullOrder.lifecycle.readiness.missing_driver}
                     label={t("inventory.dispatch.readiness_driver")}
                   />
                   <ReadinessItem
-                    ok={!order.lifecycle.readiness.missing_stops}
+                    ok={!fullOrder.lifecycle.readiness.missing_stops}
                     label={t("inventory.dispatch.readiness_stops")}
                   />
-                  {order.lifecycle.readiness.has_date_conflicts ? (
+                  {fullOrder.lifecycle.readiness.has_date_conflicts ? (
                     <ReadinessItem
                       ok={false}
                       label={t("inventory.dispatch.readiness_date_conflicts")}
@@ -297,7 +303,7 @@ function DispatchOrderDetailDialog({
                         <p className="text-xs text-muted-foreground">{stop.notes}</p>
                       ) : null}
                       {/* Show update status button when order is dispatched/in_transit and stop is not resolved */}
-                      {(order.status === "dispatched" || order.status === "in_transit") &&
+                      {(fullOrder.status === "dispatched" || fullOrder.status === "in_transit") &&
                       (stop.status === "pending" || stop.status === "in_transit") ? (
                         <Button
                           size="sm"
@@ -371,9 +377,9 @@ function DispatchOrderDetailDialog({
         </SheetContent>
       </Sheet>
 
-      {stopStatusTarget && order ? (
+      {stopStatusTarget && fullOrder ? (
         <UpdateStopStatusDialog
-          orderId={String(order.id)}
+          orderId={String(fullOrder.id)}
           stop={stopStatusTarget}
           open={stopStatusTarget !== null}
           onOpenChange={(open) => {

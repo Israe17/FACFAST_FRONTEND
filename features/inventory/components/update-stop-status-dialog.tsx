@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,6 @@ function UpdateStopStatusDialog({
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<UpdateDispatchStopStatusInput>({
     resolver: zodResolver(updateDispatchStopStatusSchema) as any,

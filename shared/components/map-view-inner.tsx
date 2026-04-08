@@ -1,20 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
 import type { MapMarker, MapPolyline } from "./map-view-types";
 
 export type { MapMarker, MapPolyline };
-
-// Fix default marker icons (Leaflet's default icons break with bundlers)
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
 
 const STOP_STATUS_COLORS: Record<string, string> = {
   pending: "#eab308",     // yellow
@@ -24,20 +14,6 @@ const STOP_STATUS_COLORS: Record<string, string> = {
   partial: "#f97316",     // orange
   skipped: "#6b7280",     // gray
 };
-
-function createColorIcon(color: string) {
-  return L.divIcon({
-    className: "",
-    html: `<div style="
-      width: 24px; height: 24px; border-radius: 50%;
-      background: ${color}; border: 3px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    "></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -14],
-  });
-}
 
 type MapViewInnerProps = {
   markers?: MapMarker[];
@@ -65,13 +41,27 @@ function MapViewInner({
   onClick,
 }: MapViewInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markersLayerRef = useRef<L.LayerGroup | null>(null);
-  const polylinesLayerRef = useRef<L.LayerGroup | null>(null);
+  const mapRef = useRef<any>(null);
+  const markersLayerRef = useRef<any>(null);
+  const polylinesLayerRef = useRef<any>(null);
+  const leafletRef = useRef<any>(null);
 
-  // Initialize map
+  // Initialize map (load leaflet at runtime)
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
+
+    // Dynamic require to avoid Turbopack resolving leaflet at compile time
+    const L = require("leaflet");
+    require("leaflet/dist/leaflet.css");
+    leafletRef.current = L;
+
+    // Fix default marker icons
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    });
 
     const map = L.map(containerRef.current).setView(
       center ?? DEFAULT_CENTER,
@@ -96,16 +86,13 @@ function MapViewInner({
   // Handle map click events
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map || !onClick) return;
 
-    if (!onClick) return;
-
-    const handler = (e: L.LeafletMouseEvent) => {
+    const handler = (e: any) => {
       onClick(e.latlng.lat, e.latlng.lng);
     };
 
     map.on("click", handler);
-
     return () => {
       map.off("click", handler);
     };
@@ -113,8 +100,9 @@ function MapViewInner({
 
   // Update markers
   useEffect(() => {
+    const L = leafletRef.current;
     const layer = markersLayerRef.current;
-    if (!layer) return;
+    if (!L || !layer) return;
 
     layer.clearLayers();
 
@@ -134,7 +122,17 @@ function MapViewInner({
             iconAnchor: [16, 16],
             popupAnchor: [0, -18],
           })
-        : createColorIcon(color);
+        : L.divIcon({
+            className: "",
+            html: `<div style="
+              width: 24px; height: 24px; border-radius: 50%;
+              background: ${color}; border: 3px solid white;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            "></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -14],
+          });
 
       const marker = L.marker([m.lat, m.lng], { icon }).addTo(layer);
 
@@ -150,8 +148,9 @@ function MapViewInner({
 
   // Update polylines
   useEffect(() => {
+    const L = leafletRef.current;
     const layer = polylinesLayerRef.current;
-    if (!layer) return;
+    if (!L || !layer) return;
 
     layer.clearLayers();
 
@@ -167,10 +166,11 @@ function MapViewInner({
 
   // Fit bounds when markers change
   useEffect(() => {
+    const L = leafletRef.current;
     const map = mapRef.current;
-    if (!map || markers.length === 0) return;
+    if (!L || !map || markers.length === 0) return;
 
-    const bounds = L.latLngBounds(markers.map((m) => [m.lat, m.lng]));
+    const bounds = L.latLngBounds(markers.map((m: MapMarker) => [m.lat, m.lng]));
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   }, [markers]);
 

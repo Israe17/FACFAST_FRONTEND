@@ -94,36 +94,44 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
   const lineColumns: ColumnDef<InventoryMovementLine>[] = [
     {
       accessorKey: "line_no",
-      header: t("inventory.detail.line_no"),
-    },
-    {
-      accessorKey: "warehouse",
-      header: t("inventory.entity.warehouse"),
-      cell: ({ row }) => row.original.warehouse.name,
-    },
-    {
-      accessorKey: "location",
-      header: t("inventory.entity.warehouse_location"),
-      cell: ({ row }) => row.original.location?.name ?? t("inventory.common.not_available"),
+      header: "#",
+      size: 40,
     },
     {
       accessorKey: "product",
       header: t("inventory.entity.product"),
-      cell: ({ row }) => row.original.product.name,
+      cell: ({ row }) => {
+        const variant = row.original.product_variant;
+        return (
+          <div>
+            <span className="font-medium">{row.original.product.name}</span>
+            {variant?.variant_name || variant?.sku ? (
+              <p className="text-xs text-muted-foreground">{variant.variant_name ?? variant.sku}</p>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "product_variant",
-      header: t("inventory.detail.variant_label"),
-      cell: ({ row }) =>
-        row.original.product_variant?.variant_name ??
-        row.original.product_variant?.sku ??
-        t("inventory.detail.default_variant"),
+      accessorKey: "warehouse",
+      header: t("inventory.entity.warehouse"),
+      cell: ({ row }) => {
+        const loc = row.original.location;
+        return (
+          <div>
+            <span>{row.original.warehouse.name}</span>
+            {loc?.name ? (
+              <p className="text-xs text-muted-foreground">{loc.name}</p>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "inventory_lot",
       header: t("inventory.entity.inventory_lot"),
       cell: ({ row }) =>
-        row.original.inventory_lot?.lot_number ?? t("inventory.common.not_available"),
+        row.original.inventory_lot?.lot_number ?? "—",
     },
     {
       accessorKey: "quantity",
@@ -133,32 +141,23 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
     {
       accessorKey: "on_hand_delta",
       header: t("inventory.form.on_hand_delta"),
-      cell: ({ row }) => row.original.on_hand_delta ?? 0,
+      cell: ({ row }) => {
+        const val = row.original.on_hand_delta ?? 0;
+        return <span className={val > 0 ? "text-green-600" : val < 0 ? "text-red-600" : ""}>{val > 0 ? `+${val}` : val}</span>;
+      },
     },
     {
       accessorKey: "reserved_delta",
       header: t("inventory.form.reserved_delta"),
-      cell: ({ row }) => row.original.reserved_delta ?? 0,
-    },
-    {
-      accessorKey: "incoming_delta",
-      header: t("inventory.form.incoming_delta"),
-      cell: ({ row }) => row.original.incoming_delta ?? 0,
-    },
-    {
-      accessorKey: "outgoing_delta",
-      header: t("inventory.form.outgoing_delta"),
-      cell: ({ row }) => row.original.outgoing_delta ?? 0,
+      cell: ({ row }) => {
+        const val = row.original.reserved_delta ?? 0;
+        return val !== 0 ? <span>{val > 0 ? `+${val}` : val}</span> : "—";
+      },
     },
     {
       accessorKey: "unit_cost",
       header: t("inventory.form.unit_cost"),
-      cell: ({ row }) => row.original.unit_cost ?? t("inventory.common.not_available"),
-    },
-    {
-      accessorKey: "total_cost",
-      header: t("inventory.detail.total_cost"),
-      cell: ({ row }) => row.original.total_cost ?? t("inventory.common.not_available"),
+      cell: ({ row }) => row.original.unit_cost ?? "—",
     },
   ];
 
@@ -231,7 +230,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         <DataCard
           description={t("inventory.detail.movement_kpi_date")}
           title={t("inventory.form.occurred_at")}
-          value={<span className="text-lg">{formatDateTime(movement.occurred_at)}</span>}
+          value={formatDateTime(movement.occurred_at)}
         />
       </div>
 
@@ -332,12 +331,14 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         description={t("inventory.detail.line_items_description")}
         title={t("inventory.detail.line_items")}
       >
-        <DataTable
-          enablePagination={false}
-          columns={lineColumns}
-          data={lines}
-          emptyMessage={t("inventory.detail.no_movement_lines")}
-        />
+        <div className="overflow-x-auto">
+          <DataTable
+            enablePagination={false}
+            columns={lineColumns}
+            data={lines}
+            emptyMessage={t("inventory.detail.no_movement_lines")}
+          />
+        </div>
       </InventoryDetailBlock>
 
       <Sheet onOpenChange={setCancelOpen} open={cancelOpen}>

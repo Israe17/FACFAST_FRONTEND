@@ -189,6 +189,8 @@ const saleOrderFormObjectSchema = z.object({
   delivery_canton: optionalTextSchema,
   delivery_charges: z.array(createSaleOrderDeliveryChargeSchema).optional().default([]),
   delivery_district: optionalTextSchema,
+  delivery_latitude: z.number().nullable().optional().catch(null),
+  delivery_longitude: z.number().nullable().optional().catch(null),
   delivery_province: optionalTextSchema,
   delivery_requested_date: optionalTextSchema,
   delivery_zone_id: makeOptionalIdSchema("Selecciona una zona."),

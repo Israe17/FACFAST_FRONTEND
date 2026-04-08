@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
-import { Plus, Trash2 } from "lucide-react";
+import { ChevronDown, MapPin, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { LocationPicker } from "@/shared/components/location-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
@@ -52,6 +53,42 @@ const chargeTypeLabels: Record<string, string> = {
   installation: "Instalación",
   express: "Express",
 };
+
+function DeliveryLocationPickerSection({ form }: { form: UseFormReturn<CreateSaleOrderInput> }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const latitude = form.watch("delivery_latitude") ?? null;
+  const longitude = form.watch("delivery_longitude") ?? null;
+
+  return (
+    <div className="rounded-lg border border-border/50">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <span className="flex items-center gap-1.5">
+          <MapPin className="size-3.5" />
+          Ubicación de entrega
+        </span>
+        <ChevronDown
+          className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      {isOpen ? (
+        <div className="px-3 pb-3">
+          <LocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            onChange={(lat, lng) => {
+              form.setValue("delivery_latitude", lat, { shouldDirty: true });
+              form.setValue("delivery_longitude", lng, { shouldDirty: true });
+            }}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 type SaleOrderFormProps = {
   branches: Branch[];
@@ -155,6 +192,8 @@ function SaleOrderForm({
       setValue("delivery_province", undefined);
       setValue("delivery_canton", undefined);
       setValue("delivery_district", undefined);
+      setValue("delivery_latitude", null);
+      setValue("delivery_longitude", null);
       setValue("delivery_zone_id", undefined);
       setValue("delivery_requested_date", undefined);
       const charges = getValues("delivery_charges");
@@ -522,6 +561,8 @@ function SaleOrderForm({
               />
             </div>
           </div>
+
+          <DeliveryLocationPickerSection form={form} />
         </div>
       )}
 

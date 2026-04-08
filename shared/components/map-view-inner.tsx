@@ -116,6 +116,20 @@ function MapViewInner({
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Invalidate size when container resizes (e.g. after Sheet open/close)
+  useEffect(() => {
+    const map = mapRef.current;
+    const container = containerRef.current;
+    if (!map || !container) return;
+
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [ready]);
+
   // Handle map click events
   useEffect(() => {
     const map = mapRef.current;

@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MapPin, Truck } from "lucide-react";
+import { Eye, MapPin, Truck } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -180,7 +180,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                 className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors ${isSelected ? "bg-muted" : ""}`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
-                  if (onOrderClick) onOrderClick(order);
                 }}
               >
                 <div className="flex items-center justify-between mb-1">
@@ -209,6 +208,21 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                       </span>
                     ) : null}
                   </p>
+                  {isSelected && onOrderClick ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-6 text-[11px] mt-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOrderClick(order);
+                      }}
+                    >
+                      <Eye className="size-3 mr-1" />
+                      Ver detalle
+                    </Button>
+                  ) : null}
                 </div>
               </button>
             );

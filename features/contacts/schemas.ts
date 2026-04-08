@@ -91,6 +91,18 @@ const nullableOptionalNumberSchema = z.preprocess((value) => {
   return value;
 }, z.union([z.coerce.number().min(0, "Debe ser al menos 0."), z.null()]).optional());
 
+const nullableCoordinateSchema = z.preprocess((value) => {
+  if (value === "" || value === undefined) {
+    return null;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
+  return value;
+}, z.union([z.coerce.number(), z.null()]).optional());
+
 const optionalIsoDateSchema = z.preprocess((value) => {
   if (typeof value !== "string") {
     return value;
@@ -138,6 +150,8 @@ export const createContactSchema = z.object({
   canton: optionalTextSchema,
   code: optionalCodeSchema,
   commercial_name: makeOptionalTrimmedTextSchema(2, "El nombre comercial debe tener al menos 2 caracteres."),
+  delivery_latitude: nullableCoordinateSchema,
+  delivery_longitude: nullableCoordinateSchema,
   district: optionalTextSchema,
   economic_activity_code: optionalTextSchema,
   email: optionalEmailSchema,
@@ -173,6 +187,8 @@ export const updateContactSchema = z.object({
   canton: optionalTextSchema,
   code: optionalCodeSchema,
   commercial_name: makeOptionalTrimmedTextSchema(2, "El nombre comercial debe tener al menos 2 caracteres."),
+  delivery_latitude: nullableCoordinateSchema,
+  delivery_longitude: nullableCoordinateSchema,
   district: optionalTextSchema,
   economic_activity_code: optionalTextSchema,
   email: optionalEmailSchema,

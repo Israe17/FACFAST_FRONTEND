@@ -60,6 +60,7 @@ type MapViewInnerProps = {
   className?: string;
   selectedMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
+  onClick?: (lat: number, lng: number) => void;
 };
 
 // Costa Rica center
@@ -74,6 +75,7 @@ function MapViewInner({
   className = "",
   selectedMarkerId,
   onMarkerClick,
+  onClick,
 }: MapViewInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -103,6 +105,24 @@ function MapViewInner({
       mapRef.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle map click events
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!onClick) return;
+
+    const handler = (e: L.LeafletMouseEvent) => {
+      onClick(e.latlng.lat, e.latlng.lng);
+    };
+
+    map.on("click", handler);
+
+    return () => {
+      map.off("click", handler);
+    };
+  }, [onClick]);
 
   // Update markers
   useEffect(() => {

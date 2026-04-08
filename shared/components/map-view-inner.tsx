@@ -1,18 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { MapMarker, MapPolyline } from "./map-view-types";
 
 export type { MapMarker, MapPolyline };
 
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
 const STOP_STATUS_COLORS: Record<string, string> = {
-  pending: "#eab308",     // yellow
-  in_transit: "#f97316",  // orange
-  delivered: "#22c55e",   // green
-  failed: "#ef4444",      // red
-  partial: "#f97316",     // orange
-  skipped: "#6b7280",     // gray
+  pending: "#eab308",
+  in_transit: "#f97316",
+  delivered: "#22c55e",
+  failed: "#ef4444",
+  partial: "#f97316",
+  skipped: "#6b7280",
 };
 
 type MapViewInnerProps = {
@@ -26,9 +32,23 @@ type MapViewInnerProps = {
   onClick?: (lat: number, lng: number) => void;
 };
 
-// Costa Rica center
 const DEFAULT_CENTER: [number, number] = [9.9281, -84.0907];
 const DEFAULT_ZOOM = 8;
+
+function waitForLeaflet(): Promise<any> {
+  return new Promise((resolve) => {
+    if (window.L) {
+      resolve(window.L);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (window.L) {
+        clearInterval(interval);
+        resolve(window.L);
+      }
+    }, 50);
+  });
+}
 
 function MapViewInner({
   markers = [],
@@ -44,42 +64,51 @@ function MapViewInner({
   const mapRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const polylinesLayerRef = useRef<any>(null);
-  const leafletRef = useRef<any>(null);
+  const LRef = useRef<any>(null);
+  const [ready, setReady] = useState(false);
 
-  // Initialize map (load leaflet at runtime)
+  // Initialize map once Leaflet is loaded from CDN
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    // Dynamic require to avoid Turbopack resolving leaflet at compile time
-    const L = require("leaflet");
-    require("leaflet/dist/leaflet.css");
-    leafletRef.current = L;
+    let cancelled = false;
 
-    // Fix default marker icons
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    waitForLeaflet().then((L) => {
+      if (cancelled || !containerRef.current) return;
+
+      LRef.current = L;
+
+      // Fix default marker icons
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      });
+
+      const map = L.map(containerRef.current).setView(
+        center ?? DEFAULT_CENTER,
+        zoom ?? DEFAULT_ZOOM,
+      );
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
+
+      markersLayerRef.current = L.layerGroup().addTo(map);
+      polylinesLayerRef.current = L.layerGroup().addTo(map);
+      mapRef.current = map;
+      setReady(true);
     });
 
-    const map = L.map(containerRef.current).setView(
-      center ?? DEFAULT_CENTER,
-      zoom ?? DEFAULT_ZOOM,
-    );
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map);
-
-    markersLayerRef.current = L.layerGroup().addTo(map);
-    polylinesLayerRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
-
     return () => {
-      map.remove();
-      mapRef.current = null;
+      cancelled = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -96,43 +125,32 @@ function MapViewInner({
     return () => {
       map.off("click", handler);
     };
-  }, [onClick]);
+  }, [onClick, ready]);
 
   // Update markers
   useEffect(() => {
-    const L = leafletRef.current;
+    const L = LRef.current;
     const layer = markersLayerRef.current;
     if (!L || !layer) return;
 
     layer.clearLayers();
 
     for (const m of markers) {
-      const color = m.color ?? STOP_STATUS_COLORS[m.status ?? ""] ?? "#3b82f6";
+      const color =
+        m.color ?? STOP_STATUS_COLORS[m.status ?? ""] ?? "#3b82f6";
       const isSelected = m.id === selectedMarkerId;
 
-      const icon = isSelected
-        ? L.divIcon({
-            className: "",
-            html: `<div style="
-              width: 32px; height: 32px; border-radius: 50%;
-              background: ${color}; border: 4px solid #1d4ed8;
-              box-shadow: 0 0 0 3px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.4);
-            "></div>`,
-            iconSize: [32, 32],
-            iconAnchor: [16, 16],
-            popupAnchor: [0, -18],
-          })
-        : L.divIcon({
-            className: "",
-            html: `<div style="
-              width: 24px; height: 24px; border-radius: 50%;
-              background: ${color}; border: 3px solid white;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            "></div>`,
-            iconSize: [24, 24],
-            iconAnchor: [12, 12],
-            popupAnchor: [0, -14],
-          });
+      const icon = L.divIcon({
+        className: "",
+        html: `<div style="
+          width: ${isSelected ? 32 : 24}px; height: ${isSelected ? 32 : 24}px; border-radius: 50%;
+          background: ${color}; border: ${isSelected ? "4px solid #1d4ed8" : "3px solid white"};
+          box-shadow: ${isSelected ? "0 0 0 3px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.4)" : "0 2px 6px rgba(0,0,0,0.3)"};
+        "></div>`,
+        iconSize: isSelected ? [32, 32] : [24, 24],
+        iconAnchor: isSelected ? [16, 16] : [12, 12],
+        popupAnchor: [0, isSelected ? -18 : -14],
+      });
 
       const marker = L.marker([m.lat, m.lng], { icon }).addTo(layer);
 
@@ -144,11 +162,11 @@ function MapViewInner({
         marker.on("click", () => onMarkerClick(m.id));
       }
     }
-  }, [markers, selectedMarkerId, onMarkerClick]);
+  }, [markers, selectedMarkerId, onMarkerClick, ready]);
 
   // Update polylines
   useEffect(() => {
-    const L = leafletRef.current;
+    const L = LRef.current;
     const layer = polylinesLayerRef.current;
     if (!L || !layer) return;
 
@@ -162,17 +180,19 @@ function MapViewInner({
         opacity: 0.7,
       }).addTo(layer);
     }
-  }, [polylines]);
+  }, [polylines, ready]);
 
   // Fit bounds when markers change
   useEffect(() => {
-    const L = leafletRef.current;
+    const L = LRef.current;
     const map = mapRef.current;
     if (!L || !map || markers.length === 0) return;
 
-    const bounds = L.latLngBounds(markers.map((m: MapMarker) => [m.lat, m.lng]));
+    const bounds = L.latLngBounds(
+      markers.map((m: MapMarker) => [m.lat, m.lng]),
+    );
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-  }, [markers]);
+  }, [markers, ready]);
 
   return (
     <div

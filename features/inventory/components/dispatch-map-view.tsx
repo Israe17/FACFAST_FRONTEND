@@ -174,10 +174,11 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
             const totalStops = (order.stops ?? []).length;
 
             return (
-              <button
+              <div
                 key={order.id}
-                type="button"
-                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors ${isSelected ? "bg-muted" : ""}`}
+                role="button"
+                tabIndex={0}
+                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer ${isSelected ? "bg-muted" : ""}`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
                 }}
@@ -224,7 +225,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                     </Button>
                   ) : null}
                 </div>
-              </button>
+              </div>
             );
           })}
           {activeOrders.length === 0 ? (

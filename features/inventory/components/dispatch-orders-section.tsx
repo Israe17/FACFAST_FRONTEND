@@ -36,6 +36,7 @@ import {
   useRoutesQuery,
   useVehiclesQuery,
   useWarehousesQuery,
+  useZonesQuery,
 } from "../queries";
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
@@ -76,6 +77,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const saleOrdersQuery = useSaleOrdersQuery(enabled && canView);
 
   const ordersQuery = useDispatchOrdersQuery(enabled && canView);
+  const zonesQuery = useZonesQuery(enabled && canView);
   const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id ?? "", {
     showErrorToast: true,
   });
@@ -220,6 +222,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           ) : (
             <DispatchMapView
               orders={ordersQuery.data ?? []}
+              zones={zonesQuery.data ?? []}
               onOrderClick={handleViewDetail}
             />
           )}

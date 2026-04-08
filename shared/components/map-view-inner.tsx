@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { MapMarker, MapPolyline } from "./map-view-types";
+import type { MapMarker, MapPolygon, MapPolyline } from "./map-view-types";
 
-export type { MapMarker, MapPolyline };
+export type { MapMarker, MapPolygon, MapPolyline };
 
 declare global {
   interface Window {
@@ -24,6 +24,7 @@ const STOP_STATUS_COLORS: Record<string, string> = {
 type MapViewInnerProps = {
   markers?: MapMarker[];
   polylines?: MapPolyline[];
+  polygons?: MapPolygon[];
   center?: [number, number];
   zoom?: number;
   className?: string;
@@ -53,6 +54,7 @@ function waitForLeaflet(): Promise<any> {
 function MapViewInner({
   markers = [],
   polylines = [],
+  polygons = [],
   center,
   zoom,
   className = "",
@@ -64,6 +66,7 @@ function MapViewInner({
   const mapRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const polylinesLayerRef = useRef<any>(null);
+  const polygonsLayerRef = useRef<any>(null);
   const LRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
 
@@ -99,6 +102,7 @@ function MapViewInner({
 
       markersLayerRef.current = L.layerGroup().addTo(map);
       polylinesLayerRef.current = L.layerGroup().addTo(map);
+      polygonsLayerRef.current = L.layerGroup().addTo(map);
       mapRef.current = map;
       setReady(true);
     });
@@ -181,6 +185,32 @@ function MapViewInner({
       }).addTo(layer);
     }
   }, [polylines, ready]);
+
+  // Update polygons (zone boundaries)
+  useEffect(() => {
+    const L = LRef.current;
+    const layer = polygonsLayerRef.current;
+    if (!L || !layer) return;
+
+    layer.clearLayers();
+
+    for (const p of polygons) {
+      const polygon = L.polygon(p.points, {
+        color: p.color ?? "#6366f1",
+        fillColor: p.fillColor ?? p.color ?? "#6366f1",
+        fillOpacity: p.fillOpacity ?? 0.1,
+        weight: 2,
+      }).addTo(layer);
+
+      if (p.label) {
+        polygon.bindTooltip(p.label, {
+          permanent: true,
+          direction: "center",
+          className: "zone-label",
+        });
+      }
+    }
+  }, [polygons, ready]);
 
   // Fit bounds when markers change
   useEffect(() => {

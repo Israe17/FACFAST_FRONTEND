@@ -1372,6 +1372,7 @@ export const zoneSchema = z
     province: z.string().nullable().optional().catch(null),
     center_latitude: z.number().nullable().optional().catch(null),
     center_longitude: z.number().nullable().optional().catch(null),
+    boundary: z.array(z.tuple([z.number(), z.number()])).nullable().optional().catch(null),
     updated_at: z.string().optional(),
   })
   .passthrough();
@@ -1384,6 +1385,9 @@ export const createZoneSchema = z.object({
   province: optionalTextSchema,
   canton: optionalTextSchema,
   district: optionalTextSchema,
+  center_latitude: z.number().nullable().optional().catch(null),
+  center_longitude: z.number().nullable().optional().catch(null),
+  boundary: z.array(z.tuple([z.number(), z.number()])).nullable().optional().catch(null),
 });
 
 export const updateZoneSchema = createZoneSchema.partial().extend({

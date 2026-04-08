@@ -459,6 +459,9 @@ export const emptyZoneFormValues: CreateZoneInput = {
   is_active: true,
   name: "",
   province: "",
+  center_latitude: null,
+  center_longitude: null,
+  boundary: null,
 };
 
 export function getZoneFormValues(zone: Zone): CreateZoneInput {
@@ -470,6 +473,9 @@ export function getZoneFormValues(zone: Zone): CreateZoneInput {
     is_active: zone.is_active,
     name: zone.name,
     province: zone.province ?? "",
+    center_latitude: zone.center_latitude ?? null,
+    center_longitude: zone.center_longitude ?? null,
+    boundary: zone.boundary ?? null,
   };
 }
 

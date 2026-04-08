@@ -151,6 +151,8 @@ export const saleOrderSchema = z
     delivery_canton: z.string().nullable().optional().catch(null),
     delivery_charges: z.array(saleOrderDeliveryChargeSchema).optional().catch([]),
     delivery_district: z.string().nullable().optional().catch(null),
+    delivery_latitude: z.number().nullable().optional().catch(null),
+    delivery_longitude: z.number().nullable().optional().catch(null),
     delivery_province: z.string().nullable().optional().catch(null),
     delivery_requested_date: z.string().nullable().optional().catch(null),
     delivery_zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),

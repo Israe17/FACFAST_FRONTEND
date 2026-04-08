@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
+import { ChevronDown, MapPin } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { LocationPicker } from "@/shared/components/location-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import { contactTypeOptions, identificationTypeOptions } from "../constants";
@@ -24,6 +27,8 @@ type ContactFormValues = {
   canton?: string;
   code?: string;
   commercial_name?: string;
+  delivery_latitude?: number | null;
+  delivery_longitude?: number | null;
   district?: string;
   economic_activity_code?: string;
   email?: string;
@@ -52,6 +57,42 @@ type ContactFormProps = {
 
 function FieldError({ message }: { message?: string }) {
   return message ? <p className="text-sm text-destructive">{message}</p> : null;
+}
+
+function LocationPickerSection({ form }: { form: UseFormReturn<ContactFormValues> }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const latitude = form.watch("delivery_latitude") ?? null;
+  const longitude = form.watch("delivery_longitude") ?? null;
+
+  return (
+    <div className="rounded-lg border border-border/50">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <span className="flex items-center gap-1.5">
+          <MapPin className="size-3.5" />
+          Ubicación en mapa
+        </span>
+        <ChevronDown
+          className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      {isOpen ? (
+        <div className="px-3 pb-3">
+          <LocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            onChange={(lat, lng) => {
+              form.setValue("delivery_latitude", lat, { shouldDirty: true });
+              form.setValue("delivery_longitude", lng, { shouldDirty: true });
+            }}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: ContactFormProps) {
@@ -251,6 +292,8 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             <FieldError message={errors.district?.message} />
           </div>
         </div>
+
+        <LocationPickerSection form={form} />
       </section>
 
       <section className="space-y-4 rounded-xl border border-border/70 p-4">

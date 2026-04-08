@@ -28,6 +28,8 @@ const defaultValues: CreateContactInput = {
   canton: "",
   code: "",
   commercial_name: "",
+  delivery_latitude: null,
+  delivery_longitude: null,
   district: "",
   economic_activity_code: "",
   email: "",

@@ -20,6 +20,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
+import { LayoutList, Map } from "lucide-react";
+
 import { useBranchesQuery } from "@/features/branches/queries";
 import { useUsersQuery } from "@/features/users/queries";
 import { useSaleOrdersQuery } from "@/features/sales/queries";
@@ -38,6 +40,7 @@ import {
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
 import { DispatchOrderDetailDialog } from "./dispatch-order-detail-dialog";
+import { DispatchMapView } from "./dispatch-map-view";
 import { getDispatchOrdersColumns } from "./dispatch-orders-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
 
@@ -62,6 +65,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
+  const [viewMode, setViewMode] = useState<"table" | "map">("table");
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
   const branchesQuery = useBranchesQuery(enabled && canView);
@@ -154,19 +158,39 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
     <>
       <CatalogSectionCard
         action={
-          canCreate ? (
-            <Button
-              onClick={() => {
-                setSelectedOrder(null);
-                setDialogOpen(true);
-              }}
-            >
-              <Plus className="size-4" />
-              {t("inventory.common.create_entity", {
-                entity: t("inventory.entity.dispatch_order"),
-              })}
-            </Button>
-          ) : null
+          <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-lg border p-0.5">
+              <Button
+                size="sm"
+                variant={viewMode === "table" ? "secondary" : "ghost"}
+                className="h-7 px-2"
+                onClick={() => setViewMode("table")}
+              >
+                <LayoutList className="size-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "map" ? "secondary" : "ghost"}
+                className="h-7 px-2"
+                onClick={() => setViewMode("map")}
+              >
+                <Map className="size-4" />
+              </Button>
+            </div>
+            {canCreate ? (
+              <Button
+                onClick={() => {
+                  setSelectedOrder(null);
+                  setDialogOpen(true);
+                }}
+              >
+                <Plus className="size-4" />
+                {t("inventory.common.create_entity", {
+                  entity: t("inventory.entity.dispatch_order"),
+                })}
+              </Button>
+            ) : null}
+          </div>
         }
         description={t("inventory.dispatch.section_description")}
         title={t("inventory.entity.dispatch_orders")}
@@ -185,13 +209,20 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           })}
           onRetry={() => ordersQuery.refetch()}
         >
-          <DataTable
-            columns={columns}
-            data={ordersQuery.data ?? []}
-            emptyMessage={t("inventory.common.empty_entity", {
-              entity: t("inventory.entity.dispatch_orders"),
-            })}
-          />
+          {viewMode === "table" ? (
+            <DataTable
+              columns={columns}
+              data={ordersQuery.data ?? []}
+              emptyMessage={t("inventory.common.empty_entity", {
+                entity: t("inventory.entity.dispatch_orders"),
+              })}
+            />
+          ) : (
+            <DispatchMapView
+              orders={ordersQuery.data ?? []}
+              onOrderClick={handleViewDetail}
+            />
+          )}
         </QueryStateWrapper>
       </CatalogSectionCard>
 

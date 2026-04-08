@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ClipboardList,
   MapPin,
@@ -23,6 +23,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { MapView, type MapMarker } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
@@ -201,6 +202,14 @@ function SaleOrderDetailDialog({
               </p>
             </div>
           ) : null}
+          {fullOrder.delivery_latitude && fullOrder.delivery_longitude ? (
+            <div className="col-span-2">
+              <DeliveryMapPreview
+                lat={fullOrder.delivery_latitude}
+                lng={fullOrder.delivery_longitude}
+              />
+            </div>
+          ) : null}
           {fullOrder.notes ? (
             <div className="col-span-2">
               <p className="text-muted-foreground">{t("inventory.common.notes")}</p>
@@ -348,6 +357,24 @@ function SaleOrderDetailDialog({
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function DeliveryMapPreview({ lat, lng }: { lat: number; lng: number }) {
+  const markers = useMemo<MapMarker[]>(
+    () => [{ id: "delivery", lat, lng, color: "#3b82f6" }],
+    [lat, lng],
+  );
+
+  return (
+    <div className="h-32 rounded-lg overflow-hidden border">
+      <MapView
+        markers={markers}
+        center={[lat, lng]}
+        zoom={14}
+        className="!min-h-0 h-full"
+      />
+    </div>
   );
 }
 

@@ -1,0 +1,211 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { MapPin, Truck } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { MapView, type MapMarker, type MapPolyline } from "@/shared/components/map-view";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import type { FrontendTranslationKey } from "@/shared/i18n/translations";
+
+import type { DispatchOrder, DispatchStop } from "../types";
+
+type DispatchMapViewProps = {
+  orders: DispatchOrder[];
+  onOrderClick?: (order: DispatchOrder) => void;
+};
+
+const statusColorMap: Record<string, string> = {
+  draft: "bg-yellow-100 text-yellow-800",
+  ready: "bg-blue-100 text-blue-800",
+  dispatched: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+const statusTranslationMap: Record<string, FrontendTranslationKey> = {
+  draft: "inventory.dispatch.status_draft",
+  ready: "inventory.dispatch.status_ready",
+  dispatched: "inventory.dispatch.status_dispatched",
+  in_transit: "inventory.dispatch.status_in_transit",
+  completed: "inventory.dispatch.status_completed",
+  cancelled: "inventory.dispatch.status_cancelled",
+};
+
+const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  pending: "inventory.dispatch.stop_pending",
+  in_transit: "inventory.dispatch.stop_in_transit",
+  delivered: "inventory.dispatch.stop_delivered",
+  failed: "inventory.dispatch.stop_failed",
+  partial: "inventory.dispatch.stop_partial",
+  skipped: "inventory.dispatch.stop_skipped",
+};
+
+function DispatchMapView({ orders, onOrderClick }: DispatchMapViewProps) {
+  const { t } = useAppTranslator();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  const selectedOrder = useMemo(
+    () => orders.find((o) => String(o.id) === selectedOrderId) ?? null,
+    [orders, selectedOrderId],
+  );
+
+  // Build markers from all stops with coordinates
+  const markers = useMemo<MapMarker[]>(() => {
+    const result: MapMarker[] = [];
+    for (const order of orders) {
+      for (const stop of order.stops ?? []) {
+        if (stop.delivery_latitude && stop.delivery_longitude) {
+          result.push({
+            id: `${order.id}-${stop.id}`,
+            lat: stop.delivery_latitude,
+            lng: stop.delivery_longitude,
+            status: stop.status,
+            popup: `<strong>${order.code ?? `DO-${order.id}`}</strong><br/>
+              ${stop.sale_order?.code ?? ""} — ${stop.customer_contact?.name ?? ""}<br/>
+              <em>${t(stopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}</em>`,
+          });
+        }
+      }
+    }
+    return result;
+  }, [orders, t]);
+
+  // Build polyline for selected order (connect its stops in sequence)
+  const polylines = useMemo<MapPolyline[]>(() => {
+    if (!selectedOrder) return [];
+    const stops = (selectedOrder.stops ?? [])
+      .filter((s) => s.delivery_latitude && s.delivery_longitude)
+      .sort((a, b) => a.delivery_sequence - b.delivery_sequence);
+
+    if (stops.length < 2) return [];
+
+    return [
+      {
+        id: `route-${selectedOrder.id}`,
+        points: stops.map((s) => [s.delivery_latitude!, s.delivery_longitude!] as [number, number]),
+        color: "#3b82f6",
+        weight: 3,
+      },
+    ];
+  }, [selectedOrder]);
+
+  // Filter markers to highlight selected order
+  const visibleMarkers = useMemo(() => {
+    if (!selectedOrderId) return markers;
+    // Show all but visually distinguish selected
+    return markers;
+  }, [markers, selectedOrderId]);
+
+  const selectedMarkerIds = useMemo(() => {
+    if (!selectedOrder) return new Set<string>();
+    return new Set((selectedOrder.stops ?? []).map((s) => `${selectedOrder.id}-${s.id}`));
+  }, [selectedOrder]);
+
+  function handleOrderSelect(orderId: string) {
+    setSelectedOrderId((prev) => (prev === orderId ? null : orderId));
+  }
+
+  // Filter active orders for the list (non-cancelled, non-completed)
+  const activeOrders = useMemo(
+    () => orders.filter((o) => o.status !== "cancelled"),
+    [orders],
+  );
+
+  return (
+    <div className="flex h-[600px] rounded-lg border overflow-hidden">
+      {/* Left: Order list */}
+      <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
+        <div className="sticky top-0 bg-background border-b px-3 py-2">
+          <p className="text-sm font-semibold flex items-center gap-1.5">
+            <Truck className="size-4" />
+            {t("inventory.dispatch.orders")} ({activeOrders.length})
+          </p>
+        </div>
+        <div className="divide-y">
+          {activeOrders.map((order) => {
+            const isSelected = String(order.id) === selectedOrderId;
+            const stopsWithCoords = (order.stops ?? []).filter(
+              (s) => s.delivery_latitude && s.delivery_longitude,
+            ).length;
+            const totalStops = (order.stops ?? []).length;
+
+            return (
+              <button
+                key={order.id}
+                type="button"
+                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors ${isSelected ? "bg-muted" : ""}`}
+                onClick={() => {
+                  handleOrderSelect(String(order.id));
+                  if (onOrderClick) onOrderClick(order);
+                }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-sm">
+                    {order.code ?? `DO-${order.id}`}
+                  </span>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusColorMap[order.status] ?? ""}`}
+                  >
+                    {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground space-y-0.5">
+                  {order.route ? (
+                    <p>{order.route.name}</p>
+                  ) : null}
+                  {order.driver_user ? (
+                    <p>{order.driver_user.name}</p>
+                  ) : null}
+                  <p className="flex items-center gap-1">
+                    <MapPin className="size-3" />
+                    {totalStops} {totalStops === 1 ? "parada" : "paradas"}
+                    {stopsWithCoords < totalStops ? (
+                      <span className="text-amber-600">
+                        ({totalStops - stopsWithCoords} sin ubicación)
+                      </span>
+                    ) : null}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+          {activeOrders.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              {t("inventory.dispatch.no_orders")}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Right: Map */}
+      <div className="flex-1 relative">
+        <MapView
+          markers={visibleMarkers.map((m) => ({
+            ...m,
+            color: selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
+          }))}
+          polylines={polylines}
+          selectedMarkerId={null}
+          className="h-full rounded-none"
+        />
+        {markers.length === 0 ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/60 pointer-events-none">
+            <div className="text-center">
+              <MapPin className="size-10 text-muted-foreground mx-auto mb-2" />
+              <p className="text-sm font-medium text-muted-foreground">
+                Sin ubicaciones en el mapa
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Las paradas aparecerán aquí cuando tengan coordenadas
+              </p>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export { DispatchMapView };

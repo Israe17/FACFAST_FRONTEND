@@ -212,7 +212,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         title={movement.code ?? `${t("inventory.form.header_id")} ${headerId}`}
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
         <DataCard
           description={t("inventory.detail.movement_kpi_lines")}
           title={t("inventory.detail.line_items")}
@@ -231,7 +231,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         <DataCard
           description={t("inventory.detail.movement_kpi_date")}
           title={t("inventory.form.occurred_at")}
-          value={formatDateTime(movement.occurred_at)}
+          value={<span className="text-lg">{formatDateTime(movement.occurred_at)}</span>}
         />
       </div>
 

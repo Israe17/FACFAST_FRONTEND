@@ -1633,10 +1633,32 @@ const deliveredLineSchema = z.object({
   delivered_quantity: z.number().min(0, "La cantidad debe ser 0 o mayor."),
 });
 
-export const updateDispatchStopStatusSchema = z.object({
-  status: z.enum(dispatchStopStatusValues),
-  received_by: optionalTextSchema,
-  failure_reason: optionalTextSchema,
-  notes: optionalTextSchema,
-  delivered_lines: z.array(deliveredLineSchema).optional(),
-});
+export const updateDispatchStopStatusSchema = z
+  .object({
+    status: z.enum(dispatchStopStatusValues),
+    received_by: optionalTextSchema,
+    failure_reason: optionalTextSchema,
+    notes: optionalTextSchema,
+    delivered_lines: z.array(deliveredLineSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      (data.status === "failed" ||
+        data.status === "partial" ||
+        data.status === "skipped") &&
+      !data.failure_reason
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Se requiere una razón de fallo para esta parada.",
+        path: ["failure_reason"],
+      });
+    }
+    if (data.status === "delivered" && !data.received_by) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Se requiere el nombre de quien recibió.",
+        path: ["received_by"],
+      });
+    }
+  });

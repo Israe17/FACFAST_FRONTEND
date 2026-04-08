@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
+import { FormErrorBanner } from "@/shared/components/form-error-banner";
 
 import { dispatchStopStatusValues } from "../constants";
 import { updateDispatchStopStatusSchema } from "../schemas";
@@ -52,7 +54,9 @@ function UpdateStopStatusDialog({
   onOpenChange,
 }: UpdateStopStatusDialogProps) {
   const { t } = useAppTranslator();
-  const mutation = useUpdateDispatchStopStatusMutation(orderId, String(stop.id));
+  const mutation = useUpdateDispatchStopStatusMutation(orderId, String(stop.id), {
+    showErrorToast: false,
+  });
 
   const stopLines = stop.lines ?? [];
 
@@ -61,6 +65,8 @@ function UpdateStopStatusDialog({
     register,
     handleSubmit,
     watch,
+    clearErrors,
+    setError,
     formState: { errors },
   } = useForm<UpdateDispatchStopStatusInput>({
     resolver: zodResolver(updateDispatchStopStatusSchema) as any,
@@ -76,6 +82,9 @@ function UpdateStopStatusDialog({
     },
   });
 
+  const { formError, handleBackendFormError, resetBackendFormErrors } =
+    useBackendFormErrors({ clearErrors, setError });
+
   const watchedStatus = watch("status");
   const showReceivedBy = watchedStatus === "delivered";
   const showFailureReason =
@@ -85,13 +94,20 @@ function UpdateStopStatusDialog({
   const showDeliveredLines = watchedStatus === "partial" && stopLines.length > 0;
 
   async function onSubmit(data: UpdateDispatchStopStatusInput) {
+    resetBackendFormErrors();
     const payload = { ...data };
     // Only send delivered_lines when status is partial
     if (data.status !== "partial") {
       delete payload.delivered_lines;
     }
-    await mutation.mutateAsync(payload);
-    onOpenChange(false);
+    try {
+      await mutation.mutateAsync(payload);
+      onOpenChange(false);
+    } catch (error) {
+      handleBackendFormError(error, {
+        fallbackMessage: t("inventory.dispatch_stop_status_error_fallback"),
+      });
+    }
   }
 
   return (
@@ -106,6 +122,8 @@ function UpdateStopStatusDialog({
         </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormErrorBanner message={formError} />
+
           <div className="space-y-2">
             <Label>{t("inventory.dispatch.status")}</Label>
             <Controller

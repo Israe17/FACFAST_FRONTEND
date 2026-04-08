@@ -195,7 +195,7 @@ function DispatchMapView({ orders, zones = [], onOrderClick }: DispatchMapViewPr
       </div>
 
       {/* Right: Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" style={{ zIndex: 0 }}>
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,

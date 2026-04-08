@@ -133,4 +133,11 @@
       linear-gradient(180deg, color-mix(in oklab, var(--background) 92%, white 8%), var(--background));
     @apply bg-background text-foreground;
   }
+  /* Keep Leaflet map below dialogs/sheets */
+  .leaflet-pane,
+  .leaflet-control,
+  .leaflet-top,
+  .leaflet-bottom {
+    z-index: 0 !important;
+  }
 }

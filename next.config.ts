@@ -6,6 +6,8 @@ const backendUrl = (process.env.BACKEND_URL?.trim() || "http://localhost:3002").
 );
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["leaflet"],
+  transpilePackages: ["react-leaflet"],
   async rewrites() {
     return [
       {

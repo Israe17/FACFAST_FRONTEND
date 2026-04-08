@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import type { MapMarker } from "./map-view-inner";
+import type { MapMarker } from "./map-view-types";
 
 const MapViewInner = dynamic(
   () => import("./map-view-inner").then((mod) => mod.MapViewInner),

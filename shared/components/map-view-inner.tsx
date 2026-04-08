@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+import type { MapMarker, MapPolyline } from "./map-view-types";
+
+export type { MapMarker, MapPolyline };
 
 // Fix default marker icons (Leaflet's default icons break with bundlers)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -34,23 +38,6 @@ function createColorIcon(color: string) {
     popupAnchor: [0, -14],
   });
 }
-
-export type MapMarker = {
-  id: string;
-  lat: number;
-  lng: number;
-  status?: string;
-  popup?: string | ReactNode;
-  color?: string;
-};
-
-export type MapPolyline = {
-  id: string;
-  points: [number, number][];
-  color?: string;
-  weight?: number;
-  dashArray?: string;
-};
 
 type MapViewInnerProps = {
   markers?: MapMarker[];

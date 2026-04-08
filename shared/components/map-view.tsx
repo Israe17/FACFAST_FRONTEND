@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export type { MapMarker, MapPolyline } from "./map-view-inner";
+export type { MapMarker, MapPolyline } from "./map-view-types";
 
 const MapViewInner = dynamic(
   () => import("./map-view-inner").then((mod) => mod.MapViewInner),

@@ -8,10 +8,11 @@ import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/sh
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
-import type { DispatchOrder, DispatchStop, Zone } from "../types";
+import type { DispatchOrder, DispatchStop, Warehouse, Zone } from "../types";
 
 type DispatchMapViewProps = {
   orders: DispatchOrder[];
+  warehouses?: Warehouse[];
   zones?: Zone[];
   onOrderClick?: (order: DispatchOrder) => void;
 };
@@ -43,7 +44,7 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   skipped: "inventory.dispatch.stop_skipped",
 };
 
-function DispatchMapView({ orders, zones = [], onOrderClick }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -80,24 +81,50 @@ function DispatchMapView({ orders, zones = [], onOrderClick }: DispatchMapViewPr
       .filter((s) => s.delivery_latitude && s.delivery_longitude)
       .sort((a, b) => a.delivery_sequence - b.delivery_sequence);
 
-    if (stops.length < 2) return [];
+    const stopPoints = stops.map((s) => [s.delivery_latitude!, s.delivery_longitude!] as [number, number]);
+
+    // Prepend warehouse origin if available
+    const warehouseId = selectedOrder.origin_warehouse_id ?? selectedOrder.origin_warehouse?.id;
+    if (warehouseId) {
+      const wh = warehouses.find((w) => String(w.id) === String(warehouseId));
+      if (wh && wh.latitude != null && wh.longitude != null) {
+        stopPoints.unshift([wh.latitude, wh.longitude]);
+      }
+    }
+
+    if (stopPoints.length < 2) return [];
 
     return [
       {
         id: `route-${selectedOrder.id}`,
-        points: stops.map((s) => [s.delivery_latitude!, s.delivery_longitude!] as [number, number]),
+        points: stopPoints,
         color: "#3b82f6",
         weight: 3,
       },
     ];
-  }, [selectedOrder]);
+  }, [selectedOrder, warehouses]);
+
+  // Build origin warehouse marker for selected order
+  const warehouseMarker = useMemo<MapMarker | null>(() => {
+    if (!selectedOrder) return null;
+    const warehouseId = selectedOrder.origin_warehouse_id ?? selectedOrder.origin_warehouse?.id;
+    if (!warehouseId) return null;
+    const warehouse = warehouses.find((w) => String(w.id) === String(warehouseId));
+    if (!warehouse || warehouse.latitude == null || warehouse.longitude == null) return null;
+    return {
+      id: `warehouse-origin-${warehouse.id}`,
+      lat: warehouse.latitude,
+      lng: warehouse.longitude,
+      color: "#16a34a",
+      popup: `<strong>Bodega: ${warehouse.name}</strong>`,
+    };
+  }, [selectedOrder, warehouses]);
 
   // Filter markers to highlight selected order
   const visibleMarkers = useMemo(() => {
-    if (!selectedOrderId) return markers;
-    // Show all but visually distinguish selected
+    if (warehouseMarker) return [...markers, warehouseMarker];
     return markers;
-  }, [markers, selectedOrderId]);
+  }, [markers, warehouseMarker]);
 
   const selectedMarkerIds = useMemo(() => {
     if (!selectedOrder) return new Set<string>();
@@ -199,7 +226,9 @@ function DispatchMapView({ orders, zones = [], onOrderClick }: DispatchMapViewPr
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
-            color: selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
+            color: m.id.startsWith("warehouse-origin-")
+              ? m.color
+              : selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
           }))}
           polylines={polylines}
           polygons={zonePolygons}

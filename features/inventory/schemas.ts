@@ -441,6 +441,8 @@ export const warehouseSchema = z
     name: z.string().catch("Warehouse"),
     purpose: warehousePurposeSchema.optional().catch(undefined),
     updated_at: z.string().optional(),
+    latitude: z.number().nullable().optional().catch(null),
+    longitude: z.number().nullable().optional().catch(null),
     uses_locations: z.boolean().optional().default(false),
   })
   .passthrough();
@@ -1078,6 +1080,8 @@ export const createWarehouseSchema = z.object({
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
   is_default: z.boolean().default(false),
+  latitude: z.number().nullable().optional().catch(null),
+  longitude: z.number().nullable().optional().catch(null),
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   uses_locations: z.boolean().default(false),
 });

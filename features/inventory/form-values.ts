@@ -302,6 +302,8 @@ export const emptyWarehouseFormValues: CreateWarehouseInput = {
   description: "",
   is_active: true,
   is_default: false,
+  latitude: null,
+  longitude: null,
   name: "",
   uses_locations: false,
 };
@@ -313,6 +315,8 @@ export function getWarehouseFormValues(warehouse: Warehouse): CreateWarehouseInp
     description: warehouse.description ?? "",
     is_active: warehouse.is_active,
     is_default: warehouse.is_default,
+    latitude: warehouse.latitude ?? null,
+    longitude: warehouse.longitude ?? null,
     name: warehouse.name,
     uses_locations: warehouse.uses_locations,
   };

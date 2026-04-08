@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   ClipboardList,
   MapPin,
@@ -12,6 +13,8 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -338,29 +341,62 @@ function SaleOrderDetailDialog({
 
         {/* Re-dispatch action */}
         {fullOrder.lifecycle?.can_reset_dispatch ? (
-          <>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{t("sales.reset_dispatch_title")}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t("sales.reset_dispatch_description", { code: fullOrder.code ?? "" })}
-                </p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => resetDispatchMutation.mutate()}
-                disabled={resetDispatchMutation.isPending}
-              >
-                <RefreshCw className={`size-4 mr-1.5 ${resetDispatchMutation.isPending ? "animate-spin" : ""}`} />
-                {resetDispatchMutation.isPending ? t("common.saving") : t("sales.reset_dispatch_title")}
-              </Button>
-            </div>
-          </>
+          <ResetDispatchSection
+            order={fullOrder}
+            mutation={resetDispatchMutation}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function ResetDispatchSection({
+  order,
+  mutation,
+}: {
+  order: SaleOrder;
+  mutation: ReturnType<typeof useResetSaleOrderDispatchStatusMutation>;
+}) {
+  const { t } = useAppTranslator();
+  const [newDate, setNewDate] = useState(order.delivery_requested_date ?? "");
+
+  function handleReset() {
+    mutation.mutate(
+      newDate ? { delivery_requested_date: newDate } : undefined,
+    );
+  }
+
+  return (
+    <>
+      <Separator />
+      <div className="space-y-3">
+        <div>
+          <p className="text-sm font-medium">{t("sales.reset_dispatch_title")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("sales.reset_dispatch_description", { code: order.code ?? "" })}
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">{t("sales.delivery_requested_date")}</Label>
+          <Input
+            type="date"
+            value={newDate}
+            onChange={(e) => setNewDate(e.target.value)}
+            className="w-48"
+          />
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleReset}
+          disabled={mutation.isPending}
+        >
+          <RefreshCw className={`size-4 mr-1.5 ${mutation.isPending ? "animate-spin" : ""}`} />
+          {mutation.isPending ? t("common.saving") : t("sales.reset_dispatch_title")}
+        </Button>
+      </div>
+    </>
   );
 }
 

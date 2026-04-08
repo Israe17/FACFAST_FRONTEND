@@ -1370,6 +1370,8 @@ export const zoneSchema = z
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Zone"),
     province: z.string().nullable().optional().catch(null),
+    center_latitude: z.number().nullable().optional().catch(null),
+    center_longitude: z.number().nullable().optional().catch(null),
     updated_at: z.string().optional(),
   })
   .passthrough();
@@ -1453,6 +1455,7 @@ export const routeSchema = z
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Route"),
     updated_at: z.string().optional(),
+    waypoints: z.array(z.object({ lat: z.number(), lng: z.number(), label: z.string().optional() })).nullable().optional().catch(null),
     zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
     zone_id: nullableIdSchema.catch(null),
   })
@@ -1496,6 +1499,8 @@ export const dispatchStopSchema = z.object({
   delivery_province: z.string().nullable().optional().catch(null),
   delivery_canton: z.string().nullable().optional().catch(null),
   delivery_district: z.string().nullable().optional().catch(null),
+  delivery_latitude: z.number().nullable().optional().catch(null),
+  delivery_longitude: z.number().nullable().optional().catch(null),
   status: z.enum(dispatchStopStatusValues).catch("pending"),
   delivered_at: z.string().nullable().optional().catch(null),
   received_by: z.string().nullable().optional().catch(null),

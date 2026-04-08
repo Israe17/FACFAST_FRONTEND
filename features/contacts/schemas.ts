@@ -108,6 +108,8 @@ export const contactSchema = z
     code: z.string().optional().catch(undefined),
     commercial_name: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
+    delivery_latitude: z.number().nullable().optional().catch(null),
+    delivery_longitude: z.number().nullable().optional().catch(null),
     district: z.string().optional().catch(undefined),
     economic_activity_code: z.string().optional().catch(undefined),
     email: z.string().optional().catch(undefined),

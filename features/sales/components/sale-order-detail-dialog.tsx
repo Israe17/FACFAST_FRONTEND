@@ -370,31 +370,33 @@ function ResetDispatchSection({
   return (
     <>
       <Separator />
-      <div className="space-y-3">
+      <div className="rounded-lg border p-4 space-y-3">
         <div>
-          <p className="text-sm font-medium">{t("sales.reset_dispatch_title")}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm font-semibold">{t("sales.reset_dispatch_title")}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
             {t("sales.reset_dispatch_description", { code: order.code ?? "" })}
           </p>
         </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">{t("sales.delivery_requested_date")}</Label>
-          <Input
-            type="date"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            className="w-48"
-          />
+        <div className="flex items-end gap-3">
+          <div className="flex-1 space-y-1.5">
+            <Label className="text-xs">{t("sales.delivery_requested_date")}</Label>
+            <Input
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+            />
+          </div>
+          <Button
+            size="default"
+            variant="outline"
+            onClick={handleReset}
+            disabled={mutation.isPending}
+            className="shrink-0"
+          >
+            <RefreshCw className={`size-4 mr-1.5 ${mutation.isPending ? "animate-spin" : ""}`} />
+            {mutation.isPending ? t("common.saving") : t("sales.reset_dispatch_title")}
+          </Button>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleReset}
-          disabled={mutation.isPending}
-        >
-          <RefreshCw className={`size-4 mr-1.5 ${mutation.isPending ? "animate-spin" : ""}`} />
-          {mutation.isPending ? t("common.saving") : t("sales.reset_dispatch_title")}
-        </Button>
       </div>
     </>
   );

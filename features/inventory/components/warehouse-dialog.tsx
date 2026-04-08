@@ -52,7 +52,7 @@ function WarehouseDialog({ branches, onOpenChange, open, warehouse }: WarehouseD
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent>
+      <SheetContent className="sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>
             {warehouse

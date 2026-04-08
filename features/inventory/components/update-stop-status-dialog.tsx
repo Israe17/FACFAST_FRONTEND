@@ -90,8 +90,12 @@ function UpdateStopStatusDialog({
     if (data.status !== "partial") {
       delete payload.delivered_lines;
     }
-    await mutation.mutateAsync(payload);
-    onOpenChange(false);
+    try {
+      await mutation.mutateAsync(payload);
+      onOpenChange(false);
+    } catch {
+      // Error already handled by mutation's onError callback
+    }
   }
 
   return (

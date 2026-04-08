@@ -137,7 +137,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             <span className="font-medium">{m.code ?? m.id}</span>
             {m.status ? (
               <Badge variant={m.status === "posted" ? "default" : "outline"} className="ml-1.5 text-[10px] px-1.5 py-0">
-                {t(`inventory.enum.movement_status.${m.status}` as const)}
+                {t(`inventory.enum.inventory_movement_status.${m.status}` as const)}
               </Badge>
             ) : null}
             {m.notes ? (
@@ -150,10 +150,20 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
     {
       accessorKey: "movement_type",
       header: t("inventory.form.movement_type"),
-      cell: ({ row }) =>
-        row.original.movement_type
-          ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
-          : t("inventory.common.not_available"),
+      cell: ({ row }) => {
+        const m = row.original;
+        if (m.movement_type) {
+          return t(`inventory.enum.ledger_movement_type.${m.movement_type}` as const);
+        }
+        // Infer type from source_document_type or notes
+        if (m.source_document_type) {
+          return m.source_document_type;
+        }
+        if (m.notes?.toLowerCase().includes("devolucion")) {
+          return "Devolución";
+        }
+        return t("inventory.common.not_available");
+      },
     },
     {
       accessorKey: "lines",

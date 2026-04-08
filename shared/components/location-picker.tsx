@@ -80,17 +80,66 @@ function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPic
 
     setSearching(true);
     try {
-      const params = new URLSearchParams({
-        q: `${query}, Costa Rica`,
+      // Try Nominatim first with detailed search
+      const nominatimParams = new URLSearchParams({
+        q: query,
         format: "json",
         limit: "5",
         countrycodes: "cr",
+        addressdetails: "1",
+        dedupe: "1",
       });
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?${params}`,
+      const nominatimRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?${nominatimParams}`,
         { headers: { "User-Agent": "FACFAST/1.0" } },
       );
-      const data: NominatimResult[] = await res.json();
+      let data: NominatimResult[] = await nominatimRes.json();
+
+      // If Nominatim returns few results, also try Photon (better fuzzy matching)
+      if (data.length < 3) {
+        try {
+          const photonParams = new URLSearchParams({
+            q: query,
+            limit: "5",
+            lang: "es",
+            lat: "9.9281",
+            lon: "-84.0907",
+            bbox: "-86.0,8.0,-82.5,11.2",
+          });
+          const photonRes = await fetch(
+            `https://photon.komoot.io/api/?${photonParams}`,
+          );
+          const photonData = await photonRes.json();
+          const photonResults: NominatimResult[] = (photonData.features ?? [])
+            .filter((f: any) => f.properties?.country === "Costa Rica")
+            .map((f: any) => ({
+              display_name: [
+                f.properties.name,
+                f.properties.street,
+                f.properties.city ?? f.properties.county,
+                f.properties.state,
+              ]
+                .filter(Boolean)
+                .join(", "),
+              lat: String(f.geometry.coordinates[1]),
+              lon: String(f.geometry.coordinates[0]),
+            }));
+
+          // Merge results, deduplicate by proximity
+          const existing = new Set(data.map((d) => `${parseFloat(d.lat).toFixed(3)},${parseFloat(d.lon).toFixed(3)}`));
+          for (const r of photonResults) {
+            const key = `${parseFloat(r.lat).toFixed(3)},${parseFloat(r.lon).toFixed(3)}`;
+            if (!existing.has(key)) {
+              data.push(r);
+              existing.add(key);
+            }
+          }
+          data = data.slice(0, 7);
+        } catch {
+          // Photon fallback is best-effort
+        }
+      }
+
       setSearchResults(data);
       setShowResults(data.length > 0);
     } catch {

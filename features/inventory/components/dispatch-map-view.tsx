@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MapPin, Truck } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Truck } from "lucide-react";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -42,6 +42,58 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   partial: "inventory.dispatch.stop_partial",
   skipped: "inventory.dispatch.stop_skipped",
 };
+
+const LEGEND_ITEMS = [
+  { color: "#eab308", label: "Pendiente" },
+  { color: "#f97316", label: "En tránsito" },
+  { color: "#22c55e", label: "Entregado" },
+  { color: "#ef4444", label: "Fallido" },
+  { color: "#6b7280", label: "Omitido" },
+  { color: "#16a34a", label: "Bodega origen", shape: "square" as const },
+  { color: "#6366f1", label: "Zona (área)", shape: "area" as const },
+];
+
+function MapLegend() {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div className="absolute bottom-2 left-2 z-[1] bg-background/95 backdrop-blur-sm rounded-lg border shadow-sm text-xs max-w-[180px]">
+      <button
+        type="button"
+        className="flex items-center justify-between w-full px-2.5 py-1.5 font-medium"
+        onClick={() => setOpen(!open)}
+      >
+        Leyenda
+        {open ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
+      </button>
+      {open ? (
+        <div className="px-2.5 pb-2 space-y-1">
+          {LEGEND_ITEMS.map((item) => (
+            <div key={item.label} className="flex items-center gap-2">
+              {item.shape === "area" ? (
+                <div
+                  className="size-3.5 rounded-sm border"
+                  style={{ backgroundColor: `${item.color}20`, borderColor: item.color }}
+                />
+              ) : item.shape === "square" ? (
+                <div
+                  className="size-3.5 rounded-sm"
+                  style={{ backgroundColor: item.color }}
+                />
+              ) : (
+                <div
+                  className="size-3.5 rounded-full border-2 border-white shadow-sm"
+                  style={{ backgroundColor: item.color }}
+                />
+              )}
+              <span className="text-muted-foreground">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOrderClick }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
@@ -235,6 +287,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
           selectedMarkerId={null}
           className="h-full rounded-none"
         />
+        <MapLegend />
         {markers.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center bg-muted/60 pointer-events-none">
             <div className="text-center">

@@ -133,8 +133,10 @@
       linear-gradient(180deg, color-mix(in oklab, var(--background) 92%, white 8%), var(--background));
     @apply bg-background text-foreground;
   }
-  /* Keep Leaflet map container below dialogs/sheets */
+  /* Keep Leaflet map container below dialogs/sheets and force GPU compositing */
   .leaflet-container {
     z-index: 0 !important;
+    isolation: isolate;
+    transform: translateZ(0);
   }
 }

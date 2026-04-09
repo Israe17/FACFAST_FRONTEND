@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Building2, Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
@@ -161,7 +162,9 @@ function ContactsTable({ data, onServerStateChange, serverState, total }: Contac
       cell: ({ row }) => (
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium">{row.original.name}</p>
+            <Link href={`/contacts/${row.original.id}`} className="font-medium hover:underline text-primary">
+              {row.original.name}
+            </Link>
             <ContactTypeBadge type={row.original.type} />
           </div>
           <p className="text-sm text-muted-foreground">

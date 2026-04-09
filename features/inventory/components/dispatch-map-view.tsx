@@ -222,9 +222,8 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
       </div>
 
       {/* Right: Map */}
-      <div className="flex-1 relative" style={{ zIndex: 0 }}>
+      <div className="flex-1 relative">
         <MapView
-          key={refreshKey ?? 0}
           markers={visibleMarkers.map((m) => ({
             ...m,
             color: m.id.startsWith("warehouse-origin-")

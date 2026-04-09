@@ -155,7 +155,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
   );
 
   return (
-    <div className="flex h-[600px] rounded-lg border overflow-hidden">
+    <div className="flex h-[600px] rounded-lg border overflow-hidden relative z-0">
       {/* Left: Order list */}
       <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
         <div className="sticky top-0 bg-background border-b px-3 py-2">

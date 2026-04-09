@@ -272,6 +272,8 @@ function buildWarehousePayload(payload: CreateWarehouseInput | UpdateWarehouseIn
     description: payload.description,
     is_active: payload.is_active,
     is_default: payload.is_default,
+    latitude: payload.latitude,
+    longitude: payload.longitude,
     name: payload.name,
     uses_locations: payload.uses_locations,
   });

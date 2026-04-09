@@ -1,6 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DataCard } from "@/shared/components/data-card";
 import { MapView, type MapMarker } from "@/shared/components/map-view";
@@ -301,11 +302,11 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
         </InventoryDetailBlock>
       </div>
 
-      {warehouse.latitude && warehouse.longitude ? (
-        <InventoryDetailBlock
-          description="Ubicación geográfica de la bodega."
-          title="Ubicación en mapa"
-        >
+      <InventoryDetailBlock
+        description="Ubicación geográfica de la bodega."
+        title="Ubicación en mapa"
+      >
+        {warehouse.latitude && warehouse.longitude ? (
           <div className="h-64 rounded-lg overflow-hidden relative z-0">
             <MapView
               markers={[
@@ -322,8 +323,14 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
               className="h-full rounded-none"
             />
           </div>
-        </InventoryDetailBlock>
-      ) : null}
+        ) : (
+          <div className="h-48 rounded-lg border border-dashed border-border/70 flex flex-col items-center justify-center text-muted-foreground">
+            <MapPin className="size-8 mb-2" />
+            <p className="text-sm font-medium">Sin ubicación configurada</p>
+            <p className="text-xs mt-1">Editá la bodega para agregar coordenadas en el mapa</p>
+          </div>
+        )}
+      </InventoryDetailBlock>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <InventoryDetailBlock

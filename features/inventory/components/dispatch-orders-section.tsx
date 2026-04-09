@@ -67,6 +67,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map">("table");
+  const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
   const branchesQuery = useBranchesQuery(enabled && canView);
@@ -224,6 +225,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               orders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
+              refreshKey={mapRefreshKey}
               onOrderClick={handleViewDetail}
             />
           )}
@@ -252,7 +254,10 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
         open={detailDialogOpen}
         onOpenChange={(open) => {
           setDetailDialogOpen(open);
-          if (!open) setDetailOrder(null);
+          if (!open) {
+            setDetailOrder(null);
+            setMapRefreshKey((k) => k + 1);
+          }
         }}
       />
 

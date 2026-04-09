@@ -12,6 +12,7 @@ type DispatchMapViewProps = {
   orders: DispatchOrder[];
   warehouses?: Warehouse[];
   zones?: Zone[];
+  refreshKey?: number;
   onOrderClick?: (order: DispatchOrder) => void;
 };
 
@@ -42,7 +43,7 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   skipped: "inventory.dispatch.stop_skipped",
 };
 
-function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOrderClick }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -223,6 +224,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
       {/* Right: Map */}
       <div className="flex-1 relative" style={{ zIndex: 0 }}>
         <MapView
+          key={refreshKey ?? 0}
           markers={visibleMarkers.map((m) => ({
             ...m,
             color: m.id.startsWith("warehouse-origin-")

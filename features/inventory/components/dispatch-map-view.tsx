@@ -2,8 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { Eye, MapPin, Truck } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -174,10 +172,11 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
             const totalStops = (order.stops ?? []).length;
 
             return (
-              <button
+              <div
                 key={order.id}
-                type="button"
-                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors ${isSelected ? "bg-muted" : ""}`}
+                role="button"
+                tabIndex={0}
+                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer ${isSelected ? "bg-muted" : ""}`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
                 }}
@@ -209,22 +208,20 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                     ) : null}
                   </p>
                   {isSelected && onOrderClick ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-6 text-[11px] mt-1"
+                    <span
+                      role="link"
+                      className="inline-flex items-center gap-1 text-[11px] mt-1 text-primary hover:underline cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         onOrderClick(order);
                       }}
                     >
-                      <Eye className="size-3 mr-1" />
+                      <Eye className="size-3" />
                       Ver detalle
-                    </Button>
+                    </span>
                   ) : null}
                 </div>
-              </button>
+              </div>
             );
           })}
           {activeOrders.length === 0 ? (

@@ -1482,6 +1482,7 @@ export const createRouteSchema = z.object({
   frequency: optionalTextSchema,
   is_active: z.boolean().default(true),
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
+  waypoints: z.array(z.object({ lat: z.number(), lng: z.number(), label: z.string().optional() })).nullable().optional().catch(null),
   zone_id: makeOptionalIdSchema("Selecciona una zona."),
 });
 

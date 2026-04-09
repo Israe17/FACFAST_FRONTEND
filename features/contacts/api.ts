@@ -23,6 +23,8 @@ function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
   return compactRecord({
     address: payload.address,
     canton: payload.canton,
+    delivery_latitude: payload.delivery_latitude,
+    delivery_longitude: payload.delivery_longitude,
     code: payload.code,
     commercial_name: payload.commercial_name,
     district: payload.district,

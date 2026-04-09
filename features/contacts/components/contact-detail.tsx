@@ -31,8 +31,8 @@ function ContactDetail({ contactId }: ContactDetailProps) {
   if (!canView) {
     return (
       <ErrorState
-        description={t("common.access_denied_description")}
-        title={t("common.access_denied_title")}
+        description={t("contacts.detail.access_denied_description")}
+        title={t("contacts.detail.access_denied_title")}
       />
     );
   }
@@ -76,7 +76,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
           {contact.code ? <Badge>{contact.code}</Badge> : null}
           <ContactTypeBadge type={contact.type} />
           <Badge variant={contact.is_active ? "default" : "secondary"}>
-            {contact.is_active ? t("common.active") : t("common.inactive")}
+            {contact.is_active ? t("contacts.detail.active") : t("contacts.detail.inactive")}
           </Badge>
         </div>
       </div>
@@ -86,25 +86,25 @@ function ContactDetail({ contactId }: ContactDetailProps) {
         <DataCard
           title={t("contacts.field.identification")}
           value={contact.identification_number ?? "—"}
-          description={contact.identification_type ?? t("common.not_available")}
+          description={contact.identification_type ?? t("contacts.detail.not_available")}
           icon={<FileText className="size-4" />}
         />
         <DataCard
           title={t("contacts.field.email")}
-          value={contact.email ?? t("common.not_available")}
+          value={contact.email ?? t("contacts.detail.not_available")}
           description={t("contacts.detail.email_description")}
           icon={<Mail className="size-4" />}
         />
         <DataCard
           title={t("contacts.field.phone")}
-          value={contact.phone ?? t("common.not_available")}
+          value={contact.phone ?? t("contacts.detail.not_available")}
           description={t("contacts.detail.phone_description")}
           icon={<Phone className="size-4" />}
         />
         <DataCard
           title={t("contacts.field.economic_activity")}
           value={contact.economic_activity_code ?? "—"}
-          description={contact.tax_condition ?? t("common.not_available")}
+          description={contact.tax_condition ?? t("contacts.detail.not_available")}
           icon={<Building2 className="size-4" />}
         />
       </div>
@@ -227,11 +227,11 @@ function ContactDetail({ contactId }: ContactDetailProps) {
       >
         <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 text-sm">
           <div>
-            <dt className="text-xs text-muted-foreground">{t("common.created_at")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("contacts.detail.created_at")}</dt>
             <dd className="font-medium">{formatDateTime(contact.created_at)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">{t("common.updated_at")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("contacts.detail.updated_at")}</dt>
             <dd className="font-medium">{formatDateTime(contact.updated_at)}</dd>
           </div>
           {contact.delivery_latitude ? (

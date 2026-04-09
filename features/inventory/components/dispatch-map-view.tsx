@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Eye, MapPin, Truck } from "lucide-react";
+import { MapPin, Truck } from "lucide-react";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -160,7 +160,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
         <div className="sticky top-0 bg-background border-b px-3 py-2">
           <p className="text-sm font-semibold flex items-center gap-1.5">
             <Truck className="size-4" />
-            {t("inventory.dispatch.orders")} ({activeOrders.length})
+            {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
           </p>
         </div>
         <div className="divide-y">
@@ -179,6 +179,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                 className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer ${isSelected ? "bg-muted" : ""}`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
+                  if (onOrderClick) onOrderClick(order);
                 }}
               >
                 <div className="flex items-center justify-between mb-1">
@@ -207,26 +208,13 @@ function DispatchMapView({ orders, warehouses = [], zones = [], onOrderClick }: 
                       </span>
                     ) : null}
                   </p>
-                  {isSelected && onOrderClick ? (
-                    <span
-                      role="link"
-                      className="inline-flex items-center gap-1 text-[11px] mt-1 text-primary hover:underline cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOrderClick(order);
-                      }}
-                    >
-                      <Eye className="size-3" />
-                      Ver detalle
-                    </span>
-                  ) : null}
                 </div>
               </div>
             );
           })}
           {activeOrders.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              {t("inventory.dispatch.no_orders")}
+              Sin órdenes de despacho
             </p>
           ) : null}
         </div>

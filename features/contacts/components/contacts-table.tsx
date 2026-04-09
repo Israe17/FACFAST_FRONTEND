@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Building2, Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
+import { Building2, Eye, Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DataTable, type ServerSideState } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
@@ -210,7 +211,17 @@ function ContactsTable({ data, onServerStateChange, serverState, total }: Contac
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => <ContactRowActions contact={row.original} />,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/contacts/${row.original.id}`}>
+              <Eye className="size-4" />
+              Ver
+            </Link>
+          </Button>
+          <ContactRowActions contact={row.original} />
+        </div>
+      ),
     },
   ];
 

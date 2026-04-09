@@ -12,6 +12,7 @@ import { LoadingState } from "@/shared/components/loading-state";
 import { MapView } from "@/shared/components/map-view";
 import { PageHeader } from "@/shared/components/page-header";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { usePermissions } from "@/shared/hooks/use-permissions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import { useContactQuery } from "../queries";
@@ -23,7 +24,18 @@ type ContactDetailProps = {
 
 function ContactDetail({ contactId }: ContactDetailProps) {
   const { t } = useAppTranslator();
-  const contactQuery = useContactQuery(contactId);
+  const { can } = usePermissions();
+  const canView = can("contacts.view");
+  const contactQuery = useContactQuery(contactId, canView);
+
+  if (!canView) {
+    return (
+      <ErrorState
+        description={t("common.access_denied_description")}
+        title={t("common.access_denied_title")}
+      />
+    );
+  }
 
   if (contactQuery.isLoading) {
     return <LoadingState description={t("contacts.detail.loading")} />;

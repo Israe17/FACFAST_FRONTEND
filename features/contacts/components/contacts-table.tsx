@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Building2, Eye, Pencil, Power, RotateCcw, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DataTable, type ServerSideState } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
@@ -45,16 +45,13 @@ function ContactStatusBadge({ isActive }: { isActive: boolean }) {
 
 function ContactRowActions({ contact }: { contact: Contact }) {
   const { can } = usePermissions();
-  const router = useRouter();
   const [activeDialog, setActiveDialog] = useState<
     "branches" | "deactivate" | "delete" | "edit" | "reactivate" | null
   >(null);
   const updateContactMutation = useUpdateContactMutation(contact.id);
   const deleteContactMutation = useDeleteContactMutation(contact.id);
 
-  const actions: TableAction[] = [
-    { icon: Eye, label: "Ver detalle", onClick: () => router.push(`/contacts/${contact.id}`) },
-  ];
+  const actions: TableAction[] = [];
   if (can("contacts.update")) {
     actions.push({ icon: Pencil, label: "Edit contact", onClick: () => setActiveDialog("edit") });
     actions.push(
@@ -214,7 +211,17 @@ function ContactsTable({ data, onServerStateChange, serverState, total }: Contac
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => <ContactRowActions contact={row.original} />,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/contacts/${row.original.id}`}>
+              <Eye className="size-4" />
+              Ver
+            </Link>
+          </Button>
+          <ContactRowActions contact={row.original} />
+        </div>
+      ),
     },
   ];
 

@@ -91,13 +91,13 @@ function ContactDetail({ contactId }: ContactDetailProps) {
         />
         <DataCard
           title={t("contacts.field.email")}
-          value={contact.email ?? t("contacts.detail.not_available")}
+          value={<span className="text-base break-all">{contact.email ?? t("contacts.detail.not_available")}</span>}
           description={t("contacts.detail.email_description")}
           icon={<Mail className="size-4" />}
         />
         <DataCard
           title={t("contacts.field.phone")}
-          value={contact.phone ?? t("contacts.detail.not_available")}
+          value={<span className="text-base">{contact.phone ?? t("contacts.detail.not_available")}</span>}
           description={t("contacts.detail.phone_description")}
           icon={<Phone className="size-4" />}
         />

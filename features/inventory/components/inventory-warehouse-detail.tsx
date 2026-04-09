@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataCard } from "@/shared/components/data-card";
+import { MapView, type MapMarker } from "@/shared/components/map-view";
 import { DataTable } from "@/shared/components/data-table";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -299,6 +300,30 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           </div>
         </InventoryDetailBlock>
       </div>
+
+      {warehouse.latitude && warehouse.longitude ? (
+        <InventoryDetailBlock
+          description="Ubicación geográfica de la bodega."
+          title="Ubicación en mapa"
+        >
+          <div className="h-64 rounded-lg overflow-hidden relative z-0">
+            <MapView
+              markers={[
+                {
+                  id: `wh-${warehouse.id}`,
+                  lat: warehouse.latitude,
+                  lng: warehouse.longitude,
+                  color: "#16a34a",
+                  popup: `<strong>${warehouse.name}</strong>`,
+                },
+              ]}
+              center={[warehouse.latitude, warehouse.longitude]}
+              zoom={14}
+              className="h-full rounded-none"
+            />
+          </div>
+        </InventoryDetailBlock>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-2">
         <InventoryDetailBlock

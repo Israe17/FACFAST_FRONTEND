@@ -1048,7 +1048,10 @@ export async function updateProductSerial(
 
 function buildZonePayload(payload: CreateZoneInput | UpdateZoneInput) {
   return compactRecord({
+    boundary: payload.boundary,
     canton: payload.canton,
+    center_latitude: payload.center_latitude,
+    center_longitude: payload.center_longitude,
     code: payload.code,
     description: payload.description,
     district: payload.district,
@@ -1124,6 +1127,7 @@ function buildRoutePayload(payload: CreateRouteInput | UpdateRouteInput) {
     frequency: payload.frequency,
     is_active: payload.is_active,
     name: payload.name,
+    waypoints: payload.waypoints,
     zone_id: toOptionalNumberId(payload.zone_id) ?? null,
   });
 }

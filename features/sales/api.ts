@@ -15,6 +15,8 @@ function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderIn
     delivery_canton: payload.delivery_canton,
     delivery_charges: payload.delivery_charges,
     delivery_district: payload.delivery_district,
+    delivery_latitude: payload.delivery_latitude,
+    delivery_longitude: payload.delivery_longitude,
     delivery_province: payload.delivery_province,
     delivery_requested_date: payload.delivery_requested_date,
     delivery_zone_id: toNumberId(payload.delivery_zone_id) ?? null,

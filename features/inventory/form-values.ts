@@ -517,6 +517,7 @@ export const emptyRouteFormValues: CreateRouteInput = {
   frequency: "",
   is_active: true,
   name: "",
+  waypoints: null,
   zone_id: undefined,
 };
 
@@ -531,6 +532,7 @@ export function getRouteFormValues(route: Route): CreateRouteInput {
     frequency: route.frequency ?? "",
     is_active: route.is_active,
     name: route.name,
+    waypoints: route.waypoints ?? null,
     zone_id: route.zone_id != null ? String(route.zone_id) : undefined,
   };
 }

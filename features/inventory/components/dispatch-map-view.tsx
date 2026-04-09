@@ -86,7 +86,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
     const warehouseId = selectedOrder.origin_warehouse_id ?? selectedOrder.origin_warehouse?.id;
     if (warehouseId) {
       const wh = warehouses.find((w) => String(w.id) === String(warehouseId));
-      if (wh && wh.latitude != null && wh.longitude != null) {
+      if (wh && wh.latitude && wh.longitude) {
         stopPoints.unshift([wh.latitude, wh.longitude]);
       }
     }
@@ -109,7 +109,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
     const warehouseId = selectedOrder.origin_warehouse_id ?? selectedOrder.origin_warehouse?.id;
     if (!warehouseId) return null;
     const warehouse = warehouses.find((w) => String(w.id) === String(warehouseId));
-    if (!warehouse || warehouse.latitude == null || warehouse.longitude == null) return null;
+    if (!warehouse || !warehouse.latitude || !warehouse.longitude) return null;
     return {
       id: `warehouse-origin-${warehouse.id}`,
       lat: warehouse.latitude,

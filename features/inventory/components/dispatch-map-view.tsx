@@ -57,7 +57,7 @@ function MapLegend() {
   const [open, setOpen] = useState(true);
 
   return (
-    <div className="absolute bottom-2 left-2 z-[1] bg-background/95 backdrop-blur-sm rounded-lg border shadow-sm text-xs max-w-[180px]">
+    <div className="absolute bottom-3 right-3 z-10 bg-background/95 backdrop-blur-sm rounded-lg border shadow-sm text-xs max-w-[180px]">
       <button
         type="button"
         className="flex items-center justify-between w-full px-2.5 py-1.5 font-medium"
@@ -155,27 +155,23 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
     ];
   }, [selectedOrder, warehouses]);
 
-  // Build origin warehouse marker for selected order
-  const warehouseMarker = useMemo<MapMarker | null>(() => {
-    if (!selectedOrder) return null;
-    const warehouseId = selectedOrder.origin_warehouse_id ?? selectedOrder.origin_warehouse?.id;
-    if (!warehouseId) return null;
-    const warehouse = warehouses.find((w) => String(w.id) === String(warehouseId));
-    if (!warehouse || !warehouse.latitude || !warehouse.longitude) return null;
-    return {
-      id: `warehouse-origin-${warehouse.id}`,
-      lat: warehouse.latitude,
-      lng: warehouse.longitude,
-      color: "#16a34a",
-      popup: `<strong>Bodega: ${warehouse.name}</strong>`,
-    };
-  }, [selectedOrder, warehouses]);
+  // Build warehouse markers (always visible for warehouses with coordinates)
+  const warehouseMarkers = useMemo<MapMarker[]>(() => {
+    return warehouses
+      .filter((w) => w.latitude && w.longitude)
+      .map((w) => ({
+        id: `warehouse-${w.id}`,
+        lat: w.latitude!,
+        lng: w.longitude!,
+        color: "#16a34a",
+        popup: `<strong>Bodega: ${w.name}</strong>`,
+      }));
+  }, [warehouses]);
 
   // Filter markers to highlight selected order
   const visibleMarkers = useMemo(() => {
-    if (warehouseMarker) return [...markers, warehouseMarker];
-    return markers;
-  }, [markers, warehouseMarker]);
+    return [...markers, ...warehouseMarkers];
+  }, [markers, warehouseMarkers]);
 
   const selectedMarkerIds = useMemo(() => {
     if (!selectedOrder) return new Set<string>();
@@ -207,6 +203,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
   );
 
   return (
+    <div className="relative">
     <div className="flex h-[600px] rounded-lg border overflow-hidden relative z-0">
       {/* Left: Order list */}
       <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
@@ -278,7 +275,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
-            color: m.id.startsWith("warehouse-origin-")
+            color: m.id.startsWith("warehouse-")
               ? m.color
               : selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
           }))}
@@ -287,7 +284,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
           selectedMarkerId={null}
           className="h-full rounded-none"
         />
-        <MapLegend />
         {markers.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center bg-muted/60 pointer-events-none">
             <div className="text-center">
@@ -302,6 +298,8 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
           </div>
         ) : null}
       </div>
+    </div>
+    <MapLegend />
     </div>
   );
 }

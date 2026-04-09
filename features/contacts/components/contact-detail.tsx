@@ -5,9 +5,9 @@ import { ArrowLeft, Building2, FileText, Mail, MapPin, Phone } from "lucide-reac
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataCard } from "@/shared/components/data-card";
 import { ErrorState } from "@/shared/components/error-state";
-import { FormSection } from "@/shared/components/form-section";
 import { LoadingState } from "@/shared/components/loading-state";
 import { MapView } from "@/shared/components/map-view";
 import { PageHeader } from "@/shared/components/page-header";
@@ -21,6 +21,26 @@ import { ContactTypeBadge } from "./contact-type-badge";
 type ContactDetailProps = {
   contactId: string;
 };
+
+function DetailBlock({
+  children,
+  title,
+  description,
+}: {
+  children: React.ReactNode;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <Card className="border-border/70 bg-card/95">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-lg">{title}</CardTitle>
+        {description ? <CardDescription>{description}</CardDescription> : null}
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+}
 
 function ContactDetail({ contactId }: ContactDetailProps) {
   const { t } = useAppTranslator();
@@ -57,7 +77,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header — follows InventoryEntityHeader pattern */}
+      {/* Header */}
       <div className="space-y-4">
         <PageHeader
           actions={
@@ -111,7 +131,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
 
       <div className="grid gap-6 xl:grid-cols-2">
         {/* Address */}
-        <FormSection
+        <DetailBlock
           title={t("contacts.detail.address_title")}
           description={t("contacts.detail.address_description")}
         >
@@ -145,10 +165,10 @@ function ContactDetail({ contactId }: ContactDetailProps) {
           ) : (
             <p className="text-sm text-muted-foreground">{t("contacts.detail.no_address")}</p>
           )}
-        </FormSection>
+        </DetailBlock>
 
         {/* Map */}
-        <FormSection
+        <DetailBlock
           title={t("contacts.detail.map_title")}
           description={t("contacts.detail.map_description")}
         >
@@ -176,12 +196,12 @@ function ContactDetail({ contactId }: ContactDetailProps) {
               <p className="text-xs mt-1">{t("contacts.detail.no_location_hint")}</p>
             </div>
           )}
-        </FormSection>
+        </DetailBlock>
       </div>
 
       {/* Exoneration */}
       {hasExoneration ? (
-        <FormSection
+        <DetailBlock
           title={t("contacts.detail.exoneration_title")}
           description={t("contacts.detail.exoneration_description")}
         >
@@ -217,11 +237,11 @@ function ContactDetail({ contactId }: ContactDetailProps) {
               </div>
             ) : null}
           </dl>
-        </FormSection>
+        </DetailBlock>
       ) : null}
 
       {/* Metadata */}
-      <FormSection
+      <DetailBlock
         title={t("contacts.detail.metadata_title")}
         description={t("contacts.detail.metadata_description")}
       >
@@ -247,7 +267,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
             </div>
           ) : null}
         </dl>
-      </FormSection>
+      </DetailBlock>
     </div>
   );
 }

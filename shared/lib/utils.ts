@@ -40,6 +40,22 @@ export function getErrorMessage(error: unknown, fallback = "Ocurrio un error ine
   return getBackendErrorMessage(error, fallback);
 }
 
+export function formatDate(value?: string | null) {
+  if (!value) {
+    return "-";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("es-CR", {
+    dateStyle: "medium",
+  }).format(date);
+}
+
 export function formatDateTime(value?: string | null) {
   if (!value) {
     return "-";

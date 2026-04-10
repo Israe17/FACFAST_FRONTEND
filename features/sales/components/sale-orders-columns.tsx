@@ -4,7 +4,7 @@ import { CheckCircle, Pencil, Trash2, XCircle } from "lucide-react";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
-import { formatDateTime } from "@/shared/lib/utils";
+import { formatDate } from "@/shared/lib/utils";
 
 import type { SaleOrder } from "../types";
 
@@ -91,7 +91,7 @@ function getSaleOrdersColumns({
             {row.original.code ?? "-"}
           </button>
           <p className="text-sm text-muted-foreground">
-            {formatDateTime(row.original.order_date)}
+            {formatDate(row.original.order_date)}
           </p>
         </div>
       ),

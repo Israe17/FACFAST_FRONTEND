@@ -26,7 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { MapView, type MapMarker } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
-import { formatDateTime } from "@/shared/lib/utils";
+import { formatDate, formatDateTime } from "@/shared/lib/utils";
 
 import { useSaleOrderQuery, useResetSaleOrderDispatchStatusMutation } from "../queries";
 import type { SaleOrder } from "../types";
@@ -177,12 +177,12 @@ function SaleOrderDetailDialog({
           ) : null}
           <div>
             <p className="text-muted-foreground">{t("sales.order_date")}</p>
-            <p className="font-medium">{formatDateTime(fullOrder.order_date)}</p>
+            <p className="font-medium">{formatDate(fullOrder.order_date)}</p>
           </div>
           {fullOrder.delivery_requested_date ? (
             <div>
               <p className="text-muted-foreground">{t("sales.delivery_requested_date")}</p>
-              <p className="font-medium">{formatDateTime(fullOrder.delivery_requested_date)}</p>
+              <p className="font-medium">{formatDate(fullOrder.delivery_requested_date)}</p>
             </div>
           ) : null}
           {fullOrder.delivery_zone ? (

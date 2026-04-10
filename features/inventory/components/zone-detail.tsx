@@ -176,7 +176,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
           description={t("inventory.zones.detail.map_description")}
         >
           {hasBoundary || hasCenter ? (
-            <div className="h-64 rounded-lg overflow-hidden relative z-0">
+            <div className="h-80 rounded-lg overflow-hidden relative z-0">
               <MapView
                 markers={mapMarkers}
                 polygons={mapPolygons}

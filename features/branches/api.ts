@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
-  return compactRecord({
+  const base = compactRecord({
     activity_code: payload.activity_code,
     address: payload.address,
     branch_number: payload.branch_number,
@@ -28,9 +28,7 @@ function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
     identification_number: payload.identification_number,
     identification_type: payload.identification_type,
     is_active: payload.is_active,
-    latitude: payload.latitude,
     legal_name: payload.legal_name,
-    longitude: payload.longitude,
     mail_key: payload.mail_key,
     name: payload.name,
     phone: payload.phone,
@@ -38,6 +36,9 @@ function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
     province: payload.province,
     signature_type: payload.signature_type,
   });
+  if (payload.latitude !== undefined) base.latitude = payload.latitude;
+  if (payload.longitude !== undefined) base.longitude = payload.longitude;
+  return base;
 }
 
 function buildTerminalPayload(payload: CreateTerminalInput | UpdateTerminalInput) {

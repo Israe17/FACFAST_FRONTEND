@@ -38,7 +38,7 @@ type LocationPickerProps = {
 };
 
 function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPickerProps) {
-  const hasCoordinates = latitude != null && longitude != null;
+  const hasCoordinates = Boolean(latitude) && Boolean(longitude);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
   const [searching, setSearching] = useState(false);

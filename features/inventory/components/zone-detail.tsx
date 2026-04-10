@@ -14,7 +14,7 @@ import { APP_ROUTES } from "@/shared/lib/routes";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import { useZoneQuery, useZoneBranchAssignmentsQuery } from "../queries";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 
 type ZoneDetailProps = {
@@ -131,7 +131,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
         {/* Summary */}
-        <InventoryDetailBlock
+        <DetailBlock
           title={t("inventory.zones.detail.summary_title")}
           description={t("inventory.zones.detail.summary_description")}
         >
@@ -169,10 +169,10 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
               <dd className="font-medium">{formatDateTime(zone.updated_at)}</dd>
             </div>
           </dl>
-        </InventoryDetailBlock>
+        </DetailBlock>
 
         {/* Map */}
-        <InventoryDetailBlock
+        <DetailBlock
           title={t("inventory.zones.detail.map_title")}
           description={t("inventory.zones.detail.map_description")}
         >
@@ -197,11 +197,11 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
               <p className="text-xs mt-1">{t("inventory.zones.detail.no_location_hint")}</p>
             </div>
           )}
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
       {/* Assigned branches */}
-      <InventoryDetailBlock
+      <DetailBlock
         title={t("inventory.zones.detail.branches_title")}
         description={t("inventory.zones.detail.branches_description")}
       >
@@ -221,7 +221,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
         ) : (
           <p className="text-sm text-muted-foreground">{t("inventory.zones.detail.no_branches")}</p>
         )}
-      </InventoryDetailBlock>
+      </DetailBlock>
     </div>
   );
 }

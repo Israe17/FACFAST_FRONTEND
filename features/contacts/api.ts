@@ -20,11 +20,9 @@ const deleteResponseSchema = z.object({
 
 
 function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
-  return compactRecord({
+  const base = compactRecord({
     address: payload.address,
     canton: payload.canton,
-    delivery_latitude: payload.delivery_latitude,
-    delivery_longitude: payload.delivery_longitude,
     code: payload.code,
     commercial_name: payload.commercial_name,
     district: payload.district,
@@ -44,6 +42,10 @@ function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
     tax_condition: payload.tax_condition,
     type: payload.type,
   });
+  // Preserve null for coordinates (compactRecord strips null)
+  if (payload.delivery_latitude !== undefined) base.delivery_latitude = payload.delivery_latitude;
+  if (payload.delivery_longitude !== undefined) base.delivery_longitude = payload.delivery_longitude;
+  return base;
 }
 
 function toOptionalNumberId(value: string | number | null | undefined, preserveNull = false) {

@@ -266,17 +266,18 @@ function buildPromotionPayload(payload: CreatePromotionInput | UpdatePromotionIn
 }
 
 function buildWarehousePayload(payload: CreateWarehouseInput | UpdateWarehouseInput) {
-  return compactRecord({
+  const base = compactRecord({
     branch_id: toOptionalNumberId(payload.branch_id),
     code: payload.code,
     description: payload.description,
     is_active: payload.is_active,
     is_default: payload.is_default,
-    latitude: payload.latitude,
-    longitude: payload.longitude,
     name: payload.name,
     uses_locations: payload.uses_locations,
   });
+  if (payload.latitude !== undefined) base.latitude = payload.latitude;
+  if (payload.longitude !== undefined) base.longitude = payload.longitude;
+  return base;
 }
 
 function buildWarehouseLocationPayload(
@@ -1047,11 +1048,8 @@ export async function updateProductSerial(
 // --- Zones ---
 
 function buildZonePayload(payload: CreateZoneInput | UpdateZoneInput) {
-  return compactRecord({
-    boundary: payload.boundary,
+  const base = compactRecord({
     canton: payload.canton,
-    center_latitude: payload.center_latitude,
-    center_longitude: payload.center_longitude,
     code: payload.code,
     description: payload.description,
     district: payload.district,
@@ -1059,6 +1057,10 @@ function buildZonePayload(payload: CreateZoneInput | UpdateZoneInput) {
     name: payload.name,
     province: payload.province,
   });
+  if (payload.boundary !== undefined) base.boundary = payload.boundary;
+  if (payload.center_latitude !== undefined) base.center_latitude = payload.center_latitude;
+  if (payload.center_longitude !== undefined) base.center_longitude = payload.center_longitude;
+  return base;
 }
 
 export async function listZones() {

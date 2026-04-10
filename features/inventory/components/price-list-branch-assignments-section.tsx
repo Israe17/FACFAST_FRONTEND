@@ -56,7 +56,7 @@ import type {
   UpdatePriceListBranchAssignmentInput,
 } from "../types";
 import { FormFieldError } from "./form-field-error";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 
 type PriceListBranchAssignmentsSectionProps = {
   enabled?: boolean;
@@ -457,7 +457,7 @@ function PriceListBranchAssignmentsSection({
 
   return (
     <>
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.price_list_branch_assignments.section_description")}
         title={t("inventory.price_list_branch_assignments.section_title")}
       >
@@ -517,7 +517,7 @@ function PriceListBranchAssignmentsSection({
             />
           </div>
         </QueryStateWrapper>
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <PriceListBranchAssignmentEditorDialog
         assignment={selectedAssignment}

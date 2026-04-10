@@ -29,7 +29,7 @@ import type {
   WarehouseStockRow,
 } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 
 type InventoryWarehouseDetailProps = {
@@ -252,7 +252,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.summary_block_description")}
           title={t("inventory.detail.summary_block_title")}
         >
@@ -287,9 +287,9 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
             {warehouse.description ?? t("inventory.common.no_description")}
           </div>
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.branch_block_description")}
           title={t("inventory.detail.branch_block_title")}
         >
@@ -299,10 +299,10 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
               {branch?.business_name ?? t("inventory.detail.single_branch_scope")}
             </p>
           </div>
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
-      <InventoryDetailBlock
+      <DetailBlock
         description="Ubicación geográfica de la bodega."
         title="Ubicación en mapa"
       >
@@ -330,10 +330,10 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             <p className="text-xs mt-1">Editá la bodega para agregar coordenadas en el mapa</p>
           </div>
         )}
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.locations_block_description")}
           title={t("inventory.entity.warehouse_locations")}
         >
@@ -343,9 +343,9 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             data={locations}
             emptyMessage={t("inventory.detail.no_warehouse_locations")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.stock_block_description")}
           title={t("inventory.entity.warehouse_stock")}
         >
@@ -355,11 +355,11 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             data={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.lots_block_description")}
           title={t("inventory.entity.inventory_lots")}
         >
@@ -369,9 +369,9 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             data={lots}
             emptyMessage={t("inventory.detail.no_related_lots")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.movements_block_description")}
           title={t("inventory.detail.recent_movements_title")}
         >
@@ -381,7 +381,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             data={movements}
             emptyMessage={t("inventory.detail.no_recent_movements")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ import type {
   InventoryMovementLine,
 } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 
 type InventoryMovementDetailProps = {
@@ -235,7 +235,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.summary_block_description")}
           title={t("inventory.detail.summary_block_title")}
         >
@@ -290,9 +290,9 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
             {movement.notes ?? t("inventory.common.no_notes")}
           </div>
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.movement_relation_block_description")}
           title={t("inventory.detail.movement_relation_block_title")}
         >
@@ -324,10 +324,10 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
           </dl>
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.detail.line_items_description")}
         title={t("inventory.detail.line_items")}
       >
@@ -339,7 +339,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             emptyMessage={t("inventory.detail.no_movement_lines")}
           />
         </div>
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <Sheet onOpenChange={setCancelOpen} open={cancelOpen}>
         <SheetContent>

@@ -32,7 +32,7 @@ import type {
   WarehouseStockRow,
 } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 import { ProductSerialsSection } from "./product-serials-section";
 import { ProductVariantsSection } from "./product-variants-section";
@@ -280,7 +280,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
         />
       </div>
 
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.detail.summary_block_description")}
         title={t("inventory.detail.summary_block_title")}
       >
@@ -331,13 +331,13 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
         <div className="mt-4 rounded-2xl border border-border/70 bg-muted/30 p-4 text-sm text-muted-foreground">
           {product.description ?? t("inventory.common.no_description")}
         </div>
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <ProductVariantsSection product={product} />
       <ProductSerialsSection product={product} />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.price_block_description")}
           title={t("inventory.entity.product_prices")}
         >
@@ -347,9 +347,9 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             data={productPricesQuery.data ?? []}
             emptyMessage={t("inventory.detail.no_product_prices")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.stock_block_description")}
           title={t("inventory.entity.warehouse_stock")}
         >
@@ -368,11 +368,11 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
               ))}
             </div>
           ) : null}
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.promotion_block_description")}
           title={t("inventory.entity.promotions")}
         >
@@ -382,9 +382,9 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             data={promotions}
             emptyMessage={t("inventory.detail.no_related_promotions")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.lots_block_description")}
           title={t("inventory.entity.inventory_lots")}
         >
@@ -394,10 +394,10 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             data={lotRows}
             emptyMessage={t("inventory.detail.no_related_lots")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.detail.movements_block_description")}
         title={t("inventory.detail.recent_movements_title")}
       >
@@ -418,7 +418,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             ))}
           </div>
         ) : null}
-      </InventoryDetailBlock>
+      </DetailBlock>
     </div>
   );
 }

@@ -226,17 +226,27 @@ function MapViewInner({
     }
   }, [polygons, ready]);
 
-  // Fit bounds when markers change
+  // Fit bounds when markers or polygons change
   useEffect(() => {
     const L = LRef.current;
     const map = mapRef.current;
-    if (!L || !map || markers.length === 0) return;
+    if (!L || !map) return;
 
-    const bounds = L.latLngBounds(
-      markers.map((m: MapMarker) => [m.lat, m.lng]),
-    );
+    const allPoints: [number, number][] = [];
+    for (const m of markers) {
+      allPoints.push([m.lat, m.lng]);
+    }
+    for (const p of polygons) {
+      for (const pt of p.points) {
+        allPoints.push(pt);
+      }
+    }
+
+    if (allPoints.length === 0) return;
+
+    const bounds = L.latLngBounds(allPoints);
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-  }, [markers, ready]);
+  }, [markers, polygons, ready]);
 
   return (
     <div

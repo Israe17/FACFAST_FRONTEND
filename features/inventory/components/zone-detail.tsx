@@ -14,7 +14,7 @@ import { APP_ROUTES } from "@/shared/lib/routes";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import { useZoneQuery, useZoneBranchAssignmentsQuery } from "../queries";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 
 type ZoneDetailProps = {
@@ -51,7 +51,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
   }
 
   const zone = zoneQuery.data;
-  const assignments = branchesQuery.data ?? [];
+  const assignedBranches = branchesQuery.data?.assigned_branches ?? [];
   const hasBoundary = zone.boundary && zone.boundary.length >= 3;
   const hasCenter = Boolean(zone.center_latitude) && Boolean(zone.center_longitude);
 
@@ -124,14 +124,14 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
         />
         <DataCard
           title={t("inventory.zones.detail.branches_count")}
-          value={assignments.length}
+          value={assignedBranches.length}
           description={t("inventory.zones.detail.branches_assigned")}
         />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
         {/* Summary */}
-        <InventoryDetailBlock
+        <DetailBlock
           title={t("inventory.zones.detail.summary_title")}
           description={t("inventory.zones.detail.summary_description")}
         >
@@ -169,10 +169,10 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
               <dd className="font-medium">{formatDateTime(zone.updated_at)}</dd>
             </div>
           </dl>
-        </InventoryDetailBlock>
+        </DetailBlock>
 
         {/* Map */}
-        <InventoryDetailBlock
+        <DetailBlock
           title={t("inventory.zones.detail.map_title")}
           description={t("inventory.zones.detail.map_description")}
         >
@@ -197,31 +197,26 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
               <p className="text-xs mt-1">{t("inventory.zones.detail.no_location_hint")}</p>
             </div>
           )}
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
       {/* Assigned branches */}
-      <InventoryDetailBlock
+      <DetailBlock
         title={t("inventory.zones.detail.branches_title")}
         description={t("inventory.zones.detail.branches_description")}
       >
-        {assignments.length > 0 ? (
+        {assignedBranches.length > 0 ? (
           <div className="divide-y">
-            {assignments.map((a: any) => (
-              <div key={a.id ?? a.branch_id} className="flex items-center justify-between py-2.5">
-                <div>
-                  <p className="font-medium text-sm">{a.branch?.name ?? a.branch_name ?? `Branch ${a.branch_id}`}</p>
-                </div>
-                <Badge variant={a.is_active ? "default" : "outline"}>
-                  {a.is_active ? t("inventory.common.active") : t("inventory.common.inactive")}
-                </Badge>
+            {assignedBranches.map((branch) => (
+              <div key={branch.id} className="flex items-center justify-between py-2.5">
+                <p className="font-medium text-sm">{branch.name ?? `#${branch.id}`}</p>
               </div>
             ))}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">{t("inventory.zones.detail.no_branches")}</p>
         )}
-      </InventoryDetailBlock>
+      </DetailBlock>
     </div>
   );
 }

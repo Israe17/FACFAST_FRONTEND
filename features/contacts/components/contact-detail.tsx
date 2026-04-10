@@ -5,8 +5,8 @@ import { ArrowLeft, Building2, FileText, Mail, MapPin, Phone } from "lucide-reac
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataCard } from "@/shared/components/data-card";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { MapView } from "@/shared/components/map-view";
@@ -21,26 +21,6 @@ import { ContactTypeBadge } from "./contact-type-badge";
 type ContactDetailProps = {
   contactId: string;
 };
-
-function DetailBlock({
-  children,
-  title,
-  description,
-}: {
-  children: React.ReactNode;
-  title: string;
-  description?: string;
-}) {
-  return (
-    <Card className="border-border/70 bg-card/95">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-lg">{title}</CardTitle>
-        {description ? <CardDescription>{description}</CardDescription> : null}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
-  );
-}
 
 function ContactDetail({ contactId }: ContactDetailProps) {
   const { t } = useAppTranslator();

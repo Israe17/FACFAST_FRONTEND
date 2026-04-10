@@ -245,7 +245,7 @@ function MapViewInner({
     if (allPoints.length === 0) return;
 
     const bounds = L.latLngBounds(allPoints);
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
   }, [markers, polygons, ready]);
 
   return (

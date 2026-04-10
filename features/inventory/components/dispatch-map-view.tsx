@@ -43,18 +43,18 @@ const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   skipped: "inventory.dispatch.stop_skipped",
 };
 
-const LEGEND_ITEMS = [
-  { color: "#eab308", label: "Pendiente" },
-  { color: "#f97316", label: "En tránsito" },
-  { color: "#22c55e", label: "Entregado" },
-  { color: "#ef4444", label: "Fallido" },
-  { color: "#6b7280", label: "Omitido" },
-  { color: "#16a34a", label: "Bodega origen", shape: "square" as const },
-  { color: "#6366f1", label: "Zona (área)", shape: "area" as const },
-];
-
-function MapLegend() {
+function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   const [open, setOpen] = useState(true);
+
+  const LEGEND_ITEMS = [
+    { color: "#eab308", label: t("inventory.dispatch.legend_pending") },
+    { color: "#f97316", label: t("inventory.dispatch.legend_in_transit") },
+    { color: "#22c55e", label: t("inventory.dispatch.legend_delivered") },
+    { color: "#ef4444", label: t("inventory.dispatch.legend_failed") },
+    { color: "#6b7280", label: t("inventory.dispatch.legend_skipped") },
+    { color: "#16a34a", label: t("inventory.dispatch.legend_warehouse"), shape: "square" as const },
+    { color: "#6366f1", label: t("inventory.dispatch.legend_zone"), shape: "area" as const },
+  ];
 
   return (
     <div className="absolute bottom-3 right-3 z-10 bg-background/95 backdrop-blur-sm rounded-lg border shadow-sm text-xs max-w-[180px]">
@@ -63,7 +63,7 @@ function MapLegend() {
         className="flex items-center justify-between w-full px-2.5 py-1.5 font-medium"
         onClick={() => setOpen(!open)}
       >
-        Leyenda
+        {t("inventory.dispatch.legend")}
         {open ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
       </button>
       {open ? (
@@ -251,7 +251,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
                   ) : null}
                   <p className="flex items-center gap-1">
                     <MapPin className="size-3" />
-                    {totalStops} {totalStops === 1 ? "parada" : "paradas"}
+                    {totalStops} {t("inventory.dispatch.stops_label")}
                     {stopsWithCoords < totalStops ? (
                       <span className="text-amber-600">
                         ({totalStops - stopsWithCoords} sin ubicación)
@@ -289,17 +289,17 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
             <div className="text-center">
               <MapPin className="size-10 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm font-medium text-muted-foreground">
-                Sin ubicaciones en el mapa
+                {t("inventory.dispatch.no_locations")}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Las paradas aparecerán aquí cuando tengan coordenadas
+                {t("inventory.dispatch.no_locations_hint")}
               </p>
             </div>
           </div>
         ) : null}
       </div>
     </div>
-    <MapLegend />
+    <MapLegend t={t} />
     </div>
   );
 }

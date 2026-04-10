@@ -63,6 +63,7 @@ function ZonePolygonEditorInner({
   const LRef = useRef<any>(null);
   const polygonLayerRef = useRef<any>(null);
   const vertexMarkersRef = useRef<any[]>([]);
+  const drawingMarkersRef = useRef<any>(null);
   const drawingPointsRef = useRef<[number, number][]>([]);
   const tempPolylineRef = useRef<any>(null);
 
@@ -100,6 +101,7 @@ function ZonePolygonEditorInner({
         maxZoom: 19,
       }).addTo(map);
 
+      drawingMarkersRef.current = L.layerGroup().addTo(map);
       mapRef.current = map;
       setReady(true);
     });
@@ -198,14 +200,14 @@ function ZonePolygonEditorInner({
         }).addTo(map);
       }
 
-      // Add vertex marker
+      // Add vertex marker to drawing layer
       L.circleMarker(point, {
         radius: 5,
         color: "#1d4ed8",
         fillColor: "#60a5fa",
         fillOpacity: 1,
         weight: 2,
-      }).addTo(map);
+      }).addTo(drawingMarkersRef.current);
     };
 
     map.on("click", handleClick);
@@ -217,12 +219,22 @@ function ZonePolygonEditorInner({
     };
   }, [drawing]);
 
+  function clearDrawingLayers() {
+    const map = mapRef.current;
+    if (!map) return;
+    if (drawingMarkersRef.current) drawingMarkersRef.current.clearLayers();
+    if (tempPolylineRef.current) {
+      map.removeLayer(tempPolylineRef.current);
+      tempPolylineRef.current = null;
+    }
+  }
+
   function handleStartDrawing() {
     const L = LRef.current;
     const map = mapRef.current;
     if (!L || !map) return;
 
-    // Clear existing boundary
+    // Clear existing boundary + drawing layers
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
       polygonLayerRef.current = null;
@@ -231,6 +243,7 @@ function ZonePolygonEditorInner({
       map.removeLayer(m);
     }
     vertexMarkersRef.current = [];
+    clearDrawingLayers();
 
     drawingPointsRef.current = [];
     setPointCount(0);
@@ -240,12 +253,7 @@ function ZonePolygonEditorInner({
   function handleFinishDrawing() {
     const points = drawingPointsRef.current;
     setDrawing(false);
-
-    // Clean temp polyline
-    if (tempPolylineRef.current && mapRef.current) {
-      mapRef.current.removeLayer(tempPolylineRef.current);
-      tempPolylineRef.current = null;
-    }
+    clearDrawingLayers();
 
     if (points.length >= 3) {
       onChange(points, computeCentroid(points));
@@ -255,14 +263,8 @@ function ZonePolygonEditorInner({
   }
 
   function handleCancelDrawing() {
-    const map = mapRef.current;
     setDrawing(false);
-
-    if (tempPolylineRef.current && map) {
-      map.removeLayer(tempPolylineRef.current);
-      tempPolylineRef.current = null;
-    }
-
+    clearDrawingLayers();
     drawingPointsRef.current = [];
     setPointCount(0);
 
@@ -271,6 +273,7 @@ function ZonePolygonEditorInner({
   }
 
   function handleClear() {
+    clearDrawingLayers();
     onChange(null, null);
   }
 

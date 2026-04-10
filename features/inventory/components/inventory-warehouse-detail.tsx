@@ -303,8 +303,8 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
       </div>
 
       <DetailBlock
-        description="Ubicación geográfica de la bodega."
-        title="Ubicación en mapa"
+        description={t("inventory.detail.map_description")}
+        title={t("inventory.detail.map_title")}
       >
         {warehouse.latitude && warehouse.longitude ? (
           <div className="h-64 rounded-lg overflow-hidden relative z-0">
@@ -326,8 +326,8 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
         ) : (
           <div className="h-48 rounded-lg border border-dashed border-border/70 flex flex-col items-center justify-center text-muted-foreground">
             <MapPin className="size-8 mb-2" />
-            <p className="text-sm font-medium">Sin ubicación configurada</p>
-            <p className="text-xs mt-1">Editá la bodega para agregar coordenadas en el mapa</p>
+            <p className="text-sm font-medium">{t("inventory.detail.no_location")}</p>
+            <p className="text-xs mt-1">{t("inventory.detail.no_location_hint")}</p>
           </div>
         )}
       </DetailBlock>

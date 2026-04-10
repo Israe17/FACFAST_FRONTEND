@@ -248,11 +248,34 @@ function MapViewInner({
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
   }, [markers, polygons, ready]);
 
+  function handleRecenter() {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+
+    const allPoints: [number, number][] = [];
+    for (const m of markers) allPoints.push([m.lat, m.lng]);
+    for (const p of polygons) for (const pt of p.points) allPoints.push(pt);
+
+    if (allPoints.length > 0) {
+      map.fitBounds(L.latLngBounds(allPoints), { padding: [50, 50], maxZoom: 15 });
+    } else {
+      map.setView([9.9281, -84.0907], 8);
+    }
+  }
+
   return (
-    <div
-      ref={containerRef}
-      className={`w-full h-full min-h-[400px] rounded-lg ${className}`}
-    />
+    <div className={`w-full h-full min-h-[400px] rounded-lg relative ${className}`}>
+      <div ref={containerRef} className="absolute inset-0" />
+      <button
+        type="button"
+        onClick={handleRecenter}
+        title="Re-enfocar"
+        className="absolute top-2 right-2 z-[1000] bg-white border border-gray-300 rounded-md shadow-sm p-1.5 hover:bg-gray-50 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+      </button>
+    </div>
   );
 }
 

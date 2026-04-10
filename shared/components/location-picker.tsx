@@ -201,7 +201,7 @@ function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPic
   return (
     <div className="space-y-2">
       {/* Search bar */}
-      <div className="relative" style={{ zIndex: 10 }}>
+      <div className="relative z-10">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
@@ -237,7 +237,7 @@ function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPic
       </div>
 
       {/* Map */}
-      <div className="h-48 rounded-lg overflow-hidden border" style={{ position: "relative", zIndex: 0 }}>
+      <div className="h-48 rounded-lg overflow-hidden border relative z-0">
         <MapViewInner
           markers={markers}
           center={center}

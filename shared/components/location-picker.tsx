@@ -46,7 +46,7 @@ function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPic
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const center: [number, number] = hasCoordinates
-    ? [latitude, longitude]
+    ? [latitude!, longitude!]
     : DEFAULT_CENTER;
 
   const zoom = hasCoordinates ? PLACED_ZOOM : DEFAULT_ZOOM;
@@ -56,8 +56,8 @@ function LocationPicker({ latitude, longitude, onChange, disabled }: LocationPic
     return [
       {
         id: "location",
-        lat: latitude,
-        lng: longitude,
+        lat: latitude!,
+        lng: longitude!,
         color: "#3b82f6",
       },
     ];

@@ -1,7 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Building2, Pencil, Trash2 } from "lucide-react";
+import { Building2, Eye, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
@@ -31,7 +33,9 @@ function getZonesColumns({
       header: t("inventory.entity.zone"),
       cell: ({ row }) => (
         <div className="space-y-1">
-          <p className="font-medium">{row.original.name}</p>
+          <Link href={`/dispatch/zones/${row.original.id}`} className="font-medium hover:underline text-primary">
+            {row.original.name}
+          </Link>
           <p className="text-sm text-muted-foreground">
             {row.original.code
               ? `${t("inventory.common.code")}: ${row.original.code}`
@@ -82,11 +86,18 @@ function getZonesColumns({
     },
   ];
 
-  if (canUpdate || canDelete) {
-    baseColumns.push({
-      id: "actions",
-      header: t("inventory.common.actions"),
-      cell: ({ row }) => (
+  baseColumns.push({
+    id: "actions",
+    header: t("inventory.common.actions"),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Button asChild size="sm" variant="outline">
+          <Link href={`/dispatch/zones/${row.original.id}`}>
+            <Eye className="size-4" />
+            {t("inventory.common.view")}
+          </Link>
+        </Button>
+        {canUpdate || canDelete ? (
         <TableRowActions
           actions={[
             ...(canUpdate
@@ -119,9 +130,10 @@ function getZonesColumns({
               : []),
           ]}
         />
-      ),
-    });
-  }
+        ) : null}
+      </div>
+    ),
+  });
 
   return baseColumns;
 }

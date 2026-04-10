@@ -40,10 +40,9 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
         color: "#6366f1",
         fillColor: "#6366f1",
         fillOpacity: 0.15,
-        label: zone.name,
       },
     ];
-  }, [zone?.boundary, zone?.id, zone?.name]);
+  }, [zone?.boundary, zone?.id]);
 
   const mapMarkers = useMemo<MapMarker[]>(() => {
     if (!zone || !Boolean(zone.center_latitude) || !Boolean(zone.center_longitude)) return [];
@@ -181,12 +180,6 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
               <MapView
                 markers={mapMarkers}
                 polygons={mapPolygons}
-                center={
-                  hasCenter
-                    ? [zone.center_latitude!, zone.center_longitude!]
-                    : undefined
-                }
-                zoom={hasCenter ? 12 : undefined}
                 className="h-full rounded-none"
               />
             </div>

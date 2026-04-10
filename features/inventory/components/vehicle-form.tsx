@@ -1,10 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { ChevronDown, ChevronRight, MapPin } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
@@ -12,6 +22,16 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { CreateVehicleInput } from "../types";
 import { FormFieldError } from "./form-field-error";
+
+const VEHICLE_TYPE_OPTIONS = [
+  { value: "truck", label: "inventory.vehicles.type_truck" },
+  { value: "van", label: "inventory.vehicles.type_van" },
+  { value: "pickup", label: "inventory.vehicles.type_pickup" },
+  { value: "motorcycle", label: "inventory.vehicles.type_motorcycle" },
+  { value: "bicycle", label: "inventory.vehicles.type_bicycle" },
+  { value: "car", label: "inventory.vehicles.type_car" },
+  { value: "other", label: "inventory.vehicles.type_other" },
+] as const;
 
 type VehicleFormProps = {
   form: UseFormReturn<CreateVehicleInput>;
@@ -41,7 +61,7 @@ function VehicleForm({ form, formError, isPending, onSubmit, submitLabel }: Vehi
 
         <div className="space-y-2">
           <Label htmlFor="vehicle-name">{t("inventory.common.name")}</Label>
-          <Input id="vehicle-name" placeholder="Camión 1" {...form.register("name")} />
+          <Input id="vehicle-name" placeholder={t("inventory.vehicles.name_placeholder")} {...form.register("name")} />
           <FormFieldError message={errors.name?.message} />
         </div>
       </div>
@@ -58,8 +78,28 @@ function VehicleForm({ form, formError, isPending, onSubmit, submitLabel }: Vehi
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="vehicle-type">{t("inventory.vehicles.vehicle_type")}</Label>
-          <Input id="vehicle-type" placeholder="Camión" {...form.register("vehicle_type")} />
+          <Label>{t("inventory.vehicles.vehicle_type")}</Label>
+          <Controller
+            control={form.control}
+            name="vehicle_type"
+            render={({ field }) => (
+              <Select
+                value={field.value ?? ""}
+                onValueChange={(value) => field.onChange(value || undefined)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("inventory.vehicles.select_vehicle_type")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {t(option.label as any)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
           <FormFieldError message={errors.vehicle_type?.message} />
         </div>
       </div>
@@ -72,6 +112,7 @@ function VehicleForm({ form, formError, isPending, onSubmit, submitLabel }: Vehi
             min={0}
             step="0.01"
             type="number"
+            placeholder="0"
             {...form.register("max_weight_kg")}
           />
           <FormFieldError message={errors.max_weight_kg?.message} />
@@ -84,6 +125,7 @@ function VehicleForm({ form, formError, isPending, onSubmit, submitLabel }: Vehi
             min={0}
             step="0.01"
             type="number"
+            placeholder="0"
             {...form.register("max_volume_m3")}
           />
           <FormFieldError message={errors.max_volume_m3?.message} />
@@ -94,7 +136,7 @@ function VehicleForm({ form, formError, isPending, onSubmit, submitLabel }: Vehi
         <Label htmlFor="vehicle-notes">{t("inventory.vehicles.notes")}</Label>
         <Textarea
           id="vehicle-notes"
-          placeholder={t("inventory.vehicles.notes")}
+          placeholder={t("inventory.vehicles.notes_placeholder")}
           {...form.register("notes")}
         />
         <FormFieldError message={errors.notes?.message} />

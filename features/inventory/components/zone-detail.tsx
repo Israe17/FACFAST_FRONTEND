@@ -28,6 +28,36 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
   const zoneQuery = useZoneQuery(zoneId, canView);
   const branchesQuery = useZoneBranchAssignmentsQuery(zoneId, canView);
 
+  const zone = zoneQuery.data;
+  const assignedBranches = branchesQuery.data?.assigned_branches ?? [];
+
+  const mapPolygons = useMemo<MapPolygon[]>(() => {
+    if (!zone?.boundary || zone.boundary.length < 3) return [];
+    return [
+      {
+        id: `zone-${zone.id}`,
+        points: zone.boundary as [number, number][],
+        color: "#6366f1",
+        fillColor: "#6366f1",
+        fillOpacity: 0.15,
+        label: zone.name,
+      },
+    ];
+  }, [zone?.boundary, zone?.id, zone?.name]);
+
+  const mapMarkers = useMemo<MapMarker[]>(() => {
+    if (!zone || !Boolean(zone.center_latitude) || !Boolean(zone.center_longitude)) return [];
+    return [
+      {
+        id: `zone-center-${zone.id}`,
+        lat: zone.center_latitude!,
+        lng: zone.center_longitude!,
+        color: "#6366f1",
+        popup: `<strong>${zone.name}</strong>`,
+      },
+    ];
+  }, [zone?.center_latitude, zone?.center_longitude, zone?.id, zone?.name]);
+
   if (!canView) {
     return (
       <ErrorState
@@ -41,7 +71,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
     return <LoadingState description={t("inventory.zones.detail.loading")} />;
   }
 
-  if (zoneQuery.isError || !zoneQuery.data) {
+  if (zoneQuery.isError || !zone) {
     return (
       <ErrorState
         description={t("inventory.zones.detail.not_found_description")}
@@ -50,38 +80,8 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
     );
   }
 
-  const zone = zoneQuery.data;
-  const assignedBranches = branchesQuery.data?.assigned_branches ?? [];
   const hasBoundary = zone.boundary && zone.boundary.length >= 3;
   const hasCenter = Boolean(zone.center_latitude) && Boolean(zone.center_longitude);
-
-  const mapPolygons = useMemo<MapPolygon[]>(() => {
-    if (!hasBoundary) return [];
-    return [
-      {
-        id: `zone-${zone.id}`,
-        points: zone.boundary as [number, number][],
-        color: "#6366f1",
-        fillColor: "#6366f1",
-        fillOpacity: 0.15,
-        label: zone.name,
-      },
-    ];
-  }, [hasBoundary, zone.boundary, zone.id, zone.name]);
-
-  const mapMarkers = useMemo<MapMarker[]>(() => {
-    if (!hasCenter) return [];
-    return [
-      {
-        id: `zone-center-${zone.id}`,
-        lat: zone.center_latitude!,
-        lng: zone.center_longitude!,
-        color: "#6366f1",
-        popup: `<strong>${zone.name}</strong>`,
-      },
-    ];
-  }, [hasCenter, zone.center_latitude, zone.center_longitude, zone.id, zone.name]);
-
   const location = [zone.province, zone.canton, zone.district].filter(Boolean).join(" / ");
 
   return (

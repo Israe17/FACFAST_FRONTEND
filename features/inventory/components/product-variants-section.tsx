@@ -32,7 +32,7 @@ import {
 } from "../queries";
 import type { Product, ProductVariant } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { ProductVariantDialog } from "./product-variant-dialog";
 import { VariantAttributesManager } from "./variant-attributes-manager";
 
@@ -232,7 +232,7 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
 
   return (
     <>
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.variants.section_description")}
         title={t("inventory.variants.section_title")}
       >
@@ -262,7 +262,7 @@ function ProductVariantsSection({ product }: ProductVariantsSectionProps) {
           emptyMessage={t("inventory.variants.no_variants")}
           enablePagination={false}
         />
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <ProductVariantDialog
         measurementUnits={(measurementUnitsQuery.data ?? []).filter((unit) => unit.is_active)}

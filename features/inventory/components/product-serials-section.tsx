@@ -55,7 +55,7 @@ import type {
 import { useInventoryModule } from "../use-inventory-module";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import { FormFieldError } from "./form-field-error";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 
 const EMPTY_SELECT_VALUE = "__none__";
 
@@ -339,7 +339,7 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
 
   return (
     <>
-      <InventoryDetailBlock
+      <DetailBlock
         description={t("inventory.serials.section_description")}
         title={t("inventory.entity.product_serials")}
       >
@@ -456,7 +456,7 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
           isLoading={serialsQuery.isLoading}
           onRetry={() => serialsQuery.refetch()}
         />
-      </InventoryDetailBlock>
+      </DetailBlock>
 
       <Sheet onOpenChange={setRegisterOpen} open={registerOpen}>
         <SheetContent >

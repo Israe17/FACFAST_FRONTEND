@@ -16,7 +16,7 @@ import { listProductPrices } from "../api";
 import { inventoryKeys, usePriceListQuery, useProductsQuery, usePromotionsQuery } from "../queries";
 import type { ProductPrice, Promotion } from "../types";
 import { useInventoryModule } from "../use-inventory-module";
-import { InventoryDetailBlock } from "./inventory-detail-block";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
 import { PriceListBranchAssignmentsSection } from "./price-list-branch-assignments-section";
 
@@ -204,7 +204,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.summary_block_description")}
           title={t("inventory.detail.summary_block_title")}
         >
@@ -230,9 +230,9 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
               <dd className="font-medium">{formatDateTime(priceList.created_at)}</dd>
             </div>
           </dl>
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.pricing_phase_block_description")}
           title={t("inventory.detail.pricing_phase_block_title")}
         >
@@ -241,7 +241,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
             <p>{t("inventory.detail.price_list_phase_note_2")}</p>
             <p>{t("inventory.detail.price_list_phase_note_3")}</p>
           </div>
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
 
       <PriceListBranchAssignmentsSection
@@ -250,7 +250,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.price_list_prices_block_description")}
           title={t("inventory.entity.product_prices")}
         >
@@ -263,9 +263,9 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
             data={relatedProductPrices}
             emptyMessage={t("inventory.detail.no_price_list_prices")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
 
-        <InventoryDetailBlock
+        <DetailBlock
           description={t("inventory.detail.price_list_promotions_block_description")}
           title={t("inventory.entity.promotions")}
         >
@@ -275,7 +275,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
             data={relatedPromotions}
             emptyMessage={t("inventory.detail.no_related_promotions")}
           />
-        </InventoryDetailBlock>
+        </DetailBlock>
       </div>
     </div>
   );

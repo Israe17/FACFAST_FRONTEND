@@ -1068,6 +1068,11 @@ export async function listZones() {
   return extractCollection(response.data, ["zones"]).map((item) => zoneSchema.parse(item));
 }
 
+export async function getZone(zoneId: string) {
+  const response = await http.get(`/zones/${zoneId}`);
+  return zoneSchema.parse(extractEntity(response.data, ["zone"]));
+}
+
 export async function createZone(payload: CreateZoneInput) {
   const response = await http.post("/zones", buildZonePayload(payload));
   return zoneSchema.parse(extractEntity(response.data, ["zone"]));

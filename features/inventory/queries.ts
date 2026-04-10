@@ -94,6 +94,7 @@ import {
   updateWarehouseLocation,
   updateWarrantyProfile,
   createZone,
+  getZone,
   listZones,
   updateZone,
   deleteZone,
@@ -227,6 +228,7 @@ export const inventoryKeys = {
     [...inventoryKeys.all, "variant-attributes", productId] as const,
   warrantyProfiles: () => [...inventoryKeys.all, "warranty-profiles"] as const,
   zones: () => [...inventoryKeys.all, "zones"] as const,
+  zone: (id: string) => [...inventoryKeys.all, "zones", id] as const,
   zoneBranches: (zoneId: string) => [...inventoryKeys.zones(), zoneId, "branches"] as const,
   vehicles: () => [...inventoryKeys.all, "vehicles"] as const,
   vehicleBranches: (vehicleId: string) => [...inventoryKeys.vehicles(), vehicleId, "branches"] as const,
@@ -2279,6 +2281,14 @@ export function useZonesQuery(enabled = true) {
     queryKey: inventoryKeys.zones(),
     queryFn: listZones,
     staleTime: CATALOG_STALE_TIME,
+  });
+}
+
+export function useZoneQuery(zoneId: string, enabled = true) {
+  return useQuery({
+    enabled: enabled && Boolean(zoneId),
+    queryKey: inventoryKeys.zone(zoneId),
+    queryFn: () => getZone(zoneId),
   });
 }
 

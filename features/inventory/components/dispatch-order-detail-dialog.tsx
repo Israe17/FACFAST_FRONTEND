@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   AlertCircle,
+  ArrowLeftRight,
   CheckCircle,
   MapPin,
   Package,
@@ -27,7 +28,7 @@ import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder, DispatchStop } from "../types";
-import { useDispatchOrderQuery } from "../queries";
+import { useDispatchOrderQuery, useInventoryMovementsByDocumentQuery } from "../queries";
 import { UpdateStopStatusDialog } from "./update-stop-status-dialog";
 
 type DispatchOrderDetailDialogProps = {
@@ -99,6 +100,13 @@ function DispatchOrderDetailDialog({
   // The list endpoint only loads basic stop data without nested relations.
   const detailQuery = useDispatchOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
+
+  const movementsQuery = useInventoryMovementsByDocumentQuery(
+    "DispatchOrder",
+    fullOrder?.id ? Number(fullOrder.id) : 0,
+    !!fullOrder?.id,
+  );
+  const movements = movementsQuery.data?.data ?? [];
 
   if (!fullOrder) return null;
 
@@ -369,6 +377,46 @@ function DispatchOrderDetailDialog({
                         })}
                     </span>
                   </div>
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {/* Inventory Movements Section */}
+          {movements.length > 0 ? (
+            <>
+              <Separator />
+              <div>
+                <h3 className="flex items-center gap-2 text-sm font-semibold mb-3">
+                  <ArrowLeftRight className="size-4" />
+                  {t("inventory.dispatch.movements_section")} ({movements.length})
+                </h3>
+                <div className="space-y-2">
+                  {movements.map((movement) => (
+                    <div
+                      key={movement.id}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{movement.code}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {movement.movement_type
+                            ? t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as FrontendTranslationKey)
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="text-xs">
+                          {movement.status ?? "—"}
+                        </Badge>
+                        {movement.occurred_at ? (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatDateTime(movement.occurred_at)}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </>

@@ -73,6 +73,16 @@ export const saleOrderLineSchema = z
       .catch(undefined),
     product_variant_id: idSchema.optional(),
     quantity: z.number(),
+    reservation: z
+      .object({
+        status: z.string(),
+        reserved_quantity: z.number(),
+        consumed_quantity: z.number(),
+        released_quantity: z.number(),
+      })
+      .nullable()
+      .optional()
+      .catch(null),
     sale_order_id: idSchema.optional(),
     tax_amount: z.number().optional().catch(0),
     unit_price: z.number(),
@@ -157,6 +167,17 @@ export const saleOrderSchema = z
     delivery_requested_date: z.string().nullable().optional().catch(null),
     delivery_zone: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
     delivery_zone_id: nullableIdSchema.catch(null),
+    dispatch_orders: z
+      .array(
+        z.object({
+          id: idSchema,
+          code: z.string().nullable().optional(),
+          status: z.string(),
+          scheduled_date: z.string().nullable().optional(),
+        }),
+      )
+      .optional()
+      .catch([]),
     dispatch_status: z.enum(saleDispatchStatusValues).catch("pending"),
     fulfillment_mode: z.enum(fulfillmentModeValues).catch("pickup"),
     id: idSchema,

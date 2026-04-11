@@ -82,6 +82,27 @@ const saleModeTranslationMap: Record<string, FrontendTranslationKey> = {
   seller_route: "sales.mode_seller_route",
 };
 
+const reservationColorMap: Record<string, string> = {
+  active: "bg-yellow-100 text-yellow-800",
+  consumed: "bg-green-100 text-green-800",
+  released: "bg-gray-100 text-gray-800",
+};
+
+const reservationTranslationMap: Record<string, FrontendTranslationKey> = {
+  active: "sales.reservation_active",
+  consumed: "sales.reservation_consumed",
+  released: "sales.reservation_released",
+};
+
+const doStatusColorMap: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-800",
+  ready: "bg-blue-100 text-blue-800",
+  dispatched: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-indigo-100 text-indigo-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
 function SaleOrderDetailDialog({
   order,
   open,
@@ -257,25 +278,35 @@ function SaleOrderDetailDialog({
                         ) : null}
                       </div>
                     </div>
-                    <div className="text-right shrink-0 ml-4">
-                      <p className="text-sm tabular-nums">
-                        {line.quantity} x{" "}
-                        {line.unit_price.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
-                      {line.discount_percent ? (
-                        <p className="text-xs text-muted-foreground">
-                          -{line.discount_percent}%
-                        </p>
+                    <div className="flex items-center gap-3 shrink-0 ml-4">
+                      {line.reservation ? (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${reservationColorMap[line.reservation.status] ?? "bg-gray-100 text-gray-800"}`}
+                          title={`${t("sales.reservation_active")}: ${line.reservation.reserved_quantity} | ${t("sales.reservation_consumed")}: ${line.reservation.consumed_quantity} | ${t("sales.reservation_released")}: ${line.reservation.released_quantity}`}
+                        >
+                          {t(reservationTranslationMap[line.reservation.status] ?? "sales.reservation_active")}
+                        </span>
                       ) : null}
-                      <p className="text-sm font-medium tabular-nums">
-                        {(line.line_total ?? 0).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
+                      <div className="text-right">
+                        <p className="text-sm tabular-nums">
+                          {line.quantity} x{" "}
+                          {line.unit_price.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                        {line.discount_percent ? (
+                          <p className="text-xs text-muted-foreground">
+                            -{line.discount_percent}%
+                          </p>
+                        ) : null}
+                        <p className="text-sm font-medium tabular-nums">
+                          {(line.line_total ?? 0).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -339,6 +370,55 @@ function SaleOrderDetailDialog({
             })}
           </span>
         </div>
+
+        {/* Dispatch Orders Section */}
+        {fullOrder.dispatch_orders && fullOrder.dispatch_orders.length > 0 ? (
+          <>
+            <Separator />
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-semibold mb-3">
+                <Truck className="size-4" />
+                {t("sales.dispatch_orders_section")} ({fullOrder.dispatch_orders.length})
+              </h3>
+              <div className="space-y-2">
+                {fullOrder.dispatch_orders.map((d) => (
+                  <div
+                    key={d.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div>
+                      <p className="text-sm font-medium">{d.code ?? `DO-${d.id}`}</p>
+                      {d.scheduled_date ? (
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(d.scheduled_date)}
+                        </p>
+                      ) : null}
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${doStatusColorMap[d.status] ?? "bg-gray-100 text-gray-800"}`}
+                    >
+                      {t(`inventory.dispatch.status_${d.status}` as FrontendTranslationKey)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : fullOrder.status === "confirmed" &&
+          fullOrder.dispatch_status === "pending" ? (
+          <>
+            <Separator />
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-semibold mb-3">
+                <Truck className="size-4" />
+                {t("sales.dispatch_orders_section")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("sales.no_dispatch_orders")}
+              </p>
+            </div>
+          </>
+        ) : null}
 
         {/* Created By */}
         {fullOrder.created_by_user ? (

@@ -1558,6 +1558,15 @@ const esTranslations = {
   "sales.reservation_released": "Liberado",
   "sales.dispatch_orders_section": "Ordenes de despacho",
   "sales.no_dispatch_orders": "Sin despacho asignado",
+  "sales.cancel_line_title": "Cancelar linea",
+  "sales.cancel_line_description": "Esta accion liberara la reserva de inventario para esta linea. Si el producto esta dañado, quedara marcado para ajuste manual.",
+  "sales.cancel_line_reason": "Razon de cancelacion",
+  "sales.cancel_line_confirm": "Cancelar linea",
+  "sales.cancel_line_success": "Linea cancelada exitosamente",
+  "sales.cancel_line_error_fallback": "Error al cancelar la linea",
+  "sales.line_status_active": "Activa",
+  "sales.line_status_cancelled": "Cancelada",
+  "sales.line_already_dispatched": "Esta linea ya fue despachada. Usa la orden de despacho para gestionar devoluciones.",
   "sales.confirm_order": "Confirmar",
   "sales.cancel_order": "Cancelar",
   "sales.form.code": "Código",
@@ -1612,6 +1621,10 @@ const esTranslations = {
   "sales.order_delete_not_allowed":
     "La orden no puede eliminarse en su estado actual.",
   "sales.order_not_found": "La orden de venta no existe.",
+  "sales.order_not_confirmed": "La orden de venta no esta confirmada.",
+  "sales.line_not_found": "La linea de la orden no existe.",
+  "sales.line_already_cancelled": "Esta linea ya esta cancelada.",
+  "sales.line_already_dispatched": "Esta linea ya fue despachada. Usa la orden de despacho para gestionar devoluciones.",
   "sales.order_delete_forbidden":
     "La orden no puede eliminarse porque tiene dependencias asociadas.",
   "sales.order_customer_inactive":
@@ -3563,6 +3576,15 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.reservation_released": "Released",
     "sales.dispatch_orders_section": "Dispatch orders",
     "sales.no_dispatch_orders": "No dispatch assigned",
+    "sales.cancel_line_title": "Cancel line",
+    "sales.cancel_line_description": "This will release the inventory reservation for this line. If the product is damaged, it will be flagged for manual adjustment.",
+    "sales.cancel_line_reason": "Cancellation reason",
+    "sales.cancel_line_confirm": "Cancel line",
+    "sales.cancel_line_success": "Line cancelled successfully",
+    "sales.cancel_line_error_fallback": "Error cancelling line",
+    "sales.line_status_active": "Active",
+    "sales.line_status_cancelled": "Cancelled",
+    "sales.line_already_dispatched": "This line has already been dispatched. Use the dispatch order to handle returns.",
     "sales.confirm_order": "Confirm",
     "sales.cancel_order": "Cancel",
     "sales.form.code": "Code",
@@ -3617,6 +3639,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.order_delete_not_allowed":
       "The order cannot be deleted in its current state.",
     "sales.order_not_found": "The sale order does not exist.",
+    "sales.order_not_confirmed": "The sale order is not confirmed.",
+    "sales.line_not_found": "The order line does not exist.",
+    "sales.line_already_cancelled": "This line is already cancelled.",
     "sales.order_delete_forbidden":
       "The order cannot be deleted because it has associated dependencies.",
     "sales.order_customer_inactive":

@@ -9,6 +9,7 @@ import {
   createSaleOrderSchema,
   updateSaleOrderSchema,
   cancelSaleOrderSchema,
+  cancelSaleOrderLineSchema,
   electronicDocumentSchema,
   emitElectronicDocumentSchema,
 } from "./schemas";
@@ -21,5 +22,6 @@ export type SaleOrder = z.infer<typeof saleOrderSchema>;
 export type CreateSaleOrderInput = z.infer<typeof createSaleOrderSchema>;
 export type UpdateSaleOrderInput = z.infer<typeof updateSaleOrderSchema>;
 export type CancelSaleOrderInput = z.infer<typeof cancelSaleOrderSchema>;
+export type CancelSaleOrderLineInput = z.infer<typeof cancelSaleOrderLineSchema>;
 export type ElectronicDocument = z.infer<typeof electronicDocumentSchema>;
 export type EmitElectronicDocumentInput = z.infer<typeof emitElectronicDocumentSchema>;

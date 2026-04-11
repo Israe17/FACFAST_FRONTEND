@@ -9,12 +9,24 @@ import {
   ShoppingCart,
   Truck,
   User,
+  X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Sheet,
   SheetContent,
@@ -28,8 +40,8 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDate, formatDateTime } from "@/shared/lib/utils";
 
-import { useSaleOrderQuery, useResetSaleOrderDispatchStatusMutation } from "../queries";
-import type { SaleOrder } from "../types";
+import { useSaleOrderQuery, useResetSaleOrderDispatchStatusMutation, useCancelSaleOrderLineMutation } from "../queries";
+import type { SaleOrder, SaleOrderLine } from "../types";
 
 type SaleOrderDetailDialogProps = {
   order: SaleOrder | null;
@@ -109,12 +121,17 @@ function SaleOrderDetailDialog({
   onOpenChange,
 }: SaleOrderDetailDialogProps) {
   const { t } = useAppTranslator();
+  const [cancelLineTarget, setCancelLineTarget] = useState<SaleOrderLine | null>(null);
 
   // Fetch full detail (with lines + delivery_charges)
   const detailQuery = useSaleOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
 
   const resetDispatchMutation = useResetSaleOrderDispatchStatusMutation(
+    order?.id ? String(order.id) : "",
+  );
+
+  const cancelLineMutation = useCancelSaleOrderLineMutation(
     order?.id ? String(order.id) : "",
   );
 
@@ -127,6 +144,7 @@ function SaleOrderDetailDialog({
   const grandTotal = linesTotal + chargesTotal;
 
   return (
+  <>
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
@@ -258,14 +276,14 @@ function SaleOrderDetailDialog({
                 .map((line) => (
                   <div
                     key={line.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className={`flex items-center justify-between rounded-lg border p-3 ${line.status === "cancelled" ? "bg-muted/50 opacity-60" : ""}`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <Badge variant="outline" className="text-xs shrink-0">
                         #{line.line_no}
                       </Badge>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className={`text-sm font-medium truncate ${line.status === "cancelled" ? "line-through" : ""}`}>
                           {line.product_variant?.product?.name ?? ""}{" "}
                           {line.product_variant?.variant_name
                             ? `/ ${line.product_variant.variant_name}`
@@ -279,7 +297,11 @@ function SaleOrderDetailDialog({
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-4">
-                      {line.reservation ? (
+                      {line.status === "cancelled" ? (
+                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800">
+                          {t("sales.line_status_cancelled")}
+                        </span>
+                      ) : line.reservation ? (
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${reservationColorMap[line.reservation.status] ?? "bg-gray-100 text-gray-800"}`}
                           title={`${t("sales.reservation_active")}: ${line.reservation.reserved_quantity} | ${t("sales.reservation_consumed")}: ${line.reservation.consumed_quantity} | ${t("sales.reservation_released")}: ${line.reservation.released_quantity}`}
@@ -288,7 +310,7 @@ function SaleOrderDetailDialog({
                         </span>
                       ) : null}
                       <div className="text-right">
-                        <p className="text-sm tabular-nums">
+                        <p className={`text-sm tabular-nums ${line.status === "cancelled" ? "line-through" : ""}`}>
                           {line.quantity} x{" "}
                           {line.unit_price.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
@@ -300,13 +322,26 @@ function SaleOrderDetailDialog({
                             -{line.discount_percent}%
                           </p>
                         ) : null}
-                        <p className="text-sm font-medium tabular-nums">
+                        <p className={`text-sm font-medium tabular-nums ${line.status === "cancelled" ? "line-through" : ""}`}>
                           {(line.line_total ?? 0).toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}
                         </p>
                       </div>
+                      {line.status !== "cancelled" &&
+                        fullOrder.status === "confirmed" &&
+                        fullOrder.lifecycle?.can_cancel ? (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="size-7 text-destructive hover:text-destructive"
+                          onClick={() => setCancelLineTarget(line)}
+                          title={t("sales.cancel_line_title")}
+                        >
+                          <X className="size-3.5" />
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 ))}
@@ -437,6 +472,78 @@ function SaleOrderDetailDialog({
         ) : null}
       </SheetContent>
     </Sheet>
+
+    {cancelLineTarget ? (
+      <CancelLineConfirmDialog
+        line={cancelLineTarget}
+        open={cancelLineTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setCancelLineTarget(null);
+        }}
+        onConfirm={(reason) => {
+          cancelLineMutation.mutate(
+            { lineId: String(cancelLineTarget.id), payload: { reason } },
+            { onSuccess: () => setCancelLineTarget(null) },
+          );
+        }}
+        isPending={cancelLineMutation.isPending}
+      />
+    ) : null}
+  </>
+  );
+}
+
+function CancelLineConfirmDialog({
+  line,
+  open,
+  onOpenChange,
+  onConfirm,
+  isPending,
+}: {
+  line: SaleOrderLine;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (reason: string) => void;
+  isPending: boolean;
+}) {
+  const { t } = useAppTranslator();
+  const [reason, setReason] = useState("");
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("sales.cancel_line_title")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("sales.cancel_line_description")}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="space-y-2">
+          <Label className="text-sm">{t("sales.cancel_line_reason")}</Label>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder={t("sales.cancel_line_reason")}
+            rows={2}
+          />
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>
+            {t("common.cancel")}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm(reason);
+            }}
+            disabled={isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isPending ? t("common.saving") : t("sales.cancel_line_confirm")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

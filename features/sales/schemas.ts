@@ -84,6 +84,7 @@ export const saleOrderLineSchema = z
       .optional()
       .catch(null),
     sale_order_id: idSchema.optional(),
+    status: z.string().optional().catch("active"),
     tax_amount: z.number().optional().catch(0),
     unit_price: z.number(),
     updated_at: z.string().optional(),
@@ -263,6 +264,10 @@ export const createSaleOrderSchema = saleOrderFormObjectSchema.superRefine(apply
 export const updateSaleOrderSchema = saleOrderFormObjectSchema.partial().superRefine(applySaleOrderModeRules);
 
 export const cancelSaleOrderSchema = z.object({
+  reason: optionalTextSchema,
+});
+
+export const cancelSaleOrderLineSchema = z.object({
   reason: optionalTextSchema,
 });
 

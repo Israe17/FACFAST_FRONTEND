@@ -21,6 +21,7 @@ const optionalTextSchema = optionalTrimmedString(z.string());
 const lifecycleFieldSchema = z
   .object({
     can_cancel: z.boolean().optional().catch(false),
+    can_cancel_lines: z.boolean().optional().catch(false),
     can_confirm: z.boolean().optional().catch(false),
     can_delete: z.boolean().optional().catch(false),
     can_edit: z.boolean().optional().catch(false),

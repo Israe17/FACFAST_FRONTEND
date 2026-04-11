@@ -330,8 +330,7 @@ function SaleOrderDetailDialog({
                         </p>
                       </div>
                       {line.status !== "cancelled" &&
-                        fullOrder.status === "confirmed" &&
-                        fullOrder.lifecycle?.can_cancel ? (
+                        fullOrder.lifecycle?.can_cancel_lines ? (
                         <Button
                           size="icon"
                           variant="ghost"

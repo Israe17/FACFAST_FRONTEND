@@ -1624,7 +1624,6 @@ const esTranslations = {
   "sales.order_not_confirmed": "La orden de venta no esta confirmada.",
   "sales.line_not_found": "La linea de la orden no existe.",
   "sales.line_already_cancelled": "Esta linea ya esta cancelada.",
-  "sales.line_already_dispatched": "Esta linea ya fue despachada. Usa la orden de despacho para gestionar devoluciones.",
   "sales.order_delete_forbidden":
     "La orden no puede eliminarse porque tiene dependencias asociadas.",
   "sales.order_customer_inactive":

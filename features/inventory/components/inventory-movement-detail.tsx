@@ -178,7 +178,10 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
     <div className="space-y-6">
       <InventoryEntityHeader
         actions={
-          movement.status === "posted" && canCancelMovement ? (
+          movement.status === "posted" &&
+          canCancelMovement &&
+          movement.source_document_type !== "SaleOrder" &&
+          movement.source_document_type !== "DispatchOrder" ? (
             <Button onClick={() => setCancelOpen(true)} variant="outline">
               {t("inventory.inventory_movements.cancel_action")}
             </Button>
@@ -196,6 +199,12 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             {movement.movement_type ? (
               <Badge variant="outline">
                 {t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as const)}
+              </Badge>
+            ) : null}
+            {movement.source_document_type === "SaleOrder" ||
+            movement.source_document_type === "DispatchOrder" ? (
+              <Badge variant="secondary">
+                {t("inventory.inventory_movements.managed_badge")}
               </Badge>
             ) : null}
           </>

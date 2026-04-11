@@ -1108,6 +1108,7 @@ const esTranslations = {
   "inventory.inventory_movements.cancel_description":
     "Se generara un movimiento compensatorio para revertir {code}.",
   "inventory.inventory_movements.cancel_title": "Cancelar movimiento posteado",
+  "inventory.inventory_movements.managed_badge": "Auto",
   "inventory.inventory_movements.create_adjustment": "Registrar ajuste",
   "inventory.inventory_movements.create_transfer": "Registrar traslado",
   "inventory.inventory_movements.inventory_lot_required":
@@ -1122,6 +1123,10 @@ const esTranslations = {
     "No fue posible registrar el ajuste de inventario.",
   "inventory.inventory_transfer_create_error_fallback":
     "No fue posible registrar el traslado de inventario.",
+  "inventory.movement_managed_by_document":
+    "Este movimiento es gestionado automáticamente. Para revertirlo, cancela la orden de venta o despacho asociada.",
+  "inventory.dispatch_order_has_delivered_stops":
+    "No se puede cancelar un despacho que tiene paradas entregadas.",
   "inventory.inventory_movement_cancel_error_fallback":
     "No fue posible cancelar el movimiento de inventario.",
   "inventory.variant_create_error_fallback":
@@ -3089,6 +3094,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.inventory_movements.cancel_description":
       "A compensating movement will be created to reverse {code}.",
     "inventory.inventory_movements.cancel_title": "Cancel posted movement",
+    "inventory.inventory_movements.managed_badge": "Auto",
     "inventory.inventory_movements.create_adjustment": "Register adjustment",
     "inventory.inventory_movements.create_transfer": "Register transfer",
     "inventory.inventory_movements.inventory_lot_required":
@@ -3103,6 +3109,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to register the inventory adjustment.",
     "inventory.inventory_transfer_create_error_fallback":
       "Unable to register the inventory transfer.",
+    "inventory.movement_managed_by_document":
+      "This movement is automatically managed. To reverse it, cancel the associated sale or dispatch order.",
+    "inventory.dispatch_order_has_delivered_stops":
+      "Cannot cancel a dispatch order that has delivered stops.",
     "inventory.inventory_movement_cancel_error_fallback":
       "Unable to cancel the inventory movement.",
     "inventory.variant_create_error_fallback":

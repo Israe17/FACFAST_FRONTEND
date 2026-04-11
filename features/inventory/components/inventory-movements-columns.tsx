@@ -46,10 +46,25 @@ export function getInventoryMovementsColumns({
     {
       accessorKey: "movement_type",
       header: t("inventory.form.movement_type"),
-      cell: ({ row }) =>
-        row.original.movement_type
-          ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
-          : t("inventory.common.not_available"),
+      cell: ({ row }) => {
+        const isManaged =
+          row.original.source_document_type === "SaleOrder" ||
+          row.original.source_document_type === "DispatchOrder";
+        return (
+          <div className="flex items-center gap-2">
+            <span>
+              {row.original.movement_type
+                ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
+                : t("inventory.common.not_available")}
+            </span>
+            {isManaged ? (
+              <Badge variant="secondary" className="text-xs">
+                {t("inventory.inventory_movements.managed_badge")}
+              </Badge>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "branch",
@@ -103,7 +118,10 @@ export function getInventoryMovementsColumns({
                 {t("inventory.common.view")}
               </Link>
             </Button>
-            {canCancel && row.original.status === "posted" ? (
+            {canCancel &&
+            row.original.status === "posted" &&
+            row.original.source_document_type !== "SaleOrder" &&
+            row.original.source_document_type !== "DispatchOrder" ? (
               <Button
                 onClick={() => onCancel(row.original)}
                 size="sm"

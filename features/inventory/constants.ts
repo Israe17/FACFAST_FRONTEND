@@ -41,6 +41,8 @@ export const ledgerInventoryMovementHeaderTypeValues = [
   "return_out",
   "purchase_expected",
   "sales_allocated",
+  "dispatch_cancelled",
+  "dispatch_return",
 ] as const;
 export const inventoryMovementStatusValues = [
   "draft",

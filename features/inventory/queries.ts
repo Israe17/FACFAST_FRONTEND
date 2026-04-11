@@ -55,6 +55,7 @@ import {
   listInventoryLotsPaginated,
   listInventoryMovements,
   listInventoryMovementsCursor,
+  listInventoryMovementsByDocument,
   listInventoryMovementsPaginated,
   listMeasurementUnits,
   listPriceLists,
@@ -1307,6 +1308,18 @@ export function useInventoryMovementsPaginatedQuery(
     queryKey: [...inventoryKeys.inventoryMovements(), "paginated", params] as const,
     queryFn: () => listInventoryMovementsPaginated(params),
     placeholderData: (prev) => prev,
+  });
+}
+
+export function useInventoryMovementsByDocumentQuery(
+  source_document_type: string,
+  source_document_id: number,
+  enabled = true,
+) {
+  return useQuery({
+    enabled: enabled && !!source_document_id,
+    queryKey: [...inventoryKeys.inventoryMovements(), "by-document", source_document_type, source_document_id] as const,
+    queryFn: () => listInventoryMovementsByDocument(source_document_type, source_document_id),
   });
 }
 

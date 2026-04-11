@@ -12,6 +12,7 @@ import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
 
 import {
   cancelSaleOrder,
+  cancelSaleOrderLine,
   confirmSaleOrder,
   createSaleOrder,
   deleteSaleOrder,
@@ -29,6 +30,7 @@ import {
 } from "./api";
 import type {
   CancelSaleOrderInput,
+  CancelSaleOrderLineInput,
   CreateSaleOrderInput,
   EmitElectronicDocumentInput,
   UpdateSaleOrderInput,
@@ -185,6 +187,32 @@ export function useCancelSaleOrderMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("sales.order_cancel_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useCancelSaleOrderLineMutation(
+  orderId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: ({ lineId, payload }: { lineId: string; payload: CancelSaleOrderLineInput }) =>
+      cancelSaleOrderLine(orderId, lineId, payload),
+    onSuccess: () => {
+      invalidateSalesQueries(queryClient, [salesKeys.orders(), salesKeys.order(orderId)]);
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.dispatchOrders() });
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.inventoryMovements() });
+      toast.success(t("sales.cancel_line_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("sales.cancel_line_error_fallback"),
         });
       }
     },

@@ -1,10 +1,10 @@
 import { http } from "@/shared/lib/http";
-import { extractCollection, extractEntity, compactNullableRecord, toNumberId } from "@/shared/lib/api-helpers";
+import { extractCollection, extractEntity, compactRecord, compactNullableRecord, toNumberId } from "@/shared/lib/api-helpers";
 import { withIdempotencyKey } from "@/shared/lib/idempotency";
 import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQueryParams } from "@/shared/lib/api-types";
 
 import { electronicDocumentSchema, saleOrderSchema } from "./schemas";
-import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput, EmitElectronicDocumentInput } from "./types";
+import type { CreateSaleOrderInput, UpdateSaleOrderInput, CancelSaleOrderInput, CancelSaleOrderLineInput, EmitElectronicDocumentInput } from "./types";
 
 function buildSaleOrderPayload(payload: CreateSaleOrderInput | UpdateSaleOrderInput) {
   return compactNullableRecord({
@@ -75,6 +75,11 @@ export async function confirmSaleOrder(orderId: string) {
 
 export async function cancelSaleOrder(orderId: string, payload: CancelSaleOrderInput) {
   const response = await http.post(`/sale-orders/${orderId}/cancel`, payload, withIdempotencyKey());
+  return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
+}
+
+export async function cancelSaleOrderLine(orderId: string, lineId: string, payload: CancelSaleOrderLineInput) {
+  const response = await http.post(`/sale-orders/${orderId}/lines/${lineId}/cancel`, compactRecord(payload));
   return saleOrderSchema.parse(extractEntity(response.data, ["sale_order", "sale-order"]));
 }
 

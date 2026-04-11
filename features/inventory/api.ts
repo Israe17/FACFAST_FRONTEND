@@ -882,6 +882,16 @@ export async function listInventoryMovementsPaginated(params: PaginatedQueryPara
   return paginatedSchema(inventoryMovementHeaderSchema).parse(response.data);
 }
 
+export async function listInventoryMovementsByDocument(
+  source_document_type: string,
+  source_document_id: number,
+) {
+  const response = await http.get("/inventory-movements", {
+    params: { source_document_type, source_document_id, limit: 50 },
+  });
+  return paginatedSchema(inventoryMovementHeaderSchema).parse(response.data);
+}
+
 export async function listInventoryMovementsCursor(params: CursorQueryParams) {
   const response = await http.get("/inventory-movements/cursor", { params });
   return cursorSchema(inventoryMovementHeaderSchema).parse(response.data);

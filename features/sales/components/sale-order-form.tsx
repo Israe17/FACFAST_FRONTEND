@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
-import { ChevronDown, MapPin, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,9 +55,17 @@ const chargeTypeLabels: Record<string, string> = {
 };
 
 function DeliveryLocationPickerSection({ form }: { form: UseFormReturn<CreateSaleOrderInput> }) {
-  const [isOpen, setIsOpen] = useState(false);
   const latitude = form.watch("delivery_latitude") ?? null;
   const longitude = form.watch("delivery_longitude") ?? null;
+  const [isOpen, setIsOpen] = useState(latitude != null && longitude != null);
+  const { t } = useAppTranslator();
+
+  // Auto-expand when coordinates are filled (e.g. from contact auto-fill)
+  useEffect(() => {
+    if (latitude != null && longitude != null && !isOpen) {
+      setIsOpen(true);
+    }
+  }, [latitude, longitude]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="rounded-lg border border-border/50">
@@ -68,7 +76,7 @@ function DeliveryLocationPickerSection({ form }: { form: UseFormReturn<CreateSal
       >
         <span className="flex items-center gap-1.5">
           <MapPin className="size-3.5" />
-          Ubicación de entrega
+          {t("sales.delivery_location")}
         </span>
         <ChevronDown
           className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -129,6 +137,7 @@ function SaleOrderForm({
   const saleMode = watch("sale_mode");
   const selectedBranchId = watch("branch_id");
   const selectedWarehouseId = watch("warehouse_id");
+  const selectedCustomerId = watch("customer_contact_id");
 
   const isDelivery = fulfillmentMode === "delivery";
   const sellerRequired = saleMode === "seller_attributed" || saleMode === "seller_route";
@@ -209,6 +218,62 @@ function SaleOrderForm({
       setValue("fulfillment_mode", "delivery");
     }
   }, [saleMode, fulfillmentMode, setValue]);
+
+  // Auto-fill delivery fields from selected contact
+  const selectedContact = useMemo(
+    () => contacts.find((c) => String(c.id) === String(selectedCustomerId)),
+    [contacts, selectedCustomerId],
+  );
+  const prevCustomerIdRef = useRef(selectedCustomerId);
+
+  useEffect(() => {
+    if (selectedCustomerId === prevCustomerIdRef.current) return;
+    prevCustomerIdRef.current = selectedCustomerId;
+
+    if (!selectedContact) return;
+
+    if (selectedContact.address) {
+      setValue("delivery_address", selectedContact.address);
+    }
+    if (selectedContact.province) {
+      setValue("delivery_province", selectedContact.province);
+    }
+    if (selectedContact.canton) {
+      setValue("delivery_canton", selectedContact.canton);
+    }
+    if (selectedContact.district) {
+      setValue("delivery_district", selectedContact.district);
+    }
+    if (
+      selectedContact.delivery_latitude != null &&
+      selectedContact.delivery_longitude != null
+    ) {
+      setValue("delivery_latitude", selectedContact.delivery_latitude);
+      setValue("delivery_longitude", selectedContact.delivery_longitude);
+    }
+  }, [selectedCustomerId, selectedContact, setValue]);
+
+  const fillDeliveryFromContact = () => {
+    if (!selectedContact) return;
+    setValue("delivery_address", selectedContact.address ?? undefined);
+    setValue("delivery_province", selectedContact.province ?? undefined);
+    setValue("delivery_canton", selectedContact.canton ?? undefined);
+    setValue("delivery_district", selectedContact.district ?? undefined);
+    setValue(
+      "delivery_latitude",
+      selectedContact.delivery_latitude ?? null,
+    );
+    setValue(
+      "delivery_longitude",
+      selectedContact.delivery_longitude ?? null,
+    );
+  };
+
+  const contactHasLocation =
+    selectedContact?.delivery_latitude != null &&
+    selectedContact?.delivery_longitude != null;
+
+  const contactHasAddress = Boolean(selectedContact?.address);
 
   const activeZones = useMemo(
     () => zones.filter((z) => z.is_active),
@@ -467,7 +532,20 @@ function SaleOrderForm({
       {/* Campos de entrega (condicional) */}
       {fulfillmentMode === "delivery" && (
         <div className="space-y-4 rounded-xl border border-border/70 p-4">
-          <h3 className="font-medium">{t("sales.fulfillment_delivery")}</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium">{t("sales.fulfillment_delivery")}</h3>
+            {selectedContact && (contactHasLocation || contactHasAddress) ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={fillDeliveryFromContact}
+              >
+                <RotateCcw className="size-3.5" />
+                {t("sales.use_contact_location")}
+              </Button>
+            ) : null}
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="so-delivery-address">

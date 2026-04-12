@@ -1595,6 +1595,13 @@ export const dispatchOrderSchema = z.object({
   created_by_user: z.object({ id: idSchema, name: z.string() }).nullable().optional().catch(null),
   stops: z.array(dispatchStopSchema).optional().catch([]),
   expenses: z.array(dispatchExpenseSchema).optional().catch([]),
+  movements: z.array(z.object({
+    id: idSchema,
+    code: z.string().nullable().optional(),
+    movement_type: z.string().nullable().optional(),
+    status: z.string().nullable().optional(),
+    occurred_at: z.string().optional(),
+  })).optional().catch([]),
   lifecycle: z.object({
     can_ready: z.boolean().optional().catch(false),
     can_edit: z.boolean().optional().catch(false),

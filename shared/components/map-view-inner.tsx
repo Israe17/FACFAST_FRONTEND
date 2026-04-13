@@ -153,24 +153,36 @@ function MapViewInner({
 
     layer.clearLayers();
 
-    for (const m of markers) {
+    // Sort so selected markers render last (on top of overlapping markers)
+    const sorted = [...markers].sort((a, b) => {
+      const aSelected = a.id === selectedMarkerId ? 1 : 0;
+      const bSelected = b.id === selectedMarkerId ? 1 : 0;
+      const aHighlight = (a.opacity ?? 1) >= 1 ? 1 : 0;
+      const bHighlight = (b.opacity ?? 1) >= 1 ? 1 : 0;
+      return (aHighlight - bHighlight) || (aSelected - bSelected);
+    });
+
+    for (const m of sorted) {
       const color =
         m.color ?? STOP_STATUS_COLORS[m.status ?? ""] ?? "#3b82f6";
       const isSelected = m.id === selectedMarkerId;
 
+      const opacity = m.opacity ?? 1;
       const icon = L.divIcon({
         className: "",
         html: `<div style="
           width: ${isSelected ? 32 : 24}px; height: ${isSelected ? 32 : 24}px; border-radius: 50%;
           background: ${color}; border: ${isSelected ? "4px solid #1d4ed8" : "3px solid white"};
           box-shadow: ${isSelected ? "0 0 0 3px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.4)" : "0 2px 6px rgba(0,0,0,0.3)"};
+          opacity: ${opacity};
         "></div>`,
         iconSize: isSelected ? [32, 32] : [24, 24],
         iconAnchor: isSelected ? [16, 16] : [12, 12],
         popupAnchor: [0, isSelected ? -18 : -14],
       });
 
-      const marker = L.marker([m.lat, m.lng], { icon }).addTo(layer);
+      const zOffset = isSelected ? 2000 : opacity >= 1 ? 1000 : 0;
+      const marker = L.marker([m.lat, m.lng], { icon, zIndexOffset: zOffset }).addTo(layer);
 
       if (m.popup) {
         marker.bindPopup(typeof m.popup === "string" ? m.popup : "");

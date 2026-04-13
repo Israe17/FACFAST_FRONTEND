@@ -221,6 +221,11 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
             ).length;
             const totalStops = (order.stops ?? []).length;
 
+            const whId = order.origin_warehouse_id ?? order.origin_warehouse?.id;
+            const whHasCoords = whId
+              ? Boolean(warehouses.find((w) => String(w.id) === String(whId))?.latitude)
+              : false;
+
             return (
               <div
                 key={order.id}
@@ -254,10 +259,20 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
                     {totalStops} {t("inventory.dispatch.stops_label")}
                     {stopsWithCoords < totalStops ? (
                       <span className="text-amber-600">
-                        ({totalStops - stopsWithCoords} sin ubicación)
+                        ({totalStops - stopsWithCoords} {t("inventory.dispatch.stops_no_location")})
                       </span>
                     ) : null}
                   </p>
+                  {whId && !whHasCoords ? (
+                    <p className="text-amber-600">
+                      ({t("inventory.dispatch.warehouse_no_location")})
+                    </p>
+                  ) : null}
+                  {!whId ? (
+                    <p className="text-amber-600">
+                      ({t("inventory.dispatch.no_origin_warehouse")})
+                    </p>
+                  ) : null}
                 </div>
               </div>
             );
@@ -275,9 +290,9 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
-            color: m.id.startsWith("warehouse-")
-              ? m.color
-              : selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
+            opacity: m.id.startsWith("warehouse-")
+              ? 1
+              : selectedOrderId && !selectedMarkerIds.has(m.id) ? 0.3 : 1,
           }))}
           polylines={polylines}
           polygons={zonePolygons}

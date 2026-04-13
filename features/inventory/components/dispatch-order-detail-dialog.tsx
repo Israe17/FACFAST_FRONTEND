@@ -28,7 +28,7 @@ import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder, DispatchStop } from "../types";
-import { useDispatchOrderQuery, useInventoryMovementsByDocumentQuery } from "../queries";
+import { useDispatchOrderQuery } from "../queries";
 import { UpdateStopStatusDialog } from "./update-stop-status-dialog";
 
 type DispatchOrderDetailDialogProps = {
@@ -101,17 +101,11 @@ function DispatchOrderDetailDialog({
   const detailQuery = useDispatchOrderQuery(order?.id ? String(order.id) : "");
   const fullOrder = detailQuery.data ?? order;
 
-  const movementsQuery = useInventoryMovementsByDocumentQuery(
-    "DispatchOrder",
-    fullOrder?.id ? Number(fullOrder.id) : 0,
-    !!fullOrder?.id,
-  );
-  const movements = movementsQuery.data?.data ?? [];
-
   if (!fullOrder) return null;
 
   const stops = fullOrder.stops ?? [];
   const expenses = fullOrder.expenses ?? [];
+  const movements = fullOrder.movements ?? [];
   const lifecycle = fullOrder.lifecycle ?? {};
 
   return (

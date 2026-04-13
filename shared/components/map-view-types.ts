@@ -7,6 +7,7 @@ export type MapMarker = {
   status?: string;
   popup?: string | ReactNode;
   color?: string;
+  opacity?: number;
 };
 
 export type MapPolyline = {

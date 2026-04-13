@@ -153,7 +153,16 @@ function MapViewInner({
 
     layer.clearLayers();
 
-    for (const m of markers) {
+    // Sort so selected markers render last (on top of overlapping markers)
+    const sorted = [...markers].sort((a, b) => {
+      const aSelected = a.id === selectedMarkerId ? 1 : 0;
+      const bSelected = b.id === selectedMarkerId ? 1 : 0;
+      const aHighlight = (a.opacity ?? 1) >= 1 ? 1 : 0;
+      const bHighlight = (b.opacity ?? 1) >= 1 ? 1 : 0;
+      return (aHighlight - bHighlight) || (aSelected - bSelected);
+    });
+
+    for (const m of sorted) {
       const color =
         m.color ?? STOP_STATUS_COLORS[m.status ?? ""] ?? "#3b82f6";
       const isSelected = m.id === selectedMarkerId;
@@ -172,7 +181,8 @@ function MapViewInner({
         popupAnchor: [0, isSelected ? -18 : -14],
       });
 
-      const marker = L.marker([m.lat, m.lng], { icon }).addTo(layer);
+      const zOffset = isSelected ? 2000 : opacity >= 1 ? 1000 : 0;
+      const marker = L.marker([m.lat, m.lng], { icon, zIndexOffset: zOffset }).addTo(layer);
 
       if (m.popup) {
         marker.bindPopup(typeof m.popup === "string" ? m.popup : "");

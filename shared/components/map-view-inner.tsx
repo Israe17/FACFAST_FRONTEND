@@ -158,12 +158,14 @@ function MapViewInner({
         m.color ?? STOP_STATUS_COLORS[m.status ?? ""] ?? "#3b82f6";
       const isSelected = m.id === selectedMarkerId;
 
+      const opacity = m.opacity ?? 1;
       const icon = L.divIcon({
         className: "",
         html: `<div style="
           width: ${isSelected ? 32 : 24}px; height: ${isSelected ? 32 : 24}px; border-radius: 50%;
           background: ${color}; border: ${isSelected ? "4px solid #1d4ed8" : "3px solid white"};
           box-shadow: ${isSelected ? "0 0 0 3px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.4)" : "0 2px 6px rgba(0,0,0,0.3)"};
+          opacity: ${opacity};
         "></div>`,
         iconSize: isSelected ? [32, 32] : [24, 24],
         iconAnchor: isSelected ? [16, 16] : [12, 12],

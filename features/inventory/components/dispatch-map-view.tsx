@@ -275,9 +275,9 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOr
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
-            color: m.id.startsWith("warehouse-")
-              ? m.color
-              : selectedMarkerIds.has(m.id) ? undefined : selectedOrderId ? "#94a3b8" : undefined,
+            opacity: m.id.startsWith("warehouse-")
+              ? 1
+              : selectedOrderId && !selectedMarkerIds.has(m.id) ? 0.3 : 1,
           }))}
           polylines={polylines}
           polygons={zonePolygons}

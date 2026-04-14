@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,10 +23,9 @@ import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
 import type { Product, Warehouse, WarehouseStockRow, Zone } from "@/features/inventory/types";
-import { listBranchPriceLists, listProductPrices } from "@/features/inventory/api";
 import {
-  inventoryKeys,
   useBranchPriceListsQuery,
+  useVariantPriceResolver,
   useWarehouseStockByWarehouseQuery,
 } from "@/features/inventory/queries";
 
@@ -336,7 +334,7 @@ function SaleOrderForm({
   );
 
   // --- Price resolution from branch price lists ---
-  const queryClient = useQueryClient();
+  const resolvePrice = useVariantPriceResolver();
 
   const branchPriceListsQuery = useBranchPriceListsQuery(
     selectedBranchId ?? "",
@@ -373,64 +371,9 @@ function SaleOrderForm({
       if (!product) return;
 
       try {
-        const branchData = await queryClient.fetchQuery({
-          queryKey: inventoryKeys.branchPriceLists(selectedBranchId),
-          queryFn: () => listBranchPriceLists(selectedBranchId),
-          staleTime: 5 * 60 * 1000,
-        });
-
-        if (!branchData || branchData.assignments.length === 0) {
-          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
-          return;
-        }
-
-        const branchPriceListIds = new Set(
-          branchData.assignments
-            .filter((a) => a.is_active && a.price_list?.id)
-            .map((a) => String(a.price_list!.id)),
-        );
-
-        if (branchPriceListIds.size === 0) {
-          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
-          return;
-        }
-
-        const productPrices = await queryClient.fetchQuery({
-          queryKey: inventoryKeys.productPrices(String(product.id)),
-          queryFn: () => listProductPrices(String(product.id)),
-          staleTime: 5 * 60 * 1000,
-        });
-
-        const now = new Date().toISOString();
-        const defaultPriceListId = branchData.default_price_list_id
-          ? String(branchData.default_price_list_id)
-          : null;
-
-        const candidates = productPrices.filter((pp) => {
-          if (!pp.is_active) return false;
-          if (!pp.price_list?.id || !branchPriceListIds.has(String(pp.price_list.id)))
-            return false;
-          const ppVariantId = pp.product_variant?.id;
-          if (ppVariantId && String(ppVariantId) !== variantId) return false;
-          if (pp.valid_from && pp.valid_from > now) return false;
-          if (pp.valid_to && pp.valid_to < now) return false;
-          return true;
-        });
-
-        const sorted = [...candidates].sort((a, b) => {
-          const aExact = a.product_variant?.id ? 1 : 0;
-          const bExact = b.product_variant?.id ? 1 : 0;
-          if (aExact !== bExact) return bExact - aExact;
-          const aDefault =
-            defaultPriceListId && String(a.price_list?.id) === defaultPriceListId ? 1 : 0;
-          const bDefault =
-            defaultPriceListId && String(b.price_list?.id) === defaultPriceListId ? 1 : 0;
-          return bDefault - aDefault;
-        });
-
-        const best = sorted[0];
-        if (best?.price != null) {
-          setValue(`lines.${index}.unit_price`, best.price);
+        const price = await resolvePrice(selectedBranchId, String(product.id), variantId);
+        if (price != null) {
+          setValue(`lines.${index}.unit_price`, price);
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: true }));
         } else {
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
@@ -439,7 +382,7 @@ function SaleOrderForm({
         // If fetch fails, don't change anything
       }
     },
-    [selectedBranchId, variantToProductMap, queryClient, setValue],
+    [selectedBranchId, variantToProductMap, resolvePrice, setValue],
   );
 
   // When variant is selected, resolve its price

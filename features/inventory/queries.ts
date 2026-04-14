@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -621,6 +622,75 @@ export function useProductPricesQuery(productId: string, enabled = true) {
     queryKey: inventoryKeys.productPrices(productId),
     queryFn: () => listProductPrices(productId),
   });
+}
+
+/**
+ * Returns an async function that resolves the best price for a given
+ * variant in a branch's price lists.  Leverages React Query cache so
+ * repeated lookups are instant.
+ */
+export function useVariantPriceResolver() {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    async (
+      branchId: string,
+      productId: string,
+      variantId: string,
+    ): Promise<number | null> => {
+      const branchData = await queryClient.fetchQuery({
+        queryKey: inventoryKeys.branchPriceLists(branchId),
+        queryFn: () => listBranchPriceLists(branchId),
+        staleTime: 5 * 60 * 1000,
+      });
+
+      if (!branchData || branchData.assignments.length === 0) return null;
+
+      const branchPriceListIds = new Set(
+        branchData.assignments
+          .filter((a) => a.is_active && a.price_list?.id)
+          .map((a) => String(a.price_list!.id)),
+      );
+
+      if (branchPriceListIds.size === 0) return null;
+
+      const productPrices = await queryClient.fetchQuery({
+        queryKey: inventoryKeys.productPrices(productId),
+        queryFn: () => listProductPrices(productId),
+        staleTime: 5 * 60 * 1000,
+      });
+
+      const now = new Date().toISOString();
+      const defaultPriceListId = branchData.default_price_list_id
+        ? String(branchData.default_price_list_id)
+        : null;
+
+      const candidates = productPrices.filter((pp) => {
+        if (!pp.is_active) return false;
+        if (!pp.price_list?.id || !branchPriceListIds.has(String(pp.price_list.id)))
+          return false;
+        const ppVariantId = pp.product_variant?.id;
+        if (ppVariantId && String(ppVariantId) !== variantId) return false;
+        if (pp.valid_from && pp.valid_from > now) return false;
+        if (pp.valid_to && pp.valid_to < now) return false;
+        return true;
+      });
+
+      const sorted = [...candidates].sort((a, b) => {
+        const aExact = a.product_variant?.id ? 1 : 0;
+        const bExact = b.product_variant?.id ? 1 : 0;
+        if (aExact !== bExact) return bExact - aExact;
+        const aDefault =
+          defaultPriceListId && String(a.price_list?.id) === defaultPriceListId ? 1 : 0;
+        const bDefault =
+          defaultPriceListId && String(b.price_list?.id) === defaultPriceListId ? 1 : 0;
+        return bDefault - aDefault;
+      });
+
+      return sorted[0]?.price ?? null;
+    },
+    [queryClient],
+  );
 }
 
 export function useCreateProductPriceMutation(

@@ -364,17 +364,15 @@ function SaleOrderForm({
     setVariantPriceStatus({});
   }, [selectedBranchId]);
 
-  const handleVariantChange = useCallback(
-    async (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
-      fieldOnChange(variantId);
-
+  // Resolve price for a single variant against the branch's price lists
+  const resolveVariantPrice = useCallback(
+    async (index: number, variantId: string) => {
       if (!selectedBranchId) return;
 
       const product = variantToProductMap.get(variantId);
       if (!product) return;
 
       try {
-        // Await branch price lists (uses cache if already fetched)
         const branchData = await queryClient.fetchQuery({
           queryKey: inventoryKeys.branchPriceLists(selectedBranchId),
           queryFn: () => listBranchPriceLists(selectedBranchId),
@@ -397,7 +395,6 @@ function SaleOrderForm({
           return;
         }
 
-        // Await product prices (uses cache if already fetched)
         const productPrices = await queryClient.fetchQuery({
           queryKey: inventoryKeys.productPrices(String(product.id)),
           queryFn: () => listProductPrices(String(product.id)),
@@ -409,7 +406,6 @@ function SaleOrderForm({
           ? String(branchData.default_price_list_id)
           : null;
 
-        // Find matching prices: active, in branch price list, matching variant or default
         const candidates = productPrices.filter((pp) => {
           if (!pp.is_active) return false;
           if (!pp.price_list?.id || !branchPriceListIds.has(String(pp.price_list.id)))
@@ -421,7 +417,6 @@ function SaleOrderForm({
           return true;
         });
 
-        // Prioritize: exact variant + default list > exact variant + any list > default variant + default list > default variant + any list
         const sorted = [...candidates].sort((a, b) => {
           const aExact = a.product_variant?.id ? 1 : 0;
           const bExact = b.product_variant?.id ? 1 : 0;
@@ -446,6 +441,27 @@ function SaleOrderForm({
     },
     [selectedBranchId, variantToProductMap, queryClient, setValue],
   );
+
+  // When variant is selected, resolve its price
+  const handleVariantChange = useCallback(
+    (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
+      fieldOnChange(variantId);
+      resolveVariantPrice(index, variantId);
+    },
+    [resolveVariantPrice],
+  );
+
+  // Re-resolve prices for existing lines when branch changes
+  const watchedLines = watch("lines");
+  useEffect(() => {
+    if (!selectedBranchId) return;
+    for (let i = 0; i < watchedLines.length; i++) {
+      const variantId = watchedLines[i]?.product_variant_id;
+      if (variantId) {
+        resolveVariantPrice(i, variantId);
+      }
+    }
+  }, [selectedBranchId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasBranchPriceLists =
     !selectedBranchId ||

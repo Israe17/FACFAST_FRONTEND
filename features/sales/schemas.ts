@@ -130,7 +130,10 @@ export const createSaleOrderLineSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(0, "El precio debe ser 0 o mayor."),
   ),
-  serial_ids: z.array(z.number()).optional().default([]),
+  serial_ids: z.preprocess(
+    (v) => (Array.isArray(v) ? v.map(Number) : []),
+    z.array(z.number()).default([]),
+  ),
 });
 
 // --- Sale Order Delivery Charge ---

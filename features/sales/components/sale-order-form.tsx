@@ -912,11 +912,13 @@ function SaleOrderForm({
                     </td>
                   </tr>
                   {(() => {
-                    const variantId = watch(`lines.${index}.product_variant_id`);
+                    const lineData = watchedLines[index];
+                    const variantId = lineData?.product_variant_id;
                     const product = variantId
                       ? variantToProductMap.get(variantId)
                       : undefined;
                     if (!product?.track_serials) return null;
+                    const selectedSerialCount = (lineData?.serial_ids ?? []).length;
                     return (
                       <tr key={`${field.id}-serials`} className="border-b last:border-b-0 bg-muted/30">
                         <td colSpan={6} className="px-3 py-2">
@@ -930,10 +932,10 @@ function SaleOrderForm({
                             variantId={variantId}
                             warehouseId={selectedWarehouseId}
                           />
-                          {(watch(`lines.${index}.serial_ids`) ?? []).length > 0 && (
+                          {selectedSerialCount > 0 && (
                             <p className="text-xs text-muted-foreground mt-1">
                               {t("sales.form.serials_selected", {
-                                count: (watch(`lines.${index}.serial_ids`) ?? []).length,
+                                count: selectedSerialCount,
                               })}
                             </p>
                           )}

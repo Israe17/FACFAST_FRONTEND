@@ -1604,6 +1604,8 @@ const esTranslations = {
   "sales.form.charge_type": "Tipo de cargo",
   "sales.form.amount": "Monto",
   "sales.form.reason": "Razón",
+  "sales.form.no_price_in_list": "Sin precio en lista de precios",
+  "sales.form.no_branch_price_list": "La sucursal no tiene lista de precios asignada",
   "sales.order_seller_required":
     "El vendedor es requerido para el modo de venta seleccionado.",
   "sales.order_route_requires_delivery":
@@ -3626,6 +3628,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.form.charge_type": "Charge type",
     "sales.form.amount": "Amount",
     "sales.form.reason": "Reason",
+    "sales.form.no_price_in_list": "No price in price list",
+    "sales.form.no_branch_price_list": "Branch has no assigned price list",
     "sales.order_seller_required":
       "A seller is required for the selected sale mode.",
     "sales.order_route_requires_delivery":

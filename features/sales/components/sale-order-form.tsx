@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
-import { ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,12 @@ import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
 import type { Product, Warehouse, WarehouseStockRow, Zone } from "@/features/inventory/types";
-import { useWarehouseStockByWarehouseQuery } from "@/features/inventory/queries";
+import { listProductPrices } from "@/features/inventory/api";
+import {
+  inventoryKeys,
+  useBranchPriceListsQuery,
+  useWarehouseStockByWarehouseQuery,
+} from "@/features/inventory/queries";
 
 import {
   deliveryChargeTypeValues,
@@ -329,6 +335,116 @@ function SaleOrderForm({
     [products, hasWarehouse, stockByVariantId],
   );
 
+  // --- Price resolution from branch price lists ---
+  const queryClient = useQueryClient();
+
+  const branchPriceListsQuery = useBranchPriceListsQuery(
+    selectedBranchId ?? "",
+    Boolean(selectedBranchId),
+  );
+
+  // Map variant_id → product for quick lookup
+  const variantToProductMap = useMemo(() => {
+    const map = new Map<string, Product>();
+    for (const product of products) {
+      for (const variant of product.variants ?? []) {
+        map.set(String(variant.id), product);
+      }
+    }
+    return map;
+  }, [products]);
+
+  // Track which variants have no price (keyed by variant_id)
+  const [variantPriceStatus, setVariantPriceStatus] = useState<
+    Record<string, boolean>
+  >({});
+
+  // Clear price status when branch changes (prices depend on branch)
+  useEffect(() => {
+    setVariantPriceStatus({});
+  }, [selectedBranchId]);
+
+  const handleVariantChange = useCallback(
+    async (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
+      fieldOnChange(variantId);
+
+      if (!selectedBranchId) return;
+
+      const product = variantToProductMap.get(variantId);
+      if (!product) return;
+
+      const branchData = branchPriceListsQuery.data;
+      if (!branchData || branchData.assignments.length === 0) {
+        setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
+        return;
+      }
+
+      const branchPriceListIds = new Set(
+        branchData.assignments
+          .filter((a) => a.is_active && a.price_list?.id)
+          .map((a) => String(a.price_list!.id)),
+      );
+
+      if (branchPriceListIds.size === 0) {
+        setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
+        return;
+      }
+
+      try {
+        const productPrices = await queryClient.fetchQuery({
+          queryKey: inventoryKeys.productPrices(String(product.id)),
+          queryFn: () => listProductPrices(String(product.id)),
+          staleTime: 5 * 60 * 1000,
+        });
+
+        const now = new Date().toISOString();
+        const defaultPriceListId = branchData.default_price_list_id
+          ? String(branchData.default_price_list_id)
+          : null;
+
+        // Find matching prices: active, in branch price list, matching variant or default
+        const candidates = productPrices.filter((pp) => {
+          if (!pp.is_active) return false;
+          if (!pp.price_list?.id || !branchPriceListIds.has(String(pp.price_list.id)))
+            return false;
+          const ppVariantId = pp.product_variant?.id;
+          if (ppVariantId && String(ppVariantId) !== variantId) return false;
+          if (pp.valid_from && pp.valid_from > now) return false;
+          if (pp.valid_to && pp.valid_to < now) return false;
+          return true;
+        });
+
+        // Prioritize: exact variant + default list > exact variant + any list > default variant + default list > default variant + any list
+        const sorted = [...candidates].sort((a, b) => {
+          const aExact = a.product_variant?.id ? 1 : 0;
+          const bExact = b.product_variant?.id ? 1 : 0;
+          if (aExact !== bExact) return bExact - aExact;
+          const aDefault =
+            defaultPriceListId && String(a.price_list?.id) === defaultPriceListId ? 1 : 0;
+          const bDefault =
+            defaultPriceListId && String(b.price_list?.id) === defaultPriceListId ? 1 : 0;
+          return bDefault - aDefault;
+        });
+
+        const best = sorted[0];
+        if (best?.price != null) {
+          setValue(`lines.${index}.unit_price`, best.price);
+          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: true }));
+        } else {
+          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
+        }
+      } catch {
+        // If fetch fails, don't change anything
+      }
+    },
+    [selectedBranchId, variantToProductMap, branchPriceListsQuery.data, queryClient, setValue],
+  );
+
+  const hasBranchPriceLists =
+    !selectedBranchId ||
+    branchPriceListsQuery.isLoading ||
+    (branchPriceListsQuery.data?.assignments ?? []).some((a) => a.is_active);
+
   return (
     <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
@@ -435,6 +551,12 @@ function SaleOrderForm({
             )}
           />
           <FormFieldError message={errors.branch_id?.message} />
+          {!hasBranchPriceLists && (
+            <p className="text-xs text-amber-600 flex items-center gap-1">
+              <AlertCircle className="size-3 shrink-0" />
+              {t("sales.form.no_branch_price_list")}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -711,21 +833,32 @@ function SaleOrderForm({
                         control={control}
                         name={`lines.${index}.product_variant_id`}
                         render={({ field: selectField }) => (
-                          <Select
-                            onValueChange={selectField.onChange}
-                            value={selectField.value}
-                          >
-                            <SelectTrigger className="h-8 min-w-[180px]">
-                              <SelectValue placeholder="Selecciona producto" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {variantOptions.map((opt) => (
-                                <SelectItem key={opt.id} value={opt.id}>
-                                  {opt.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <>
+                            <Select
+                              onValueChange={(value) =>
+                                handleVariantChange(index, value, selectField.onChange)
+                              }
+                              value={selectField.value}
+                            >
+                              <SelectTrigger className="h-8 min-w-[180px]">
+                                <SelectValue placeholder="Selecciona producto" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {variantOptions.map((opt) => (
+                                  <SelectItem key={opt.id} value={opt.id}>
+                                    {opt.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {selectField.value &&
+                              variantPriceStatus[selectField.value] === false && (
+                                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                                  <AlertCircle className="size-3 shrink-0" />
+                                  {t("sales.form.no_price_in_list")}
+                                </p>
+                              )}
+                          </>
                         )}
                       />
                       <FormFieldError

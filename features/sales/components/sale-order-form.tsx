@@ -364,37 +364,22 @@ function SaleOrderForm({
     setVariantPriceStatus({});
   }, [selectedBranchId]);
 
-  const handleVariantChange = useCallback(
-    async (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
-      fieldOnChange(variantId);
-
-      console.log("[PriceResolve] handleVariantChange called", { index, variantId, selectedBranchId });
-
-      if (!selectedBranchId) {
-        console.log("[PriceResolve] No branch selected, skipping");
-        return;
-      }
+  // Resolve price for a single variant against the branch's price lists
+  const resolveVariantPrice = useCallback(
+    async (index: number, variantId: string) => {
+      if (!selectedBranchId) return;
 
       const product = variantToProductMap.get(variantId);
-      if (!product) {
-        console.log("[PriceResolve] Product not found for variant", variantId, "map keys:", [...variantToProductMap.keys()]);
-        return;
-      }
-
-      console.log("[PriceResolve] Found product", product.id, product.name);
+      if (!product) return;
 
       try {
-        // Await branch price lists (uses cache if already fetched)
         const branchData = await queryClient.fetchQuery({
           queryKey: inventoryKeys.branchPriceLists(selectedBranchId),
           queryFn: () => listBranchPriceLists(selectedBranchId),
           staleTime: 5 * 60 * 1000,
         });
 
-        console.log("[PriceResolve] branchData", JSON.stringify(branchData, null, 2));
-
         if (!branchData || branchData.assignments.length === 0) {
-          console.log("[PriceResolve] No branch assignments found");
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
           return;
         }
@@ -405,29 +390,22 @@ function SaleOrderForm({
             .map((a) => String(a.price_list!.id)),
         );
 
-        console.log("[PriceResolve] branchPriceListIds", [...branchPriceListIds]);
-
         if (branchPriceListIds.size === 0) {
-          console.log("[PriceResolve] No active price list IDs");
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
           return;
         }
 
-        // Await product prices (uses cache if already fetched)
         const productPrices = await queryClient.fetchQuery({
           queryKey: inventoryKeys.productPrices(String(product.id)),
           queryFn: () => listProductPrices(String(product.id)),
           staleTime: 5 * 60 * 1000,
         });
 
-        console.log("[PriceResolve] productPrices", JSON.stringify(productPrices, null, 2));
-
         const now = new Date().toISOString();
         const defaultPriceListId = branchData.default_price_list_id
           ? String(branchData.default_price_list_id)
           : null;
 
-        // Find matching prices: active, in branch price list, matching variant or default
         const candidates = productPrices.filter((pp) => {
           if (!pp.is_active) return false;
           if (!pp.price_list?.id || !branchPriceListIds.has(String(pp.price_list.id)))
@@ -439,9 +417,6 @@ function SaleOrderForm({
           return true;
         });
 
-        console.log("[PriceResolve] candidates", candidates.length, JSON.stringify(candidates, null, 2));
-
-        // Prioritize: exact variant + default list > exact variant + any list > default variant + default list > default variant + any list
         const sorted = [...candidates].sort((a, b) => {
           const aExact = a.product_variant?.id ? 1 : 0;
           const bExact = b.product_variant?.id ? 1 : 0;
@@ -455,19 +430,38 @@ function SaleOrderForm({
 
         const best = sorted[0];
         if (best?.price != null) {
-          console.log("[PriceResolve] Setting price", best.price, "for line", index);
           setValue(`lines.${index}.unit_price`, best.price);
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: true }));
         } else {
-          console.log("[PriceResolve] No matching price found");
           setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
         }
-      } catch (err) {
-        console.error("[PriceResolve] Error:", err);
+      } catch {
+        // If fetch fails, don't change anything
       }
     },
     [selectedBranchId, variantToProductMap, queryClient, setValue],
   );
+
+  // When variant is selected, resolve its price
+  const handleVariantChange = useCallback(
+    (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
+      fieldOnChange(variantId);
+      resolveVariantPrice(index, variantId);
+    },
+    [resolveVariantPrice],
+  );
+
+  // Re-resolve prices for existing lines when branch changes
+  const watchedLines = watch("lines");
+  useEffect(() => {
+    if (!selectedBranchId) return;
+    for (let i = 0; i < watchedLines.length; i++) {
+      const variantId = watchedLines[i]?.product_variant_id;
+      if (variantId) {
+        resolveVariantPrice(i, variantId);
+      }
+    }
+  }, [selectedBranchId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasBranchPriceLists =
     !selectedBranchId ||

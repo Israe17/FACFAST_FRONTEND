@@ -1606,6 +1606,11 @@ const esTranslations = {
   "sales.form.reason": "Razón",
   "sales.form.no_price_in_list": "Sin precio en lista de precios",
   "sales.form.no_branch_price_list": "La sucursal no tiene lista de precios asignada",
+  "sales.form.select_serials": "Seleccionar seriales",
+  "sales.form.no_serials_available": "No hay seriales disponibles",
+  "sales.form.select_warehouse_for_serials": "Selecciona una bodega para ver seriales",
+  "sales.form.serials_selected": "{{count}} serial(es) seleccionado(s)",
+  "sales.assigned_serials": "Seriales asignados",
   "sales.order_seller_required":
     "El vendedor es requerido para el modo de venta seleccionado.",
   "sales.order_route_requires_delivery":
@@ -3630,6 +3635,11 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.form.reason": "Reason",
     "sales.form.no_price_in_list": "No price in price list",
     "sales.form.no_branch_price_list": "Branch has no assigned price list",
+    "sales.form.select_serials": "Select serials",
+    "sales.form.no_serials_available": "No serials available",
+    "sales.form.select_warehouse_for_serials": "Select a warehouse to see serials",
+    "sales.form.serials_selected": "{{count}} serial(s) selected",
+    "sales.assigned_serials": "Assigned serials",
     "sales.order_seller_required":
       "A seller is required for the selected sale mode.",
     "sales.order_route_requires_delivery":

@@ -24,7 +24,7 @@ import type { Branch } from "@/features/branches/types";
 import type { Contact } from "@/features/contacts/types";
 import type { User } from "@/features/users/types";
 import type { Product, Warehouse, WarehouseStockRow, Zone } from "@/features/inventory/types";
-import { listProductPrices } from "@/features/inventory/api";
+import { listBranchPriceLists, listProductPrices } from "@/features/inventory/api";
 import {
   inventoryKeys,
   useBranchPriceListsQuery,
@@ -373,24 +373,31 @@ function SaleOrderForm({
       const product = variantToProductMap.get(variantId);
       if (!product) return;
 
-      const branchData = branchPriceListsQuery.data;
-      if (!branchData || branchData.assignments.length === 0) {
-        setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
-        return;
-      }
-
-      const branchPriceListIds = new Set(
-        branchData.assignments
-          .filter((a) => a.is_active && a.price_list?.id)
-          .map((a) => String(a.price_list!.id)),
-      );
-
-      if (branchPriceListIds.size === 0) {
-        setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
-        return;
-      }
-
       try {
+        // Await branch price lists (uses cache if already fetched)
+        const branchData = await queryClient.fetchQuery({
+          queryKey: inventoryKeys.branchPriceLists(selectedBranchId),
+          queryFn: () => listBranchPriceLists(selectedBranchId),
+          staleTime: 5 * 60 * 1000,
+        });
+
+        if (!branchData || branchData.assignments.length === 0) {
+          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
+          return;
+        }
+
+        const branchPriceListIds = new Set(
+          branchData.assignments
+            .filter((a) => a.is_active && a.price_list?.id)
+            .map((a) => String(a.price_list!.id)),
+        );
+
+        if (branchPriceListIds.size === 0) {
+          setVariantPriceStatus((prev) => ({ ...prev, [variantId]: false }));
+          return;
+        }
+
+        // Await product prices (uses cache if already fetched)
         const productPrices = await queryClient.fetchQuery({
           queryKey: inventoryKeys.productPrices(String(product.id)),
           queryFn: () => listProductPrices(String(product.id)),
@@ -437,7 +444,7 @@ function SaleOrderForm({
         // If fetch fails, don't change anything
       }
     },
-    [selectedBranchId, variantToProductMap, branchPriceListsQuery.data, queryClient, setValue],
+    [selectedBranchId, variantToProductMap, queryClient, setValue],
   );
 
   const hasBranchPriceLists =

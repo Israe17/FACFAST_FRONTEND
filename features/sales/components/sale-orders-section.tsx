@@ -18,6 +18,7 @@ import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import { useBranchesQuery } from "@/features/branches/queries";
@@ -30,7 +31,7 @@ import {
 } from "@/features/inventory/queries";
 
 import {
-  useSaleOrdersQuery,
+  useSaleOrdersPaginatedQuery,
   useConfirmSaleOrderMutation,
   useCancelSaleOrderMutation,
   useDeleteSaleOrderMutation,
@@ -69,7 +70,8 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
   const productsQuery = useProductsQuery(enabled && canView);
   const zonesQuery = useZonesQuery(enabled && canView);
 
-  const ordersQuery = useSaleOrdersQuery(enabled && canView);
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "order_date", sort_order: "DESC" });
+  const ordersQuery = useSaleOrdersPaginatedQuery(queryParams, enabled && canView);
   const confirmMutation = useConfirmSaleOrderMutation(confirmTarget?.id ?? "", {
     showErrorToast: true,
   });
@@ -164,10 +166,14 @@ function SaleOrdersSection({ enabled = true }: SaleOrdersSectionProps) {
         >
           <DataTable
             columns={columns}
-            data={ordersQuery.data ?? []}
+            data={ordersQuery.data?.data ?? []}
             emptyMessage={t("inventory.common.empty_entity", {
               entity: t("sales.entity.sale_orders"),
             })}
+            serverSide
+            serverState={serverState}
+            onServerStateChange={onStateChange}
+            total={ordersQuery.data?.total ?? 0}
           />
         </QueryStateWrapper>
       </CatalogSectionCard>

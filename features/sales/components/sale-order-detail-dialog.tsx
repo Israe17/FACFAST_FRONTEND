@@ -342,6 +342,23 @@ function SaleOrderDetailDialog({
                         </Button>
                       ) : null}
                     </div>
+                    {(line.assigned_serials ?? []).length > 0 ? (
+                      <div className="mt-1.5 pl-1">
+                        <p className="text-xs text-muted-foreground mb-0.5">
+                          {t("sales.assigned_serials")}:
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {(line.assigned_serials ?? []).map((s) => (
+                            <span
+                              key={s.id}
+                              className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-xs font-mono"
+                            >
+                              {s.serial_number}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ))}
               <div className="flex justify-end pt-2 border-t">

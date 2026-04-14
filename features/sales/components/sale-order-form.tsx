@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import { AlertCircle, ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
 
@@ -38,6 +38,7 @@ import {
 } from "../form-values";
 import type { CreateSaleOrderInput } from "../types";
 import { FormFieldError } from "@/features/inventory/components/form-field-error";
+import { SaleOrderLineSerialSelector } from "./sale-order-line-serial-selector";
 
 const EMPTY_SELECT_VALUE = "__none__";
 
@@ -385,14 +386,25 @@ function SaleOrderForm({
     [selectedBranchId, variantToProductMap, resolvePrice, setValue],
   );
 
-  // When variant is selected, resolve its price
+  // When variant is selected, resolve its price and clear serials
   const handleVariantChange = useCallback(
     (index: number, variantId: string, fieldOnChange: (v: string) => void) => {
       fieldOnChange(variantId);
+      setValue(`lines.${index}.serial_ids`, []);
       resolveVariantPrice(index, variantId);
     },
-    [resolveVariantPrice],
+    [resolveVariantPrice, setValue],
   );
+
+  // Clear serial selections when warehouse changes
+  useEffect(() => {
+    const lines = getValues("lines");
+    for (let i = 0; i < lines.length; i++) {
+      if ((lines[i]?.serial_ids ?? []).length > 0) {
+        setValue(`lines.${i}.serial_ids`, []);
+      }
+    }
+  }, [selectedWarehouseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Re-resolve prices for existing lines when branch changes
   const watchedLines = watch("lines");
@@ -793,7 +805,8 @@ function SaleOrderForm({
               </thead>
               <tbody>
                 {lineFields.map((field, index) => (
-                  <tr key={field.id} className="border-b last:border-b-0">
+                  <Fragment key={field.id}>
+                  <tr className="border-b last:border-b-0">
                     <td className="px-3 py-2">
                       <Controller
                         control={control}
@@ -898,6 +911,37 @@ function SaleOrderForm({
                       </Button>
                     </td>
                   </tr>
+                  {(() => {
+                    const variantId = watch(`lines.${index}.product_variant_id`);
+                    const product = variantId
+                      ? variantToProductMap.get(variantId)
+                      : undefined;
+                    if (!product?.track_serials) return null;
+                    return (
+                      <tr key={`${field.id}-serials`} className="border-b last:border-b-0 bg-muted/30">
+                        <td colSpan={6} className="px-3 py-2">
+                          <p className="text-xs font-medium mb-1">
+                            {t("sales.form.select_serials")}
+                          </p>
+                          <SaleOrderLineSerialSelector
+                            form={form}
+                            lineIndex={index}
+                            product={product}
+                            variantId={variantId}
+                            warehouseId={selectedWarehouseId}
+                          />
+                          {(watch(`lines.${index}.serial_ids`) ?? []).length > 0 && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {t("sales.form.serials_selected", {
+                                count: (watch(`lines.${index}.serial_ids`) ?? []).length,
+                              })}
+                            </p>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })()}
+                </Fragment>
                 ))}
               </tbody>
             </table>

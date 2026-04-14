@@ -5,6 +5,7 @@ export const emptySaleOrderLineFormValues: CreateSaleOrderLineInput = {
   notes: "",
   product_variant_id: "",
   quantity: 1,
+  serial_ids: [],
   tax_amount: 0,
   unit_price: 0,
 };
@@ -72,6 +73,7 @@ export function getSaleOrderFormValues(order: SaleOrder): CreateSaleOrderInput {
       notes: line.notes ?? "",
       product_variant_id: String(line.product_variant_id ?? line.product_variant?.id ?? ""),
       quantity: line.quantity,
+      serial_ids: (line.assigned_serials ?? []).map((s) => Number(s.product_serial_id)),
       tax_amount: line.tax_amount ?? 0,
       unit_price: line.unit_price,
     })),

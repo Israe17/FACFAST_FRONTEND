@@ -1301,6 +1301,7 @@ const productVariantFormObjectSchema = z.object({
   track_expiration: z.boolean().default(false),
   track_inventory: z.boolean().default(true),
   track_lots: z.boolean().default(false),
+  track_serials: z.boolean().default(false),
   variant_name: requiredTrimmedString("El nombre de la variante es requerido."),
 });
 
@@ -1313,6 +1314,14 @@ function applyVariantRules(
       code: z.ZodIssueCode.custom,
       message: "El rastreo de lotes requiere rastreo de inventario.",
       path: ["track_lots"],
+    });
+  }
+
+  if (values.track_serials && !values.track_inventory) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "El rastreo de seriales requiere rastreo de inventario.",
+      path: ["track_serials"],
     });
   }
 

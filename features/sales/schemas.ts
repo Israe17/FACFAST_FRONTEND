@@ -88,6 +88,18 @@ export const saleOrderLineSchema = z
     status: z.string().optional().catch("active"),
     tax_amount: z.number().optional().catch(0),
     unit_price: z.number(),
+    assigned_serials: z
+      .array(
+        z.object({
+          id: idSchema,
+          product_serial_id: idSchema,
+          serial_number: z.string(),
+          status: z.string(),
+          assigned_at: z.string().nullable().optional(),
+        }),
+      )
+      .optional()
+      .catch([]),
     updated_at: z.string().optional(),
   })
   .passthrough();
@@ -118,6 +130,7 @@ export const createSaleOrderLineSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(0, "El precio debe ser 0 o mayor."),
   ),
+  serial_ids: z.array(z.number()).optional().default([]),
 });
 
 // --- Sale Order Delivery Charge ---

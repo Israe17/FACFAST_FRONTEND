@@ -20,7 +20,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
-import { LayoutList, Map } from "lucide-react";
+import { LayoutList, Map, Monitor } from "lucide-react";
 
 import { useBranchesQuery } from "@/features/branches/queries";
 import { useUsersQuery } from "@/features/users/queries";
@@ -41,6 +41,7 @@ import {
 import type { DispatchOrder } from "../types";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
 import { DispatchOrderDetailDialog } from "./dispatch-order-detail-dialog";
+import { DispatchCommandCenter } from "./dispatch-command-center";
 import { DispatchMapView } from "./dispatch-map-view";
 import { getDispatchOrdersColumns } from "./dispatch-orders-columns";
 import { CatalogSectionCard } from "./catalog-section-card";
@@ -66,7 +67,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
-  const [viewMode, setViewMode] = useState<"table" | "map">("table");
+  const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
   const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
@@ -179,6 +180,15 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               >
                 <Map className="size-4" />
               </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "command" ? "secondary" : "ghost"}
+                className="h-7 px-2"
+                onClick={() => setViewMode("command")}
+                title={t("inventory.dispatch.command_center")}
+              >
+                <Monitor className="size-4" />
+              </Button>
             </div>
             {canCreate ? (
               <Button
@@ -220,13 +230,30 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 entity: t("inventory.entity.dispatch_orders"),
               })}
             />
-          ) : (
+          ) : viewMode === "map" ? (
             <DispatchMapView
               orders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
               refreshKey={mapRefreshKey}
               onOrderClick={handleViewDetail}
+            />
+          ) : (
+            <DispatchCommandCenter
+              pendingOrders={(saleOrdersQuery.data ?? []).filter(
+                (o) =>
+                  o.status === "confirmed" &&
+                  o.fulfillment_mode === "delivery" &&
+                  o.dispatch_status === "pending",
+              )}
+              dispatchOrders={ordersQuery.data ?? []}
+              warehouses={warehousesQuery.data ?? []}
+              zones={zonesQuery.data ?? []}
+              onCreateDispatch={() => {
+                setSelectedOrder(null);
+                setDialogOpen(true);
+              }}
+              onViewDispatchDetail={handleViewDetail}
             />
           )}
         </QueryStateWrapper>

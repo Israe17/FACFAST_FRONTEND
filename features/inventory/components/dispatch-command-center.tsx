@@ -258,8 +258,8 @@ function DispatchCommandCenter({
       </div>
 
       {/* Bottom bar: Dispatch orders */}
-      <div className="h-20 border-t shrink-0 bg-background overflow-x-auto">
-        <div className="flex items-center gap-3 px-3 py-2 h-full">
+      <div className="border-t shrink-0 bg-background overflow-x-auto">
+        <div className="flex items-center gap-2 px-3 py-1.5">
           {dispatchOrders.map((order) => (
             <DispatchBarCard
               key={order.id}

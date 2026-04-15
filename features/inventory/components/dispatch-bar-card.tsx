@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { Truck } from "lucide-react";
 
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
@@ -50,14 +49,18 @@ function DispatchBarCard({ order, isSelected, onClick }: DispatchBarCardProps) {
     [stops],
   );
   const totalStops = stops.length;
-  const progressPercent = totalStops > 0 ? (deliveredCount / totalStops) * 100 : 0;
+  const progressPercent =
+    totalStops > 0 ? (deliveredCount / totalStops) * 100 : 0;
+
+  const vehicleLabel = order.vehicle?.plate_number ?? t("inventory.dispatch.no_vehicle");
+  const driverLabel = order.driver_user?.name ?? t("inventory.dispatch.no_driver");
 
   return (
     <div
       role="button"
       tabIndex={0}
-      className={`min-w-[220px] shrink-0 rounded-lg border bg-card p-3 cursor-pointer transition-all hover:shadow-md ${
-        isSelected ? "ring-2 ring-primary shadow-md" : ""
+      className={`min-w-[200px] max-w-[240px] shrink-0 rounded-lg border bg-card px-3 py-1.5 cursor-pointer transition-all hover:shadow-sm ${
+        isSelected ? "ring-2 ring-primary shadow-sm" : ""
       }`}
       onClick={() => onClick(String(order.id))}
       onKeyDown={(e) => {
@@ -67,47 +70,28 @@ function DispatchBarCard({ order, isSelected, onClick }: DispatchBarCardProps) {
         }
       }}
     >
-      {/* Status badge */}
-      <div className="flex items-center justify-between mb-1.5">
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusColorMap[order.status] ?? ""}`}
-        >
-          {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
-        </span>
-        <Truck className="size-3.5 text-muted-foreground" />
-      </div>
-
-      {/* Code + vehicle plate */}
-      <div className="flex items-center justify-between gap-1 mb-0.5">
-        <span className="text-sm font-medium truncate">
+      {/* Row 1: code + status badge */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold truncate">
           {order.code ?? `DO-${order.id}`}
         </span>
-        {order.vehicle ? (
-          <span className="text-[10px] text-muted-foreground font-mono">
-            {order.vehicle.plate_number}
-          </span>
-        ) : null}
-      </div>
-
-      {/* Driver name */}
-      {order.driver_user ? (
-        <p className="text-xs text-muted-foreground truncate mb-1.5">
-          {order.driver_user.name}
-        </p>
-      ) : null}
-
-      {/* Stop count + progress text */}
-      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-        <span>
-          {t("inventory.dispatch.stops_label")}
-        </span>
-        <span className="font-medium tabular-nums">
-          {deliveredCount}/{totalStops}
+        <span
+          className={`inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-medium leading-tight shrink-0 ${statusColorMap[order.status] ?? ""}`}
+        >
+          {t(
+            statusTranslationMap[order.status] ??
+              "inventory.dispatch.status_draft",
+          )}
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+      {/* Row 2: vehicle · driver · stops */}
+      <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+        {vehicleLabel} · {driverLabel} · {deliveredCount}/{totalStops}
+      </p>
+
+      {/* Row 3: thin progress bar */}
+      <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-1">
         <div
           className={`h-full rounded-full transition-all ${progressColorMap[order.status] ?? "bg-gray-400"}`}
           style={{ width: `${progressPercent}%` }}

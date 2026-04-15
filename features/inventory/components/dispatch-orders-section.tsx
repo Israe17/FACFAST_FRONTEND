@@ -249,15 +249,11 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               dispatchOrders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
-              onAssignToDispatch={() => {
-                // TODO: implement assign to existing DO
-              }}
-              onCreateDispatchWithOrders={() => {
+              onCreateDispatch={() => {
                 setSelectedOrder(null);
                 setDialogOpen(true);
               }}
               onViewDispatchDetail={handleViewDetail}
-              onOrderClick={handleViewDetail}
             />
           )}
         </QueryStateWrapper>

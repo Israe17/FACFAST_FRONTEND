@@ -1,16 +1,19 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Package, Truck, CheckCircle2 } from "lucide-react";
+import { Package, Plus, Truck, CheckCircle2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { SaleOrder } from "@/features/sales/types";
 
+import { useAddDispatchStopMutation } from "../queries";
 import type { DispatchOrder, Warehouse, Zone } from "../types";
 import { DispatchBarCard } from "./dispatch-bar-card";
 import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 import { DispatchMapView } from "./dispatch-map-view";
+import { DispatchSmartSuggestions } from "./dispatch-smart-suggestions";
 import { PendingOrderCard } from "./pending-order-card";
 
 type DispatchCommandCenterProps = {
@@ -18,10 +21,8 @@ type DispatchCommandCenterProps = {
   dispatchOrders: DispatchOrder[];
   warehouses: Warehouse[];
   zones: Zone[];
-  onAssignToDispatch: (orderIds: string[], dispatchId: string) => void;
-  onCreateDispatchWithOrders: (orderIds: string[]) => void;
+  onCreateDispatch: () => void;
   onViewDispatchDetail: (order: DispatchOrder) => void;
-  onOrderClick: (order: DispatchOrder) => void;
 };
 
 function DispatchCommandCenter({
@@ -29,16 +30,27 @@ function DispatchCommandCenter({
   dispatchOrders,
   warehouses,
   zones,
-  onAssignToDispatch,
-  onCreateDispatchWithOrders,
+  onCreateDispatch,
   onViewDispatchDetail,
-  onOrderClick,
 }: DispatchCommandCenterProps) {
   const { t } = useAppTranslator();
 
-  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
-  const [selectedPendingIds, setSelectedPendingIds] = useState<Set<string>>(new Set());
-  const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null);
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(
+    null,
+  );
+  const [selectedPendingIds, setSelectedPendingIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(
+    null,
+  );
+  const [suggestionsVisible, setSuggestionsVisible] = useState(true);
+
+  // Mutation for adding stops to the currently selected DO
+  const addStopMutation = useAddDispatchStopMutation(
+    selectedDispatchId ?? "",
+    { showErrorToast: true },
+  );
 
   // --- KPI counts ---
   const pendingCount = pendingOrders.length;
@@ -63,6 +75,17 @@ function DispatchCommandCenter({
     [dispatchOrders, selectedDispatchId],
   );
 
+  // --- Editable DOs for assignment target ---
+  const editableDispatches = useMemo(
+    () =>
+      dispatchOrders.filter(
+        (o) => o.status === "draft" || o.status === "ready",
+      ),
+    [dispatchOrders],
+  );
+
+  const selectedCount = selectedPendingIds.size;
+
   // --- Handlers ---
   const handleTogglePendingSelect = useCallback((orderId: string) => {
     setSelectedPendingIds((prev) => {
@@ -81,29 +104,38 @@ function DispatchCommandCenter({
   }, []);
 
   const handleAssignSingle = useCallback(
-    (orderId: string) => {
+    async (orderId: string) => {
       if (selectedDispatchId) {
-        onAssignToDispatch([orderId], selectedDispatchId);
+        await addStopMutation.mutateAsync({ sale_order_id: orderId });
       } else {
-        onCreateDispatchWithOrders([orderId]);
+        onCreateDispatch();
       }
     },
-    [selectedDispatchId, onAssignToDispatch, onCreateDispatchWithOrders],
+    [selectedDispatchId, addStopMutation, onCreateDispatch],
   );
+
+  const handleBulkAssign = useCallback(async () => {
+    if (!selectedDispatchId || selectedCount === 0) return;
+    for (const saleOrderId of selectedPendingIds) {
+      await addStopMutation.mutateAsync({ sale_order_id: saleOrderId });
+    }
+    setSelectedPendingIds(new Set());
+  }, [selectedDispatchId, selectedCount, selectedPendingIds, addStopMutation]);
 
   const handleDispatchBarClick = useCallback(
     (orderId: string) => {
       setSelectedDispatchId((prev) => (prev === orderId ? null : orderId));
-      const order = dispatchOrders.find((o) => String(o.id) === orderId);
-      if (order) {
-        onOrderClick(order);
-      }
     },
-    [dispatchOrders, onOrderClick],
+    [],
   );
 
   const handleCloseDetail = useCallback(() => {
     setSelectedDispatchId(null);
+  }, []);
+
+  const handleSuggestionSelect = useCallback((orderIds: string[]) => {
+    setSelectedPendingIds(new Set(orderIds));
+    setSuggestionsVisible(false);
   }, []);
 
   return (
@@ -142,13 +174,19 @@ function DispatchCommandCenter({
       {/* Main 3-panel layout */}
       <div className="flex flex-1 min-h-0">
         {/* Left panel: Pending orders */}
-        <div className="w-72 border-r overflow-y-auto h-full bg-background">
+        <div className="w-72 border-r flex flex-col h-full bg-background">
           <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
             <p className="text-sm font-semibold">
               {t("inventory.dispatch.pending_orders")} ({pendingCount})
             </p>
           </div>
-          <div className="p-2 space-y-2">
+          <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            <DispatchSmartSuggestions
+              pendingOrders={pendingOrders}
+              onSelectOrders={handleSuggestionSelect}
+              onDismiss={() => setSuggestionsVisible(false)}
+              visible={suggestionsVisible}
+            />
             {pendingOrders.map((order) => (
               <PendingOrderCard
                 key={order.id}
@@ -166,6 +204,36 @@ function DispatchCommandCenter({
               </p>
             ) : null}
           </div>
+
+          {/* Bulk action bar */}
+          {selectedCount > 0 ? (
+            <div className="border-t bg-background px-3 py-2 space-y-1.5 shrink-0">
+              <p className="text-xs font-medium">
+                {t("inventory.dispatch.assign_selected", {
+                  count: selectedCount,
+                })}
+              </p>
+              {selectedDispatchId ? (
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={handleBulkAssign}
+                  disabled={addStopMutation.isPending}
+                >
+                  {t("inventory.dispatch.to_existing_dispatch")}
+                </Button>
+              ) : null}
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
+                onClick={onCreateDispatch}
+              >
+                <Plus className="size-3.5" />
+                {t("inventory.dispatch.to_new_dispatch")}
+              </Button>
+            </div>
+          ) : null}
         </div>
 
         {/* Center: Map */}

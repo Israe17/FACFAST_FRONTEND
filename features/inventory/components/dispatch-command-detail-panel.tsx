@@ -261,28 +261,40 @@ function DispatchCommandDetailPanel({
           </p>
         ) : null}
 
-        <Button variant="outline" size="sm" className="w-full mt-2">
-          <Plus className="size-4" />
-          {t("inventory.dispatch.add_stop")}
-        </Button>
+        {dispatchOrder.lifecycle?.can_edit ? (
+          <Button variant="outline" size="sm" className="w-full mt-2">
+            <Plus className="size-4" />
+            {t("inventory.dispatch.add_stop")}
+          </Button>
+        ) : null}
       </div>
 
       <Separator />
 
-      {/* Action buttons */}
-      <div className="px-3 py-3 shrink-0 space-y-2">
-        <Button className="w-full" size="sm">
-          {t("inventory.dispatch.mark_dispatched")}
-        </Button>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
-            {t("inventory.dispatch.edit")}
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
-            {t("inventory.dispatch.cancel")}
-          </Button>
+      {/* Action buttons — only show if any action is available */}
+      {(dispatchOrder.lifecycle?.can_dispatch ||
+        dispatchOrder.lifecycle?.can_edit ||
+        dispatchOrder.lifecycle?.can_cancel) ? (
+        <div className="px-3 py-3 shrink-0 space-y-2">
+          {dispatchOrder.lifecycle?.can_dispatch ? (
+            <Button className="w-full" size="sm">
+              {t("inventory.dispatch.mark_dispatched")}
+            </Button>
+          ) : null}
+          <div className="flex gap-2">
+            {dispatchOrder.lifecycle?.can_edit ? (
+              <Button variant="outline" size="sm" className="flex-1">
+                {t("inventory.dispatch.edit")}
+              </Button>
+            ) : null}
+            {dispatchOrder.lifecycle?.can_cancel ? (
+              <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
+                {t("inventory.dispatch.cancel")}
+              </Button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,290 @@
+"use client";
+
+import { useCallback, useState } from "react";
+import {
+  Calendar,
+  GripVertical,
+  MapPin,
+  Plus,
+  Truck,
+  User,
+  X,
+} from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import type { FrontendTranslationKey } from "@/shared/i18n/translations";
+import { formatDateTime } from "@/shared/lib/utils";
+
+import type { DispatchOrder, DispatchStop } from "../types";
+
+type DispatchCommandDetailPanelProps = {
+  dispatchOrder: DispatchOrder;
+  onClose: () => void;
+};
+
+const statusColorMap: Record<string, string> = {
+  draft: "bg-yellow-100 text-yellow-800",
+  ready: "bg-blue-100 text-blue-800",
+  dispatched: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+const statusTranslationMap: Record<string, FrontendTranslationKey> = {
+  draft: "inventory.dispatch.status_draft",
+  ready: "inventory.dispatch.status_ready",
+  dispatched: "inventory.dispatch.status_dispatched",
+  in_transit: "inventory.dispatch.status_in_transit",
+  completed: "inventory.dispatch.status_completed",
+  cancelled: "inventory.dispatch.status_cancelled",
+};
+
+const stopStatusColorMap: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  delivered: "bg-green-100 text-green-800",
+  failed: "bg-red-100 text-red-800",
+  partial: "bg-orange-100 text-orange-800",
+  skipped: "bg-gray-100 text-gray-800",
+};
+
+const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  pending: "inventory.dispatch.stop_pending",
+  in_transit: "inventory.dispatch.stop_in_transit",
+  delivered: "inventory.dispatch.stop_delivered",
+  failed: "inventory.dispatch.stop_failed",
+  partial: "inventory.dispatch.stop_partial",
+  skipped: "inventory.dispatch.stop_skipped",
+};
+
+// --- Sortable stop item ---
+type SortableStopItemProps = {
+  stop: DispatchStop;
+  t: ReturnType<typeof useAppTranslator>["t"];
+};
+
+function SortableStopItem({ stop, t }: SortableStopItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: String(stop.id) });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const address = [
+    stop.delivery_address,
+    stop.delivery_district,
+    stop.delivery_canton,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-start gap-2 rounded-lg border p-2.5 bg-card ${
+        isDragging ? "opacity-50 shadow-lg" : ""
+      }`}
+    >
+      {/* Drag handle */}
+      <button
+        type="button"
+        className="mt-0.5 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="size-4" />
+      </button>
+
+      {/* Stop content */}
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1.5">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+              #{stop.delivery_sequence}
+            </Badge>
+            <span className="text-sm font-medium truncate">
+              {stop.customer_contact?.name ?? stop.sale_order?.code ?? `#${stop.id}`}
+            </span>
+          </div>
+          <span
+            className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium shrink-0 ${
+              stopStatusColorMap[stop.status] ?? ""
+            }`}
+          >
+            {t(
+              stopStatusTranslationMap[stop.status] ??
+                "inventory.dispatch.stop_pending",
+            )}
+          </span>
+        </div>
+
+        {address ? (
+          <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+            <MapPin className="size-3 shrink-0" />
+            {address}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+// --- Main panel component ---
+function DispatchCommandDetailPanel({
+  dispatchOrder,
+  onClose,
+}: DispatchCommandDetailPanelProps) {
+  const { t } = useAppTranslator();
+
+  const [orderedStops, setOrderedStops] = useState<DispatchStop[]>(
+    () =>
+      [...(dispatchOrder.stops ?? [])].sort(
+        (a, b) => a.delivery_sequence - b.delivery_sequence,
+      ),
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      setOrderedStops((prev) => {
+        const oldIndex = prev.findIndex((s) => String(s.id) === String(active.id));
+        const newIndex = prev.findIndex((s) => String(s.id) === String(over.id));
+        if (oldIndex === -1 || newIndex === -1) return prev;
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    },
+    [],
+  );
+
+  const stopIds = orderedStops.map((s) => String(s.id));
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2 border-b px-3 py-2.5 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-sm font-semibold truncate">
+            {dispatchOrder.code ?? t("inventory.entity.dispatch_order")}
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${
+              statusColorMap[dispatchOrder.status] ?? ""
+            }`}
+          >
+            {t(
+              statusTranslationMap[dispatchOrder.status] ??
+                "inventory.dispatch.status_draft",
+            )}
+          </span>
+        </div>
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-foreground"
+          onClick={onClose}
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+
+      {/* Info section */}
+      <div className="px-3 py-3 space-y-2 text-sm shrink-0">
+        {dispatchOrder.vehicle ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Truck className="size-3.5 shrink-0" />
+            <span className="truncate">
+              {dispatchOrder.vehicle.name} ({dispatchOrder.vehicle.plate_number})
+            </span>
+          </div>
+        ) : null}
+        {dispatchOrder.driver_user ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <User className="size-3.5 shrink-0" />
+            <span className="truncate">{dispatchOrder.driver_user.name}</span>
+          </div>
+        ) : null}
+        {dispatchOrder.scheduled_date ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Calendar className="size-3.5 shrink-0" />
+            <span>{formatDateTime(dispatchOrder.scheduled_date)}</span>
+          </div>
+        ) : null}
+      </div>
+
+      <Separator />
+
+      {/* Stops list */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+          {t("inventory.dispatch.stops")} ({orderedStops.length})
+        </p>
+
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={stopIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {orderedStops.map((stop) => (
+                <SortableStopItem key={stop.id} stop={stop} t={t} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+
+        {orderedStops.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            {t("inventory.dispatch.no_stops")}
+          </p>
+        ) : null}
+
+        <Button variant="outline" size="sm" className="w-full mt-2">
+          <Plus className="size-4" />
+          {t("inventory.dispatch.add_stop")}
+        </Button>
+      </div>
+
+      <Separator />
+
+      {/* Action buttons */}
+      <div className="px-3 py-3 shrink-0 space-y-2">
+        <Button className="w-full" size="sm">
+          {t("inventory.dispatch.mark_dispatched")}
+        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1">
+            {t("inventory.dispatch.edit")}
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
+            {t("inventory.dispatch.cancel")}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { DispatchCommandDetailPanel };

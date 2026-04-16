@@ -236,7 +236,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
               refreshKey={mapRefreshKey}
-              onOrderClick={handleViewDetail}
+              onViewOrderDetail={handleViewDetail}
             />
           ) : (
             <DispatchCommandCenter

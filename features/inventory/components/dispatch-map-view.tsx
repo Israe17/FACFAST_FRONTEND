@@ -15,6 +15,8 @@ type DispatchMapViewProps = {
   refreshKey?: number;
   /** Hide the built-in order list sidebar (default true). Set to false when the parent already provides its own panel. */
   showSidebar?: boolean;
+  /** Use h-full instead of h-[600px] to fill parent container. */
+  fillHeight?: boolean;
   onOrderClick?: (order: DispatchOrder) => void;
   /** Called when a sidebar card is selected/deselected (for external panel integration). */
   onOrderSelect?: (orderId: string) => void;
@@ -117,7 +119,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, onOrderClick, onOrderSelect }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, fillHeight = false, onOrderClick, onOrderSelect }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -225,8 +227,8 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
   );
 
   return (
-    <div className={showSidebar ? "relative" : "relative h-full"}>
-    <div className={`flex ${showSidebar ? "h-[600px]" : "h-full"} rounded-lg border overflow-hidden relative z-0`}>
+    <div className={`relative ${fillHeight ? "h-full" : ""}`}>
+    <div className={`flex ${fillHeight ? "h-full" : "h-[600px]"} rounded-lg border overflow-hidden relative z-0`}>
       {/* Left: Order list */}
       <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
         <div className="sticky top-0 bg-background border-b px-3 py-2">

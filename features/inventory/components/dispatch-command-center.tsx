@@ -262,6 +262,7 @@ function DispatchCommandCenter({
             orders={dispatchOrders}
             warehouses={warehouses}
             zones={zones}
+            fillHeight
             onOrderSelect={handleDispatchBarClick}
           />
         </div>

@@ -195,7 +195,7 @@ function DispatchCommandCenter({
       {/* Main 3-panel layout */}
       <div className="flex flex-1 min-h-0">
         {/* Left panel: Pending orders */}
-        <div className="w-72 border-r flex flex-col h-full bg-background">
+        <div className="w-72 shrink-0 border-r flex flex-col h-full bg-background hidden lg:flex">
           <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
             <p className="text-sm font-semibold">
               {t("inventory.dispatch.pending_orders")} ({pendingCount})
@@ -263,13 +263,14 @@ function DispatchCommandCenter({
             orders={dispatchOrders}
             warehouses={warehouses}
             zones={zones}
+            showSidebar={false}
             onOrderClick={onViewDispatchDetail}
           />
         </div>
 
         {/* Right panel: Dispatch detail (conditional) */}
         {selectedDispatchOrder ? (
-          <div className="w-80 border-l overflow-y-auto h-full bg-background">
+          <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background hidden xl:block">
             <DispatchCommandDetailPanel
               dispatchOrder={selectedDispatchOrder}
               onClose={handleCloseDetail}

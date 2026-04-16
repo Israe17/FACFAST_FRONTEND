@@ -75,7 +75,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
-  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "code" });
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "scheduled_date", sort_order: "DESC" });
 
   // Restore sidebar when unmounting (user navigates away while in operational view)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable, only run on unmount

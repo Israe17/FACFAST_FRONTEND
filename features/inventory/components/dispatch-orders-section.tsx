@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 
 import {
@@ -19,6 +19,7 @@ import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { useSidebar } from "@/components/ui/sidebar";
 
 import { LayoutList, Map, Monitor } from "lucide-react";
 
@@ -53,6 +54,8 @@ type DispatchOrdersSectionProps = {
 function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
+  const { setOpen: setSidebarOpen, open: sidebarOpen } = useSidebar();
+  const sidebarWasOpen = useRef(sidebarOpen);
   const canView = can("dispatch_orders.view");
   const canCreate = can("dispatch_orders.create");
   const canUpdate = can("dispatch_orders.update");
@@ -69,6 +72,23 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
   const [mapRefreshKey, setMapRefreshKey] = useState(0);
+
+  const handleViewModeChange = useCallback(
+    (mode: "table" | "map" | "command") => {
+      if (mode === "command" || mode === "map") {
+        // Save current sidebar state before collapsing
+        if (viewMode === "table") {
+          sidebarWasOpen.current = sidebarOpen;
+        }
+        setSidebarOpen(false);
+      } else {
+        // Restore sidebar when going back to table
+        setSidebarOpen(sidebarWasOpen.current);
+      }
+      setViewMode(mode);
+    },
+    [viewMode, sidebarOpen, setSidebarOpen],
+  );
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
   const branchesQuery = useBranchesQuery(enabled && canView);
@@ -168,7 +188,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 size="sm"
                 variant={viewMode === "table" ? "secondary" : "ghost"}
                 className="h-7 px-2"
-                onClick={() => setViewMode("table")}
+                onClick={() => handleViewModeChange("table")}
               >
                 <LayoutList className="size-4" />
               </Button>
@@ -176,7 +196,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 size="sm"
                 variant={viewMode === "map" ? "secondary" : "ghost"}
                 className="h-7 px-2"
-                onClick={() => setViewMode("map")}
+                onClick={() => handleViewModeChange("map")}
               >
                 <Map className="size-4" />
               </Button>
@@ -184,7 +204,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 size="sm"
                 variant={viewMode === "command" ? "secondary" : "ghost"}
                 className="h-7 px-2"
-                onClick={() => setViewMode("command")}
+                onClick={() => handleViewModeChange("command")}
                 title={t("inventory.dispatch.command_center")}
               >
                 <Monitor className="size-4" />

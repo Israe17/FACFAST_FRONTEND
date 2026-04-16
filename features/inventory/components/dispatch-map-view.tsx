@@ -97,7 +97,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, onOrderClick }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, onOrderClick }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -206,9 +206,8 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
 
   return (
     <div className="relative">
-    <div className={`flex ${showSidebar ? "h-[600px]" : "h-full"} rounded-lg border overflow-hidden relative z-0`}>
+    <div className="flex h-[600px] rounded-lg border overflow-hidden relative z-0">
       {/* Left: Order list */}
-      {showSidebar ? (
       <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
         <div className="sticky top-0 bg-background border-b px-3 py-2">
           <p className="text-sm font-semibold flex items-center gap-1.5">
@@ -287,7 +286,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
           ) : null}
         </div>
       </div>
-      ) : null}
 
       {/* Right: Map */}
       <div className="flex-1 relative">

@@ -263,7 +263,6 @@ function DispatchCommandCenter({
             orders={dispatchOrders}
             warehouses={warehouses}
             zones={zones}
-            showSidebar={false}
             onOrderClick={onViewDispatchDetail}
           />
         </div>

@@ -21,6 +21,9 @@ type DispatchCommandCenterProps = {
   zones: Zone[];
   onCreateDispatch: () => void;
   onViewDispatchDetail: (order: DispatchOrder) => void;
+  onEditDispatch: (order: DispatchOrder) => void;
+  onDispatchDispatch: (order: DispatchOrder) => void;
+  onCancelDispatch: (order: DispatchOrder) => void;
 };
 
 function DispatchCommandCenter({
@@ -30,6 +33,9 @@ function DispatchCommandCenter({
   zones,
   onCreateDispatch,
   onViewDispatchDetail,
+  onEditDispatch,
+  onDispatchDispatch,
+  onCancelDispatch,
 }: DispatchCommandCenterProps) {
   const { t } = useAppTranslator();
 
@@ -251,6 +257,9 @@ function DispatchCommandCenter({
             fillHeight
             onOrderSelect={handleDispatchBarClick}
             onViewOrderDetail={onViewDispatchDetail}
+            onEditOrder={onEditDispatch}
+            onDispatchOrder={onDispatchDispatch}
+            onCancelOrder={onCancelDispatch}
           />
         </div>
       </div>

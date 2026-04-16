@@ -24,6 +24,12 @@ type DispatchMapViewProps = {
   onOrderSelect?: (orderId: string) => void;
   /** Called when "Ver detalle completo" is clicked in the inline detail panel. */
   onViewOrderDetail?: (order: DispatchOrder) => void;
+  /** Called when "Editar" is clicked in the inline detail panel. */
+  onEditOrder?: (order: DispatchOrder) => void;
+  /** Called when "Despachar" is clicked in the inline detail panel. */
+  onDispatchOrder?: (order: DispatchOrder) => void;
+  /** Called when "Cancelar" is clicked in the inline detail panel. */
+  onCancelOrder?: (order: DispatchOrder) => void;
 };
 
 
@@ -79,7 +85,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail, onEditOrder, onDispatchOrder, onCancelOrder }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -318,6 +324,21 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
             onViewFullDetail={
               onViewOrderDetail
                 ? () => onViewOrderDetail(selectedOrder)
+                : undefined
+            }
+            onEdit={
+              onEditOrder
+                ? () => onEditOrder(selectedOrder)
+                : undefined
+            }
+            onDispatch={
+              onDispatchOrder
+                ? () => onDispatchOrder(selectedOrder)
+                : undefined
+            }
+            onCancel={
+              onCancelOrder
+                ? () => onCancelOrder(selectedOrder)
                 : undefined
             }
           />

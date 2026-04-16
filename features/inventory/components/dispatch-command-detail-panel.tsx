@@ -42,6 +42,9 @@ type DispatchCommandDetailPanelProps = {
   dispatchOrder: DispatchOrder;
   onClose: () => void;
   onViewFullDetail?: () => void;
+  onEdit?: () => void;
+  onDispatch?: () => void;
+  onCancel?: () => void;
 };
 
 
@@ -131,6 +134,9 @@ function DispatchCommandDetailPanel({
   dispatchOrder,
   onClose,
   onViewFullDetail,
+  onEdit,
+  onDispatch,
+  onCancel,
 }: DispatchCommandDetailPanelProps) {
   const { t } = useAppTranslator();
 
@@ -249,19 +255,19 @@ function DispatchCommandDetailPanel({
         dispatchOrder.lifecycle?.can_edit ||
         dispatchOrder.lifecycle?.can_cancel) ? (
         <div className="px-3 py-3 shrink-0 space-y-2">
-          {dispatchOrder.lifecycle?.can_dispatch ? (
-            <Button className="w-full" size="sm">
+          {dispatchOrder.lifecycle?.can_dispatch && onDispatch ? (
+            <Button className="w-full" size="sm" onClick={onDispatch}>
               {t("inventory.dispatch.mark_dispatched")}
             </Button>
           ) : null}
           <div className="flex gap-2">
-            {dispatchOrder.lifecycle?.can_edit ? (
-              <Button variant="outline" size="sm" className="flex-1">
+            {dispatchOrder.lifecycle?.can_edit && onEdit ? (
+              <Button variant="outline" size="sm" className="flex-1" onClick={onEdit}>
                 {t("inventory.dispatch.edit")}
               </Button>
             ) : null}
-            {dispatchOrder.lifecycle?.can_cancel ? (
-              <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
+            {dispatchOrder.lifecycle?.can_cancel && onCancel ? (
+              <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700" onClick={onCancel}>
                 {t("inventory.dispatch.cancel")}
               </Button>
             ) : null}

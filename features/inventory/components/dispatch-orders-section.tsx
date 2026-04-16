@@ -18,6 +18,7 @@ import { DataTable } from "@/shared/components/data-table";
 import { QueryStateWrapper } from "@/shared/components/query-state-wrapper";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useServerTableState } from "@/shared/hooks/use-server-table-state";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { useSidebar } from "@/components/ui/sidebar";
 
@@ -29,6 +30,7 @@ import { useSaleOrdersQuery } from "@/features/sales/queries";
 
 import {
   useDispatchOrdersQuery,
+  useDispatchOrdersPaginatedQuery,
   useMarkDispatchReadyMutation,
   useMarkDispatchDispatchedMutation,
   useMarkDispatchCompletedMutation,
@@ -73,6 +75,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
+  const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "code" });
 
   // Restore sidebar when unmounting (user navigates away while in operational view)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable, only run on unmount
@@ -107,7 +110,8 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const vehiclesQuery = useVehiclesQuery(enabled && canView);
   const saleOrdersQuery = useSaleOrdersQuery(enabled && canView);
 
-  const ordersQuery = useDispatchOrdersQuery(enabled && canView);
+  const ordersPaginatedQuery = useDispatchOrdersPaginatedQuery(queryParams, enabled && canView);
+  const ordersQuery = useDispatchOrdersQuery(enabled && canView && viewMode !== "table");
   const zonesQuery = useZonesQuery(enabled && canView);
   const readyMutation = useMarkDispatchReadyMutation(readyTarget?.id ?? "", {
     showErrorToast: true,
@@ -237,6 +241,19 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
         description={t("inventory.dispatch.section_description")}
         title={t("inventory.entity.dispatch_orders")}
       >
+        {viewMode === "table" ? (
+          <DataTable
+            columns={columns}
+            data={ordersPaginatedQuery.data?.data ?? []}
+            emptyMessage={t("inventory.common.empty_entity", {
+              entity: t("inventory.entity.dispatch_orders"),
+            })}
+            serverSide
+            serverState={serverState}
+            onServerStateChange={onStateChange}
+            total={ordersPaginatedQuery.data?.total ?? 0}
+          />
+        ) : (
         <QueryStateWrapper
           errorDescription={getBackendErrorMessage(
             ordersQuery.error,
@@ -251,15 +268,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           })}
           onRetry={() => ordersQuery.refetch()}
         >
-          {viewMode === "table" ? (
-            <DataTable
-              columns={columns}
-              data={ordersQuery.data ?? []}
-              emptyMessage={t("inventory.common.empty_entity", {
-                entity: t("inventory.entity.dispatch_orders"),
-              })}
-            />
-          ) : viewMode === "map" ? (
+          {viewMode === "map" ? (
             <DispatchMapView
               orders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
@@ -293,6 +302,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
             />
           )}
         </QueryStateWrapper>
+        )}
       </CatalogSectionCard>
 
       <DispatchOrderDialog

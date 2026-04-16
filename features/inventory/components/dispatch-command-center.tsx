@@ -73,15 +73,6 @@ function DispatchCommandCenter({
     [dispatchOrders, selectedDispatchId],
   );
 
-  // --- Editable DOs for assignment target ---
-  const editableDispatches = useMemo(
-    () =>
-      dispatchOrders.filter(
-        (o) => o.status === "draft" || o.status === "ready",
-      ),
-    [dispatchOrders],
-  );
-
   const selectedCount = selectedPendingIds.size;
 
   // Check if selected DO can accept new stops

@@ -3,41 +3,18 @@
 import { useMemo } from "react";
 
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
 import type { DispatchOrder } from "../types";
+import {
+  dispatchStatusColorMap,
+  dispatchStatusTranslationMap,
+  dispatchProgressColorMap,
+} from "../constants";
 
 type DispatchBarCardProps = {
   order: DispatchOrder;
   isSelected: boolean;
   onClick: (orderId: string) => void;
-};
-
-const statusColorMap: Record<string, string> = {
-  draft: "bg-yellow-100 text-yellow-800",
-  ready: "bg-blue-100 text-blue-800",
-  dispatched: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusTranslationMap: Record<string, FrontendTranslationKey> = {
-  draft: "inventory.dispatch.status_draft",
-  ready: "inventory.dispatch.status_ready",
-  dispatched: "inventory.dispatch.status_dispatched",
-  in_transit: "inventory.dispatch.status_in_transit",
-  completed: "inventory.dispatch.status_completed",
-  cancelled: "inventory.dispatch.status_cancelled",
-};
-
-const progressColorMap: Record<string, string> = {
-  draft: "bg-yellow-400",
-  ready: "bg-blue-400",
-  dispatched: "bg-indigo-400",
-  in_transit: "bg-orange-400",
-  completed: "bg-green-400",
-  cancelled: "bg-red-400",
 };
 
 function DispatchBarCard({ order, isSelected, onClick }: DispatchBarCardProps) {
@@ -76,10 +53,10 @@ function DispatchBarCard({ order, isSelected, onClick }: DispatchBarCardProps) {
           {order.code ?? `DO-${order.id}`}
         </span>
         <span
-          className={`inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-medium leading-tight shrink-0 ${statusColorMap[order.status] ?? ""}`}
+          className={`inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-medium leading-tight shrink-0 ${dispatchStatusColorMap[order.status] ?? ""}`}
         >
           {t(
-            statusTranslationMap[order.status] ??
+            dispatchStatusTranslationMap[order.status] ??
               "inventory.dispatch.status_draft",
           )}
         </span>
@@ -93,7 +70,7 @@ function DispatchBarCard({ order, isSelected, onClick }: DispatchBarCardProps) {
       {/* Row 3: thin progress bar */}
       <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-1">
         <div
-          className={`h-full rounded-full transition-all ${progressColorMap[order.status] ?? "bg-gray-400"}`}
+          className={`h-full rounded-full transition-all ${dispatchProgressColorMap[order.status] ?? "bg-gray-400"}`}
           style={{ width: `${progressPercent}%` }}
         />
       </div>

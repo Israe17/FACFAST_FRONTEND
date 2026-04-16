@@ -71,7 +71,6 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
-  const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
   // Restore sidebar when unmounting (user navigates away while in operational view)
   useEffect(() => {
@@ -262,7 +261,6 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               orders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
-              refreshKey={mapRefreshKey}
               onViewOrderDetail={handleViewDetail}
             />
           ) : (
@@ -310,7 +308,6 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           setDetailDialogOpen(open);
           if (!open) {
             setDetailOrder(null);
-            setMapRefreshKey((k) => k + 1);
           }
         }}
       />

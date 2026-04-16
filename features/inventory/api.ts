@@ -1208,10 +1208,9 @@ function buildDispatchOrderPayload(payload: CreateDispatchOrderInput | UpdateDis
 }
 
 export async function listDispatchOrders() {
-  const response = await http.get("/dispatch-orders");
-  return extractCollection(response.data, ["dispatch_orders"]).map((item) =>
-    dispatchOrderSchema.parse(item),
-  );
+  const response = await http.get("/dispatch-orders", { params: { limit: 500 } });
+  const parsed = paginatedSchema(dispatchOrderSchema).parse(response.data);
+  return parsed.data;
 }
 
 export async function getDispatchOrder(orderId: string) {

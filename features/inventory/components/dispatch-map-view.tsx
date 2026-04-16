@@ -36,6 +36,15 @@ const statusTranslationMap: Record<string, FrontendTranslationKey> = {
   cancelled: "inventory.dispatch.status_cancelled",
 };
 
+const borderColorMap: Record<string, string> = {
+  draft: "border-l-yellow-400",
+  ready: "border-l-blue-400",
+  dispatched: "border-l-indigo-400",
+  in_transit: "border-l-orange-400",
+  completed: "border-l-green-400",
+  cancelled: "border-l-red-400",
+};
+
 const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
   pending: "inventory.dispatch.stop_pending",
   in_transit: "inventory.dispatch.stop_in_transit",
@@ -215,7 +224,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
             {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
           </p>
         </div>
-        <div className="divide-y">
+        <div className="p-2 space-y-2">
           {activeOrders.map((order) => {
             const isSelected = String(order.id) === selectedOrderId;
             const stopsWithCoords = (order.stops ?? []).filter(
@@ -233,31 +242,50 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                 key={order.id}
                 role="button"
                 tabIndex={0}
-                className={`w-full text-left px-3 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer ${isSelected ? "bg-muted" : ""}`}
+                className={`border-l-4 ${borderColorMap[order.status] ?? "border-l-gray-400"} rounded-md border p-2.5 transition-colors cursor-pointer ${
+                  isSelected ? "bg-accent" : "hover:bg-muted/40"
+                }`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
                   if (onOrderClick) onOrderClick(order);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleOrderSelect(String(order.id));
+                    if (onOrderClick) onOrderClick(order);
+                  }
+                }}
               >
+                {/* Row 1: Code + status badge */}
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm">
+                  <span className="font-semibold text-sm truncate">
                     {order.code ?? `DO-${order.id}`}
                   </span>
                   <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusColorMap[order.status] ?? ""}`}
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${statusColorMap[order.status] ?? ""}`}
                   >
                     {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
                   </span>
                 </div>
+
+                {/* Row 2: Vehicle + driver */}
                 <div className="text-xs text-muted-foreground space-y-0.5">
-                  {order.route ? (
-                    <p>{order.route.name}</p>
+                  {order.vehicle ? (
+                    <p className="flex items-center gap-1">
+                      <Truck className="size-3 shrink-0" />
+                      <span className="truncate">{order.vehicle.plate_number}</span>
+                      {order.driver_user ? (
+                        <span className="truncate">· {order.driver_user.name}</span>
+                      ) : null}
+                    </p>
+                  ) : order.driver_user ? (
+                    <p className="truncate">{order.driver_user.name}</p>
                   ) : null}
-                  {order.driver_user ? (
-                    <p>{order.driver_user.name}</p>
-                  ) : null}
+
+                  {/* Row 3: Stops + warnings */}
                   <p className="flex items-center gap-1">
-                    <MapPin className="size-3" />
+                    <MapPin className="size-3 shrink-0" />
                     {totalStops} {t("inventory.dispatch.stops_label")}
                     {stopsWithCoords < totalStops ? (
                       <span className="text-amber-600">

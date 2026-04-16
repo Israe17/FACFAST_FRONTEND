@@ -54,8 +54,10 @@ type DispatchOrdersSectionProps = {
 function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
-  const { setOpen: setSidebarOpen, open: sidebarOpen } = useSidebar();
-  const sidebarWasOpen = useRef(sidebarOpen);
+  const sidebar = useSidebar();
+  const sidebarWasOpen = useRef(sidebar.open);
+  const sidebarRef = useRef(sidebar);
+  sidebarRef.current = sidebar;
   const canView = can("dispatch_orders.view");
   const canCreate = can("dispatch_orders.create");
   const canUpdate = can("dispatch_orders.update");
@@ -73,27 +75,28 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
 
   // Restore sidebar when unmounting (user navigates away while in operational view)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable, only run on unmount
   useEffect(() => {
     return () => {
       if (sidebarWasOpen.current) {
-        setSidebarOpen(true);
+        sidebarRef.current.setOpen(true);
       }
     };
-  }, [setSidebarOpen]);
+  }, []);
 
   const handleViewModeChange = useCallback(
     (mode: "table" | "map" | "command") => {
       if (mode === "command" || mode === "map") {
         if (viewMode === "table") {
-          sidebarWasOpen.current = sidebarOpen;
+          sidebarWasOpen.current = sidebarRef.current.open;
         }
-        setSidebarOpen(false);
+        sidebarRef.current.setOpen(false);
       } else {
-        setSidebarOpen(sidebarWasOpen.current);
+        sidebarRef.current.setOpen(sidebarWasOpen.current);
       }
       setViewMode(mode);
     },
-    [viewMode, sidebarOpen, setSidebarOpen],
+    [viewMode],
   );
 
   // Prefetch catalogs at section level so they are in cache when dialog opens
@@ -262,6 +265,9 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
               onViewOrderDetail={handleViewDetail}
+              onEditOrder={handleEdit}
+              onDispatchOrder={setDispatchTarget}
+              onCancelOrder={setCancelTarget}
             />
           ) : (
             <DispatchCommandCenter
@@ -279,6 +285,9 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 setDialogOpen(true);
               }}
               onViewDispatchDetail={handleViewDetail}
+              onEditDispatch={handleEdit}
+              onDispatchDispatch={setDispatchTarget}
+              onCancelDispatch={setCancelTarget}
             />
           )}
         </QueryStateWrapper>

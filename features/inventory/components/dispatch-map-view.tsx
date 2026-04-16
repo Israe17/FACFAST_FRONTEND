@@ -16,6 +16,8 @@ type DispatchMapViewProps = {
   /** Hide the built-in order list sidebar (default true). Set to false when the parent already provides its own panel. */
   showSidebar?: boolean;
   onOrderClick?: (order: DispatchOrder) => void;
+  /** Called when a sidebar card is selected/deselected (for external panel integration). */
+  onOrderSelect?: (orderId: string) => void;
 };
 
 const statusColorMap: Record<string, string> = {
@@ -43,6 +45,15 @@ const borderColorMap: Record<string, string> = {
   in_transit: "border-l-orange-400",
   completed: "border-l-green-400",
   cancelled: "border-l-red-400",
+};
+
+const progressColorMap: Record<string, string> = {
+  draft: "bg-yellow-400",
+  ready: "bg-blue-400",
+  dispatched: "bg-indigo-400",
+  in_transit: "bg-orange-400",
+  completed: "bg-green-400",
+  cancelled: "bg-red-400",
 };
 
 const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
@@ -106,7 +117,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, onOrderClick }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, onOrderClick, onOrderSelect }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -232,6 +243,11 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
             ).length;
             const totalStops = (order.stops ?? []).length;
 
+            const deliveredCount = (order.stops ?? []).filter(
+              (s) => s.status === "delivered",
+            ).length;
+            const progressPercent = totalStops > 0 ? (deliveredCount / totalStops) * 100 : 0;
+
             const whId = order.origin_warehouse_id ?? order.origin_warehouse?.id;
             const whHasCoords = whId
               ? Boolean(warehouses.find((w) => String(w.id) === String(whId))?.latitude)
@@ -247,12 +263,14 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                 }`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
+                  if (onOrderSelect) onOrderSelect(String(order.id));
                   if (onOrderClick) onOrderClick(order);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     handleOrderSelect(String(order.id));
+                    if (onOrderSelect) onOrderSelect(String(order.id));
                     if (onOrderClick) onOrderClick(order);
                   }
                 }}
@@ -303,6 +321,20 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                       ({t("inventory.dispatch.no_origin_warehouse")})
                     </p>
                   ) : null}
+                </div>
+
+                {/* Progress */}
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1.5">
+                  <span>{t("inventory.dispatch.stops_label")}</span>
+                  <span className="font-medium tabular-nums">
+                    {deliveredCount}/{totalStops}
+                  </span>
+                </div>
+                <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-0.5">
+                  <div
+                    className={`h-full rounded-full transition-all ${progressColorMap[order.status] ?? "bg-gray-400"}`}
+                    style={{ width: `${progressPercent}%` }}
+                  />
                 </div>
               </div>
             );

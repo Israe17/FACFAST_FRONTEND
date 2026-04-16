@@ -24,6 +24,7 @@ type DispatchCommandCenterProps = {
   onEditDispatch: (order: DispatchOrder) => void;
   onDispatchDispatch: (order: DispatchOrder) => void;
   onCancelDispatch: (order: DispatchOrder) => void;
+  onAddStop: (order: DispatchOrder) => void;
 };
 
 function DispatchCommandCenter({
@@ -36,6 +37,7 @@ function DispatchCommandCenter({
   onEditDispatch,
   onDispatchDispatch,
   onCancelDispatch,
+  onAddStop,
 }: DispatchCommandCenterProps) {
   const { t } = useAppTranslator();
 
@@ -260,6 +262,7 @@ function DispatchCommandCenter({
             onEditOrder={onEditDispatch}
             onDispatchOrder={onDispatchDispatch}
             onCancelOrder={onCancelDispatch}
+            onAddStop={onAddStop}
           />
         </div>
       </div>

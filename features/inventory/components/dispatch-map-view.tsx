@@ -30,6 +30,8 @@ type DispatchMapViewProps = {
   onDispatchOrder?: (order: DispatchOrder) => void;
   /** Called when "Cancelar" is clicked in the inline detail panel. */
   onCancelOrder?: (order: DispatchOrder) => void;
+  /** Called when "Agregar parada" is clicked in the inline detail panel. */
+  onAddStop?: (order: DispatchOrder) => void;
 };
 
 
@@ -85,7 +87,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail, onEditOrder, onDispatchOrder, onCancelOrder }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail, onEditOrder, onDispatchOrder, onCancelOrder, onAddStop }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -339,6 +341,11 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
             onCancel={
               onCancelOrder
                 ? () => onCancelOrder(selectedOrder)
+                : undefined
+            }
+            onAddStop={
+              onAddStop
+                ? () => onAddStop(selectedOrder)
                 : undefined
             }
           />

@@ -268,6 +268,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               onEditOrder={handleEdit}
               onDispatchOrder={setDispatchTarget}
               onCancelOrder={setCancelTarget}
+              onAddStop={handleViewDetail}
             />
           ) : (
             <DispatchCommandCenter
@@ -288,6 +289,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               onEditDispatch={handleEdit}
               onDispatchDispatch={setDispatchTarget}
               onCancelDispatch={setCancelTarget}
+              onAddStop={handleViewDetail}
             />
           )}
         </QueryStateWrapper>

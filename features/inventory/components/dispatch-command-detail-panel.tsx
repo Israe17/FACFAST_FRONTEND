@@ -45,6 +45,7 @@ type DispatchCommandDetailPanelProps = {
   onEdit?: () => void;
   onDispatch?: () => void;
   onCancel?: () => void;
+  onAddStop?: () => void;
 };
 
 
@@ -137,6 +138,7 @@ function DispatchCommandDetailPanel({
   onEdit,
   onDispatch,
   onCancel,
+  onAddStop,
 }: DispatchCommandDetailPanelProps) {
   const { t } = useAppTranslator();
 
@@ -240,8 +242,8 @@ function DispatchCommandDetailPanel({
           </p>
         ) : null}
 
-        {dispatchOrder.lifecycle?.can_edit ? (
-          <Button variant="outline" size="sm" className="w-full mt-2">
+        {dispatchOrder.lifecycle?.can_edit && onAddStop ? (
+          <Button variant="outline" size="sm" className="w-full mt-2" onClick={onAddStop}>
             <Plus className="size-4" />
             {t("inventory.dispatch.add_stop")}
           </Button>

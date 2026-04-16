@@ -10,7 +10,6 @@ import type { SaleOrder } from "@/features/sales/types";
 
 import { useAddDispatchStopMutation } from "../queries";
 import type { DispatchOrder, Warehouse, Zone } from "../types";
-import { DispatchBarCard } from "./dispatch-bar-card";
 import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 import { DispatchMapView } from "./dispatch-map-view";
 import { DispatchSmartSuggestions } from "./dispatch-smart-suggestions";
@@ -257,14 +256,13 @@ function DispatchCommandCenter({
           ) : null}
         </div>
 
-        {/* Center: Map */}
+        {/* Center: Map with sidebar */}
         <div className="flex-1 min-w-0 relative z-0 overflow-hidden">
           <DispatchMapView
             orders={dispatchOrders}
             warehouses={warehouses}
             zones={zones}
-            showSidebar={false}
-            onOrderClick={onViewDispatchDetail}
+            onOrderSelect={handleDispatchBarClick}
           />
         </div>
 
@@ -274,28 +272,10 @@ function DispatchCommandCenter({
             <DispatchCommandDetailPanel
               dispatchOrder={selectedDispatchOrder}
               onClose={handleCloseDetail}
+              onViewFullDetail={() => onViewDispatchDetail(selectedDispatchOrder)}
             />
           </div>
         ) : null}
-      </div>
-
-      {/* Bottom bar: Dispatch orders */}
-      <div className="border-t shrink-0 bg-background overflow-x-auto">
-        <div className="flex items-center gap-2 px-3 py-1.5">
-          {dispatchOrders.map((order) => (
-            <DispatchBarCard
-              key={order.id}
-              order={order}
-              isSelected={selectedDispatchId === String(order.id)}
-              onClick={handleDispatchBarClick}
-            />
-          ))}
-          {dispatchOrders.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center w-full">
-              {t("inventory.dispatch.no_dispatch_orders")}
-            </p>
-          ) : null}
-        </div>
       </div>
     </div>
   );

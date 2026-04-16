@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import {
   Calendar,
+  ExternalLink,
   GripVertical,
   MapPin,
   Plus,
@@ -35,6 +36,7 @@ import type { DispatchOrder, DispatchStop } from "../types";
 type DispatchCommandDetailPanelProps = {
   dispatchOrder: DispatchOrder;
   onClose: () => void;
+  onViewFullDetail?: () => void;
 };
 
 const statusColorMap: Record<string, string> = {
@@ -158,6 +160,7 @@ function SortableStopItem({ stop, t }: SortableStopItemProps) {
 function DispatchCommandDetailPanel({
   dispatchOrder,
   onClose,
+  onViewFullDetail,
 }: DispatchCommandDetailPanelProps) {
   const { t } = useAppTranslator();
 
@@ -293,6 +296,21 @@ function DispatchCommandDetailPanel({
               </Button>
             ) : null}
           </div>
+        </div>
+      ) : null}
+
+      {/* View full detail button */}
+      {onViewFullDetail ? (
+        <div className="px-3 pb-3 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={onViewFullDetail}
+          >
+            <ExternalLink className="size-3.5" />
+            {t("inventory.dispatch.view_full_detail")}
+          </Button>
         </div>
       ) : null}
     </div>

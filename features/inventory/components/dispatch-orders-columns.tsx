@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder } from "../types";
+import { dispatchStatusColorMap, dispatchStatusTranslationMap } from "../constants";
 
 type GetDispatchOrdersColumnsParams = {
   canUpdate: boolean;
@@ -21,24 +22,6 @@ type GetDispatchOrdersColumnsParams = {
   onDelete: (order: DispatchOrder) => void;
   onViewDetail: (order: DispatchOrder) => void;
   t: ReturnType<typeof useAppTranslator>["t"];
-};
-
-const statusColorMap: Record<string, string> = {
-  draft: "bg-yellow-100 text-yellow-800",
-  ready: "bg-blue-100 text-blue-800",
-  dispatched: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusTranslationMap: Record<string, FrontendTranslationKey> = {
-  draft: "inventory.dispatch.status_draft",
-  ready: "inventory.dispatch.status_ready",
-  dispatched: "inventory.dispatch.status_dispatched",
-  in_transit: "inventory.dispatch.status_in_transit",
-  completed: "inventory.dispatch.status_completed",
-  cancelled: "inventory.dispatch.status_cancelled",
 };
 
 const typeTranslationMap: Record<string, FrontendTranslationKey> = {
@@ -116,9 +99,9 @@ function getDispatchOrdersColumns({
         return (
           <div className="flex items-center gap-1.5">
             <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[order.status] ?? ""}`}
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${dispatchStatusColorMap[order.status] ?? ""}`}
             >
-              {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+              {t(dispatchStatusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
             </span>
             {hasMissing ? (
               <Tooltip>

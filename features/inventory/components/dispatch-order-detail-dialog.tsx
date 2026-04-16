@@ -28,6 +28,12 @@ import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder, DispatchStop } from "../types";
+import {
+  dispatchStatusColorMap,
+  dispatchStatusTranslationMap,
+  dispatchStopStatusColorMap,
+  dispatchStopStatusTranslationMap,
+} from "../constants";
 import { useDispatchOrderQuery } from "../queries";
 import { UpdateStopStatusDialog } from "./update-stop-status-dialog";
 
@@ -35,42 +41,6 @@ type DispatchOrderDetailDialogProps = {
   order: DispatchOrder | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-};
-
-const statusColorMap: Record<string, string> = {
-  draft: "bg-yellow-100 text-yellow-800",
-  ready: "bg-blue-100 text-blue-800",
-  dispatched: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusTranslationMap: Record<string, FrontendTranslationKey> = {
-  draft: "inventory.dispatch.status_draft",
-  ready: "inventory.dispatch.status_ready",
-  dispatched: "inventory.dispatch.status_dispatched",
-  in_transit: "inventory.dispatch.status_in_transit",
-  completed: "inventory.dispatch.status_completed",
-  cancelled: "inventory.dispatch.status_cancelled",
-};
-
-const stopStatusColorMap: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  delivered: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
-  partial: "bg-orange-100 text-orange-800",
-  skipped: "bg-gray-100 text-gray-800",
-};
-
-const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
-  pending: "inventory.dispatch.stop_pending",
-  in_transit: "inventory.dispatch.stop_in_transit",
-  delivered: "inventory.dispatch.stop_delivered",
-  failed: "inventory.dispatch.stop_failed",
-  partial: "inventory.dispatch.stop_partial",
-  skipped: "inventory.dispatch.stop_skipped",
 };
 
 function ReadinessItem({ ok, label }: { ok: boolean; label: string }) {
@@ -128,9 +98,9 @@ function DispatchOrderDetailDialog({
             <div>
               <p className="text-muted-foreground">{t("inventory.dispatch.status")}</p>
               <span
-                className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColorMap[fullOrder.status] ?? ""}`}
+                className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${dispatchStatusColorMap[fullOrder.status] ?? ""}`}
               >
-                {t(statusTranslationMap[fullOrder.status] ?? "inventory.dispatch.status_draft")}
+                {t(dispatchStatusTranslationMap[fullOrder.status] ?? "inventory.dispatch.status_draft")}
               </span>
             </div>
             <div>
@@ -251,9 +221,9 @@ function DispatchOrderDetailDialog({
                           ) : null}
                         </div>
                         <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${stopStatusColorMap[stop.status] ?? ""}`}
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${dispatchStopStatusColorMap[stop.status] ?? ""}`}
                         >
-                          {t(stopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}
+                          {t(dispatchStopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}
                         </span>
                       </div>
                       {stop.delivery_address ? (

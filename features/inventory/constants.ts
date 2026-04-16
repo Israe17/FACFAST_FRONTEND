@@ -151,3 +151,61 @@ export const dispatchTypeValues = ["individual", "consolidated"] as const;
 export const dispatchOrderStatusValues = ["draft", "ready", "dispatched", "in_transit", "completed", "cancelled"] as const;
 export const dispatchStopStatusValues = ["pending", "in_transit", "delivered", "failed", "partial", "skipped"] as const;
 export const dispatchExpenseTypeValues = ["fuel", "tolls", "per_diem", "driver_pay", "helper", "outsource", "maintenance", "other"] as const;
+
+// --- Dispatch UI maps (shared across dispatch components) ---
+
+import type { FrontendTranslationKey } from "@/shared/i18n/translations";
+
+export const dispatchStatusColorMap: Record<string, string> = {
+  draft: "bg-yellow-100 text-yellow-800",
+  ready: "bg-blue-100 text-blue-800",
+  dispatched: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+export const dispatchStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  draft: "inventory.dispatch.status_draft",
+  ready: "inventory.dispatch.status_ready",
+  dispatched: "inventory.dispatch.status_dispatched",
+  in_transit: "inventory.dispatch.status_in_transit",
+  completed: "inventory.dispatch.status_completed",
+  cancelled: "inventory.dispatch.status_cancelled",
+};
+
+export const dispatchBorderColorMap: Record<string, string> = {
+  draft: "border-l-yellow-400",
+  ready: "border-l-blue-400",
+  dispatched: "border-l-indigo-400",
+  in_transit: "border-l-orange-400",
+  completed: "border-l-green-400",
+  cancelled: "border-l-red-400",
+};
+
+export const dispatchProgressColorMap: Record<string, string> = {
+  draft: "bg-yellow-400",
+  ready: "bg-blue-400",
+  dispatched: "bg-indigo-400",
+  in_transit: "bg-orange-400",
+  completed: "bg-green-400",
+  cancelled: "bg-red-400",
+};
+
+export const dispatchStopStatusColorMap: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-800",
+  in_transit: "bg-orange-100 text-orange-800",
+  delivered: "bg-green-100 text-green-800",
+  failed: "bg-red-100 text-red-800",
+  partial: "bg-orange-100 text-orange-800",
+  skipped: "bg-gray-100 text-gray-800",
+};
+
+export const dispatchStopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  pending: "inventory.dispatch.stop_pending",
+  in_transit: "inventory.dispatch.stop_in_transit",
+  delivered: "inventory.dispatch.stop_delivered",
+  failed: "inventory.dispatch.stop_failed",
+  partial: "inventory.dispatch.stop_partial",
+  skipped: "inventory.dispatch.stop_skipped",
+};

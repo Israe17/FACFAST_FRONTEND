@@ -4,71 +4,28 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, MapPin, Truck } from "lucide-react";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import type { FrontendTranslationKey } from "@/shared/i18n/translations";
-
-import type { DispatchOrder, DispatchStop, Warehouse, Zone } from "../types";
+import type { DispatchOrder, Warehouse, Zone } from "../types";
+import {
+  dispatchStatusColorMap,
+  dispatchStatusTranslationMap,
+  dispatchBorderColorMap,
+  dispatchProgressColorMap,
+  dispatchStopStatusTranslationMap,
+} from "../constants";
 import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 
 type DispatchMapViewProps = {
   orders: DispatchOrder[];
   warehouses?: Warehouse[];
   zones?: Zone[];
-  refreshKey?: number;
-  /** Hide the built-in order list sidebar (default true). Set to false when the parent already provides its own panel. */
-  showSidebar?: boolean;
   /** Use h-full instead of h-[600px] to fill parent container. */
   fillHeight?: boolean;
-  onOrderClick?: (order: DispatchOrder) => void;
   /** Called when a sidebar card is selected/deselected (for external panel integration). */
   onOrderSelect?: (orderId: string) => void;
   /** Called when "Ver detalle completo" is clicked in the inline detail panel. */
   onViewOrderDetail?: (order: DispatchOrder) => void;
 };
 
-const statusColorMap: Record<string, string> = {
-  draft: "bg-yellow-100 text-yellow-800",
-  ready: "bg-blue-100 text-blue-800",
-  dispatched: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusTranslationMap: Record<string, FrontendTranslationKey> = {
-  draft: "inventory.dispatch.status_draft",
-  ready: "inventory.dispatch.status_ready",
-  dispatched: "inventory.dispatch.status_dispatched",
-  in_transit: "inventory.dispatch.status_in_transit",
-  completed: "inventory.dispatch.status_completed",
-  cancelled: "inventory.dispatch.status_cancelled",
-};
-
-const borderColorMap: Record<string, string> = {
-  draft: "border-l-yellow-400",
-  ready: "border-l-blue-400",
-  dispatched: "border-l-indigo-400",
-  in_transit: "border-l-orange-400",
-  completed: "border-l-green-400",
-  cancelled: "border-l-red-400",
-};
-
-const progressColorMap: Record<string, string> = {
-  draft: "bg-yellow-400",
-  ready: "bg-blue-400",
-  dispatched: "bg-indigo-400",
-  in_transit: "bg-orange-400",
-  completed: "bg-green-400",
-  cancelled: "bg-red-400",
-};
-
-const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
-  pending: "inventory.dispatch.stop_pending",
-  in_transit: "inventory.dispatch.stop_in_transit",
-  delivered: "inventory.dispatch.stop_delivered",
-  failed: "inventory.dispatch.stop_failed",
-  partial: "inventory.dispatch.stop_partial",
-  skipped: "inventory.dispatch.stop_skipped",
-};
 
 function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   const [open, setOpen] = useState(true);
@@ -122,7 +79,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, fillHeight = false, onOrderClick, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -144,7 +101,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
             status: stop.status,
             popup: `<strong>${order.code ?? `DO-${order.id}`}</strong><br/>
               ${stop.sale_order?.code ?? ""} — ${stop.customer_contact?.name ?? ""}<br/>
-              <em>${t(stopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}</em>`,
+              <em>${t(dispatchStopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}</em>`,
           });
         }
       }
@@ -191,9 +148,9 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
         lat: w.latitude!,
         lng: w.longitude!,
         color: "#16a34a",
-        popup: `<strong>Bodega: ${w.name}</strong>`,
+        popup: `<strong>${t("inventory.dispatch.legend_warehouse")}: ${w.name}</strong>`,
       }));
-  }, [warehouses]);
+  }, [warehouses, t]);
 
   // Filter markers to highlight selected order
   const visibleMarkers = useMemo(() => {
@@ -223,7 +180,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
     setSelectedOrderId((prev) => (prev === orderId ? null : orderId));
   }
 
-  // Filter active orders for the list (non-cancelled, non-completed)
+  // Filter active orders for the list (exclude cancelled)
   const activeOrders = useMemo(
     () => orders.filter((o) => o.status !== "cancelled"),
     [orders],
@@ -263,20 +220,18 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                 key={order.id}
                 role="button"
                 tabIndex={0}
-                className={`border-l-4 ${borderColorMap[order.status] ?? "border-l-gray-400"} rounded-md border p-2.5 transition-colors cursor-pointer ${
+                className={`border-l-4 ${dispatchBorderColorMap[order.status] ?? "border-l-gray-400"} rounded-md border p-2.5 transition-colors cursor-pointer ${
                   isSelected ? "bg-accent" : "hover:bg-muted/40"
                 }`}
                 onClick={() => {
                   handleOrderSelect(String(order.id));
                   if (onOrderSelect) onOrderSelect(String(order.id));
-                  if (onOrderClick) onOrderClick(order);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     handleOrderSelect(String(order.id));
                     if (onOrderSelect) onOrderSelect(String(order.id));
-                    if (onOrderClick) onOrderClick(order);
                   }
                 }}
               >
@@ -286,9 +241,9 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                     {order.code ?? `DO-${order.id}`}
                   </span>
                   <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${statusColorMap[order.status] ?? ""}`}
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${dispatchStatusColorMap[order.status] ?? ""}`}
                   >
-                    {t(statusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+                    {t(dispatchStatusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
                   </span>
                 </div>
 
@@ -337,7 +292,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                 </div>
                 <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-0.5">
                   <div
-                    className={`h-full rounded-full transition-all ${progressColorMap[order.status] ?? "bg-gray-400"}`}
+                    className={`h-full rounded-full transition-all ${dispatchProgressColorMap[order.status] ?? "bg-gray-400"}`}
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -346,7 +301,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
           })}
           {activeOrders.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Sin órdenes de despacho
+              {t("inventory.dispatch.no_dispatch_orders")}
             </p>
           ) : null}
         </div>

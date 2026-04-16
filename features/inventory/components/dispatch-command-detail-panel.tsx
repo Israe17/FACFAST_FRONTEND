@@ -28,10 +28,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { DispatchOrder, DispatchStop } from "../types";
+import {
+  dispatchStatusColorMap,
+  dispatchStatusTranslationMap,
+  dispatchStopStatusColorMap,
+  dispatchStopStatusTranslationMap,
+} from "../constants";
 
 type DispatchCommandDetailPanelProps = {
   dispatchOrder: DispatchOrder;
@@ -39,41 +44,6 @@ type DispatchCommandDetailPanelProps = {
   onViewFullDetail?: () => void;
 };
 
-const statusColorMap: Record<string, string> = {
-  draft: "bg-yellow-100 text-yellow-800",
-  ready: "bg-blue-100 text-blue-800",
-  dispatched: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusTranslationMap: Record<string, FrontendTranslationKey> = {
-  draft: "inventory.dispatch.status_draft",
-  ready: "inventory.dispatch.status_ready",
-  dispatched: "inventory.dispatch.status_dispatched",
-  in_transit: "inventory.dispatch.status_in_transit",
-  completed: "inventory.dispatch.status_completed",
-  cancelled: "inventory.dispatch.status_cancelled",
-};
-
-const stopStatusColorMap: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  in_transit: "bg-orange-100 text-orange-800",
-  delivered: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
-  partial: "bg-orange-100 text-orange-800",
-  skipped: "bg-gray-100 text-gray-800",
-};
-
-const stopStatusTranslationMap: Record<string, FrontendTranslationKey> = {
-  pending: "inventory.dispatch.stop_pending",
-  in_transit: "inventory.dispatch.stop_in_transit",
-  delivered: "inventory.dispatch.stop_delivered",
-  failed: "inventory.dispatch.stop_failed",
-  partial: "inventory.dispatch.stop_partial",
-  skipped: "inventory.dispatch.stop_skipped",
-};
 
 // --- Sortable stop item ---
 type SortableStopItemProps = {
@@ -135,11 +105,11 @@ function SortableStopItem({ stop, t }: SortableStopItemProps) {
           </div>
           <span
             className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium shrink-0 ${
-              stopStatusColorMap[stop.status] ?? ""
+              dispatchStopStatusColorMap[stop.status] ?? ""
             }`}
           >
             {t(
-              stopStatusTranslationMap[stop.status] ??
+              dispatchStopStatusTranslationMap[stop.status] ??
                 "inventory.dispatch.stop_pending",
             )}
           </span>
@@ -198,11 +168,11 @@ function DispatchCommandDetailPanel({
           </span>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${
-              statusColorMap[dispatchOrder.status] ?? ""
+              dispatchStatusColorMap[dispatchOrder.status] ?? ""
             }`}
           >
             {t(
-              statusTranslationMap[dispatchOrder.status] ??
+              dispatchStatusTranslationMap[dispatchOrder.status] ??
                 "inventory.dispatch.status_draft",
             )}
           </span>

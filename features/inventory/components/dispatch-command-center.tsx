@@ -160,9 +160,9 @@ function DispatchCommandCenter({
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)] overflow-x-auto">
+    <div className="flex flex-col h-[calc(100vh-220px)]">
       {/* Top KPIs bar */}
-      <div className="flex items-center gap-6 border-b px-4 py-2.5 shrink-0 bg-background min-w-[960px]">
+      <div className="flex items-center gap-6 border-b px-4 py-2.5 shrink-0 bg-background">
         <div className="flex items-center gap-2">
           <Package className="size-4 text-orange-500" />
           <span className="text-sm text-muted-foreground">
@@ -193,7 +193,7 @@ function DispatchCommandCenter({
       </div>
 
       {/* Main 3-panel layout */}
-      <div className="flex flex-1 min-h-0 min-w-[960px]">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left panel: Pending orders */}
         <div className="w-72 shrink-0 border-r flex flex-col h-full bg-background">
           <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
@@ -258,11 +258,12 @@ function DispatchCommandCenter({
         </div>
 
         {/* Center: Map */}
-        <div className="flex-1 relative z-0">
+        <div className="flex-1 min-w-0 relative z-0 overflow-hidden">
           <DispatchMapView
             orders={dispatchOrders}
             warehouses={warehouses}
             zones={zones}
+            showSidebar={false}
             onOrderClick={onViewDispatchDetail}
           />
         </div>

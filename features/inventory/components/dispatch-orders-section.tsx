@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 
 import {
@@ -73,16 +73,23 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
   const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
+  // Restore sidebar when unmounting (user navigates away while in operational view)
+  useEffect(() => {
+    return () => {
+      if (sidebarWasOpen.current) {
+        setSidebarOpen(true);
+      }
+    };
+  }, [setSidebarOpen]);
+
   const handleViewModeChange = useCallback(
     (mode: "table" | "map" | "command") => {
       if (mode === "command" || mode === "map") {
-        // Save current sidebar state before collapsing
         if (viewMode === "table") {
           sidebarWasOpen.current = sidebarOpen;
         }
         setSidebarOpen(false);
       } else {
-        // Restore sidebar when going back to table
         setSidebarOpen(sidebarWasOpen.current);
       }
       setViewMode(mode);

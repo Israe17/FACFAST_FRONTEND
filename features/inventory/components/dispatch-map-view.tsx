@@ -6,7 +6,7 @@ import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/sh
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
-import type { DispatchOrder, DispatchStop, Warehouse, Zone } from "../types";
+import type { DispatchOrder, Warehouse, Zone } from "../types";
 import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 
 type DispatchMapViewProps = {
@@ -14,11 +14,8 @@ type DispatchMapViewProps = {
   warehouses?: Warehouse[];
   zones?: Zone[];
   refreshKey?: number;
-  /** Hide the built-in order list sidebar (default true). Set to false when the parent already provides its own panel. */
-  showSidebar?: boolean;
   /** Use h-full instead of h-[600px] to fill parent container. */
   fillHeight?: boolean;
-  onOrderClick?: (order: DispatchOrder) => void;
   /** Called when a sidebar card is selected/deselected (for external panel integration). */
   onOrderSelect?: (orderId: string) => void;
   /** Called when "Ver detalle completo" is clicked in the inline detail panel. */
@@ -122,7 +119,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, fillHeight = false, onOrderClick, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, fillHeight = false, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -191,9 +188,9 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
         lat: w.latitude!,
         lng: w.longitude!,
         color: "#16a34a",
-        popup: `<strong>Bodega: ${w.name}</strong>`,
+        popup: `<strong>${t("inventory.dispatch.legend_warehouse")}: ${w.name}</strong>`,
       }));
-  }, [warehouses]);
+  }, [warehouses, t]);
 
   // Filter markers to highlight selected order
   const visibleMarkers = useMemo(() => {
@@ -269,14 +266,12 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
                 onClick={() => {
                   handleOrderSelect(String(order.id));
                   if (onOrderSelect) onOrderSelect(String(order.id));
-                  if (onOrderClick) onOrderClick(order);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     handleOrderSelect(String(order.id));
                     if (onOrderSelect) onOrderSelect(String(order.id));
-                    if (onOrderClick) onOrderClick(order);
                   }
                 }}
               >
@@ -346,7 +341,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
           })}
           {activeOrders.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Sin órdenes de despacho
+              {t("inventory.dispatch.no_dispatch_orders")}
             </p>
           ) : null}
         </div>

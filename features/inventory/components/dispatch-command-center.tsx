@@ -86,6 +86,19 @@ function DispatchCommandCenter({
 
   const selectedCount = selectedPendingIds.size;
 
+  // Check if selected DO can accept new stops
+  const canAssignToSelected = useMemo(() => {
+    if (!selectedDispatchOrder) return false;
+    if (!selectedDispatchOrder.lifecycle?.can_edit) return false;
+    if (
+      selectedDispatchOrder.dispatch_type === "individual" &&
+      (selectedDispatchOrder.stops ?? []).length > 0
+    ) {
+      return false;
+    }
+    return true;
+  }, [selectedDispatchOrder]);
+
   // --- Handlers ---
   const handleTogglePendingSelect = useCallback((orderId: string) => {
     setSelectedPendingIds((prev) => {
@@ -105,22 +118,30 @@ function DispatchCommandCenter({
 
   const handleAssignSingle = useCallback(
     async (orderId: string) => {
-      if (selectedDispatchId) {
-        await addStopMutation.mutateAsync({ sale_order_id: orderId });
+      if (selectedDispatchId && canAssignToSelected) {
+        const nextSeq = (selectedDispatchOrder?.stops ?? []).length + 1;
+        await addStopMutation.mutateAsync({
+          sale_order_id: orderId,
+          delivery_sequence: nextSeq,
+        });
       } else {
         onCreateDispatch();
       }
     },
-    [selectedDispatchId, addStopMutation, onCreateDispatch],
+    [selectedDispatchId, canAssignToSelected, selectedDispatchOrder, addStopMutation, onCreateDispatch],
   );
 
   const handleBulkAssign = useCallback(async () => {
     if (!selectedDispatchId || selectedCount === 0) return;
+    let seq = (selectedDispatchOrder?.stops ?? []).length + 1;
     for (const saleOrderId of selectedPendingIds) {
-      await addStopMutation.mutateAsync({ sale_order_id: saleOrderId });
+      await addStopMutation.mutateAsync({
+        sale_order_id: saleOrderId,
+        delivery_sequence: seq++,
+      });
     }
     setSelectedPendingIds(new Set());
-  }, [selectedDispatchId, selectedCount, selectedPendingIds, addStopMutation]);
+  }, [selectedDispatchId, selectedCount, selectedPendingIds, selectedDispatchOrder, addStopMutation]);
 
   const handleDispatchBarClick = useCallback(
     (orderId: string) => {
@@ -213,7 +234,7 @@ function DispatchCommandCenter({
                   count: selectedCount,
                 })}
               </p>
-              {selectedDispatchId ? (
+              {selectedDispatchId && canAssignToSelected ? (
                 <Button
                   size="sm"
                   className="w-full"

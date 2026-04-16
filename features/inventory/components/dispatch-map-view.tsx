@@ -7,6 +7,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
 import type { DispatchOrder, DispatchStop, Warehouse, Zone } from "../types";
+import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 
 type DispatchMapViewProps = {
   orders: DispatchOrder[];
@@ -20,6 +21,8 @@ type DispatchMapViewProps = {
   onOrderClick?: (order: DispatchOrder) => void;
   /** Called when a sidebar card is selected/deselected (for external panel integration). */
   onOrderSelect?: (orderId: string) => void;
+  /** Called when "Ver detalle completo" is clicked in the inline detail panel. */
+  onViewOrderDetail?: (order: DispatchOrder) => void;
 };
 
 const statusColorMap: Record<string, string> = {
@@ -119,7 +122,7 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
   );
 }
 
-function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, fillHeight = false, onOrderClick, onOrderSelect }: DispatchMapViewProps) {
+function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, showSidebar = true, fillHeight = false, onOrderClick, onOrderSelect, onViewOrderDetail }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -348,6 +351,23 @@ function DispatchMapView({ orders, warehouses = [], zones = [], refreshKey, show
           ) : null}
         </div>
       </div>
+
+      {/* Center: Detail panel (inline, when order selected) */}
+      {selectedOrder ? (
+        <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background">
+          <DispatchCommandDetailPanel
+            dispatchOrder={selectedOrder}
+            onClose={() => {
+              setSelectedOrderId(null);
+            }}
+            onViewFullDetail={
+              onViewOrderDetail
+                ? () => onViewOrderDetail(selectedOrder)
+                : undefined
+            }
+          />
+        </div>
+      ) : null}
 
       {/* Right: Map */}
       <div className="flex-1 relative">

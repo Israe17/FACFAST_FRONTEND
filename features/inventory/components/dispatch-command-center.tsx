@@ -10,7 +10,6 @@ import type { SaleOrder } from "@/features/sales/types";
 
 import { useAddDispatchStopMutation } from "../queries";
 import type { DispatchOrder, Warehouse, Zone } from "../types";
-import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 import { DispatchMapView } from "./dispatch-map-view";
 import { DispatchSmartSuggestions } from "./dispatch-smart-suggestions";
 import { PendingOrderCard } from "./pending-order-card";
@@ -149,10 +148,6 @@ function DispatchCommandCenter({
     [],
   );
 
-  const handleCloseDetail = useCallback(() => {
-    setSelectedDispatchId(null);
-  }, []);
-
   const handleSuggestionSelect = useCallback((orderIds: string[]) => {
     setSelectedPendingIds(new Set(orderIds));
     setSuggestionsVisible(false);
@@ -256,7 +251,7 @@ function DispatchCommandCenter({
           ) : null}
         </div>
 
-        {/* Center: Map with sidebar */}
+        {/* Center: Map with sidebar + inline detail panel */}
         <div className="flex-1 min-w-0 relative z-0 overflow-hidden">
           <DispatchMapView
             orders={dispatchOrders}
@@ -264,19 +259,9 @@ function DispatchCommandCenter({
             zones={zones}
             fillHeight
             onOrderSelect={handleDispatchBarClick}
+            onViewOrderDetail={onViewDispatchDetail}
           />
         </div>
-
-        {/* Right panel: Dispatch detail (conditional) */}
-        {selectedDispatchOrder ? (
-          <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background">
-            <DispatchCommandDetailPanel
-              dispatchOrder={selectedDispatchOrder}
-              onClose={handleCloseDetail}
-              onViewFullDetail={() => onViewDispatchDetail(selectedDispatchOrder)}
-            />
-          </div>
-        ) : null}
       </div>
     </div>
   );

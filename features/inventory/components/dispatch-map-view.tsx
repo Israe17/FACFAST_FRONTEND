@@ -13,6 +13,8 @@ type DispatchMapViewProps = {
   warehouses?: Warehouse[];
   zones?: Zone[];
   refreshKey?: number;
+  /** Hide the built-in order list sidebar (default true). Set to false when the parent already provides its own panel. */
+  showSidebar?: boolean;
   onOrderClick?: (order: DispatchOrder) => void;
 };
 

@@ -160,9 +160,9 @@ function DispatchCommandCenter({
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)]">
+    <div className="flex flex-col h-[calc(100vh-220px)] overflow-x-auto">
       {/* Top KPIs bar */}
-      <div className="flex items-center gap-6 border-b px-4 py-2.5 shrink-0 bg-background">
+      <div className="flex items-center gap-6 border-b px-4 py-2.5 shrink-0 bg-background min-w-[960px]">
         <div className="flex items-center gap-2">
           <Package className="size-4 text-orange-500" />
           <span className="text-sm text-muted-foreground">
@@ -193,9 +193,9 @@ function DispatchCommandCenter({
       </div>
 
       {/* Main 3-panel layout */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 min-w-[960px]">
         {/* Left panel: Pending orders */}
-        <div className="w-72 border-r flex flex-col h-full bg-background">
+        <div className="w-72 shrink-0 border-r flex flex-col h-full bg-background">
           <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
             <p className="text-sm font-semibold">
               {t("inventory.dispatch.pending_orders")} ({pendingCount})
@@ -269,7 +269,7 @@ function DispatchCommandCenter({
 
         {/* Right panel: Dispatch detail (conditional) */}
         {selectedDispatchOrder ? (
-          <div className="w-80 border-l overflow-y-auto h-full bg-background">
+          <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background">
             <DispatchCommandDetailPanel
               dispatchOrder={selectedDispatchOrder}
               onClose={handleCloseDetail}

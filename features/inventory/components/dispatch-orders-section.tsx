@@ -231,9 +231,11 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
                 }}
               >
                 <Plus className="size-4" />
-                {t("inventory.common.create_entity", {
-                  entity: t("inventory.entity.dispatch_order"),
-                })}
+                <span className="hidden sm:inline">
+                  {t("inventory.common.create_entity", {
+                    entity: t("inventory.entity.dispatch_order"),
+                  })}
+                </span>
               </Button>
             ) : null}
           </div>

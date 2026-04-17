@@ -1,16 +1,9 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Package, Plus, Truck, CheckCircle2 } from "lucide-react";
+import { ChevronDown, Package, Plus, Truck, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetBody,
-} from "@/components/ui/sheet";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 
@@ -260,50 +253,57 @@ function DispatchCommandCenter({
 
       {/* Main layout */}
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
-        {/* Left panel: Pending orders — inline on desktop, Sheet on mobile */}
-        {isMobile ? (
-          <Sheet open={mobilePendingOpen} onOpenChange={setMobilePendingOpen}>
-            <SheetContent side="left" className="p-0">
-              <SheetHeader className="sr-only">
-                <SheetTitle>{t("inventory.dispatch.pending_orders")}</SheetTitle>
-              </SheetHeader>
-              <SheetBody className="p-0">
-                {pendingPanelContent}
-              </SheetBody>
-            </SheetContent>
-          </Sheet>
-        ) : (
+        {/* Left panel: Pending orders — inline on desktop, collapsible top panel on mobile */}
+        {!isMobile ? (
           <div className="w-72 shrink-0 border-r flex flex-col h-full bg-background">
             {pendingPanelContent}
           </div>
-        )}
+        ) : null}
 
         {/* Center: Map with sidebar + inline detail panel */}
-        <div className="flex-1 min-w-0 relative z-0 overflow-hidden">
-          <DispatchMapView
-            orders={dispatchOrders}
-            warehouses={warehouses}
-            zones={zones}
-            fillHeight
-            onOrderSelect={handleDispatchBarClick}
-            onViewOrderDetail={onViewDispatchDetail}
-            onEditOrder={onEditDispatch}
-            onDispatchOrder={onDispatchDispatch}
-            onCancelOrder={onCancelDispatch}
-            onAddStop={onAddStop}
-          />
+        <div className="flex-1 min-w-0 relative z-0 overflow-hidden flex flex-col">
+          {/* Mobile: collapsible pending orders panel */}
+          {isMobile && pendingCount > 0 ? (
+            <div className="shrink-0 bg-background border-b z-10">
+              <button
+                type="button"
+                className="flex items-center justify-between w-full px-4 py-2.5 active:bg-muted/50 transition-colors"
+                onClick={() => setMobilePendingOpen((v) => !v)}
+              >
+                <div className="flex items-center gap-2">
+                  <Package className="size-4 text-orange-500" />
+                  <span className="text-sm font-semibold">
+                    {t("inventory.dispatch.pending_orders")}
+                  </span>
+                  <span className="text-xs bg-orange-500 text-white rounded-full px-1.5 py-0.5 font-medium tabular-nums">
+                    {pendingCount}
+                  </span>
+                </div>
+                <ChevronDown className={`size-4 text-muted-foreground transition-transform ${mobilePendingOpen ? "rotate-180" : ""}`} />
+              </button>
+              {mobilePendingOpen ? (
+                <div className="max-h-[40vh] overflow-y-auto border-t">
+                  {pendingPanelContent}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="flex-1 min-h-0">
+            <DispatchMapView
+              orders={dispatchOrders}
+              warehouses={warehouses}
+              zones={zones}
+              fillHeight
+              onOrderSelect={handleDispatchBarClick}
+              onViewOrderDetail={onViewDispatchDetail}
+              onEditOrder={onEditDispatch}
+              onDispatchOrder={onDispatchDispatch}
+              onCancelOrder={onCancelDispatch}
+              onAddStop={onAddStop}
+            />
+          </div>
         </div>
       </div>
-      {isMobile && pendingCount > 0 ? (
-        <button
-          type="button"
-          className="absolute top-14 right-3 z-10 flex items-center gap-1 rounded-full bg-orange-500 text-white px-2.5 py-1 shadow-lg text-xs font-medium active:scale-95 transition-transform"
-          onClick={() => setMobilePendingOpen(true)}
-        >
-          <Package className="size-3" />
-          {pendingCount}
-        </button>
-      ) : null}
     </div>
   );
 }

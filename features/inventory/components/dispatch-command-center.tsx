@@ -297,11 +297,11 @@ function DispatchCommandCenter({
       {isMobile && pendingCount > 0 ? (
         <button
           type="button"
-          className="absolute top-2 right-3 z-10 flex items-center gap-1.5 rounded-full bg-orange-500 text-white pl-2.5 pr-3 py-1.5 shadow-lg text-xs font-medium active:scale-95 transition-transform"
+          className="absolute top-14 right-3 z-10 flex items-center gap-1 rounded-full bg-orange-500 text-white px-2.5 py-1 shadow-lg text-xs font-medium active:scale-95 transition-transform"
           onClick={() => setMobilePendingOpen(true)}
         >
-          <Package className="size-3.5" />
-          {pendingCount} {t("inventory.dispatch.pending_orders")}
+          <Package className="size-3" />
+          {pendingCount}
         </button>
       ) : null}
     </div>

@@ -410,14 +410,14 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
-    {/* Mobile FAB — bottom pill style like Uber/Rappi */}
+    {/* Mobile FAB */}
     {isMobile ? (
       <button
         type="button"
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full bg-primary text-primary-foreground pl-3 pr-4 py-2.5 shadow-lg text-sm font-medium active:scale-95 transition-transform"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3 py-2 shadow-lg text-xs font-medium active:scale-95 transition-transform"
         onClick={() => setMobileListOpen(true)}
       >
-        <Truck className="size-4" />
+        <Truck className="size-3.5" />
         {activeOrders.length} {t("inventory.entity.dispatch_orders")}
       </button>
     ) : null}

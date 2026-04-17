@@ -1,9 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, MapPin, Truck } from "lucide-react";
+import { ChevronDown, ChevronUp, List, MapPin, Truck } from "lucide-react";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetBody,
+} from "@/components/ui/sheet";
 import type { DispatchOrder, Warehouse, Zone } from "../types";
 import {
   dispatchStatusColorMap,
@@ -35,8 +44,8 @@ type DispatchMapViewProps = {
 };
 
 
-function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
-  const [open, setOpen] = useState(true);
+function MapLegend({ t, defaultCollapsed = false }: { t: ReturnType<typeof useAppTranslator>["t"]; defaultCollapsed?: boolean }) {
+  const [open, setOpen] = useState(!defaultCollapsed);
 
   const LEGEND_ITEMS = [
     { color: "#eab308", label: t("inventory.dispatch.legend_pending") },
@@ -89,7 +98,9 @@ function MapLegend({ t }: { t: ReturnType<typeof useAppTranslator>["t"] }) {
 
 function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = false, onOrderSelect, onViewOrderDetail, onEditOrder, onDispatchOrder, onCancelOrder, onAddStop }: DispatchMapViewProps) {
   const { t } = useAppTranslator();
+  const isMobile = useIsMobile();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [mobileListOpen, setMobileListOpen] = useState(false);
 
   const selectedOrder = useMemo(
     () => orders.find((o) => String(o.id) === selectedOrderId) ?? null,
@@ -186,6 +197,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
 
   function handleOrderSelect(orderId: string) {
     setSelectedOrderId((prev) => (prev === orderId ? null : orderId));
+    if (isMobile) setMobileListOpen(false);
   }
 
   // Filter active orders for the list (exclude cancelled)
@@ -194,166 +206,185 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
     [orders],
   );
 
+  const orderListContent = (
+    <>
+      <div className="sticky top-0 bg-background border-b px-3 py-2">
+        <p className="text-sm font-semibold flex items-center gap-1.5">
+          <Truck className="size-4" />
+          {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+        </p>
+      </div>
+      <div className="p-2 space-y-2">
+        {activeOrders.map((order) => {
+          const isSelected = String(order.id) === selectedOrderId;
+          const stopsWithCoords = (order.stops ?? []).filter(
+            (s) => s.delivery_latitude && s.delivery_longitude,
+          ).length;
+          const totalStops = (order.stops ?? []).length;
+
+          const deliveredCount = (order.stops ?? []).filter(
+            (s) => s.status === "delivered",
+          ).length;
+          const progressPercent = totalStops > 0 ? (deliveredCount / totalStops) * 100 : 0;
+
+          const whId = order.origin_warehouse_id ?? order.origin_warehouse?.id;
+          const whHasCoords = whId
+            ? Boolean(warehouses.find((w) => String(w.id) === String(whId))?.latitude)
+            : false;
+
+          return (
+            <div
+              key={order.id}
+              role="button"
+              tabIndex={0}
+              className={`border-l-4 ${dispatchBorderColorMap[order.status] ?? "border-l-gray-400"} rounded-md border p-2.5 transition-colors cursor-pointer ${
+                isSelected ? "bg-accent" : "hover:bg-muted/40"
+              }`}
+              onClick={() => {
+                handleOrderSelect(String(order.id));
+                if (onOrderSelect) onOrderSelect(String(order.id));
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleOrderSelect(String(order.id));
+                  if (onOrderSelect) onOrderSelect(String(order.id));
+                }
+              }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-semibold text-sm truncate">
+                  {order.code ?? `DO-${order.id}`}
+                </span>
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${dispatchStatusColorMap[order.status] ?? ""}`}
+                >
+                  {t(dispatchStatusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
+                </span>
+              </div>
+
+              <div className="text-xs text-muted-foreground space-y-0.5">
+                {order.vehicle ? (
+                  <p className="flex items-center gap-1">
+                    <Truck className="size-3 shrink-0" />
+                    <span className="truncate">{order.vehicle.plate_number}</span>
+                    {order.driver_user ? (
+                      <span className="truncate">· {order.driver_user.name}</span>
+                    ) : null}
+                  </p>
+                ) : order.driver_user ? (
+                  <p className="truncate">{order.driver_user.name}</p>
+                ) : null}
+
+                <p className="flex items-center gap-1">
+                  <MapPin className="size-3 shrink-0" />
+                  {totalStops} {t("inventory.dispatch.stops_label")}
+                  {stopsWithCoords < totalStops ? (
+                    <span className="text-amber-600">
+                      ({totalStops - stopsWithCoords} {t("inventory.dispatch.stops_no_location")})
+                    </span>
+                  ) : null}
+                </p>
+                {whId && !whHasCoords ? (
+                  <p className="text-amber-600">
+                    ({t("inventory.dispatch.warehouse_no_location")})
+                  </p>
+                ) : null}
+                {!whId ? (
+                  <p className="text-amber-600">
+                    ({t("inventory.dispatch.no_origin_warehouse")})
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1.5">
+                <span>{t("inventory.dispatch.stops_label")}</span>
+                <span className="font-medium tabular-nums">
+                  {deliveredCount}/{totalStops}
+                </span>
+              </div>
+              <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-0.5">
+                <div
+                  className={`h-full rounded-full transition-all ${dispatchProgressColorMap[order.status] ?? "bg-gray-400"}`}
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+        {activeOrders.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            {t("inventory.dispatch.no_dispatch_orders")}
+          </p>
+        ) : null}
+      </div>
+    </>
+  );
+
+  const detailPanelContent = selectedOrder ? (
+    <DispatchCommandDetailPanel
+      dispatchOrder={selectedOrder}
+      onClose={() => setSelectedOrderId(null)}
+      onViewFullDetail={onViewOrderDetail ? () => onViewOrderDetail(selectedOrder) : undefined}
+      onEdit={onEditOrder ? () => onEditOrder(selectedOrder) : undefined}
+      onDispatch={onDispatchOrder ? () => onDispatchOrder(selectedOrder) : undefined}
+      onCancel={onCancelOrder ? () => onCancelOrder(selectedOrder) : undefined}
+      onAddStop={onAddStop ? () => onAddStop(selectedOrder) : undefined}
+    />
+  ) : null;
+
   return (
     <div className={`relative ${fillHeight ? "h-full" : ""}`}>
     <div className={`flex ${fillHeight ? "h-full" : "h-[600px]"} rounded-lg border overflow-hidden relative z-0`}>
-      {/* Left: Order list */}
-      <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
-        <div className="sticky top-0 bg-background border-b px-3 py-2">
-          <p className="text-sm font-semibold flex items-center gap-1.5">
-            <Truck className="size-4" />
-            {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
-          </p>
+      {/* Left: Order list — inline on desktop, Sheet on mobile */}
+      {isMobile ? (
+        <Sheet open={mobileListOpen} onOpenChange={setMobileListOpen}>
+          <SheetContent side="left" className="p-0 overflow-y-auto">
+            <SheetHeader className="sr-only">
+              <SheetTitle>{t("inventory.entity.dispatch_orders")}</SheetTitle>
+            </SheetHeader>
+            <SheetBody className="p-0">
+              {orderListContent}
+            </SheetBody>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
+          {orderListContent}
         </div>
-        <div className="p-2 space-y-2">
-          {activeOrders.map((order) => {
-            const isSelected = String(order.id) === selectedOrderId;
-            const stopsWithCoords = (order.stops ?? []).filter(
-              (s) => s.delivery_latitude && s.delivery_longitude,
-            ).length;
-            const totalStops = (order.stops ?? []).length;
+      )}
 
-            const deliveredCount = (order.stops ?? []).filter(
-              (s) => s.status === "delivered",
-            ).length;
-            const progressPercent = totalStops > 0 ? (deliveredCount / totalStops) * 100 : 0;
-
-            const whId = order.origin_warehouse_id ?? order.origin_warehouse?.id;
-            const whHasCoords = whId
-              ? Boolean(warehouses.find((w) => String(w.id) === String(whId))?.latitude)
-              : false;
-
-            return (
-              <div
-                key={order.id}
-                role="button"
-                tabIndex={0}
-                className={`border-l-4 ${dispatchBorderColorMap[order.status] ?? "border-l-gray-400"} rounded-md border p-2.5 transition-colors cursor-pointer ${
-                  isSelected ? "bg-accent" : "hover:bg-muted/40"
-                }`}
-                onClick={() => {
-                  handleOrderSelect(String(order.id));
-                  if (onOrderSelect) onOrderSelect(String(order.id));
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleOrderSelect(String(order.id));
-                    if (onOrderSelect) onOrderSelect(String(order.id));
-                  }
-                }}
-              >
-                {/* Row 1: Code + status badge */}
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm truncate">
-                    {order.code ?? `DO-${order.id}`}
-                  </span>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ${dispatchStatusColorMap[order.status] ?? ""}`}
-                  >
-                    {t(dispatchStatusTranslationMap[order.status] ?? "inventory.dispatch.status_draft")}
-                  </span>
-                </div>
-
-                {/* Row 2: Vehicle + driver */}
-                <div className="text-xs text-muted-foreground space-y-0.5">
-                  {order.vehicle ? (
-                    <p className="flex items-center gap-1">
-                      <Truck className="size-3 shrink-0" />
-                      <span className="truncate">{order.vehicle.plate_number}</span>
-                      {order.driver_user ? (
-                        <span className="truncate">· {order.driver_user.name}</span>
-                      ) : null}
-                    </p>
-                  ) : order.driver_user ? (
-                    <p className="truncate">{order.driver_user.name}</p>
-                  ) : null}
-
-                  {/* Row 3: Stops + warnings */}
-                  <p className="flex items-center gap-1">
-                    <MapPin className="size-3 shrink-0" />
-                    {totalStops} {t("inventory.dispatch.stops_label")}
-                    {stopsWithCoords < totalStops ? (
-                      <span className="text-amber-600">
-                        ({totalStops - stopsWithCoords} {t("inventory.dispatch.stops_no_location")})
-                      </span>
-                    ) : null}
-                  </p>
-                  {whId && !whHasCoords ? (
-                    <p className="text-amber-600">
-                      ({t("inventory.dispatch.warehouse_no_location")})
-                    </p>
-                  ) : null}
-                  {!whId ? (
-                    <p className="text-amber-600">
-                      ({t("inventory.dispatch.no_origin_warehouse")})
-                    </p>
-                  ) : null}
-                </div>
-
-                {/* Progress */}
-                <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1.5">
-                  <span>{t("inventory.dispatch.stops_label")}</span>
-                  <span className="font-medium tabular-nums">
-                    {deliveredCount}/{totalStops}
-                  </span>
-                </div>
-                <div className="h-0.5 w-full rounded-full bg-muted overflow-hidden mt-0.5">
-                  <div
-                    className={`h-full rounded-full transition-all ${dispatchProgressColorMap[order.status] ?? "bg-gray-400"}`}
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-          {activeOrders.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              {t("inventory.dispatch.no_dispatch_orders")}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Center: Detail panel (inline, when order selected) */}
-      {selectedOrder ? (
+      {/* Detail panel — inline on desktop, Sheet on mobile */}
+      {isMobile ? (
+        <Sheet open={!!selectedOrder} onOpenChange={(open) => { if (!open) setSelectedOrderId(null); }}>
+          <SheetContent side="right" className="p-0 overflow-y-auto">
+            <SheetHeader className="sr-only">
+              <SheetTitle>{selectedOrder?.code ?? t("inventory.entity.dispatch_order")}</SheetTitle>
+            </SheetHeader>
+            <SheetBody className="p-0">
+              {detailPanelContent}
+            </SheetBody>
+          </SheetContent>
+        </Sheet>
+      ) : selectedOrder ? (
         <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background">
-          <DispatchCommandDetailPanel
-            dispatchOrder={selectedOrder}
-            onClose={() => {
-              setSelectedOrderId(null);
-            }}
-            onViewFullDetail={
-              onViewOrderDetail
-                ? () => onViewOrderDetail(selectedOrder)
-                : undefined
-            }
-            onEdit={
-              onEditOrder
-                ? () => onEditOrder(selectedOrder)
-                : undefined
-            }
-            onDispatch={
-              onDispatchOrder
-                ? () => onDispatchOrder(selectedOrder)
-                : undefined
-            }
-            onCancel={
-              onCancelOrder
-                ? () => onCancelOrder(selectedOrder)
-                : undefined
-            }
-            onAddStop={
-              onAddStop
-                ? () => onAddStop(selectedOrder)
-                : undefined
-            }
-          />
+          {detailPanelContent}
         </div>
       ) : null}
 
-      {/* Right: Map */}
+      {/* Map */}
       <div className="flex-1 relative">
+        {isMobile ? (
+          <Button
+            size="sm"
+            variant="secondary"
+            className="absolute bottom-3 left-3 z-10 shadow-md gap-1.5"
+            onClick={() => setMobileListOpen(true)}
+          >
+            <List className="size-4" />
+            {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+          </Button>
+        ) : null}
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
@@ -381,7 +412,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
-    <MapLegend t={t} />
+    <MapLegend t={t} defaultCollapsed={isMobile} />
     </div>
   );
 }

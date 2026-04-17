@@ -42,6 +42,7 @@ import {
   useZonesQuery,
 } from "../queries";
 import type { DispatchOrder } from "../types";
+import { AddDispatchStopDialog } from "./add-dispatch-stop-dialog";
 import { DispatchOrderDialog } from "./dispatch-order-dialog";
 import { DispatchOrderDetailDialog } from "./dispatch-order-detail-dialog";
 import { DispatchCommandCenter } from "./dispatch-command-center";
@@ -74,6 +75,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const [completeTarget, setCompleteTarget] = useState<DispatchOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DispatchOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DispatchOrder | null>(null);
+  const [addStopTarget, setAddStopTarget] = useState<DispatchOrder | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "map" | "command">("table");
   const { serverState, onStateChange, queryParams } = useServerTableState({ sort_by: "scheduled_date", sort_order: "DESC" });
 
@@ -109,6 +111,17 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
   const routesQuery = useRoutesQuery(enabled && canView);
   const vehiclesQuery = useVehiclesQuery(enabled && canView);
   const saleOrdersQuery = useSaleOrdersQuery(enabled && canView);
+
+  const pendingSaleOrders = useMemo(
+    () =>
+      (saleOrdersQuery.data ?? []).filter(
+        (o) =>
+          o.status === "confirmed" &&
+          o.fulfillment_mode === "delivery" &&
+          o.dispatch_status === "pending",
+      ),
+    [saleOrdersQuery.data],
+  );
 
   const ordersPaginatedQuery = useDispatchOrdersPaginatedQuery(queryParams, enabled && canView);
   const ordersQuery = useDispatchOrdersQuery(enabled && canView && viewMode !== "table");
@@ -279,16 +292,11 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               onEditOrder={handleEdit}
               onDispatchOrder={setDispatchTarget}
               onCancelOrder={setCancelTarget}
-              onAddStop={handleViewDetail}
+              onAddStop={setAddStopTarget}
             />
           ) : (
             <DispatchCommandCenter
-              pendingOrders={(saleOrdersQuery.data ?? []).filter(
-                (o) =>
-                  o.status === "confirmed" &&
-                  o.fulfillment_mode === "delivery" &&
-                  o.dispatch_status === "pending",
-              )}
+              pendingOrders={pendingSaleOrders}
               dispatchOrders={ordersQuery.data ?? []}
               warehouses={warehousesQuery.data ?? []}
               zones={zonesQuery.data ?? []}
@@ -300,7 +308,7 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
               onEditDispatch={handleEdit}
               onDispatchDispatch={setDispatchTarget}
               onCancelDispatch={setCancelTarget}
-              onAddStop={handleViewDetail}
+              onAddStop={setAddStopTarget}
             />
           )}
         </QueryStateWrapper>
@@ -334,6 +342,17 @@ function DispatchOrdersSection({ enabled = true }: DispatchOrdersSectionProps) {
           }
         }}
       />
+
+      {addStopTarget ? (
+        <AddDispatchStopDialog
+          dispatchOrder={addStopTarget}
+          pendingOrders={pendingSaleOrders}
+          open
+          onOpenChange={(open) => {
+            if (!open) setAddStopTarget(null);
+          }}
+        />
+      ) : null}
 
       {/* Ready confirmation dialog */}
       <AlertDialog

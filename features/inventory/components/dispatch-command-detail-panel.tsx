@@ -3,9 +3,11 @@
 import { useCallback, useState } from "react";
 import {
   Calendar,
+  ChevronDown,
   ExternalLink,
   GripVertical,
   MapPin,
+  Package,
   Plus,
   Truck,
   User,
@@ -69,6 +71,7 @@ const RESOLVED_STATUSES = new Set(["delivered", "failed", "partial", "skipped"])
 const STATUS_TRANSITION_OPTIONS = ["in_transit", "delivered", "failed", "partial", "skipped"] as const;
 
 function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: SortableStopItemProps) {
+  const [expanded, setExpanded] = useState(false);
   const {
     attributes,
     listeners,
@@ -156,6 +159,43 @@ function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: Sortable
             <MapPin className="size-3 shrink-0" />
             {address}
           </p>
+        ) : null}
+
+        {(stop.lines?.length ?? 0) > 0 ? (
+          <button
+            type="button"
+            className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+          >
+            <Package className="size-3" />
+            {stop.lines!.length} {t("inventory.dispatch.product")}
+            <ChevronDown className={`size-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        ) : null}
+
+        {expanded && stop.lines?.length ? (
+          <div className="rounded border bg-muted/30 text-xs mt-1">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="px-2 py-1 text-left font-medium">{t("inventory.dispatch.product")}</th>
+                  <th className="px-2 py-1 text-right font-medium w-12">{t("inventory.dispatch.ordered")}</th>
+                  <th className="px-2 py-1 text-right font-medium w-12">{t("inventory.dispatch.delivered")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stop.lines.map((line) => (
+                  <tr key={line.id} className="border-b last:border-b-0">
+                    <td className="px-2 py-1 truncate max-w-[120px]">
+                      {line.product_variant?.product?.name ?? line.product_variant?.sku ?? `#${line.product_variant_id}`}
+                    </td>
+                    <td className="px-2 py-1 text-right tabular-nums">{line.ordered_quantity}</td>
+                    <td className="px-2 py-1 text-right tabular-nums">{line.delivered_quantity ?? "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : null}
       </div>
     </div>

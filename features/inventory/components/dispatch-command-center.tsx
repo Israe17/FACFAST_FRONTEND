@@ -276,7 +276,7 @@ function DispatchCommandCenter({
             <Button
               size="sm"
               variant="secondary"
-              className="absolute top-3 left-3 z-10 shadow-md gap-1.5"
+              className="absolute top-20 left-3 z-10 shadow-md gap-1.5"
               onClick={() => setMobilePendingOpen(true)}
             >
               <Package className="size-4" />

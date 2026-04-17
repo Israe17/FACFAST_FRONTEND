@@ -378,7 +378,7 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
           <Button
             size="sm"
             variant="secondary"
-            className="absolute bottom-3 left-3 z-10 shadow-md gap-1.5"
+            className="absolute bottom-10 left-3 z-10 shadow-md gap-1.5"
             onClick={() => setMobileListOpen(true)}
           >
             <List className="size-4" />

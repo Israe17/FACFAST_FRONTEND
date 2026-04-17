@@ -374,17 +374,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
 
       {/* Map */}
       <div className="flex-1 relative">
-        {isMobile ? (
-          <Button
-            size="sm"
-            variant="secondary"
-            className="absolute bottom-10 left-3 z-10 shadow-md gap-1.5"
-            onClick={() => setMobileListOpen(true)}
-          >
-            <List className="size-4" />
-            {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
-          </Button>
-        ) : null}
         <MapView
           markers={visibleMarkers.map((m) => ({
             ...m,
@@ -412,6 +401,17 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
+    {isMobile ? (
+      <Button
+        size="sm"
+        variant="secondary"
+        className="absolute bottom-10 left-3 z-10 shadow-md gap-1.5"
+        onClick={() => setMobileListOpen(true)}
+      >
+        <List className="size-4" />
+        {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+      </Button>
+    ) : null}
     <MapLegend t={t} defaultCollapsed={isMobile} />
     </div>
   );

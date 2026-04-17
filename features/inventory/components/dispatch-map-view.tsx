@@ -1,11 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, List, MapPin, Truck } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Truck } from "lucide-react";
 import { MapView, type MapMarker, type MapPolygon, type MapPolyline } from "@/shared/components/map-view";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -328,25 +327,8 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
   return (
     <div className={`relative ${fillHeight ? "h-full" : ""}`}>
     <div className={`flex ${fillHeight ? "h-full" : "h-[600px]"} ${isMobile ? "" : "rounded-lg border"} overflow-hidden relative z-0`}>
-      {/* Left: Order list — inline on desktop, bottom Sheet on mobile */}
-      {isMobile ? (
-        <Sheet open={mobileListOpen} onOpenChange={setMobileListOpen}>
-          <SheetContent side="bottom" className="p-0 h-[70vh] flex flex-col rounded-t-xl">
-            <SheetHeader className="px-4 pt-3 pb-2 border-b shrink-0">
-              <div className="mx-auto w-10 h-1 rounded-full bg-muted-foreground/30 mb-2" />
-              <SheetTitle className="text-sm font-semibold flex items-center gap-1.5">
-                <Truck className="size-4" />
-                {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
-              </SheetTitle>
-            </SheetHeader>
-            <SheetBody className="p-0 flex-1 overflow-y-auto">
-              <div className="p-2 space-y-2">
-                {orderListContent}
-              </div>
-            </SheetBody>
-          </SheetContent>
-        </Sheet>
-      ) : (
+      {/* Left: Order list — inline on desktop only */}
+      {!isMobile ? (
         <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
           <div className="sticky top-0 bg-background border-b px-3 py-2">
             <p className="text-sm font-semibold flex items-center gap-1.5">
@@ -358,24 +340,10 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
             {orderListContent}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Detail panel — inline on desktop, bottom Sheet on mobile */}
-      {isMobile ? (
-        <Sheet open={!!selectedOrder} onOpenChange={(open) => { if (!open) setSelectedOrderId(null); }}>
-          <SheetContent side="bottom" className="p-0 h-[60vh] flex flex-col rounded-t-xl">
-            <SheetHeader className="px-4 pt-3 pb-2 border-b shrink-0">
-              <div className="mx-auto w-10 h-1 rounded-full bg-muted-foreground/30 mb-2" />
-              <SheetTitle className="text-sm font-semibold">
-                {selectedOrder?.code ?? t("inventory.entity.dispatch_order")}
-              </SheetTitle>
-            </SheetHeader>
-            <SheetBody className="p-0 flex-1 overflow-y-auto">
-              {detailPanelContent}
-            </SheetBody>
-          </SheetContent>
-        </Sheet>
-      ) : selectedOrder ? (
+      {/* Detail panel — inline on desktop only */}
+      {!isMobile && selectedOrder ? (
         <div className="w-80 shrink-0 border-l overflow-y-auto h-full bg-background">
           {detailPanelContent}
         </div>
@@ -410,16 +378,47 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
-    {/* Mobile FAB */}
+    {/* Mobile: collapsible bottom panel (POS-style) */}
     {isMobile ? (
-      <button
-        type="button"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3 py-2 shadow-lg text-xs font-medium active:scale-95 transition-transform"
-        onClick={() => setMobileListOpen(true)}
-      >
-        <Truck className="size-3.5" />
-        {activeOrders.length} {t("inventory.entity.dispatch_orders")}
-      </button>
+      <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col bg-background rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] transition-all">
+        <button
+          type="button"
+          className="flex items-center justify-between px-4 py-3 active:bg-muted/50 transition-colors"
+          onClick={() => setMobileListOpen((v) => !v)}
+        >
+          <div className="flex items-center gap-2">
+            <Truck className="size-4 text-primary" />
+            <span className="text-sm font-semibold">
+              {t("inventory.entity.dispatch_orders")}
+            </span>
+            <span className="text-xs bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 font-medium tabular-nums">
+              {activeOrders.length}
+            </span>
+          </div>
+          <ChevronUp className={`size-4 text-muted-foreground transition-transform ${mobileListOpen ? "rotate-180" : ""}`} />
+        </button>
+        {mobileListOpen ? (
+          <div className="max-h-[50vh] overflow-y-auto border-t px-2 pb-2 space-y-2">
+            {orderListContent}
+          </div>
+        ) : null}
+      </div>
+    ) : null}
+    {/* Mobile: detail bottom sheet */}
+    {isMobile ? (
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => { if (!open) setSelectedOrderId(null); }}>
+        <SheetContent side="bottom" className="p-0 h-[60vh] flex flex-col rounded-t-xl">
+          <SheetHeader className="px-4 pt-3 pb-2 border-b shrink-0">
+            <div className="mx-auto w-10 h-1 rounded-full bg-muted-foreground/30 mb-2" />
+            <SheetTitle className="text-sm font-semibold">
+              {selectedOrder?.code ?? t("inventory.entity.dispatch_order")}
+            </SheetTitle>
+          </SheetHeader>
+          <SheetBody className="p-0 flex-1 overflow-y-auto">
+            {detailPanelContent}
+          </SheetBody>
+        </SheetContent>
+      </Sheet>
     ) : null}
     {!isMobile ? <MapLegend t={t} defaultCollapsed={false} /> : null}
     </div>

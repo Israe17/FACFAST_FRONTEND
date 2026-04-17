@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
-import { MapPin, Truck } from "lucide-react";
+import { useMemo, useState } from "react";
+import { MapPin, Search, Truck } from "lucide-react";
 
+import { Input } from "@/components/ui/input";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { DispatchOrder, Warehouse } from "../types";
@@ -27,22 +28,61 @@ function DispatchOrderListPanel({
   onOrderSelect,
 }: DispatchOrderListPanelProps) {
   const { t } = useAppTranslator();
+  const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
 
-  const activeOrders = useMemo(
-    () => orders.filter((o) => o.status !== "cancelled"),
-    [orders],
-  );
+  const filteredOrders = useMemo(() => {
+    let result = orders.filter((o) => o.status !== "cancelled");
+
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (o) =>
+          o.code?.toLowerCase().includes(q) ||
+          o.vehicle?.plate_number?.toLowerCase().includes(q) ||
+          o.vehicle?.name?.toLowerCase().includes(q) ||
+          o.driver_user?.name?.toLowerCase().includes(q) ||
+          o.route?.name?.toLowerCase().includes(q),
+      );
+    }
+
+    if (dateFilter) {
+      result = result.filter((o) => {
+        if (!o.scheduled_date) return false;
+        return o.scheduled_date.substring(0, 10) === dateFilter;
+      });
+    }
+
+    return result;
+  }, [orders, search, dateFilter]);
 
   return (
     <>
-      <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
+      <div className="sticky top-0 bg-background border-b px-3 py-2 z-10 space-y-2">
         <p className="text-sm font-semibold flex items-center gap-1.5">
           <Truck className="size-4" />
-          {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+          {t("inventory.entity.dispatch_orders")} ({filteredOrders.length})
         </p>
+        <div className="flex gap-1.5">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <Input
+              className="h-7 text-xs pl-7"
+              placeholder={t("common.table.search_placeholder")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Input
+            type="date"
+            className="h-7 text-xs w-[120px] shrink-0"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+        </div>
       </div>
       <div className="p-2 space-y-2">
-        {activeOrders.map((order) => {
+        {filteredOrders.map((order) => {
           const isSelected = String(order.id) === selectedOrderId;
           const stopsWithCoords = (order.stops ?? []).filter(
             (s) => s.delivery_latitude && s.delivery_longitude,
@@ -146,7 +186,7 @@ function DispatchOrderListPanel({
             </div>
           );
         })}
-        {activeOrders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
             {t("inventory.dispatch.no_dispatch_orders")}
           </p>

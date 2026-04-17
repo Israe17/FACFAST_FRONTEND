@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Package, Plus, Truck, CheckCircle2 } from "lucide-react";
+import { Package, Plus, Search, Truck, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -57,6 +58,8 @@ function DispatchCommandCenter({
   const [selectedPendingIds, setSelectedPendingIds] = useState<Set<string>>(new Set());
   const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null);
   const [suggestionsVisible, setSuggestionsVisible] = useState(true);
+  const [pendingSearch, setPendingSearch] = useState("");
+  const [pendingDateFilter, setPendingDateFilter] = useState("");
 
   const addStopMutation = useAddDispatchStopMutation(selectedDispatchId ?? "", { showErrorToast: true });
 
@@ -131,13 +134,51 @@ function DispatchCommandCenter({
     setSuggestionsVisible(false);
   }, []);
 
+  const filteredPending = useMemo(() => {
+    let result = pendingOrders;
+    if (pendingSearch) {
+      const q = pendingSearch.toLowerCase();
+      result = result.filter(
+        (o) =>
+          o.code?.toLowerCase().includes(q) ||
+          o.customer_contact?.name?.toLowerCase().includes(q) ||
+          o.delivery_address?.toLowerCase().includes(q) ||
+          o.delivery_zone?.name?.toLowerCase().includes(q),
+      );
+    }
+    if (pendingDateFilter) {
+      result = result.filter((o) => {
+        if (!o.delivery_requested_date) return false;
+        return o.delivery_requested_date.substring(0, 10) === pendingDateFilter;
+      });
+    }
+    return result;
+  }, [pendingOrders, pendingSearch, pendingDateFilter]);
+
   // --- Pending orders panel content ---
   const pendingContent = (
     <div className="flex flex-col h-full">
-      <div className="sticky top-0 bg-background border-b px-3 py-2 z-10">
+      <div className="sticky top-0 bg-background border-b px-3 py-2 z-10 space-y-2">
         <p className="text-sm font-semibold">
-          {t("inventory.dispatch.pending_orders")} ({pendingCount})
+          {t("inventory.dispatch.pending_orders")} ({filteredPending.length})
         </p>
+        <div className="flex gap-1.5">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <Input
+              className="h-7 text-xs pl-7"
+              placeholder={t("common.table.search_placeholder")}
+              value={pendingSearch}
+              onChange={(e) => setPendingSearch(e.target.value)}
+            />
+          </div>
+          <Input
+            type="date"
+            className="h-7 text-xs w-[120px] shrink-0"
+            value={pendingDateFilter}
+            onChange={(e) => setPendingDateFilter(e.target.value)}
+          />
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         <DispatchSmartSuggestions
@@ -146,7 +187,7 @@ function DispatchCommandCenter({
           onDismiss={() => setSuggestionsVisible(false)}
           visible={suggestionsVisible}
         />
-        {pendingOrders.map((order) => (
+        {filteredPending.map((order) => (
           <PendingOrderCard
             key={order.id}
             order={order}
@@ -157,7 +198,7 @@ function DispatchCommandCenter({
             onAssign={handleAssignSingle}
           />
         ))}
-        {pendingOrders.length === 0 ? (
+        {filteredPending.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
             {t("inventory.dispatch.no_pending_orders")}
           </p>

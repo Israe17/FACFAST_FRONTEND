@@ -20,6 +20,7 @@ import {
   dispatchProgressColorMap,
   dispatchStopStatusTranslationMap,
 } from "../constants";
+import { CollapsibleMobilePanel } from "./collapsible-mobile-panel";
 import { DispatchCommandDetailPanel } from "./dispatch-command-detail-panel";
 
 type DispatchMapViewProps = {
@@ -99,7 +100,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
   const { t } = useAppTranslator();
   const isMobile = useIsMobile();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [mobileListOpen, setMobileListOpen] = useState(false);
 
   const selectedOrder = useMemo(
     () => orders.find((o) => String(o.id) === selectedOrderId) ?? null,
@@ -196,7 +196,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
 
   function handleOrderSelect(orderId: string) {
     setSelectedOrderId((prev) => (prev === orderId ? null : orderId));
-    if (isMobile) setMobileListOpen(false);
   }
 
   // Filter active orders for the list (exclude cancelled)
@@ -378,31 +377,18 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
-    {/* Mobile: collapsible bottom panel (POS-style) */}
+    {/* Mobile: collapsible bottom panel */}
     {isMobile ? (
-      <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col bg-background rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] transition-all">
-        <button
-          type="button"
-          className="flex items-center justify-between px-4 py-3 active:bg-muted/50 transition-colors"
-          onClick={() => setMobileListOpen((v) => !v)}
-        >
-          <div className="flex items-center gap-2">
-            <Truck className="size-4 text-primary" />
-            <span className="text-sm font-semibold">
-              {t("inventory.entity.dispatch_orders")}
-            </span>
-            <span className="text-xs bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 font-medium tabular-nums">
-              {activeOrders.length}
-            </span>
-          </div>
-          <ChevronUp className={`size-4 text-muted-foreground transition-transform ${mobileListOpen ? "rotate-180" : ""}`} />
-        </button>
-        {mobileListOpen ? (
-          <div className="max-h-[50vh] overflow-y-auto border-t px-2 pb-2 space-y-2">
-            {orderListContent}
-          </div>
-        ) : null}
-      </div>
+      <CollapsibleMobilePanel
+        title={t("inventory.entity.dispatch_orders")}
+        count={activeOrders.length}
+        icon={<Truck className="size-4 text-primary" />}
+        position="bottom"
+      >
+        <div className="px-2 pb-2 space-y-2">
+          {orderListContent}
+        </div>
+      </CollapsibleMobilePanel>
     ) : null}
     {/* Mobile: detail bottom sheet */}
     {isMobile ? (

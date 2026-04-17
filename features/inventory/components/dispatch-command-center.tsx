@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ChevronDown, Package, Plus, Truck, CheckCircle2 } from "lucide-react";
+import { Package, Plus, Truck, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -11,6 +11,7 @@ import type { SaleOrder } from "@/features/sales/types";
 
 import { useAddDispatchStopMutation } from "../queries";
 import type { DispatchOrder, Warehouse, Zone } from "../types";
+import { CollapsibleMobilePanel } from "./collapsible-mobile-panel";
 import { DispatchMapView } from "./dispatch-map-view";
 import { DispatchSmartSuggestions } from "./dispatch-smart-suggestions";
 import { PendingOrderCard } from "./pending-order-card";
@@ -53,7 +54,6 @@ function DispatchCommandCenter({
     null,
   );
   const [suggestionsVisible, setSuggestionsVisible] = useState(true);
-  const [mobilePendingOpen, setMobilePendingOpen] = useState(false);
 
   // Mutation for adding stops to the currently selected DO
   const addStopMutation = useAddDispatchStopMutation(
@@ -264,29 +264,16 @@ function DispatchCommandCenter({
         <div className="flex-1 min-w-0 relative z-0 overflow-hidden flex flex-col">
           {/* Mobile: collapsible pending orders panel */}
           {isMobile && pendingCount > 0 ? (
-            <div className="shrink-0 bg-background border-b z-10">
-              <button
-                type="button"
-                className="flex items-center justify-between w-full px-4 py-2.5 active:bg-muted/50 transition-colors"
-                onClick={() => setMobilePendingOpen((v) => !v)}
-              >
-                <div className="flex items-center gap-2">
-                  <Package className="size-4 text-orange-500" />
-                  <span className="text-sm font-semibold">
-                    {t("inventory.dispatch.pending_orders")}
-                  </span>
-                  <span className="text-xs bg-orange-500 text-white rounded-full px-1.5 py-0.5 font-medium tabular-nums">
-                    {pendingCount}
-                  </span>
-                </div>
-                <ChevronDown className={`size-4 text-muted-foreground transition-transform ${mobilePendingOpen ? "rotate-180" : ""}`} />
-              </button>
-              {mobilePendingOpen ? (
-                <div className="max-h-[40vh] overflow-y-auto border-t">
-                  {pendingPanelContent}
-                </div>
-              ) : null}
-            </div>
+            <CollapsibleMobilePanel
+              title={t("inventory.dispatch.pending_orders")}
+              count={pendingCount}
+              icon={<Package className="size-4 text-orange-500" />}
+              countColor="bg-orange-500 text-white"
+              position="top"
+              maxHeight="40vh"
+            >
+              {pendingPanelContent}
+            </CollapsibleMobilePanel>
           ) : null}
           <div className="flex-1 min-h-0">
             <DispatchMapView

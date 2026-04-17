@@ -226,7 +226,7 @@ function DispatchCommandCenter({
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)]">
+    <div className="relative flex flex-col h-[calc(100vh-220px)]">
       {/* Top KPIs bar */}
       <div className="flex items-center gap-3 md:gap-6 border-b px-4 py-2.5 shrink-0 bg-background overflow-x-auto md:overflow-visible">
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
@@ -262,27 +262,16 @@ function DispatchCommandCenter({
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
         {/* Left panel: Pending orders — inline on desktop, Sheet on mobile */}
         {isMobile ? (
-          <>
-            <Sheet open={mobilePendingOpen} onOpenChange={setMobilePendingOpen}>
-              <SheetContent side="left" className="p-0">
-                <SheetHeader className="sr-only">
-                  <SheetTitle>{t("inventory.dispatch.pending_orders")}</SheetTitle>
-                </SheetHeader>
-                <SheetBody className="p-0">
-                  {pendingPanelContent}
-                </SheetBody>
-              </SheetContent>
-            </Sheet>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="absolute top-20 left-3 z-10 shadow-md gap-1.5"
-              onClick={() => setMobilePendingOpen(true)}
-            >
-              <Package className="size-4" />
-              {pendingCount}
-            </Button>
-          </>
+          <Sheet open={mobilePendingOpen} onOpenChange={setMobilePendingOpen}>
+            <SheetContent side="left" className="p-0">
+              <SheetHeader className="sr-only">
+                <SheetTitle>{t("inventory.dispatch.pending_orders")}</SheetTitle>
+              </SheetHeader>
+              <SheetBody className="p-0">
+                {pendingPanelContent}
+              </SheetBody>
+            </SheetContent>
+          </Sheet>
         ) : (
           <div className="w-72 shrink-0 border-r flex flex-col h-full bg-background">
             {pendingPanelContent}
@@ -305,6 +294,17 @@ function DispatchCommandCenter({
           />
         </div>
       </div>
+      {isMobile ? (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="absolute top-14 left-3 z-10 shadow-md gap-1.5"
+          onClick={() => setMobilePendingOpen(true)}
+        >
+          <Package className="size-4" />
+          {pendingCount}
+        </Button>
+      ) : null}
     </div>
   );
 }

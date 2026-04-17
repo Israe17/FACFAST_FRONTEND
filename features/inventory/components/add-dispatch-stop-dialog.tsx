@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Search } from "lucide-react";
+import { CalendarDays, MapPin, Search } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet,
   SheetContent,
@@ -14,26 +14,16 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 
 import type { SaleOrder } from "@/features/sales/types";
 
-import { emptyDispatchStopFormValues } from "../form-values";
-import { createDispatchStopSchema } from "../schemas";
-import type { CreateDispatchStopInput, DispatchOrder } from "../types";
+import type { DispatchOrder } from "../types";
 import { useAddDispatchStopMutation } from "../queries";
-import { FormFieldError } from "./form-field-error";
 
 type AddDispatchStopDialogProps = {
   dispatchOrder: DispatchOrder;
@@ -55,37 +45,21 @@ function AddDispatchStopDialog({
 
   const nextSequence = (dispatchOrder.stops?.length ?? 0) + 1;
   const [saleOrderSearch, setSaleOrderSearch] = useState("");
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    reset,
-    clearErrors,
-    setError,
-    formState: { errors },
-  } = useForm<CreateDispatchStopInput>({
-    resolver: zodResolver(createDispatchStopSchema) as any,
-    defaultValues: {
-      ...emptyDispatchStopFormValues,
-      delivery_sequence: nextSequence,
-    },
-  });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [notes, setNotes] = useState("");
 
   const { formError, handleBackendFormError, resetBackendFormErrors } =
-    useBackendFormErrors({ clearErrors, setError });
+    useBackendFormErrors({ clearErrors: () => {}, setError: () => {} });
 
   useEffect(() => {
     if (open) {
-      reset({
-        ...emptyDispatchStopFormValues,
-        delivery_sequence: nextSequence,
-      });
+      setSelectedIds(new Set());
+      setNotes("");
       setSaleOrderSearch("");
       resetBackendFormErrors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, dispatchOrder.id, nextSequence]);
+  }, [open, dispatchOrder.id]);
 
   const filteredPendingOrders = useMemo(() => {
     const q = saleOrderSearch.trim().toLowerCase();
@@ -93,18 +67,34 @@ function AddDispatchStopDialog({
     return pendingOrders.filter(
       (o) =>
         o.code?.toLowerCase().includes(q) ||
-        o.customer_contact?.name?.toLowerCase().includes(q),
+        o.customer_contact?.name?.toLowerCase().includes(q) ||
+        o.delivery_address?.toLowerCase().includes(q) ||
+        o.delivery_zone?.name?.toLowerCase().includes(q),
     );
   }, [pendingOrders, saleOrderSearch]);
 
-  async function onSubmit(data: CreateDispatchStopInput) {
+  function toggleId(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function handleSubmit() {
+    if (selectedIds.size === 0) return;
     resetBackendFormErrors();
     try {
-      await mutation.mutateAsync({
-        sale_order_id: data.sale_order_id,
-        delivery_sequence: data.delivery_sequence,
-        notes: data.notes && data.notes.trim() ? data.notes.trim() : undefined,
-      });
+      let seq = nextSequence;
+      const trimmedNotes = notes.trim() ? notes.trim() : undefined;
+      for (const saleOrderId of selectedIds) {
+        await mutation.mutateAsync({
+          sale_order_id: saleOrderId,
+          delivery_sequence: seq++,
+          notes: trimmedNotes,
+        });
+      }
       onOpenChange(false);
     } catch (error) {
       handleBackendFormError(error, {
@@ -115,8 +105,8 @@ function AddDispatchStopDialog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent size="sm">
-        <SheetHeader>
+      <SheetContent size="sm" className="flex flex-col gap-0 p-0">
+        <SheetHeader className="px-4 py-3 border-b shrink-0">
           <SheetTitle>{t("inventory.dispatch.add_stop")}</SheetTitle>
           <SheetDescription>
             {dispatchOrder.code ?? `DO-${dispatchOrder.id}`} —{" "}
@@ -124,99 +114,144 @@ function AddDispatchStopDialog({
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="px-4 py-3 border-b shrink-0 space-y-2">
           <FormErrorBanner message={formError} />
-
-          <div className="space-y-2">
-            <Label>{t("sales.entity.sale_order")}</Label>
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-              <Input
-                className="h-8 text-xs pl-7"
-                placeholder={t(
-                  "inventory.dispatch.search_sale_orders_placeholder",
-                )}
-                value={saleOrderSearch}
-                onChange={(e) => setSaleOrderSearch(e.target.value)}
-              />
-            </div>
-            <Controller
-              control={control}
-              name="sale_order_id"
-              render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value ?? ""}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t(
-                        "inventory.dispatch.select_sale_order",
-                      )}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredPendingOrders.length === 0 ? (
-                      <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                        {t("inventory.dispatch.no_eligible_orders")}
-                      </div>
-                    ) : (
-                      filteredPendingOrders.map((o) => (
-                        <SelectItem key={o.id} value={String(o.id)}>
-                          <span className="font-medium">
-                            {o.code ?? `OV-${o.id}`}
-                          </span>
-                          {o.customer_contact?.name ? (
-                            <span className="text-muted-foreground">
-                              {" "}
-                              — {o.customer_contact.name}
-                            </span>
-                          ) : null}
-                          {o.delivery_zone?.name ? (
-                            <span className="text-muted-foreground">
-                              {" "}
-                              · {o.delivery_zone.name}
-                            </span>
-                          ) : null}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FormFieldError message={errors.sale_order_id?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t("inventory.dispatch.delivery_sequence")}</Label>
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <Input
-              type="number"
-              min={1}
-              {...register("delivery_sequence", { valueAsNumber: true })}
+              className="h-8 text-xs pl-7"
+              placeholder={t("inventory.dispatch.search_sale_orders_placeholder")}
+              value={saleOrderSearch}
+              onChange={(e) => setSaleOrderSearch(e.target.value)}
             />
-            <FormFieldError message={errors.delivery_sequence?.message} />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label>{t("inventory.common.notes")}</Label>
-            <Textarea {...register("notes")} />
-            <FormFieldError message={errors.notes?.message} />
-          </div>
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+          {filteredPendingOrders.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              {t("inventory.dispatch.no_eligible_orders")}
+            </p>
+          ) : (
+            filteredPendingOrders.map((order) => {
+              const id = String(order.id);
+              const isSelected = selectedIds.has(id);
+              const deliveryAddress = [
+                order.delivery_address,
+                order.delivery_district,
+                order.delivery_canton,
+              ]
+                .filter(Boolean)
+                .join(", ");
+              const dateLabel = order.delivery_requested_date
+                ? new Date(order.delivery_requested_date).toLocaleDateString()
+                : null;
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? t("common.saving") : t("common.save")}
-            </Button>
+              return (
+                <div
+                  key={order.id}
+                  role="button"
+                  tabIndex={0}
+                  className={`border-l-4 border-l-orange-400 rounded-md border p-2.5 transition-colors cursor-pointer ${
+                    isSelected ? "bg-accent" : "hover:bg-muted/40"
+                  }`}
+                  onClick={() => toggleId(id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleId(id);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-2">
+                    <div
+                      className="pt-0.5"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleId(id)}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-sm font-medium truncate">
+                          {order.code ?? `OV-${order.id}`}
+                        </span>
+                        {order.customer_contact?.name ? (
+                          <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                            {order.customer_contact.name}
+                          </span>
+                        ) : null}
+                      </div>
+                      {deliveryAddress ? (
+                        <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                          <MapPin className="size-3 shrink-0" />
+                          {deliveryAddress}
+                        </p>
+                      ) : null}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {order.delivery_zone ? (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0"
+                          >
+                            {order.delivery_zone.name}
+                          </Badge>
+                        ) : null}
+                        {dateLabel ? (
+                          <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0 text-[10px] font-medium bg-gray-100 text-gray-800">
+                            <CalendarDays className="size-2.5" />
+                            {dateLabel}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="border-t bg-background px-4 py-3 shrink-0 space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">{t("inventory.common.notes")}</Label>
+            <Textarea
+              className="min-h-[60px] text-xs"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
           </div>
-        </form>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">
+              {selectedIds.size > 0
+                ? t("inventory.dispatch.assign_selected", {
+                    count: selectedIds.size,
+                  })
+                : null}
+            </span>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={selectedIds.size === 0 || mutation.isPending}
+                onClick={handleSubmit}
+              >
+                {mutation.isPending ? t("common.saving") : t("common.save")}
+              </Button>
+            </div>
+          </div>
+        </div>
       </SheetContent>
     </Sheet>
   );

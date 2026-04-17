@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Calendar,
   ChevronDown,
@@ -218,26 +218,34 @@ function DispatchCommandDetailPanel({
   const canChangeStopStatus =
     dispatchOrder.status === "dispatched" || dispatchOrder.status === "in_transit";
 
-  const [orderedStops, setOrderedStops] = useState<DispatchStop[]>(
+  const [dragOrderOverride, setDragOrderOverride] = useState<string[] | null>(null);
+
+  const sortedStops = useMemo(
     () =>
       [...(dispatchOrder.stops ?? [])].sort(
         (a, b) => a.delivery_sequence - b.delivery_sequence,
       ),
+    [dispatchOrder.stops],
   );
+
+  const orderedStops = useMemo(() => {
+    if (!dragOrderOverride) return sortedStops;
+    const map = new Map(sortedStops.map((s) => [String(s.id), s]));
+    return dragOrderOverride.map((id) => map.get(id)).filter(Boolean) as DispatchStop[];
+  }, [sortedStops, dragOrderOverride]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      setOrderedStops((prev) => {
-        const oldIndex = prev.findIndex((s) => String(s.id) === String(active.id));
-        const newIndex = prev.findIndex((s) => String(s.id) === String(over.id));
-        if (oldIndex === -1 || newIndex === -1) return prev;
-        return arrayMove(prev, oldIndex, newIndex);
-      });
+      const ids = orderedStops.map((s) => String(s.id));
+      const oldIndex = ids.indexOf(String(active.id));
+      const newIndex = ids.indexOf(String(over.id));
+      if (oldIndex === -1 || newIndex === -1) return;
+      setDragOrderOverride(arrayMove(ids, oldIndex, newIndex));
     },
-    [],
+    [orderedStops],
   );
 
   const stopIds = orderedStops.map((s) => String(s.id));

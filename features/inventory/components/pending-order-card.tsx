@@ -1,14 +1,54 @@
 "use client";
 
-import { useMemo } from "react";
-import { CalendarDays, MapPin } from "lucide-react";
+import { useMemo, useState } from "react";
+import { CalendarDays, ChevronDown, MapPin, Package } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { SaleOrder } from "@/features/sales/types";
+import type { SaleOrder, SaleOrderLine } from "@/features/sales/types";
+
+function ProductLinesExpander({ lines, t }: { lines: SaleOrderLine[]; t: ReturnType<typeof useAppTranslator>["t"] }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+        onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+      >
+        <Package className="size-3" />
+        {lines.length} {t("inventory.dispatch.product")}
+        <ChevronDown className={`size-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+      </button>
+      {expanded ? (
+        <div className="rounded border bg-muted/30 text-xs">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="px-2 py-1 text-left font-medium">{t("inventory.dispatch.product")}</th>
+                <th className="px-2 py-1 text-right font-medium w-10">{t("inventory.dispatch.ordered")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lines.map((line) => (
+                <tr key={line.id} className="border-b last:border-b-0">
+                  <td className="px-2 py-1 truncate max-w-[140px]">
+                    {line.product_variant?.product?.name ?? line.product_variant?.sku ?? `#${line.product_variant_id}`}
+                  </td>
+                  <td className="px-2 py-1 text-right tabular-nums">{line.quantity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+    </>
+  );
+}
 
 type PendingOrderCardProps = {
   order: SaleOrder;
@@ -136,6 +176,11 @@ function PendingOrderCard({
               })}
             </span>
           </div>
+
+          {/* Product lines expandable */}
+          {(order.lines?.length ?? 0) > 0 ? (
+            <ProductLinesExpander lines={order.lines!} t={t} />
+          ) : null}
 
           {/* Assign button */}
           <div className="flex justify-end pt-0.5">

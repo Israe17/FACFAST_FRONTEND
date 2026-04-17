@@ -208,13 +208,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
 
   const orderListContent = (
     <>
-      <div className="sticky top-0 bg-background border-b px-3 py-2">
-        <p className="text-sm font-semibold flex items-center gap-1.5">
-          <Truck className="size-4" />
-          {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
-        </p>
-      </div>
-      <div className="p-2 space-y-2">
         {activeOrders.map((order) => {
           const isSelected = String(order.id) === selectedOrderId;
           const stopsWithCoords = (order.stops ?? []).filter(
@@ -317,7 +310,6 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
             {t("inventory.dispatch.no_dispatch_orders")}
           </p>
         ) : null}
-      </div>
     </>
   );
 
@@ -335,33 +327,50 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
 
   return (
     <div className={`relative ${fillHeight ? "h-full" : ""}`}>
-    <div className={`flex ${fillHeight ? "h-full" : "h-[600px]"} rounded-lg border overflow-hidden relative z-0`}>
-      {/* Left: Order list — inline on desktop, Sheet on mobile */}
+    <div className={`flex ${fillHeight ? "h-full" : "h-[600px]"} ${isMobile ? "" : "rounded-lg border"} overflow-hidden relative z-0`}>
+      {/* Left: Order list — inline on desktop, bottom Sheet on mobile */}
       {isMobile ? (
         <Sheet open={mobileListOpen} onOpenChange={setMobileListOpen}>
-          <SheetContent side="left" className="p-0 overflow-y-auto">
-            <SheetHeader className="sr-only">
-              <SheetTitle>{t("inventory.entity.dispatch_orders")}</SheetTitle>
+          <SheetContent side="bottom" className="p-0 h-[70vh] flex flex-col rounded-t-xl">
+            <SheetHeader className="px-4 pt-3 pb-2 border-b shrink-0">
+              <div className="mx-auto w-10 h-1 rounded-full bg-muted-foreground/30 mb-2" />
+              <SheetTitle className="text-sm font-semibold flex items-center gap-1.5">
+                <Truck className="size-4" />
+                {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+              </SheetTitle>
             </SheetHeader>
-            <SheetBody className="p-0">
-              {orderListContent}
+            <SheetBody className="p-0 flex-1 overflow-y-auto">
+              <div className="p-2 space-y-2">
+                {orderListContent}
+              </div>
             </SheetBody>
           </SheetContent>
         </Sheet>
       ) : (
         <div className="w-80 shrink-0 border-r overflow-y-auto bg-background">
-          {orderListContent}
+          <div className="sticky top-0 bg-background border-b px-3 py-2">
+            <p className="text-sm font-semibold flex items-center gap-1.5">
+              <Truck className="size-4" />
+              {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
+            </p>
+          </div>
+          <div className="p-2 space-y-2">
+            {orderListContent}
+          </div>
         </div>
       )}
 
-      {/* Detail panel — inline on desktop, Sheet on mobile */}
+      {/* Detail panel — inline on desktop, bottom Sheet on mobile */}
       {isMobile ? (
         <Sheet open={!!selectedOrder} onOpenChange={(open) => { if (!open) setSelectedOrderId(null); }}>
-          <SheetContent side="right" className="p-0 overflow-y-auto">
-            <SheetHeader className="sr-only">
-              <SheetTitle>{selectedOrder?.code ?? t("inventory.entity.dispatch_order")}</SheetTitle>
+          <SheetContent side="bottom" className="p-0 h-[60vh] flex flex-col rounded-t-xl">
+            <SheetHeader className="px-4 pt-3 pb-2 border-b shrink-0">
+              <div className="mx-auto w-10 h-1 rounded-full bg-muted-foreground/30 mb-2" />
+              <SheetTitle className="text-sm font-semibold">
+                {selectedOrder?.code ?? t("inventory.entity.dispatch_order")}
+              </SheetTitle>
             </SheetHeader>
-            <SheetBody className="p-0">
+            <SheetBody className="p-0 flex-1 overflow-y-auto">
               {detailPanelContent}
             </SheetBody>
           </SheetContent>
@@ -401,18 +410,18 @@ function DispatchMapView({ orders, warehouses = [], zones = [], fillHeight = fal
         ) : null}
       </div>
     </div>
+    {/* Mobile FAB — bottom pill style like Uber/Rappi */}
     {isMobile ? (
-      <Button
-        size="sm"
-        variant="secondary"
-        className="absolute bottom-10 left-3 z-10 shadow-md gap-1.5"
+      <button
+        type="button"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full bg-primary text-primary-foreground pl-3 pr-4 py-2.5 shadow-lg text-sm font-medium active:scale-95 transition-transform"
         onClick={() => setMobileListOpen(true)}
       >
-        <List className="size-4" />
-        {t("inventory.entity.dispatch_orders")} ({activeOrders.length})
-      </Button>
+        <Truck className="size-4" />
+        {activeOrders.length} {t("inventory.entity.dispatch_orders")}
+      </button>
     ) : null}
-    <MapLegend t={t} defaultCollapsed={isMobile} />
+    {!isMobile ? <MapLegend t={t} defaultCollapsed={false} /> : null}
     </div>
   );
 }

@@ -4,6 +4,13 @@ import { useMemo, useState } from "react";
 import { MapPin, Search, Truck } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { DispatchOrder, Warehouse } from "../types";
@@ -13,6 +20,8 @@ import {
   dispatchBorderColorMap,
   dispatchProgressColorMap,
 } from "../constants";
+
+const STATUS_OPTIONS = ["draft", "ready", "dispatched", "in_transit", "completed"] as const;
 
 type DispatchOrderListPanelProps = {
   orders: DispatchOrder[];
@@ -29,10 +38,15 @@ function DispatchOrderListPanel({
 }: DispatchOrderListPanelProps) {
   const { t } = useAppTranslator();
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
 
   const filteredOrders = useMemo(() => {
     let result = orders.filter((o) => o.status !== "cancelled");
+
+    if (statusFilter !== "all") {
+      result = result.filter((o) => o.status === statusFilter);
+    }
 
     if (search) {
       const q = search.toLowerCase();
@@ -54,7 +68,7 @@ function DispatchOrderListPanel({
     }
 
     return result;
-  }, [orders, search, dateFilter]);
+  }, [orders, search, statusFilter, dateFilter]);
 
   return (
     <>
@@ -63,16 +77,29 @@ function DispatchOrderListPanel({
           <Truck className="size-4" />
           {t("inventory.entity.dispatch_orders")} ({filteredOrders.length})
         </p>
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            className="h-7 text-xs pl-7"
+            placeholder={t("common.table.search_placeholder")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <div className="flex gap-1.5">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-            <Input
-              className="h-7 text-xs pl-7"
-              placeholder={t("common.table.search_placeholder")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-7 text-xs flex-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("inventory.dispatch.all_statuses")}</SelectItem>
+              {STATUS_OPTIONS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(dispatchStatusTranslationMap[s])}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             type="date"
             className="h-7 text-xs w-[120px] shrink-0"

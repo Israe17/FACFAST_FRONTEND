@@ -24,6 +24,13 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -59,6 +66,7 @@ type SortableStopItemProps = {
 };
 
 const RESOLVED_STATUSES = new Set(["delivered", "failed", "partial", "skipped"]);
+const STATUS_TRANSITION_OPTIONS = ["in_transit", "delivered", "failed", "partial", "skipped"] as const;
 
 function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: SortableStopItemProps) {
   const {
@@ -112,16 +120,35 @@ function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: Sortable
               {stop.customer_contact?.name ?? stop.sale_order?.code ?? `#${stop.id}`}
             </span>
           </div>
-          <span
-            className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium shrink-0 ${
-              dispatchStopStatusColorMap[stop.status] ?? ""
-            }`}
-          >
-            {t(
-              dispatchStopStatusTranslationMap[stop.status] ??
-                "inventory.dispatch.stop_pending",
-            )}
-          </span>
+          {canChangeStatus && !RESOLVED_STATUSES.has(stop.status) && onStatusChange ? (
+            <Select
+              value={stop.status}
+              onValueChange={() => onStatusChange(stop)}
+            >
+              <SelectTrigger className="h-5 w-auto gap-1 border-0 px-1.5 py-0 text-[10px] font-medium shrink-0 rounded-full shadow-none [&>svg]:size-3">
+                <span className={`inline-flex items-center rounded-full px-1 py-0 ${dispatchStopStatusColorMap[stop.status] ?? ""}`}>
+                  {t(dispatchStopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_TRANSITION_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${dispatchStopStatusColorMap[s] ?? ""}`}>
+                      {t(dispatchStopStatusTranslationMap[s])}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span
+              className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium shrink-0 ${
+                dispatchStopStatusColorMap[stop.status] ?? ""
+              }`}
+            >
+              {t(dispatchStopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}
+            </span>
+          )}
         </div>
 
         {address ? (
@@ -129,19 +156,6 @@ function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: Sortable
             <MapPin className="size-3 shrink-0" />
             {address}
           </p>
-        ) : null}
-
-        {canChangeStatus && !RESOLVED_STATUSES.has(stop.status) && onStatusChange ? (
-          <button
-            type="button"
-            className="text-[11px] font-medium text-primary hover:underline"
-            onClick={(e) => {
-              e.stopPropagation();
-              onStatusChange(stop);
-            }}
-          >
-            {t("inventory.dispatch.change_stop_status")}
-          </button>
         ) : null}
       </div>
     </div>

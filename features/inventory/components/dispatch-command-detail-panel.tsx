@@ -115,14 +115,7 @@ function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: Sortable
           <span
             className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium shrink-0 ${
               dispatchStopStatusColorMap[stop.status] ?? ""
-            } ${canChangeStatus && !RESOLVED_STATUSES.has(stop.status) ? "cursor-pointer ring-1 ring-offset-1 ring-primary/30 hover:ring-primary/60" : ""}`}
-            onClick={(e) => {
-              if (canChangeStatus && !RESOLVED_STATUSES.has(stop.status) && onStatusChange) {
-                e.stopPropagation();
-                onStatusChange(stop);
-              }
-            }}
-            role={canChangeStatus && !RESOLVED_STATUSES.has(stop.status) ? "button" : undefined}
+            }`}
           >
             {t(
               dispatchStopStatusTranslationMap[stop.status] ??
@@ -136,6 +129,19 @@ function SortableStopItem({ stop, t, canChangeStatus, onStatusChange }: Sortable
             <MapPin className="size-3 shrink-0" />
             {address}
           </p>
+        ) : null}
+
+        {canChangeStatus && !RESOLVED_STATUSES.has(stop.status) && onStatusChange ? (
+          <button
+            type="button"
+            className="text-[11px] font-medium text-primary hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onStatusChange(stop);
+            }}
+          >
+            {t("inventory.dispatch.change_stop_status")}
+          </button>
         ) : null}
       </div>
     </div>

@@ -839,7 +839,6 @@ const esTranslations = {
   "inventory.dispatch.overdue_badge": "Atrasada",
   "inventory.dispatch.groupable_badge": "Agrupable",
   "inventory.dispatch.reorder_stops": "Arrastrar para reordenar",
-  "inventory.dispatch.add_stop": "Agregar stop",
   "inventory.dispatch.suggestion_group_zone": "Ordenes agrupables por zona",
   "inventory.dispatch.suggestion_group_detail": "{{count}} ordenes en zona {{zone}} pueden agruparse en un despacho",
   "inventory.dispatch.suggestion_select": "Seleccionar {{count}} ordenes",
@@ -1569,7 +1568,6 @@ const esTranslations = {
   "sales.delete_title": "Eliminar orden",
   "sales.delete_description":
     "¿Eliminar la orden {{code}}? Esta acción no se puede deshacer.",
-  "sales.order_date": "Fecha",
   "sales.customer": "Cliente",
   "sales.status": "Estado",
   "sales.fulfillment": "Cumplimiento",
@@ -2889,7 +2887,6 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.dispatch.overdue_badge": "Overdue",
     "inventory.dispatch.groupable_badge": "Groupable",
     "inventory.dispatch.reorder_stops": "Drag to reorder",
-    "inventory.dispatch.add_stop": "Add stop",
     "inventory.dispatch.suggestion_group_zone": "Orders groupable by zone",
     "inventory.dispatch.suggestion_group_detail": "{{count}} orders in zone {{zone}} can be grouped into a dispatch",
     "inventory.dispatch.suggestion_select": "Select {{count}} orders",
@@ -3632,7 +3629,6 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "sales.delete_title": "Delete order",
     "sales.delete_description":
       "Delete order {{code}}? This action cannot be undone.",
-    "sales.order_date": "Date",
     "sales.customer": "Customer",
     "sales.status": "Status",
     "sales.fulfillment": "Fulfillment",

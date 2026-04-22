@@ -18,7 +18,7 @@ type Identifiable = { id: number | string };
  */
 export function useSeedEntityOption<T extends Identifiable>(
   catalog: T[],
-  currentSelection: T | null | undefined,
+  currentSelection: Identifiable | null | undefined,
 ): T[] {
   return useMemo(() => {
     if (!currentSelection) return catalog;
@@ -26,7 +26,7 @@ export function useSeedEntityOption<T extends Identifiable>(
       (item) => String(item.id) === String(currentSelection.id),
     );
     if (exists) return catalog;
-    return [currentSelection, ...catalog];
+    return [currentSelection as T, ...catalog];
   }, [catalog, currentSelection]);
 }
 
@@ -38,11 +38,11 @@ export function useSeedEntityOption<T extends Identifiable>(
  */
 export function useSeedEntityOptions<T extends Identifiable>(
   catalog: T[],
-  currentSelections: (T | null | undefined)[],
+  currentSelections: (Identifiable | null | undefined)[],
 ): T[] {
   return useMemo(() => {
     const validSelections = currentSelections.filter(
-      (s): s is T => s != null,
+      (s): s is Identifiable => s != null,
     );
     if (validSelections.length === 0) return catalog;
 
@@ -52,6 +52,6 @@ export function useSeedEntityOptions<T extends Identifiable>(
     );
     if (missing.length === 0) return catalog;
 
-    return [...missing, ...catalog];
+    return [...(missing as T[]), ...catalog];
   }, [catalog, currentSelections]);
 }

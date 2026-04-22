@@ -84,7 +84,7 @@ function EmitDocumentDialog({ onOpenChange, open }: EmitDocumentDialogProps) {
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <FormErrorBanner
-            message={getBackendErrorMessage(emitMutation.error, null)}
+            message={getBackendErrorMessage(emitMutation.error, undefined)}
           />
 
           <div className="space-y-2">

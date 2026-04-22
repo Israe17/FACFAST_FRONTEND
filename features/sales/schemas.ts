@@ -244,7 +244,7 @@ const saleOrderFormObjectSchema = z.object({
 });
 
 function applySaleOrderModeRules(
-  values: z.input<typeof saleOrderFormObjectSchema>,
+  values: Partial<z.output<typeof saleOrderFormObjectSchema>>,
   ctx: z.RefinementCtx,
 ) {
   if (values.fulfillment_mode === "delivery") {

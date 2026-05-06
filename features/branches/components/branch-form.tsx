@@ -70,6 +70,7 @@ function FieldError({ message }: { message?: string }) {
 
 function LocationPickerSection({ form }: { form: UseFormReturn<BranchFormValues> }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useAppTranslator();
   const latitude = form.watch("latitude") ?? null;
   const longitude = form.watch("longitude") ?? null;
 
@@ -82,7 +83,7 @@ function LocationPickerSection({ form }: { form: UseFormReturn<BranchFormValues>
       >
         <span className="flex items-center gap-1.5">
           <MapPin className="size-3.5" />
-          Ubicación en mapa
+          {t("branches.form.map_location")}
         </span>
         <ChevronDown
           className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}

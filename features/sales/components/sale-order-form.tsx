@@ -42,23 +42,6 @@ import { SaleOrderLineSerialSelector } from "./sale-order-line-serial-selector";
 
 const EMPTY_SELECT_VALUE = "__none__";
 
-const saleModeLabels: Record<string, string> = {
-  branch_direct: "Venta directa en sucursal",
-  seller_attributed: "Atribuida a vendedor",
-  seller_route: "Ruta de vendedor",
-};
-
-const fulfillmentModeLabels: Record<string, string> = {
-  pickup: "Retiro en sucursal",
-  delivery: "Entrega a domicilio",
-};
-
-const chargeTypeLabels: Record<string, string> = {
-  shipping: "Envío",
-  installation: "Instalación",
-  express: "Express",
-};
-
 function DeliveryLocationPickerSection({ form }: { form: UseFormReturn<CreateSaleOrderInput> }) {
   const latitude = form.watch("delivery_latitude") ?? null;
   const longitude = form.watch("delivery_longitude") ?? null;
@@ -131,6 +114,22 @@ function SaleOrderForm({
   zones,
 }: SaleOrderFormProps) {
   const { t } = useAppTranslator();
+
+  const saleModeLabel: Record<string, string> = {
+    branch_direct: t("sales.mode_branch_direct"),
+    seller_attributed: t("sales.mode_seller_attributed"),
+    seller_route: t("sales.mode_seller_route"),
+  };
+  const fulfillmentModeLabel: Record<string, string> = {
+    pickup: t("sales.fulfillment_pickup"),
+    delivery: t("sales.fulfillment_delivery"),
+  };
+  const chargeTypeLabel: Record<string, string> = {
+    shipping: t("sales.charge_type_shipping"),
+    installation: t("sales.charge_type_installation"),
+    express: t("sales.charge_type_express"),
+  };
+
   const {
     formState: { errors },
     control,
@@ -321,7 +320,7 @@ function SaleOrderForm({
               const available = stockByVariantId.get(String(v.id));
               const stockLabel =
                 hasWarehouse && available !== undefined
-                  ? ` (${available} disp.)`
+                  ? ` ${t("sales.form.stock_label", { count: String(available) })}`
                   : "";
               return {
                 id: v.id,
@@ -461,7 +460,7 @@ function SaleOrderForm({
                 <SelectContent>
                   {(["branch_direct", "seller_attributed", "seller_route"] as const).map((mode) => (
                     <SelectItem key={mode} value={mode}>
-                      {saleModeLabels[mode]}
+                      {saleModeLabel[mode]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -490,7 +489,7 @@ function SaleOrderForm({
                 <SelectContent>
                   {(["pickup", "delivery"] as const).map((mode) => (
                     <SelectItem key={mode} value={mode}>
-                      {fulfillmentModeLabels[mode]}
+                      {fulfillmentModeLabel[mode]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -499,7 +498,7 @@ function SaleOrderForm({
           />
           {saleMode === "seller_route" && (
             <p className="text-xs text-muted-foreground">
-              Ruta de vendedor requiere entrega a domicilio.
+              {t("sales.form.seller_route_requires_delivery")}
             </p>
           )}
           <FormFieldError message={errors.fulfillment_mode?.message} />
@@ -516,7 +515,7 @@ function SaleOrderForm({
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger id="so-branch-id">
-                  <SelectValue placeholder="Selecciona una sucursal" />
+                  <SelectValue placeholder={t("sales.form.select_branch")} />
                 </SelectTrigger>
                 <SelectContent>
                   {activeBranches.map((branch) => (
@@ -547,7 +546,7 @@ function SaleOrderForm({
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger id="so-customer-contact-id">
-                  <SelectValue placeholder="Selecciona un cliente" />
+                  <SelectValue placeholder={t("sales.form.select_customer")} />
                 </SelectTrigger>
                 <SelectContent>
                   {activeContacts.map((contact) => (
@@ -581,10 +580,10 @@ function SaleOrderForm({
                 value={field.value ?? EMPTY_SELECT_VALUE}
               >
                 <SelectTrigger id="so-seller-user-id">
-                  <SelectValue placeholder="Sin vendedor asignado" />
+                  <SelectValue placeholder={t("sales.form.no_seller_assigned")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={EMPTY_SELECT_VALUE}>Sin vendedor</SelectItem>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>{t("sales.form.no_seller")}</SelectItem>
                   {activeUsers.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name || user.email}
@@ -612,10 +611,10 @@ function SaleOrderForm({
                 value={field.value ?? EMPTY_SELECT_VALUE}
               >
                 <SelectTrigger id="so-warehouse-id">
-                  <SelectValue placeholder="Sin bodega asignada" />
+                  <SelectValue placeholder={t("sales.form.no_warehouse_assigned")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={EMPTY_SELECT_VALUE}>Sin bodega</SelectItem>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>{t("sales.form.no_warehouse")}</SelectItem>
                   {activeWarehouses.map((warehouse) => (
                     <SelectItem key={warehouse.id} value={warehouse.id}>
                       {warehouse.name}
@@ -709,10 +708,10 @@ function SaleOrderForm({
                     value={field.value ?? EMPTY_SELECT_VALUE}
                   >
                     <SelectTrigger id="so-delivery-zone-id">
-                      <SelectValue placeholder="Sin zona asignada" />
+                      <SelectValue placeholder={t("sales.form.no_zone_assigned")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={EMPTY_SELECT_VALUE}>Sin zona</SelectItem>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>{t("sales.form.no_zone")}</SelectItem>
                       {activeZones.map((zone) => (
                         <SelectItem key={zone.id} value={zone.id}>
                           {zone.name}
@@ -820,7 +819,7 @@ function SaleOrderForm({
                               value={selectField.value}
                             >
                               <SelectTrigger className="h-8 min-w-[180px]">
-                                <SelectValue placeholder="Selecciona producto" />
+                                <SelectValue placeholder={t("sales.form.select_product")} />
                               </SelectTrigger>
                               <SelectContent>
                                 {variantOptions.map((opt) => (
@@ -1002,7 +1001,7 @@ function SaleOrderForm({
                               <SelectContent>
                                 {deliveryChargeTypeValues.map((ct) => (
                                   <SelectItem key={ct} value={ct}>
-                                    {chargeTypeLabels[ct] ?? ct}
+                                    {chargeTypeLabel[ct] ?? ct}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

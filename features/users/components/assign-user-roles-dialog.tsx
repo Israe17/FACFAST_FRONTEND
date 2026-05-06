@@ -94,6 +94,7 @@ function AssignUserRolesDialog({
           <SheetDescription>Update the roles assigned to {user.name}.</SheetDescription>
         </SheetHeader>
 
+        <SheetBody>
         {rolesQuery.isLoading ? <LoadingState description="Loading available roles." /> : null}
         {rolesQuery.isError ? (
           <ErrorState
@@ -114,7 +115,7 @@ function AssignUserRolesDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormErrorBanner message={formError} />
 
-            <div className="max-h-80 space-y-3 rounded-xl border border-border p-4">
+            <div className="max-h-80 space-y-3 overflow-y-auto rounded-xl border border-border p-4">
               {rolesQuery.data.map((role) => (
                 <label
                   key={role.id}
@@ -147,6 +148,7 @@ function AssignUserRolesDialog({
             </div>
           </form>
         ) : null}
+        </SheetBody>
       </SheetContent>
     </Sheet>
   );

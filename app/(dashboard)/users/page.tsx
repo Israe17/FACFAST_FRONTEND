@@ -34,11 +34,15 @@ export default function UsersPage() {
   if (!can("users.view")) {
     return (
       <ErrorState
-        description="You do not have permission to view users."
-        title="Access denied"
+        description={t("users.page_access_denied")}
+        title={t("common.access_denied_title")}
       />
     );
   }
+
+  const activeBranchValue = isBusinessLevelContext
+    ? t("common.enterprise_level")
+    : (activeBranchId ?? t("common.none"));
 
   return (
     <>
@@ -47,23 +51,23 @@ export default function UsersPage() {
           can("users.create") ? (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="size-4" />
-              Create user
+              {t("users.create_button")}
             </Button>
           ) : null
         }
-        description="Manage users, statuses, passwords, roles, branches and effective permissions."
-        eyebrow="Administration"
-        title="Users"
+        description={t("users.page_description")}
+        eyebrow={t("users.page_eyebrow")}
+        title={t("users.page_title")}
       />
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">
-          Active branch: {isBusinessLevelContext ? "Company level" : (activeBranchId ?? "None")}
+          {t("users.active_branch_context", { value: activeBranchValue })}
         </Badge>
         <Badge variant="outline">Query source: /api/users</Badge>
       </div>
 
-      {usersQuery.isLoading ? <LoadingState description="Loading users." /> : null}
+      {usersQuery.isLoading ? <LoadingState description={t("users.loading_users")} /> : null}
       {usersQuery.isError ? (
         <ErrorState
           description={getTranslatedBackendErrorMessage(usersQuery.error, {
@@ -79,13 +83,13 @@ export default function UsersPage() {
             can("users.create") ? (
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="size-4" />
-                Create user
+                {t("users.create_button")}
               </Button>
             ) : null
           }
-          description="Create the first user record for this business."
+          description={t("users.empty_description")}
           icon={Users}
-          title="No users found"
+          title={t("users.empty_title")}
         />
       ) : null}
       {usersQuery.data?.length ? <UsersTable data={usersQuery.data} /> : null}

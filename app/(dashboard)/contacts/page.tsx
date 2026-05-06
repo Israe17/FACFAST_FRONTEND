@@ -73,11 +73,15 @@ export default function ContactsPage() {
   if (!can("contacts.view")) {
     return (
       <ErrorState
-        description="You do not have permission to view contacts."
-        title="Access denied"
+        description={t("contacts.page_access_denied")}
+        title={t("common.access_denied_title")}
       />
     );
   }
+
+  const activeBranchValue = isBusinessLevelContext
+    ? t("common.enterprise_level")
+    : (activeBranchId ?? t("common.none"));
 
   return (
     <>
@@ -86,43 +90,45 @@ export default function ContactsPage() {
           can("contacts.create") ? (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="size-4" />
-              Create contact
+              {t("contacts.create_button")}
             </Button>
           ) : null
         }
-        description="Manage customers, suppliers and identification lookups from the same administrative screen."
-        eyebrow="Administration"
-        title="Contacts"
+        description={t("contacts.page_description")}
+        eyebrow={t("contacts.page_eyebrow")}
+        title={t("contacts.page_title")}
       />
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">
-          Active branch context: {isBusinessLevelContext ? "Company level" : (activeBranchId ?? "None")}
+          {t("contacts.active_branch_context", { value: activeBranchValue })}
         </Badge>
         <Badge variant="outline">Query source: /api/contacts</Badge>
-        {submittedLookup ? <Badge variant="outline">Lookup: {submittedLookup}</Badge> : null}
+        {submittedLookup ? (
+          <Badge variant="outline">
+            {t("contacts.lookup_badge", { value: submittedLookup })}
+          </Badge>
+        ) : null}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[0.7fr_0.7fr_1.6fr]">
         <DataCard
-          description="Contacts returned by the backend for the authenticated tenant."
+          description={t("contacts.stats.registered_description")}
           icon={<ContactRound className="size-5" />}
-          title="Registered contacts"
+          title={t("contacts.stats.registered_title")}
           value={totalContacts}
         />
         <DataCard
-          description="Active records ready to be reused by future modules."
+          description={t("contacts.stats.active_description")}
           icon={<Plus className="size-5" />}
-          title="Active contacts"
+          title={t("contacts.stats.active_title")}
           value={activeContacts}
         />
 
         <Card>
           <CardHeader>
-            <CardTitle>Lookup by identification</CardTitle>
-            <CardDescription>
-              Search a contact record using the backend lookup endpoint.
-            </CardDescription>
+            <CardTitle>{t("contacts.lookup.card_title")}</CardTitle>
+            <CardDescription>{t("contacts.lookup.card_description")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form className="flex flex-col gap-3 sm:flex-row" onSubmit={handleLookupSubmit}>
@@ -133,7 +139,7 @@ export default function ContactsPage() {
               />
               <Button type="submit">
                 <Search className="size-4" />
-                Search
+                {t("contacts.lookup.search_button")}
               </Button>
             </form>
 
@@ -142,7 +148,7 @@ export default function ContactsPage() {
                 {lookupQuery.isLoading ? (
                   <LoadingState
                     className="min-h-0 p-6"
-                    description="Searching contact by identification."
+                    description={t("contacts.lookup.searching")}
                   />
                 ) : null}
                 {lookupQuery.isError ? (
@@ -161,9 +167,9 @@ export default function ContactsPage() {
                 {lookupQuery.isSuccess && !lookupQuery.data ? (
                   <EmptyState
                     className="min-h-0 py-10"
-                    description={`No contact was returned for ${submittedLookup}.`}
+                    description={t("contacts.lookup.not_found_description", { id: submittedLookup })}
                     icon={Search}
-                    title="No contact found"
+                    title={t("contacts.lookup.not_found_title")}
                   />
                 ) : null}
                 {lookupQuery.data ? (
@@ -172,22 +178,23 @@ export default function ContactsPage() {
                       <p className="font-medium">{lookupQuery.data.name}</p>
                       <ContactTypeBadge type={lookupQuery.data.type} />
                       <Badge variant="outline">
-                        {lookupQuery.data.is_active ? "ACTIVE" : "INACTIVE"}
+                        {lookupQuery.data.is_active ? t("common.active_status") : t("common.inactive_status")}
                       </Badge>
                     </div>
                     <div className="grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
                       <p>
-                        Identification:{" "}
-                        {lookupQuery.data.identification_number || "No identification number"}
+                        {t("contacts.lookup.identification", {
+                          value: lookupQuery.data.identification_number || t("contacts.lookup.no_identification"),
+                        })}
                       </p>
-                      <p>Email: {lookupQuery.data.email || "No email"}</p>
-                      <p>Phone: {lookupQuery.data.phone || "No phone"}</p>
-                      <p>Updated: {formatDateTime(lookupQuery.data.updated_at)}</p>
+                      <p>{t("contacts.lookup.email_label", { value: lookupQuery.data.email || t("common.no_email") })}</p>
+                      <p>{t("contacts.lookup.phone_label", { value: lookupQuery.data.phone || t("common.no_phone") })}</p>
+                      <p>{t("contacts.lookup.updated_label", { value: formatDateTime(lookupQuery.data.updated_at) })}</p>
                     </div>
                     {can("contacts.update") ? (
                       <div className="flex justify-end">
                         <Button onClick={() => setLookupEditOpen(true)} variant="outline">
-                          Edit contact
+                          {t("contacts.lookup.edit_button")}
                         </Button>
                       </div>
                     ) : null}
@@ -199,7 +206,7 @@ export default function ContactsPage() {
         </Card>
       </div>
 
-      {contactsQuery.isLoading ? <LoadingState description="Loading contacts." /> : null}
+      {contactsQuery.isLoading ? <LoadingState description={t("contacts.loading_contacts")} /> : null}
       {contactsQuery.isError ? (
         <ErrorState
           description={getTranslatedBackendErrorMessage(contactsQuery.error, {
@@ -215,13 +222,13 @@ export default function ContactsPage() {
             can("contacts.create") ? (
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="size-4" />
-                Create contact
+                {t("contacts.create_button")}
               </Button>
             ) : null
           }
-          description="Create the first contact record for customers, suppliers or both."
+          description={t("contacts.empty_description")}
           icon={ContactRound}
-          title="No contacts found"
+          title={t("contacts.empty_title")}
         />
       ) : null}
       {contactsQuery.data?.data.length ? (

@@ -70,17 +70,15 @@ function EditTerminalDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit terminal</SheetTitle>
-          <SheetDescription>
-            Update the terminal configuration for this branch.
-          </SheetDescription>
+          <SheetTitle>{t("branches.edit_terminal_title")}</SheetTitle>
+          <SheetDescription>{t("branches.edit_terminal_description")}</SheetDescription>
         </SheetHeader>
         <TerminalForm
           form={form as unknown as UseFormReturn<TerminalFormValues>}
           formError={formError}
           isPending={updateTerminalMutation.isPending}
           onSubmit={(values) => handleSubmit(values as UpdateTerminalInput)}
-          submitLabel="Save changes"
+          submitLabel={t("common.save_changes")}
         />
       </SheetContent>
     </Sheet>

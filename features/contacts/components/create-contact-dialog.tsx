@@ -64,17 +64,15 @@ function CreateContactDialog({ onOpenChange, open }: CreateContactDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
-          <SheetTitle>Create contact</SheetTitle>
-          <SheetDescription>
-            Register a new customer, supplier or tenant contact record.
-          </SheetDescription>
+          <SheetTitle>{t("contacts.create_title")}</SheetTitle>
+          <SheetDescription>{t("contacts.create_description")}</SheetDescription>
         </SheetHeader>
         <ContactForm
           form={form as unknown as UseFormReturn<ContactFormValues>}
           formError={formError}
           isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateContactInput)}
-          submitLabel="Create contact"
+          submitLabel={t("contacts.create_title")}
         />
       </SheetContent>
     </Sheet>

@@ -71,10 +71,8 @@ function EditBranchDialog({ branch, onOpenChange, open }: EditBranchDialogProps)
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
-          <SheetTitle>Edit branch</SheetTitle>
-          <SheetDescription>
-            Update the branch using the same backend payload shape.
-          </SheetDescription>
+          <SheetTitle>{t("branches.edit_title")}</SheetTitle>
+          <SheetDescription>{t("branches.edit_description")}</SheetDescription>
         </SheetHeader>
         <BranchForm
           form={form as unknown as UseFormReturn<BranchFormValues>}
@@ -82,7 +80,7 @@ function EditBranchDialog({ branch, onOpenChange, open }: EditBranchDialogProps)
           isPending={updateBranchMutation.isPending}
           onSubmit={(values) => handleSubmit(values as UpdateBranchInput)}
           secretState={getBranchSecretState(branch)}
-          submitLabel="Save changes"
+          submitLabel={t("common.save_changes")}
         />
       </SheetContent>
     </Sheet>

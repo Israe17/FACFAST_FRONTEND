@@ -61,6 +61,7 @@ function FieldError({ message }: { message?: string }) {
 
 function LocationPickerSection({ form }: { form: UseFormReturn<ContactFormValues> }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useAppTranslator();
   const latitude = form.watch("delivery_latitude") ?? null;
   const longitude = form.watch("delivery_longitude") ?? null;
 
@@ -73,7 +74,7 @@ function LocationPickerSection({ form }: { form: UseFormReturn<ContactFormValues
       >
         <span className="flex items-center gap-1.5">
           <MapPin className="size-3.5" />
-          Ubicación en mapa
+          {t("contacts.form.map_location")}
         </span>
         <ChevronDown
           className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}

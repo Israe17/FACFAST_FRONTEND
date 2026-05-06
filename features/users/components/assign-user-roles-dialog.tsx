@@ -90,16 +90,16 @@ function AssignUserRolesDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Assign roles</SheetTitle>
-          <SheetDescription>Update the roles assigned to {user.name}.</SheetDescription>
+          <SheetTitle>{t("users.assign_roles_title")}</SheetTitle>
+          <SheetDescription>{t("users.assign_roles_description", { name: user.name })}</SheetDescription>
         </SheetHeader>
 
         <SheetBody>
-        {rolesQuery.isLoading ? <LoadingState description="Loading available roles." /> : null}
+        {rolesQuery.isLoading ? <LoadingState description={t("users.loading_roles")} /> : null}
         {rolesQuery.isError ? (
           <ErrorState
             description={getTranslatedBackendErrorMessage(rolesQuery.error, {
-              fallbackMessage: "Unable to load roles.",
+              fallbackMessage: t("users.load_roles_error"),
               translateMessage: t,
             }) ?? undefined}
             onRetry={() => rolesQuery.refetch()}
@@ -107,8 +107,8 @@ function AssignUserRolesDialog({
         ) : null}
         {rolesQuery.data?.length === 0 ? (
           <EmptyState
-            description="No roles are available to assign yet."
-            title="No roles available"
+            description={t("users.no_roles_description")}
+            title={t("users.no_roles_title")}
           />
         ) : null}
         {rolesQuery.data?.length ? (
@@ -130,7 +130,9 @@ function AssignUserRolesDialog({
                       <p className="font-medium">{role.name}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {role.code ? `Code: ${role.code}` : `Key: ${role.role_key}`}
+                      {role.code
+                        ? t("users.role_code", { code: role.code })
+                        : t("users.role_key", { key: role.role_key })}
                     </p>
                   </div>
                 </label>
@@ -140,10 +142,10 @@ function AssignUserRolesDialog({
             <div className="flex justify-end">
               <ActionButton
                 isLoading={assignRolesMutation.isPending}
-                loadingText="Updating"
+                loadingText={t("common.updating")}
                 type="submit"
               >
-                Save roles
+                {t("users.save_roles")}
               </ActionButton>
             </div>
           </form>

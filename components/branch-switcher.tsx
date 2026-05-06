@@ -5,10 +5,12 @@ import { Building2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatBranchLabel } from "@/shared/lib/utils";
 
 function BranchSwitcher() {
   const { isPlatformMode } = usePlatformMode();
+  const { t } = useAppTranslator();
   const {
     activeBranchId,
     availableBranchIds,
@@ -28,8 +30,8 @@ function BranchSwitcher() {
       <div className="flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground">
         <Building2 className="size-4" />
         {isBusinessLevelContext
-          ? "Contexto activo: nivel empresa"
-          : `Sucursal fija: ${formatBranchLabel(activeBranchId ?? "")}`}
+          ? t("branches.switcher.business_level_context")
+          : t("branches.switcher.fixed_branch", { label: formatBranchLabel(activeBranchId ?? "") })}
       </div>
     );
   }
@@ -38,7 +40,7 @@ function BranchSwitcher() {
     return (
       <div className="flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground">
         <Building2 className="size-4" />
-        Sin sucursales
+        {t("branches.switcher.no_branches")}
       </div>
     );
   }
@@ -53,7 +55,7 @@ function BranchSwitcher() {
         <SelectTrigger>
           <div className="flex min-w-0 items-center gap-2">
             <Building2 className="size-4 text-muted-foreground" />
-            <SelectValue placeholder="Selecciona sucursal" />
+            <SelectValue placeholder={t("branches.switcher.select_branch")} />
           </div>
         </SelectTrigger>
         <SelectContent>

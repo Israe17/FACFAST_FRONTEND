@@ -44,17 +44,15 @@ function CreateBranchDialog({ onOpenChange, open }: CreateBranchDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
-          <SheetTitle>Create branch</SheetTitle>
-          <SheetDescription>
-            Register a new branch using the current backend contract.
-          </SheetDescription>
+          <SheetTitle>{t("branches.create_title")}</SheetTitle>
+          <SheetDescription>{t("branches.create_description")}</SheetDescription>
         </SheetHeader>
         <BranchForm
           form={form as unknown as UseFormReturn<BranchFormValues>}
           formError={formError}
           isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateBranchInput)}
-          submitLabel="Create branch"
+          submitLabel={t("branches.create_title")}
         />
       </SheetContent>
     </Sheet>

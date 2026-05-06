@@ -62,15 +62,15 @@ function EditRoleDialog({ onOpenChange, open, role }: EditRoleDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit role</SheetTitle>
-          <SheetDescription>Update the details of this role.</SheetDescription>
+          <SheetTitle>{t("roles.edit_title")}</SheetTitle>
+          <SheetDescription>{t("roles.edit_description")}</SheetDescription>
         </SheetHeader>
         <RoleForm
           form={form as unknown as UseFormReturn<RoleFormValues>}
           formError={formError}
           isPending={updateRoleMutation.isPending}
           onSubmit={(values) => handleSubmit(values as UpdateRoleInput)}
-          submitLabel="Save changes"
+          submitLabel={t("common.save_changes")}
         />
       </SheetContent>
     </Sheet>

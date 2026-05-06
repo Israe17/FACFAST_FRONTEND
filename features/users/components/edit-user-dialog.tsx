@@ -79,11 +79,11 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit user</SheetTitle>
-          <SheetDescription>Update the main information of this user.</SheetDescription>
+          <SheetTitle>{t("users.edit_title")}</SheetTitle>
+          <SheetDescription>{t("users.edit_description")}</SheetDescription>
         </SheetHeader>
 
-        {userQuery.isLoading ? <LoadingState description="Loading user details." /> : null}
+        {userQuery.isLoading ? <LoadingState description={t("users.loading_details")} /> : null}
         {userQuery.isError ? (
           <ErrorState
             description={getTranslatedBackendErrorMessage(userQuery.error, {
@@ -99,7 +99,7 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
             formError={formError}
             isPending={updateUserMutation.isPending}
             onSubmit={(values) => handleSubmit(values as UpdateUserInput)}
-            submitLabel="Save changes"
+            submitLabel={t("common.save_changes")}
           />
         ) : null}
       </SheetContent>

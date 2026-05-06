@@ -21,6 +21,7 @@ import { loginSchema } from "@/features/auth/schemas";
 import type { LoginInput } from "@/features/auth/types";
 import { getLandingRoute } from "@/features/auth/utils";
 import { ActionButton } from "@/shared/components/action-button";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 import { getErrorMessage } from "@/shared/lib/utils";
 
@@ -28,6 +29,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const form = useForm<LoginInput>({
     defaultValues: {
@@ -53,7 +55,7 @@ function LoginForm() {
       router.refresh();
     },
     onError: (error) => {
-      setSubmitError(getErrorMessage(error, "No fue posible iniciar sesión."));
+      setSubmitError(getErrorMessage(error, t("auth.login_error_fallback")));
     },
   });
 
@@ -70,15 +72,13 @@ function LoginForm() {
   return (
     <Card className="border-border/70 bg-card/95 shadow-xl shadow-primary/5">
       <CardHeader className="border-b-0 pb-2">
-        <CardTitle className="text-2xl">Acceso administrativo</CardTitle>
-        <CardDescription>
-          Inicia sesión con tu cuenta actual. La sesión se mantiene con cookies HttpOnly.
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("auth.login_title")}</CardTitle>
+        <CardDescription>{t("auth.login_description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor="email">Correo</Label>
+            <Label htmlFor="email">{t("auth.email_label")}</Label>
             <div className="relative">
               <Mail className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -93,14 +93,14 @@ function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">{t("auth.password_label")}</Label>
             <div className="relative">
               <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="password"
                 autoComplete="current-password"
                 className="pl-9"
-                placeholder="Ingresa tu contraseña"
+                placeholder={t("auth.password_placeholder")}
                 type="password"
                 {...form.register("password")}
               />
@@ -119,16 +119,15 @@ function LoginForm() {
           <ActionButton
             className="w-full"
             isLoading={loginMutation.isPending}
-            loadingText="Ingresando"
+            loadingText={t("auth.logging_in")}
             type="submit"
           >
-            Entrar
+            {t("auth.login_button")}
           </ActionButton>
         </form>
 
         <div className="mt-6 rounded-xl border border-dashed border-border/80 bg-muted/40 p-4 text-sm text-muted-foreground">
-          El onboarding de nuevas empresas ahora vive dentro del panel de plataforma para usuarios
-          con acceso super admin.
+          {t("auth.superadmin_hint")}
         </div>
       </CardContent>
     </Card>

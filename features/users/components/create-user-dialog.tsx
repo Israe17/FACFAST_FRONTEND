@@ -4,7 +4,6 @@ import type { UseFormReturn } from "react-hook-form";
 
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -45,10 +44,8 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Create user</SheetTitle>
-          <SheetDescription>
-            Create a new user without leaving the administrative table.
-          </SheetDescription>
+          <SheetTitle>{t("users.create_title")}</SheetTitle>
+          <SheetDescription>{t("users.create_description")}</SheetDescription>
         </SheetHeader>
         <UserForm
           form={form as unknown as UseFormReturn<UserFormValues>}
@@ -56,7 +53,7 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
           includePassword
           isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateUserInput)}
-          submitLabel="Create user"
+          submitLabel={t("users.create_title")}
         />
       </SheetContent>
     </Sheet>

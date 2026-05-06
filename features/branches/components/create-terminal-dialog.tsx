@@ -47,17 +47,15 @@ function CreateTerminalDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Create terminal</SheetTitle>
-          <SheetDescription>
-            Add a new terminal to {branchName}.
-          </SheetDescription>
+          <SheetTitle>{t("branches.create_terminal_title")}</SheetTitle>
+          <SheetDescription>{t("branches.create_terminal_description", { branch: branchName })}</SheetDescription>
         </SheetHeader>
         <TerminalForm
           form={form as unknown as UseFormReturn<TerminalFormValues>}
           formError={formError}
           isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateTerminalInput)}
-          submitLabel="Create terminal"
+          submitLabel={t("branches.create_terminal_title")}
         />
       </SheetContent>
     </Sheet>

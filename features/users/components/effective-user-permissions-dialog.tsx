@@ -2,7 +2,6 @@
 
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -12,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import { useUserEffectivePermissionsQuery } from "../queries";
 
@@ -28,6 +28,7 @@ function EffectiveUserPermissionsDialog({
   userId,
   userName,
 }: EffectiveUserPermissionsDialogProps) {
+  const { t } = useAppTranslator();
   const permissionsQuery = useUserEffectivePermissionsQuery(userId, open);
   const groupedPermissions =
     permissionsQuery.data?.reduce<Record<string, string[]>>((groups, permission) => {
@@ -41,25 +42,25 @@ function EffectiveUserPermissionsDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
-          <SheetTitle>Effective permissions</SheetTitle>
+          <SheetTitle>{t("users.effective_permissions_title")}</SheetTitle>
           <SheetDescription>
-            Permissions currently resolved for {userName}.
+            {t("users.effective_permissions_description", { name: userName })}
           </SheetDescription>
         </SheetHeader>
 
         {permissionsQuery.isLoading ? (
-          <LoadingState description="Loading effective permissions." />
+          <LoadingState description={t("users.loading_permissions")} />
         ) : null}
         {permissionsQuery.isError ? (
           <ErrorState
-            description="Unable to load effective permissions."
+            description={t("users.load_permissions_error")}
             onRetry={() => permissionsQuery.refetch()}
           />
         ) : null}
         {permissionsQuery.data?.length === 0 ? (
           <EmptyState
-            description="This user does not currently resolve any effective permissions."
-            title="No permissions"
+            description={t("users.no_permissions_description")}
+            title={t("users.no_permissions_title")}
           />
         ) : null}
         {permissionsQuery.data?.length ? (

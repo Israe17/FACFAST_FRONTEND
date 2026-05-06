@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -14,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionButton } from "@/shared/components/action-button";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { changeUserPasswordSchema } from "../schemas";
@@ -31,6 +31,7 @@ function ChangeUserPasswordDialog({
   open,
   userId,
 }: ChangeUserPasswordDialogProps) {
+  const { t } = useAppTranslator();
   const changePasswordMutation = useChangeUserPasswordMutation(userId);
   const form = useForm<ChangeUserPasswordInput>({
     defaultValues: {
@@ -45,10 +46,7 @@ function ChangeUserPasswordDialog({
 
   useEffect(() => {
     if (!open) {
-      form.reset({
-        confirmPassword: "",
-        password: "",
-      });
+      form.reset({ confirmPassword: "", password: "" });
     }
   }, [form, open]);
 
@@ -63,16 +61,16 @@ function ChangeUserPasswordDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Change password</SheetTitle>
-          <SheetDescription>Set a new password for this user.</SheetDescription>
+          <SheetTitle>{t("users.change_password_title")}</SheetTitle>
+          <SheetDescription>{t("users.change_password_description")}</SheetDescription>
         </SheetHeader>
 
         <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor="user-new-password">New password</Label>
+            <Label htmlFor="user-new-password">{t("users.new_password")}</Label>
             <Input
               id="user-new-password"
-              placeholder="New password"
+              placeholder={t("users.new_password")}
               type="password"
               {...form.register("password")}
             />
@@ -82,10 +80,10 @@ function ChangeUserPasswordDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="user-confirm-password">Confirm password</Label>
+            <Label htmlFor="user-confirm-password">{t("users.confirm_password")}</Label>
             <Input
               id="user-confirm-password"
-              placeholder="Confirm password"
+              placeholder={t("users.confirm_password")}
               type="password"
               {...form.register("confirmPassword")}
             />
@@ -97,10 +95,10 @@ function ChangeUserPasswordDialog({
           <div className="flex justify-end">
             <ActionButton
               isLoading={changePasswordMutation.isPending}
-              loadingText="Updating"
+              loadingText={t("common.updating")}
               type="submit"
             >
-              Update password
+              {t("users.update_password")}
             </ActionButton>
           </div>
         </form>

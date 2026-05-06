@@ -104,25 +104,28 @@ function AssignUserBranchesDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Assign branches</SheetTitle>
-          <SheetDescription>
-            Update the branch access for {user.name}. The current session branch context is kept in
-            sync.
-          </SheetDescription>
+          <SheetTitle>{t("users.assign_branches_title")}</SheetTitle>
+          <SheetDescription>{t("users.assign_branches_description", { name: user.name })}</SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">
-            Active branch: {isBusinessLevelContext ? "Company level" : (activeBranchId ?? "None")}
+            {t("users.active_branch_badge", {
+              branch: isBusinessLevelContext ? t("common.enterprise_level") : (activeBranchId ?? t("common.no_branch")),
+            })}
           </Badge>
-          <Badge variant="outline">Allowed branches: {allowedBranchIds.length || "All"}</Badge>
+          <Badge variant="outline">
+            {t("users.allowed_branches_badge", {
+              count: allowedBranchIds.length || t("common.all"),
+            })}
+          </Badge>
         </div>
 
-        {branchesQuery.isLoading ? <LoadingState description="Loading branches." /> : null}
+        {branchesQuery.isLoading ? <LoadingState description={t("users.loading_branches")} /> : null}
         {branchesQuery.isError ? (
           <ErrorState
             description={getTranslatedBackendErrorMessage(branchesQuery.error, {
-              fallbackMessage: "Unable to load branches.",
+              fallbackMessage: t("users.load_branches_error"),
               translateMessage: t,
             }) ?? undefined}
             onRetry={() => branchesQuery.refetch()}
@@ -130,8 +133,8 @@ function AssignUserBranchesDialog({
         ) : null}
         {branchesQuery.data?.length === 0 ? (
           <EmptyState
-            description="No branches were returned by the backend."
-            title="No branches available"
+            description={t("users.no_branches_description")}
+            title={t("users.no_branches_title")}
           />
         ) : null}
         {branches.length ? (
@@ -159,10 +162,10 @@ function AssignUserBranchesDialog({
             <div className="flex justify-end">
               <ActionButton
                 isLoading={assignBranchesMutation.isPending}
-                loadingText="Updating"
+                loadingText={t("common.updating")}
                 type="submit"
               >
-                Save branches
+                {t("users.save_branches")}
               </ActionButton>
             </div>
           </form>

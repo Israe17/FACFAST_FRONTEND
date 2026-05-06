@@ -40,15 +40,15 @@ function CreateRoleDialog({ onOpenChange, open }: CreateRoleDialogProps) {
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Create role</SheetTitle>
-          <SheetDescription>Create a new role for RBAC administration.</SheetDescription>
+          <SheetTitle>{t("roles.create_title")}</SheetTitle>
+          <SheetDescription>{t("roles.create_description")}</SheetDescription>
         </SheetHeader>
         <RoleForm
           form={form as unknown as UseFormReturn<RoleFormValues>}
           formError={formError}
           isPending={isPending}
           onSubmit={(values) => handleSubmit(values as CreateRoleInput)}
-          submitLabel="Create role"
+          submitLabel={t("roles.create_title")}
         />
       </SheetContent>
     </Sheet>

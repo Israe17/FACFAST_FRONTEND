@@ -117,13 +117,11 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent size="md">
         <SheetHeader>
-          <SheetTitle>Edit contact</SheetTitle>
-          <SheetDescription>
-            Update the selected contact without leaving the administrative table.
-          </SheetDescription>
+          <SheetTitle>{t("contacts.edit_title")}</SheetTitle>
+          <SheetDescription>{t("contacts.edit_description")}</SheetDescription>
         </SheetHeader>
 
-        {contactQuery.isLoading ? <LoadingState description="Loading contact details." /> : null}
+        {contactQuery.isLoading ? <LoadingState description={t("contacts.loading_details")} /> : null}
         {contactQuery.isError ? (
           <ErrorState
             description={getTranslatedBackendErrorMessage(contactQuery.error, {
@@ -139,7 +137,7 @@ function EditContactDialog({ contactId, onOpenChange, open }: EditContactDialogP
             formError={formError}
             isPending={updateContactMutation.isPending}
             onSubmit={(values) => handleSubmit(values as UpdateContactInput)}
-            submitLabel="Save changes"
+            submitLabel={t("common.save_changes")}
           />
         ) : null}
       </SheetContent>

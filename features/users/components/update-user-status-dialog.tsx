@@ -6,7 +6,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -36,16 +35,6 @@ type UpdateUserStatusDialogProps = {
   user: User;
 };
 
-const userStatusOptions: Array<{
-  description: string;
-  value: UpdateUserStatusInput["status"];
-}> = [
-  { description: "User can operate normally.", value: "active" },
-  { description: "User remains registered but should not operate.", value: "inactive" },
-  { description: "Access is temporarily suspended.", value: "suspended" },
-  { description: "Logical deleted status only. Permanent delete is a separate action.", value: "deleted" },
-];
-
 function UpdateUserStatusDialog({
   onOpenChange,
   open,
@@ -53,6 +42,17 @@ function UpdateUserStatusDialog({
 }: UpdateUserStatusDialogProps) {
   const updateStatusMutation = useUpdateUserStatusMutation(user.id);
   const { t } = useAppTranslator();
+
+  const userStatusOptions: Array<{
+    description: string;
+    value: UpdateUserStatusInput["status"];
+  }> = [
+    { description: t("users.status_active_description"), value: "active" },
+    { description: t("users.status_inactive_description"), value: "inactive" },
+    { description: t("users.status_suspended_description"), value: "suspended" },
+    { description: t("users.status_deleted_description"), value: "deleted" },
+  ];
+
   const form = useForm<UpdateUserStatusInput>({
     defaultValues: {
       allow_login: user.allow_login ?? user.status === "active",
@@ -63,14 +63,8 @@ function UpdateUserStatusDialog({
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(form);
 
-  const statusValue = useWatch({
-    control: form.control,
-    name: "status",
-  });
-  const allowLoginValue = useWatch({
-    control: form.control,
-    name: "allow_login",
-  });
+  const statusValue = useWatch({ control: form.control, name: "status" });
+  const allowLoginValue = useWatch({ control: form.control, name: "allow_login" });
 
   useEffect(() => {
     if (open) {
@@ -84,7 +78,6 @@ function UpdateUserStatusDialog({
 
   async function handleSubmit(values: UpdateUserStatusInput) {
     resetBackendFormErrors();
-
     try {
       await updateStatusMutation.mutateAsync(values);
       onOpenChange(false);
@@ -99,18 +92,15 @@ function UpdateUserStatusDialog({
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Change user status</SheetTitle>
-          <SheetDescription>
-            Use lifecycle status for non-destructive user administration. Permanent delete remains
-            a separate action.
-          </SheetDescription>
+          <SheetTitle>{t("users.change_status_title")}</SheetTitle>
+          <SheetDescription>{t("users.change_status_description")}</SheetDescription>
         </SheetHeader>
 
         <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <FormErrorBanner message={formError} />
 
           <div className="space-y-2">
-            <Label htmlFor="user-status">Status</Label>
+            <Label htmlFor="user-status">{t("users.status_label")}</Label>
             <Select
               onValueChange={(value) =>
                 form.setValue("status", value as UpdateUserStatusInput["status"], {
@@ -120,7 +110,7 @@ function UpdateUserStatusDialog({
               value={statusValue}
             >
               <SelectTrigger id="user-status">
-                <SelectValue placeholder="Select a status" />
+                <SelectValue placeholder={t("users.status_placeholder")} />
               </SelectTrigger>
               <SelectContent>
                 {userStatusOptions.map((option) => (
@@ -143,21 +133,18 @@ function UpdateUserStatusDialog({
               }}
             />
             <div className="space-y-1">
-              <p className="font-medium">Allow login</p>
-              <p className="text-sm text-muted-foreground">
-                Toggle whether this user can authenticate while keeping the backend status value
-                explicit.
-              </p>
+              <p className="font-medium">{t("users.allow_login")}</p>
+              <p className="text-sm text-muted-foreground">{t("users.allow_login_description")}</p>
             </div>
           </label>
 
           <div className="flex justify-end">
             <ActionButton
               isLoading={updateStatusMutation.isPending}
-              loadingText="Updating"
+              loadingText={t("common.updating")}
               type="submit"
             >
-              Save status
+              {t("users.save_status")}
             </ActionButton>
           </div>
         </form>

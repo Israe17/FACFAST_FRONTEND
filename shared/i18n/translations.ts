@@ -485,6 +485,12 @@ const esTranslations = {
   "inventory.form.cabys_section_description":
     "Código del Catálogo de Bienes y Servicios de Hacienda (opcional)",
   "inventory.form.cabys_section_title": "Clasificación CABYS",
+  "inventory.form.tax_profile_cabys_section_description":
+    "Busca el código CABYS oficial de Hacienda. Al seleccionarlo se cargan automáticamente la tasa, el código de tasa y el tipo de impuesto.",
+  "inventory.form.tax_profile_identity_section_title": "Identidad del perfil",
+  "inventory.form.tax_profile_identity_section_description":
+    "Nombre y descripción para identificar este perfil al asignarlo a productos o categorías.",
+  "inventory.form.iva_rate_code_hint": "Código Hacienda derivado de la tasa: {code}",
   "inventory.form.category_code_placeholder": "Ej: CG-0001",
   "inventory.form.category_item_kind": "Tipo de bien o servicio",
   "inventory.form.category_item_kind_description":
@@ -2853,6 +2859,12 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.cabys_section_description":
       "Code from the Goods and Services Catalog of Hacienda (optional)",
     "inventory.form.cabys_section_title": "CABYS Classification",
+    "inventory.form.tax_profile_cabys_section_description":
+      "Search the official Hacienda CABYS code. Selecting one auto-fills the tax rate, rate code, and tax type.",
+    "inventory.form.tax_profile_identity_section_title": "Profile identity",
+    "inventory.form.tax_profile_identity_section_description":
+      "Name and description used to identify this profile when assigning it to products or categories.",
+    "inventory.form.iva_rate_code_hint": "Hacienda code derived from the rate: {code}",
     "inventory.form.category_code_placeholder": "E.g.: CG-0001",
     "inventory.form.category_item_kind": "Type of good or service",
     "inventory.form.category_item_kind_description":

@@ -122,6 +122,19 @@ export const taxProfileItemKindOptions = [
   { label: "Service", value: "service" },
 ] as const;
 
+export const HACIENDA_IVA_RATE_CODES: Record<number, string> = {
+  0: "01",
+  1: "02",
+  2: "03",
+  4: "04",
+  8: "07",
+  13: "08",
+};
+
+export function resolveHaciendaIvaRateCode(rate: number): string {
+  return HACIENDA_IVA_RATE_CODES[rate] ?? "08";
+}
+
 export const productTypeOptions = [
   { label: "Product", value: "product" },
   { label: "Service", value: "service" },

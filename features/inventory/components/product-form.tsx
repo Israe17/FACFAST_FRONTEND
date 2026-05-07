@@ -107,11 +107,12 @@ export function ProductForm({
       return;
     }
     const selectedCategory = categories.find((c) => c.id === categoryId);
-    if (!selectedCategory?.cabys_code) {
+    const defaultTaxProfileId = selectedCategory?.default_tax_profile_id;
+    if (!defaultTaxProfileId) {
       return;
     }
     const matchingProfile = taxProfiles.find(
-      (tp) => tp.cabys_code === selectedCategory.cabys_code && tp.is_active,
+      (tp) => tp.id === defaultTaxProfileId && tp.is_active,
     );
     if (matchingProfile) {
       form.setValue("tax_profile_id", matchingProfile.id, { shouldDirty: true });

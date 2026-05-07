@@ -236,14 +236,23 @@ export const measurementUnitSchema = z
   })
   .passthrough();
 
+const categoryDefaultTaxProfileSummarySchema = z
+  .object({
+    id: idSchema,
+    name: z.string().catch(""),
+    cabys_code: z.string().nullable().optional().catch(null),
+    description: z.string().nullable().optional().catch(null),
+    iva_rate: z.coerce.number().nullable().optional().catch(null),
+  })
+  .passthrough();
+
 const productCategoryBaseSchema = z
   .object({
     business_id: idSchema.optional().catch(undefined),
-    cabys_code: z.string().nullable().optional().catch(null),
-    cabys_descripcion: z.string().nullable().optional().catch(null),
-    cabys_impuesto: z.coerce.number().nullable().optional().catch(null),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
+    default_tax_profile: categoryDefaultTaxProfileSummarySchema.nullable().optional().catch(null),
+    default_tax_profile_id: nullableIdSchema.default(null),
     description: z.string().nullable().optional().catch(undefined),
     id: idSchema,
     is_active: z.boolean().optional().default(true),

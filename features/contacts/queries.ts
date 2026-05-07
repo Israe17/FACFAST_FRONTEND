@@ -19,6 +19,7 @@ import {
   listContactsPaginated,
   lookupContactByIdentification,
   lookupTaxpayer,
+  lookupTaxpayerEmail,
   updateContactBranchAssignment,
   updateContact,
   verifyExoneration,
@@ -286,14 +287,47 @@ export function useDeleteContactBranchAssignmentMutation(
   });
 }
 
-export function useTaxpayerLookupMutation() {
+export function useTaxpayerLookupMutation(options: MutationFeedbackOptions = {}) {
+  const { t } = useAppTranslator();
+
   return useMutation({
     mutationFn: (identification: string) => lookupTaxpayer(identification),
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("contacts.hacienda.lookup_error"),
+        });
+      }
+    },
   });
 }
 
-export function useExonerationVerifyMutation() {
+export function useTaxpayerEmailLookupMutation(options: MutationFeedbackOptions = {}) {
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: (identification: string) => lookupTaxpayerEmail(identification),
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("contacts.hacienda.lookup_error"),
+        });
+      }
+    },
+  });
+}
+
+export function useExonerationVerifyMutation(options: MutationFeedbackOptions = {}) {
+  const { t } = useAppTranslator();
+
   return useMutation({
     mutationFn: (authorization: string) => verifyExoneration(authorization),
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("contacts.hacienda.verify_error"),
+        });
+      }
+    },
   });
 }

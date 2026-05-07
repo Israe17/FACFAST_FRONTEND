@@ -16,45 +16,45 @@ const esTranslations = {
   "branches.dependency.warehouses": "bodegas",
   "branches.form.active_branch": "Sucursal activa",
   "branches.form.active_branch_description": "Las sucursales inactivas se conservan para historial sin usarse operativamente.",
-  "branches.form.activity_code": "Codigo de actividad economica",
+  "branches.form.activity_code": "Código de actividad economica",
   "branches.form.address": "Direccion",
   "branches.form.branch_name": "Nombre de sucursal",
-  "branches.form.branch_number": "Numero de sucursal",
+  "branches.form.branch_number": "Número de sucursal",
   "branches.form.business_name": "Nombre comercial",
-  "branches.form.canton": "Canton",
+  "branches.form.cantón": "Cantón",
   "branches.form.cedula_juridica": "Cedula juridica",
   "branches.form.cert_path": "Ruta del certificado",
   "branches.form.city": "Ciudad",
-  "branches.form.code": "Codigo",
+  "branches.form.code": "Código",
   "branches.form.configured": "Configurado",
-  "branches.form.configuration_description": "Parametros de facturacion electronica y firma digital.",
-  "branches.form.configuration_title": "Configuracion",
+  "branches.form.configuration_description": "Parámetros de facturación electronica y firma digital.",
+  "branches.form.configuration_title": "Configuración",
   "branches.form.crypto_key": "Clave criptografica",
   "branches.form.district": "Distrito",
-  "branches.form.email": "Correo electronico",
+  "branches.form.email": "Correo electrónico",
   "branches.form.empty": "Vacio",
-  "branches.form.hacienda_password": "Contrasena Hacienda",
+  "branches.form.hacienda_password": "Contraseña Hacienda",
   "branches.form.hacienda_username": "Usuario Hacienda",
-  "branches.form.identification_number": "Numero de identificacion",
-  "branches.form.identification_type": "Tipo de identificacion",
+  "branches.form.identification_number": "Número de identificación",
+  "branches.form.identification_type": "Tipo de identificación",
   "branches.form.identity_description": "Datos de identidad y estado operativo de la sucursal.",
   "branches.form.identity_title": "Identidad de sucursal",
   "branches.form.legal_name": "Razon social",
   "branches.form.location_description": "Datos geograficos y de contacto de la sucursal.",
-  "branches.form.location_title": "Ubicacion y contacto",
+  "branches.form.location_title": "Ubicación y contacto",
   "branches.form.mail_key": "Clave de correo",
-  "branches.form.phone": "Telefono",
-  "branches.form.provider_code": "Codigo de proveedor",
+  "branches.form.phone": "Teléfono",
+  "branches.form.provider_code": "Código de proveedor",
   "branches.form.province": "Provincia",
   "branches.form.secret_flags_label": "Campos sensibles",
   "branches.form.select_type": "Selecciona un tipo",
   "branches.form.signature_type": "Tipo de firma",
   "branches.terminal_form.active_terminal": "Terminal activa",
   "branches.terminal_form.active_terminal_description": "Las terminales inactivas se conservan para historial.",
-  "branches.terminal_form.code": "Codigo de terminal",
+  "branches.terminal_form.code": "Código de terminal",
   "branches.terminal_form.name": "Nombre",
-  "branches.terminal_form.number": "Numero de terminal",
-  "branches.terminal_form.terminal_number": "Numero de terminal",
+  "branches.terminal_form.number": "Número de terminal",
+  "branches.terminal_form.terminal_number": "Número de terminal",
   "branches.terminal_create_error_fallback": "No fue posible crear la terminal.",
   "branches.terminal_delete_error_fallback": "No fue posible eliminar la terminal.",
   "branches.terminal_update_error_fallback": "No fue posible actualizar la terminal.",
@@ -67,8 +67,8 @@ const esTranslations = {
   "branches.create_terminal_description": "Agrega un nuevo terminal a {branch}.",
   "branches.edit_terminal_title": "Editar terminal",
   "branches.edit_terminal_description": "Actualiza la configuración del terminal.",
-  "business.update_error_fallback": "No fue posible actualizar la configuracion de empresa.",
-  "business.update_success": "Configuracion de empresa actualizada correctamente.",
+  "business.update_error_fallback": "No fue posible actualizar la configuración de empresa.",
+  "business.update_success": "Configuración de empresa actualizada correctamente.",
   "common.branch_label": "Sucursal: {label}",
   "common.business_label": "Empresa: {label}",
   "common.cancel": "Cancelar",
@@ -78,11 +78,11 @@ const esTranslations = {
   "common.delete_success": "Eliminado correctamente.",
   "common.enter_business": "Entrar a empresa",
   "common.enterprise_level": "Nivel empresa",
-  "common.load_failed": "No fue posible cargar la informacion.",
+  "common.load_failed": "No fue posible cargar la información.",
   "common.no_active_business": "Sin empresa activa",
   "common.no_branch": "Sin sucursal",
   "common.no_tenant_context": "Sin contexto tenant activo",
-  "common.operation_completed": "Operacion completada.",
+  "common.operation_completed": "Operación completada.",
   "common.platform_admin_in_tenant": "Platform admin dentro del tenant",
   "common.save": "Guardar",
   "common.saving": "Guardando...",
@@ -93,13 +93,13 @@ const esTranslations = {
   "common.all": "Todos",
   "common.saved_successfully": "Guardado correctamente.",
   "common.try_again": "Intenta de nuevo.",
-  "common.table.first_page": "Primera pagina",
-  "common.table.last_page": "Ultima pagina",
+  "common.table.first_page": "Primera página",
+  "common.table.last_page": "Ultima página",
   "common.table.next_page": "Siguiente",
   "common.table.no_results": "No hay registros disponibles.",
   "common.table.page": "Pagina {page} de {totalPages}",
   "common.table.previous_page": "Anterior",
-  "common.table.rows_per_page": "Filas por pagina",
+  "common.table.rows_per_page": "Filas por página",
   "common.table.search_placeholder": "Buscar...",
   "common.table.showing": "Mostrando {from}-{to} de {total} registros",
   "common.update_success": "Actualizado correctamente.",
@@ -117,7 +117,7 @@ const esTranslations = {
     "No fue posible actualizar el contexto comercial por sucursal del contacto.",
   "contacts.branch_assignment_delete_error_fallback":
     "No fue posible eliminar el contexto comercial por sucursal del contacto.",
-  "contacts.lookup_empty_input": "Ingresa una identificacion para buscar.",
+  "contacts.lookup_empty_input": "Ingresa una identificación para buscar.",
   "contacts.lookup_error_fallback": "No fue posible ejecutar la busqueda del contacto.",
   "contacts.branch_assignments.account_manager": "Account manager",
   "contacts.branch_assignments.actions": "Acciones",
@@ -139,11 +139,11 @@ const esTranslations = {
   "contacts.branch_assignments.confirm_reactivate_title": "Reactivar asignacion",
   "contacts.branch_assignments.create_assignment": "Crear asignacion",
   "contacts.branch_assignments.create_error": "No fue posible crear la asignacion.",
-  "contacts.branch_assignments.credit": "Credito",
-  "contacts.branch_assignments.credit_enabled": "Credito habilitado",
-  "contacts.branch_assignments.credit_enabled_description": "Permite operaciones a credito para este contacto en la sucursal.",
-  "contacts.branch_assignments.credit_limit_label": "Limite de credito",
-  "contacts.branch_assignments.custom_credit_limit": "Limite de credito personalizado",
+  "contacts.branch_assignments.credit": "Crédito",
+  "contacts.branch_assignments.credit_enabled": "Crédito habilitado",
+  "contacts.branch_assignments.credit_enabled_description": "Permite operaciones a crédito para este contacto en la sucursal.",
+  "contacts.branch_assignments.credit_limit_label": "Límite de crédito",
+  "contacts.branch_assignments.custom_credit_limit": "Límite de crédito personalizado",
   "contacts.branch_assignments.custom_price_list": "Lista de precios personalizada",
   "contacts.branch_assignments.deactivate": "Desactivar",
   "contacts.branch_assignments.default": "Por defecto",
@@ -168,7 +168,7 @@ const esTranslations = {
   "contacts.branch_assignments.mode_scoped": "Por sucursal",
   "contacts.branch_assignments.no_account_manager": "Sin responsable",
   "contacts.branch_assignments.no_branch_context": "Sin contexto de sucursal",
-  "contacts.branch_assignments.no_code": "Sin codigo",
+  "contacts.branch_assignments.no_code": "Sin código",
   "contacts.branch_assignments.no_custom_price_list": "Sin lista personalizada",
   "contacts.branch_assignments.no_notes": "Sin notas",
   "contacts.branch_assignments.no_permission": "No tienes permiso para gestionar asignaciones de sucursal.",
@@ -194,33 +194,33 @@ const esTranslations = {
   "contacts.form.active_contact_description": "Los registros inactivos se mantienen para historial sin usarse operativamente.",
   "contacts.form.address": "Direccion",
   "contacts.form.address_placeholder": "Direccion exacta y referencias",
-  "contacts.form.canton": "Canton",
-  "contacts.form.code": "Codigo",
+  "contacts.form.cantón": "Cantón",
+  "contacts.form.code": "Código",
   "contacts.form.commercial_name": "Nombre comercial",
   "contacts.form.commercial_name_placeholder": "Nombre de fantasia",
   "contacts.form.district": "Distrito",
-  "contacts.form.document_number": "Numero de documento",
-  "contacts.form.economic_activity_code": "Codigo de actividad economica",
-  "contacts.form.email": "Correo electronico",
+  "contacts.form.document_number": "Número de documento",
+  "contacts.form.economic_activity_code": "Código de actividad economica",
+  "contacts.form.email": "Correo electrónico",
   "contacts.form.exoneration_description": "Campos opcionales para condiciones tributarias especiales.",
-  "contacts.form.exoneration_percentage": "Porcentaje de exoneracion",
-  "contacts.form.exoneration_title": "Exoneracion",
-  "contacts.form.exoneration_type": "Tipo de exoneracion",
+  "contacts.form.exoneration_percentage": "Porcentaje de exoneración",
+  "contacts.form.exoneration_title": "Exoneración",
+  "contacts.form.exoneration_type": "Tipo de exoneración",
   "contacts.form.general_description": "Identidad principal y estado operativo del contacto.",
-  "contacts.form.general_title": "Informacion general",
+  "contacts.form.general_title": "Información general",
   "contacts.form.identification_description": "Identificadores fiscales y datos tributarios.",
-  "contacts.form.identification_number": "Numero de identificacion",
+  "contacts.form.identification_number": "Número de identificación",
   "contacts.form.identification_title": "Identificacion y tributo",
-  "contacts.form.identification_type": "Tipo de identificacion",
+  "contacts.form.identification_type": "Tipo de identificación",
   "contacts.form.institution": "Institucion",
   "contacts.form.issue_date": "Fecha de emision",
   "contacts.form.location_description": "Canales de comunicacion y datos geograficos.",
-  "contacts.form.location_title": "Contacto y ubicacion",
+  "contacts.form.location_title": "Contacto y ubicación",
   "contacts.form.name": "Nombre",
   "contacts.form.name_placeholder": "Nombre legal o personal",
-  "contacts.form.phone": "Telefono",
+  "contacts.form.phone": "Teléfono",
   "contacts.form.province": "Provincia",
-  "contacts.form.select_identification_type": "Selecciona un tipo de identificacion",
+  "contacts.form.select_identification_type": "Selecciona un tipo de identificación",
   "contacts.form.select_type": "Selecciona un tipo",
   "contacts.form.tax_condition": "Condicion tributaria",
   "contacts.form.type": "Tipo",
@@ -228,7 +228,7 @@ const esTranslations = {
   "contacts.create_title": "Crear contacto",
   "contacts.create_description": "Registra un nuevo cliente, proveedor o contacto.",
   "contacts.edit_title": "Editar contacto",
-  "contacts.edit_description": "Actualiza el contacto seleccionado.",
+  "contacts.edit_description": "Actualiza el contacto selecciónado.",
   "contacts.loading_details": "Cargando detalles del contacto.",
   "contacts.eyebrow": "Contacto",
   "contacts.detail.back_to_list": "Volver a contactos",
@@ -236,28 +236,28 @@ const esTranslations = {
   "contacts.detail.not_found_title": "Contacto no encontrado",
   "contacts.detail.not_found_description": "No se encontro el contacto solicitado.",
   "contacts.detail.address_title": "Direccion",
-  "contacts.detail.address_description": "Ubicacion de entrega del contacto.",
+  "contacts.detail.address_description": "Ubicación de entrega del contacto.",
   "contacts.detail.no_address": "Sin direccion registrada.",
-  "contacts.detail.map_title": "Ubicacion en mapa",
+  "contacts.detail.map_title": "Ubicación en mapa",
   "contacts.detail.map_description": "Coordenadas de entrega.",
-  "contacts.detail.no_location": "Sin ubicacion configurada",
+  "contacts.detail.no_location": "Sin ubicación configurada",
   "contacts.detail.no_location_hint": "Edita el contacto para agregar coordenadas.",
-  "contacts.detail.exoneration_title": "Exoneracion fiscal",
-  "contacts.detail.exoneration_description": "Informacion de exoneracion tributaria.",
+  "contacts.detail.exoneration_title": "Exoneración fiscal",
+  "contacts.detail.exoneration_description": "Información de exoneración tributaria.",
   "contacts.detail.metadata_title": "Registro",
   "contacts.detail.metadata_description": "Fechas y datos del registro.",
   "contacts.detail.email_description": "Email de contacto",
-  "contacts.detail.phone_description": "Numero de contacto",
+  "contacts.detail.phone_description": "Número de contacto",
   "contacts.field.identification": "Identificacion",
   "contacts.field.email": "Correo",
-  "contacts.field.phone": "Telefono",
+  "contacts.field.phone": "Teléfono",
   "contacts.field.economic_activity": "Actividad economica",
   "contacts.field.address": "Direccion",
   "contacts.field.province": "Provincia",
-  "contacts.field.canton": "Canton",
+  "contacts.field.cantón": "Cantón",
   "contacts.field.district": "Distrito",
-  "contacts.field.exoneration_type": "Tipo de exoneracion",
-  "contacts.field.exoneration_document": "Numero de documento",
+  "contacts.field.exoneration_type": "Tipo de exoneración",
+  "contacts.field.exoneration_document": "Número de documento",
   "contacts.field.exoneration_institution": "Institucion",
   "contacts.field.exoneration_date": "Fecha de emision",
   "contacts.field.exoneration_percentage": "Porcentaje",
@@ -272,17 +272,17 @@ const esTranslations = {
   "contacts.detail.updated_at": "Actualizado",
   "error.BRANCH_ACCESS_FORBIDDEN": "No tienes acceso a esta sucursal.",
   "error.BRANCH_CONFIGURATION_PERMISSION_REQUIRED":
-    "No tienes permiso para editar la configuracion sensible de la sucursal.",
+    "No tienes permiso para editar la configuración sensible de la sucursal.",
   "error.BRANCH_DELETE_FORBIDDEN":
     "No se puede eliminar la sucursal porque tiene dependencias operativas.",
   "error.BRANCH_MANAGE_SCOPE_FORBIDDEN":
     "No tienes alcance para administrar esta sucursal.",
   "error.BRANCH_NOT_FOUND": "Sucursal no encontrada.",
-  "error.CONTACT_CODE_DUPLICATE": "Ya existe un contacto con ese codigo.",
+  "error.CONTACT_CODE_DUPLICATE": "Ya existe un contacto con ese código.",
   "error.CONTACT_DELETE_FORBIDDEN":
     "No se puede eliminar el contacto porque tiene historial operativo.",
   "error.CONTACT_IDENTIFICATION_DUPLICATE":
-    "Ya existe un contacto con esa identificacion.",
+    "Ya existe un contacto con esa identificación.",
   "error.CONTACT_BRANCH_ASSIGNMENT_NOT_FOUND":
     "No se encontro la asignacion comercial de sucursal para este contacto.",
   "error.CONTACT_BRANCH_ASSIGNMENT_DUPLICATE":
@@ -290,9 +290,9 @@ const esTranslations = {
   "error.CONTACT_BRANCH_EXCLUSIVE_CONFLICT":
     "Este contacto ya tiene una asignacion exclusiva activa en otra sucursal.",
   "error.CONTACT_ACCOUNT_MANAGER_BRANCH_SCOPE_INVALID":
-    "El account manager seleccionado no tiene acceso a la sucursal indicada.",
+    "El account manager selecciónado no tiene acceso a la sucursal indicada.",
   "error.CONTACT_LOOKUP_MULTIPLE":
-    "La busqueda devolvio multiples contactos para esa identificacion.",
+    "La busqueda devolvio multiples contactos para esa identificación.",
   "error.CONTACT_NOT_FOUND": "Contacto no encontrado.",
   "error.TERMINAL_NOT_FOUND": "Terminal no encontrada.",
   "error.USER_CROSS_BUSINESS_MANAGEMENT_FORBIDDEN":
@@ -320,23 +320,23 @@ const esTranslations = {
   "inventory.brand_update_error_fallback": "No fue posible actualizar la marca.",
   "inventory.zone_create_error_fallback": "No fue posible crear la zona.",
   "inventory.zone_update_error_fallback": "No fue posible actualizar la zona.",
-  "inventory.vehicle_create_error_fallback": "No fue posible crear el vehiculo.",
-  "inventory.vehicle_update_error_fallback": "No fue posible actualizar el vehiculo.",
+  "inventory.vehicle_create_error_fallback": "No fue posible crear el vehículo.",
+  "inventory.vehicle_update_error_fallback": "No fue posible actualizar el vehículo.",
   "inventory.route_create_error_fallback": "No fue posible crear la ruta.",
   "inventory.route_update_error_fallback": "No fue posible actualizar la ruta.",
   "inventory.access_denied_description":
-    "No tienes permisos para ver el modulo de inventario.",
+    "No tienes permisos para ver el módulo de inventario.",
   "inventory.access_denied_title": "Acceso denegado",
-  "inventory.category_create_error_fallback": "No fue posible crear la categoria.",
-  "inventory.category_update_error_fallback": "No fue posible actualizar la categoria.",
+  "inventory.category_create_error_fallback": "No fue posible crear la categoría.",
+  "inventory.category_update_error_fallback": "No fue posible actualizar la categoría.",
   "inventory.common.actions": "Acciones",
   "inventory.common.active": "Activo",
   "inventory.common.all_variants": "Todas las variantes",
-  "inventory.common.code": "Codigo",
+  "inventory.common.code": "Código",
   "inventory.common.coverage": "Cobertura",
   "inventory.common.create_entity": "Crear {entity}",
   "inventory.common.currency": "Moneda",
-  "inventory.common.description": "Descripcion",
+  "inventory.common.description": "Descripción",
   "inventory.common.deactivate": "Desactivar",
   "inventory.common.reactivate": "Reactivar",
   "inventory.common.delete": "Eliminar",
@@ -348,8 +348,8 @@ const esTranslations = {
   "inventory.common.level": "Nivel",
   "inventory.common.loading_entity": "Cargando {entity}.",
   "inventory.common.name": "Nombre",
-  "inventory.common.no_description": "Sin descripcion",
-  "inventory.common.no_manual_code": "Sin codigo manual",
+  "inventory.common.no_description": "Sin descripción",
+  "inventory.common.no_manual_code": "Sin código manual",
   "inventory.common.no_notes": "Sin notas",
   "inventory.common.notes": "Notas",
   "inventory.common.date": "Fecha",
@@ -357,10 +357,10 @@ const esTranslations = {
   "inventory.common.email": "Correo electrónico",
   "inventory.common.not_available": "N/D",
   "inventory.common.parent": "Padre",
-  "inventory.common.root": "Raiz",
+  "inventory.common.root": "Raíz",
   "inventory.common.save_changes": "Guardar cambios",
   "inventory.common.status": "Estado",
-  "inventory.common.symbol": "Simbolo",
+  "inventory.common.symbol": "Símbolo",
   "inventory.common.type": "Tipo",
   "inventory.common.unable_to_load_entity": "No fue posible cargar {entity}.",
   "inventory.common.unknown": "Desconocido",
@@ -368,7 +368,7 @@ const esTranslations = {
   "inventory.common.view": "Ver",
   "inventory.entity.brand": "marca",
   "inventory.entity.brands": "marcas",
-  "inventory.entity.category": "categoria",
+  "inventory.entity.category": "categoría",
   "inventory.entity.measurement_unit": "unidad de medida",
   "inventory.entity.measurement_units": "unidades de medida",
   "inventory.entity.price_list": "lista de precios",
@@ -376,18 +376,18 @@ const esTranslations = {
   "inventory.entity.product": "producto",
   "inventory.entity.product_price": "precio de producto",
   "inventory.entity.product_prices": "precios de producto",
-  "inventory.entity.product_category": "categoria",
-  "inventory.entity.product_categories": "categorias de producto",
+  "inventory.entity.product_category": "categoría",
+  "inventory.entity.product_categories": "categorías de producto",
   "inventory.entity.products": "productos",
   "inventory.entity.variant": "variante",
   "inventory.entity.variants": "variantes",
-  "inventory.entity.promotion": "promocion",
+  "inventory.entity.promotion": "promoción",
   "inventory.entity.promotions": "promociones",
   "inventory.entity.tax_profile": "perfil fiscal",
   "inventory.entity.tax_profiles": "perfiles fiscales",
   "inventory.entity.warehouse": "bodega",
   "inventory.entity.warehouses": "bodegas",
-  "inventory.entity.warehouse_location": "ubicacion de bodega",
+  "inventory.entity.warehouse_location": "ubicación de bodega",
   "inventory.entity.warehouse_locations": "ubicaciones de bodega",
   "inventory.entity.warehouse_stock": "stock por bodega",
   "inventory.entity.inventory_lot": "lote",
@@ -396,20 +396,20 @@ const esTranslations = {
   "inventory.entity.inventory_movements": "movimientos de inventario",
   "inventory.entity.product_serial": "serial",
   "inventory.entity.product_serials": "seriales",
-  "inventory.entity.warranty_profile": "perfil de garantia",
-  "inventory.entity.warranty_profiles": "perfiles de garantia",
+  "inventory.entity.warranty_profile": "perfil de garantía",
+  "inventory.entity.warranty_profiles": "perfiles de garantía",
   "inventory.entity.zone": "zona",
   "inventory.entity.zones": "zonas",
-  "inventory.entity.vehicle": "vehiculo",
-  "inventory.entity.vehicles": "vehiculos",
+  "inventory.entity.vehicle": "vehículo",
+  "inventory.entity.vehicles": "vehículos",
   "inventory.entity.route": "ruta",
   "inventory.entity.routes": "rutas",
   "inventory.form.active_brand": "Marca activa",
   "inventory.form.active_brand_description":
-    "Las marcas inactivas se mantienen para historial, pero no deberian usarse operativamente.",
-  "inventory.form.active_category": "Categoria activa",
+    "Las marcas inactivas se mantienen para historial, pero no deberían usarse operativamente.",
+  "inventory.form.active_category": "Categoría activa",
   "inventory.form.active_category_description":
-    "Las categorias inactivas se mantienen referenciadas en historial, pero no deberian usarse en productos nuevos.",
+    "Las categorías inactivas se mantienen referenciadas en historial, pero no deberían usarse en productos nuevos.",
   "inventory.form.active_measurement_unit": "Unidad de medida activa",
   "inventory.form.active_measurement_unit_description":
     "Mantiene la unidad disponible para historial sin usarla en flujos nuevos de producto.",
@@ -418,42 +418,42 @@ const esTranslations = {
     "Las listas inactivas quedan solo para historial y reporteria.",
   "inventory.form.active_product": "Producto activo",
   "inventory.form.active_product_description":
-    "Los productos inactivos siguen visibles para historial y auditoria.",
+    "Los productos inactivos siguen visibles para historial y auditoría.",
   "inventory.form.active_tax_profile": "Perfil fiscal activo",
   "inventory.form.active_tax_profile_description":
     "Los perfiles inactivos se mantienen solo para historial.",
-  "inventory.form.active_warranty_profile": "Perfil de garantia activo",
+  "inventory.form.active_warranty_profile": "Perfil de garantía activo",
   "inventory.form.active_warranty_profile_description":
     "Los perfiles inactivos siguen disponibles para historial y referencias legadas.",
   "inventory.form.allow_negative_stock": "Permitir inventario negativo",
   "inventory.form.allow_negative_stock_description":
-    "Usalo solo cuando la operacion permita balances negativos temporales.",
-  "inventory.form.allows_exoneration": "Permite exoneracion",
+    "Usalo solo cuando la operación permita balances negativos temporales.",
+  "inventory.form.allows_exoneration": "Permite exoneración",
   "inventory.form.allows_exoneration_description":
-    "Habilita manejo de exoneracion para compradores elegibles.",
+    "Habilita manejo de exoneración para compradores elegibles.",
   "inventory.form.active_inventory_lot": "Lote activo",
   "inventory.form.active_inventory_lot_description":
     "Los lotes inactivos quedan visibles para historial, pero no deben seguir usandose operativamente.",
   "inventory.form.active_product_price": "Precio activo",
   "inventory.form.active_product_price_description":
     "Permite desactivar precios sin borrar historial.",
-  "inventory.form.active_promotion": "Promocion activa",
+  "inventory.form.active_promotion": "Promoción activa",
   "inventory.form.active_promotion_description":
-    "Las promociones inactivas se conservan para auditoria y analitica.",
+    "Las promociones inactivas se conservan para auditoría y analítica.",
   "inventory.form.active_warehouse": "Bodega activa",
   "inventory.form.active_warehouse_description":
     "Las bodegas inactivas permanecen en historial, pero no deben recibir nuevas operaciones.",
-  "inventory.form.active_warehouse_location": "Ubicacion activa",
+  "inventory.form.active_warehouse_location": "Ubicación activa",
   "inventory.form.active_warehouse_location_description":
-    "Mantiene la ubicacion visible para historial sin usarla en nuevas operaciones.",
-  "inventory.form.barcode": "Codigo de barras",
+    "Mantiene la ubicación visible para historial sin usarla en nuevas operaciones.",
+  "inventory.form.barcode": "Código de barras",
   "inventory.form.aisle": "Pasillo",
   "inventory.form.all_warehouses": "Todas las bodegas",
   "inventory.form.adjustment_type": "Tipo de ajuste",
   "inventory.form.available_quantity": "Disponible",
   "inventory.form.bonus_quantity": "Cantidad bonificada",
   "inventory.form.branch": "Sucursal",
-  "inventory.form.cabys_code": "Codigo CABYS",
+  "inventory.form.cabys_code": "Código CABYS",
   "inventory.form.coverage_notes": "Notas de cobertura",
   "inventory.form.current_quantity": "Cantidad actual",
   "inventory.form.default_price_list": "Lista de precios por defecto",
@@ -464,58 +464,58 @@ const esTranslations = {
     "El backend desactiva la bodega default anterior dentro de la misma sucursal.",
   "inventory.form.destination_warehouse": "Bodega destino",
   "inventory.form.discount_value": "Valor de descuento",
-  "inventory.form.duration_unit": "Unidad de duracion",
-  "inventory.form.duration_value": "Valor de duracion",
-  "inventory.form.expiration_date": "Fecha de expiracion",
+  "inventory.form.duration_unit": "Unidad de duración",
+  "inventory.form.duration_value": "Valor de duración",
+  "inventory.form.expiration_date": "Fecha de expiración",
   "inventory.form.has_variants": "Tiene variantes",
   "inventory.form.has_variants_description":
     "Habilita la gestion de variantes (talla, color, etc.) para este producto.",
-  "inventory.form.has_warranty": "Tiene garantia",
+  "inventory.form.has_warranty": "Tiene garantía",
   "inventory.form.has_warranty_description":
-    "El perfil de garantia se vuelve obligatorio cuando este flag esta activo.",
+    "El perfil de garantía se vuelve obligatorio cuando este flag esta activo.",
   "inventory.form.header_id": "Header",
   "inventory.form.initial_quantity": "Cantidad inicial",
   "inventory.form.inventory": "Inventario",
   "inventory.form.is_dispatch_area": "Area de despacho",
   "inventory.form.is_dispatch_area_description":
-    "Marca la ubicacion como util para despachos.",
+    "Marca la ubicación como util para despachos.",
   "inventory.form.is_picking_area": "Area de picking",
   "inventory.form.is_picking_area_description":
-    "Marca la ubicacion como util para preparacion de pedidos.",
+    "Marca la ubicación como util para preparacion de pedidos.",
   "inventory.form.is_receiving_area": "Area de recepcion",
   "inventory.form.is_receiving_area_description":
-    "Marca la ubicacion como util para recepcion de mercaderia.",
+    "Marca la ubicación como util para recepcion de mercaderia.",
   "inventory.form.item_kind": "Tipo de item",
   "inventory.form.iva_rate": "Tasa de IVA",
-  "inventory.form.iva_rate_code": "Codigo de tasa IVA",
+  "inventory.form.iva_rate_code": "Código de tasa IVA",
   "inventory.form.kind": "Tipo",
   "inventory.form.level": "Nivel",
   "inventory.form.locations": "Ubicaciones",
-  "inventory.form.lot_number": "Numero de lote",
-  "inventory.form.manufacturing_date": "Fecha de fabricacion",
-  "inventory.form.min_quantity": "Cantidad minima",
+  "inventory.form.lot_number": "Número de lote",
+  "inventory.form.manufacturing_date": "Fecha de fabricación",
+  "inventory.form.min_quantity": "Cantidad mínima",
   "inventory.form.movement_type": "Tipo de movimiento",
   "inventory.form.no_brand": "Sin marca",
-  "inventory.form.no_category": "Sin categoria",
+  "inventory.form.no_category": "Sin categoría",
   "inventory.form.no_inventory_lot": "Sin lote",
-  "inventory.form.no_location": "Sin ubicacion",
+  "inventory.form.no_location": "Sin ubicación",
   "inventory.form.no_parent": "Sin padre",
   "inventory.form.no_sale_unit": "Sin unidad de venta",
   "inventory.form.no_stock_unit": "Sin unidad de inventario",
   "inventory.form.no_supplier_contact": "Sin proveedor",
-  "inventory.form.no_warranty_profile": "Sin perfil de garantia",
-  "inventory.form.occurred_at": "Ocurrio en",
+  "inventory.form.no_warranty_profile": "Sin perfil de garantía",
+  "inventory.form.occurred_at": "Ocurrió en",
   "inventory.form.on_hand_delta": "Delta disponible",
   "inventory.form.on_hand_quantity": "Existencia",
   "inventory.form.origin_warehouse": "Bodega origen",
   "inventory.form.override_price": "Precio override",
-  "inventory.form.parent_category": "Categoria padre",
-  "inventory.form.position": "Posicion",
+  "inventory.form.parent_category": "Categoría padre",
+  "inventory.form.position": "Posición",
   "inventory.form.price": "Precio",
   "inventory.form.product": "Producto",
   "inventory.form.projected_quantity": "Proyectado",
-  "inventory.form.promotion_type": "Tipo de promocion",
-  "inventory.form.purpose": "Proposito",
+  "inventory.form.promotion_type": "Tipo de promoción",
+  "inventory.form.purpose": "Propósito",
   "inventory.form.quantity": "Cantidad",
   "inventory.form.rack": "Rack",
   "inventory.form.received_at": "Recibido en",
@@ -528,7 +528,7 @@ const esTranslations = {
   "inventory.form.sale_unit": "Unidad de venta",
   "inventory.form.select_adjustment_type": "Selecciona un tipo de ajuste",
   "inventory.form.select_branch": "Selecciona una sucursal",
-  "inventory.form.select_duration_unit": "Selecciona una unidad de duracion",
+  "inventory.form.select_duration_unit": "Selecciona una unidad de duración",
   "inventory.form.select_destination_warehouse": "Selecciona una bodega destino",
   "inventory.form.select_item_kind": "Selecciona el tipo de item",
   "inventory.form.select_kind": "Selecciona un tipo",
@@ -537,7 +537,7 @@ const esTranslations = {
   "inventory.form.select_product": "Selecciona un producto",
   "inventory.form.select_variant": "Selecciona una variante",
   "inventory.form.product_variant": "Variante",
-  "inventory.form.select_promotion_type": "Selecciona un tipo de promocion",
+  "inventory.form.select_promotion_type": "Selecciona un tipo de promoción",
   "inventory.form.select_tax_profile": "Selecciona un perfil fiscal",
   "inventory.form.select_tax_type": "Selecciona el tipo de impuesto",
   "inventory.form.select_type": "Selecciona un tipo",
@@ -548,9 +548,9 @@ const esTranslations = {
   "inventory.form.supplier_contact": "Proveedor",
   "inventory.form.tax_profile": "Perfil fiscal",
   "inventory.form.tax_type": "Tipo de impuesto",
-  "inventory.form.track_expiration": "Rastrear expiracion",
+  "inventory.form.track_expiration": "Rastrear expiración",
   "inventory.form.track_expiration_description":
-    "Las fechas de expiracion solo aplican cuando el rastreo por lotes esta activo.",
+    "Las fechas de expiración solo aplican cuando el rastreo por lotes esta activo.",
   "inventory.form.track_inventory": "Rastrear inventario",
   "inventory.form.track_inventory_description":
     "Habilita balances de stock para este producto.",
@@ -565,21 +565,21 @@ const esTranslations = {
   "inventory.form.valid_from": "Valido desde",
   "inventory.form.valid_to": "Valido hasta",
   "inventory.form.validity": "Vigencia",
-  "inventory.form.warranty_profile": "Perfil de garantia",
+  "inventory.form.warranty_profile": "Perfil de garantía",
   "inventory.form.zone": "Zona",
   "inventory.form.plate_number": "Placa",
-  "inventory.form.vehicle_type": "Tipo de vehiculo",
-  "inventory.form.max_weight_kg": "Peso maximo (kg)",
-  "inventory.form.max_volume_m3": "Volumen maximo (m3)",
+  "inventory.form.vehicle_type": "Tipo de vehículo",
+  "inventory.form.max_weight_kg": "Peso máximo (kg)",
+  "inventory.form.max_volume_m3": "Volumen máximo (m3)",
   "inventory.form.estimated_cost": "Costo estimado",
   "inventory.form.frequency": "Frecuencia",
   "inventory.form.day_of_week": "Dia de semana",
-  "inventory.form.default_vehicle": "Vehiculo por defecto",
+  "inventory.form.default_vehicle": "Vehículo por defecto",
   "inventory.form.default_driver": "Chofer por defecto",
   "inventory.form.select_zone": "Seleccionar zona",
   "inventory.form.no_zone": "Sin zona",
-  "inventory.form.select_vehicle": "Seleccionar vehiculo",
-  "inventory.form.no_vehicle": "Sin vehiculo",
+  "inventory.form.select_vehicle": "Seleccionar vehículo",
+  "inventory.form.no_vehicle": "Sin vehículo",
   "inventory.form.active_zone": "Zona activa",
   "inventory.zones.detail.access_denied_title": "Acceso denegado",
   "inventory.zones.detail.access_denied_description": "No tienes permiso para ver zonas.",
@@ -590,61 +590,61 @@ const esTranslations = {
   "inventory.zones.detail.global": "Global",
   "inventory.zones.detail.scoped": "Por sucursal",
   "inventory.zones.detail.province": "Provincia",
-  "inventory.zones.detail.canton": "Canton",
+  "inventory.zones.detail.cantón": "Cantón",
   "inventory.zones.detail.district": "Distrito",
   "inventory.zones.detail.branches_count": "Sucursales",
   "inventory.zones.detail.branches_assigned": "Sucursales asignadas a esta zona.",
   "inventory.zones.detail.summary_title": "Resumen",
-  "inventory.zones.detail.summary_description": "Informacion principal de la zona.",
+  "inventory.zones.detail.summary_description": "Información principal de la zona.",
   "inventory.zones.detail.scope": "Alcance",
-  "inventory.zones.detail.map_title": "Ubicacion en mapa",
-  "inventory.zones.detail.map_description": "Limite geografico de la zona.",
-  "inventory.zones.detail.no_location": "Sin ubicacion configurada",
+  "inventory.zones.detail.map_title": "Ubicación en mapa",
+  "inventory.zones.detail.map_description": "Límite geografico de la zona.",
+  "inventory.zones.detail.no_location": "Sin ubicación configurada",
   "inventory.zones.detail.no_location_hint": "Edita la zona para delimitar en el mapa.",
   "inventory.zones.detail.branches_title": "Sucursales asignadas",
   "inventory.zones.detail.branches_description": "Sucursales que operan con esta zona.",
   "inventory.zones.detail.no_branches": "Sin sucursales asignadas.",
   "inventory.form.active_zone_description": "Las zonas inactivas se conservan para historial sin usarse operativamente.",
-  "inventory.form.active_vehicle": "Vehiculo activo",
-  "inventory.form.active_vehicle_description": "Los vehiculos inactivos se conservan para historial sin usarse operativamente.",
+  "inventory.form.active_vehicle": "Vehículo activo",
+  "inventory.form.active_vehicle_description": "Los vehículos inactivos se conservan para historial sin usarse operativamente.",
   "inventory.form.active_route": "Ruta activa",
   "inventory.form.active_route_description": "Las rutas inactivas se conservan para historial sin usarse operativamente.",
   "inventory.form.province": "Provincia",
-  "inventory.form.canton": "Canton",
+  "inventory.form.cantón": "Cantón",
   "inventory.form.district": "Distrito",
   "inventory.brands.delete_title": "Eliminar marca",
   "inventory.brands.delete_description":
     "La marca \"{name}\" sera eliminada permanentemente. Solo es posible si ningun producto la usa actualmente.",
   "inventory.brands.dialog_description":
-    "Mantiene el catalogo de marcas usando el contrato actual de inventario del backend.",
+    "Mantiene el catálogo de marcas usando el contrato actual de inventario del backend.",
   "inventory.brands.section_description":
-    "Catalogo comercial de marcas que luego usan productos y precios.",
+    "Catálogo comercial de marcas que luego usan productos y precios.",
   "inventory.zones.province": "Provincia",
-  "inventory.zones.canton": "Canton",
+  "inventory.zones.cantón": "Cantón",
   "inventory.zones.district": "Distrito",
-  "inventory.zones.location": "Ubicacion",
+  "inventory.zones.location": "Ubicación",
   "inventory.vehicles.plate_number": "Placa",
-  "inventory.vehicles.vehicle_type": "Tipo de vehiculo",
-  "inventory.vehicles.max_weight_kg": "Peso maximo (kg)",
-  "inventory.vehicles.max_volume_m3": "Volumen maximo (m3)",
+  "inventory.vehicles.vehicle_type": "Tipo de vehículo",
+  "inventory.vehicles.max_weight_kg": "Peso máximo (kg)",
+  "inventory.vehicles.max_volume_m3": "Volumen máximo (m3)",
   "inventory.vehicles.capacity": "Capacidad",
   "inventory.vehicles.notes": "Notas",
-  "inventory.vehicles.notes_placeholder": "Notas adicionales sobre el vehiculo",
-  "inventory.vehicles.name_placeholder": "Nombre del vehiculo",
+  "inventory.vehicles.notes_placeholder": "Notas adicionales sobre el vehículo",
+  "inventory.vehicles.name_placeholder": "Nombre del vehículo",
   "inventory.vehicles.select_vehicle_type": "Selecciona un tipo",
-  "inventory.vehicles.type_truck": "Camion",
+  "inventory.vehicles.type_truck": "Camión",
   "inventory.vehicles.type_van": "Furgoneta",
   "inventory.vehicles.type_pickup": "Pickup",
   "inventory.vehicles.type_motorcycle": "Motocicleta",
   "inventory.vehicles.type_bicycle": "Bicicleta",
-  "inventory.vehicles.type_car": "Automovil",
+  "inventory.vehicles.type_car": "Automóvil",
   "inventory.vehicles.type_other": "Otro",
   "inventory.routes.zone": "Zona",
   "inventory.routes.select_zone": "Seleccionar zona",
   "inventory.routes.no_zone": "Sin zona",
-  "inventory.routes.default_vehicle": "Vehiculo por defecto",
-  "inventory.routes.select_vehicle": "Seleccionar vehiculo",
-  "inventory.routes.no_vehicle": "Sin vehiculo",
+  "inventory.routes.default_vehicle": "Vehículo por defecto",
+  "inventory.routes.select_vehicle": "Seleccionar vehículo",
+  "inventory.routes.no_vehicle": "Sin vehículo",
   "inventory.routes.default_driver_user_id": "ID chofer por defecto",
   "inventory.routes.estimated_cost": "Costo estimado",
   "inventory.routes.frequency": "Frecuencia",
@@ -653,73 +653,73 @@ const esTranslations = {
   "inventory.zones.delete_description":
     "La zona \"{name}\" sera eliminada permanentemente.",
   "inventory.zones.dialog_description":
-    "Administra las zonas geograficas de entrega y cobertura logistica.",
+    "Administra las zonas geográficas de entrega y cobertura logística.",
   "inventory.zones.section_description":
-    "Zonas geograficas usadas por rutas y despachos.",
-  "inventory.vehicles.delete_title": "Eliminar vehiculo",
+    "Zonas geográficas usadas por rutas y despachos.",
+  "inventory.vehicles.delete_title": "Eliminar vehículo",
   "inventory.vehicles.delete_description":
-    "El vehiculo \"{name}\" sera eliminado permanentemente.",
+    "El vehículo \"{name}\" sera eliminado permanentemente.",
   "inventory.vehicles.dialog_description":
-    "Administra los vehiculos disponibles para despachos y logistica.",
+    "Administra los vehículos disponibles para despachos y logística.",
   "inventory.vehicles.section_description":
-    "Flota de vehiculos usados en rutas y despachos.",
+    "Flota de vehículos usados en rutas y despachos.",
   "inventory.routes.delete_title": "Eliminar ruta",
   "inventory.routes.delete_description":
     "La ruta \"{name}\" sera eliminada permanentemente.",
   "inventory.routes.dialog_description":
-    "Administra las rutas de entrega y su configuracion logistica.",
+    "Administra las rutas de entrega y su configuración logística.",
   "inventory.routes.section_description":
-    "Rutas de entrega con zona, vehiculo y chofer por defecto.",
-  "inventory.categories.delete_title": "Eliminar categoria",
+    "Rutas de entrega con zona, vehículo y chofer por defecto.",
+  "inventory.categories.delete_title": "Eliminar categoría",
   "inventory.categories.delete_description":
-    "La categoria \"{name}\" sera eliminada permanentemente. Solo es posible si no tiene subcategorias ni productos asignados.",
+    "La categoría \"{name}\" sera eliminada permanentemente. Solo es posible si no tiene subcategorías ni productos asignados.",
   "inventory.categories.dialog_description":
-    "Mantiene la jerarquia de categorias de producto usada por inventario.",
+    "Mantiene la jerarquia de categorías de producto usada por inventario.",
   "inventory.categories.section_description":
-    "Clasificacion jerarquica para productos y futura analitica de inventario.",
+    "Clasificacion jerarquica para productos y futura analítica de inventario.",
   "inventory.measurement_units.delete_title": "Eliminar unidad de medida",
   "inventory.measurement_units.delete_description":
     "La unidad \"{name}\" sera eliminada permanentemente. Solo es posible si ningun producto o variante la usa.",
   "inventory.measurement_units.dialog_description":
-    "Mantiene las unidades de inventario y venta usadas por entidades del modulo.",
+    "Mantiene las unidades de inventario y venta usadas por entidades del módulo.",
   "inventory.measurement_units.section_description":
     "Unidades de inventario, venta y conversion disponibles para productos y precios.",
   "inventory.page_description":
-    "Base operativa de inventario del tenant. Esta fase cubre catalogos, pricing, bodegas, lotes y movimientos.",
+    "Base operativa de inventario del tenant. Esta fase cubre catálogos, pricing, bodegas, lotes y movimientos.",
   "inventory.page_phase_badge": "Fase 3",
   "inventory.page_scope_badge": "Inventario operativo",
   "inventory.page_tenant_aware_badge": "Tenant aware",
   "inventory.page_title": "Inventario",
-  "inventory.module_eyebrow": "ERP inventory",
-  "inventory.module_title": "Modulo de inventory",
+  "inventory.module_eyebrow": "ERP Inventario",
+  "inventory.module_title": "Módulo de inventario",
   "inventory.module_description":
-    "Navega por catalogos, productos, pricing, bodegas y operacion sin convertir Inventory en una pagina infinita.",
+    "Navega por catálogos, productos, precios, bodegas y operación sin convertir el inventario en una página infinita.",
   "inventory.context.business_label": "Empresa",
   "inventory.context.branch_label": "Contexto sucursal",
   "inventory.context.company_level": "Nivel empresa",
   "inventory.context.mode_label": "Modo",
-  "inventory.nav.catalogs": "Catalogos",
+  "inventory.nav.catalogs": "Catálogos",
   "inventory.nav.products": "Productos",
-  "inventory.nav.pricing": "Pricing",
+  "inventory.nav.pricing": "Precios",
   "inventory.nav.warehouses": "Bodegas",
-  "inventory.nav.operations": "Operacion",
-  "inventory.landing.title": "Centro de inventory",
+  "inventory.nav.operations": "Operación",
+  "inventory.landing.title": "Centro de inventario",
   "inventory.landing.description":
-    "Inventory ahora funciona como un mini-sistema del dashboard: entra por submodulos, revisa relaciones y abre detalles por entidad.",
+    "El inventario ahora funciona como un mini-sistema del dashboard: entra por submódulos, revisa relaciones y abre detalles por entidad.",
   "inventory.landing.primary_action": "Abrir productos",
   "inventory.landing.products_kpi_title": "Productos",
-  "inventory.landing.products_kpi_description": "Catalogo maestro listo para stock y pricing.",
-  "inventory.landing.catalogs_kpi_title": "Catalogos",
-  "inventory.landing.catalogs_kpi_description": "Bases maestras activas para inventory.",
-  "inventory.landing.pricing_kpi_title": "Pricing",
+  "inventory.landing.products_kpi_description": "Catálogo maestro listo para stock y precios.",
+  "inventory.landing.catalogs_kpi_title": "Catálogos",
+  "inventory.landing.catalogs_kpi_description": "Bases maestras activas para inventario.",
+  "inventory.landing.pricing_kpi_title": "Precios",
   "inventory.landing.pricing_kpi_description": "Listas comerciales y reglas promocionales.",
   "inventory.landing.warehouses_kpi_title": "Bodegas",
   "inventory.landing.warehouses_kpi_description": "Infraestructura operativa del tenant.",
-  "inventory.landing.loading_modules": "Cargando resumen de submodulos de inventory.",
+  "inventory.landing.loading_modules": "Cargando resumen de submódulos de inventario.",
   "inventory.landing.records_badge": "{count} registros",
-  "inventory.landing.open_module": "Entrar al submodulo",
+  "inventory.landing.open_module": "Entrar al submódulo",
   "inventory.landing.catalogs_description":
-    "Gestiona categorias, marcas, unidades y perfiles reutilizables sin mezclarlo con la operacion.",
+    "Gestiona categorías, marcas, unidades y perfiles reutilizables sin mezclarlo con la operación.",
   "inventory.landing.products_description":
     "Administra productos, su capa default variant y sus relaciones comerciales y operativas.",
   "inventory.landing.pricing_description":
@@ -728,29 +728,29 @@ const esTranslations = {
     "Mantiene bodegas, ubicaciones y vistas de detalle con stock, lotes y actividad reciente.",
   "inventory.landing.operations_description":
     "Consulta stock, lotes y movimientos con enfoque operativo y detalle por documento.",
-  "inventory.catalogs.page_title": "Catalogos de inventory",
+  "inventory.catalogs.page_title": "Catálogos de inventario",
   "inventory.catalogs.page_description":
-    "Mantiene los catalogos base del modulo con una vista compacta y escalable.",
-  "inventory.catalogs.summary.categories": "Jerarquia de clasificacion para productos.",
-  "inventory.catalogs.summary.brands": "Catalogo comercial usado por productos.",
+    "Mantiene los catálogos base del módulo con una vista compacta y escalable.",
+  "inventory.catalogs.summary.categories": "Jerarquía de clasificación para productos.",
+  "inventory.catalogs.summary.brands": "Catálogo comercial usado por productos.",
   "inventory.catalogs.summary.units": "Unidades disponibles para stock y venta.",
   "inventory.catalogs.summary.tax_profiles": "Perfiles fiscales reutilizables.",
   "inventory.catalogs.summary.warranty_profiles": "Coberturas configuradas para postventa.",
-  "inventory.catalogs.switcher.categories_description": "Jerarquia y subcategorias.",
-  "inventory.catalogs.switcher.brands_description": "Catalogo comercial.",
+  "inventory.catalogs.switcher.categories_description": "Jerarquía y subcategorías.",
+  "inventory.catalogs.switcher.brands_description": "Catálogo comercial.",
   "inventory.catalogs.switcher.units_description": "Unidades y simbolos.",
   "inventory.catalogs.switcher.tax_profiles_description": "Reglas fiscales por item.",
   "inventory.catalogs.switcher.warranty_profiles_description": "Cobertura postventa.",
   "inventory.products.page_title": "Productos",
   "inventory.products.page_description":
-    "Vista principal del catalogo de productos con acceso directo a su detalle operativo.",
-  "inventory.products.summary.total": "Total del catalogo activo e historico.",
-  "inventory.products.summary.active": "Productos disponibles para operacion.",
+    "Vista principal del catálogo de productos con acceso directo a su detalle operativo.",
+  "inventory.products.summary.total": "Total del catálogo activo e historico.",
+  "inventory.products.summary.active": "Productos disponibles para operación.",
   "inventory.products.summary.inventory_enabled": "Productos que generan stock y ledger.",
-  "inventory.products.summary.services": "Servicios mantenidos dentro del catalogo.",
-  "inventory.pricing.page_title": "Pricing y comercial",
+  "inventory.products.summary.services": "Servicios mantenidos dentro del catálogo.",
+  "inventory.pricing.page_title": "Precios y comercial",
   "inventory.pricing.page_description":
-    "Organiza listas de precios, precios por producto y promociones sin mezclarlo con stock o catalogos.",
+    "Organiza listas de precios, precios por producto y promociones sin mezclarlo con stock o catálogos.",
   "inventory.pricing.summary.price_lists": "Listas comerciales configuradas.",
   "inventory.pricing.summary.active_price_lists": "Listas activas disponibles para uso.",
   "inventory.pricing.summary.promotions": "Promociones definidas en el tenant.",
@@ -764,7 +764,7 @@ const esTranslations = {
   "inventory.warehouses.summary.active": "Bodegas actualmente activas.",
   "inventory.warehouses.summary.default": "Bodegas marcadas como default.",
   "inventory.warehouses.summary.locations": "Bodegas con ubicaciones internas.",
-  "inventory.operations.page_title": "Operacion de inventory",
+  "inventory.operations.page_title": "Operación de inventario",
   "inventory.operations.page_description":
     "Explora vistas operativas enfocadas en stock, lotes y movimientos del ledger.",
   "inventory.operations.cards.stock_description":
@@ -776,14 +776,14 @@ const esTranslations = {
   "inventory.operations.open_view": "Abrir vista",
   "inventory.operations.page_hint":
     "Las acciones operativas importantes viven dentro de sus vistas enfocadas. Desde movimientos puedes registrar ajustes o traslados; desde stock y lotes analizas el estado actual.",
-  "inventory.operations.back_to_overview": "Volver a operacion",
+  "inventory.operations.back_to_overview": "Volver a operación",
   "inventory.operations.stock_page_title": "Stock por bodega",
   "inventory.operations.stock_page_description":
     "Lectura enfocada de balances por bodega, producto y variante default.",
   "inventory.operations.lots_page_title": "Lotes",
   "inventory.operations.lots_page_description":
     "Consulta y administra lotes sin mezclar esta vista con movimientos o pricing.",
-  "inventory.operations.movements_page_title": "Movimientos de inventory",
+  "inventory.operations.movements_page_title": "Movimientos de inventario",
   "inventory.operations.movements_page_description":
     "Revisa el ledger por lineas, registra ajustes y abre el detalle por header.",
   "inventory.detail.loading_product": "Cargando detalle del producto.",
@@ -811,16 +811,16 @@ const esTranslations = {
   "inventory.detail.warehouse_description":
     "Vista detallada de la bodega con ubicaciones, stock, lotes y movimientos recientes.",
   "inventory.detail.price_list_description":
-    "Vista detallada de la lista de precios con sus precios relacionados y contexto comercial actual.",
+    "Vista detallada de la lista de precios con sus precios relaciónados y contexto comercial actual.",
   "inventory.detail.movement_description":
-    "Documento reconstruido desde el ledger por header y lineas relacionadas.",
+    "Documento reconstruido desde el ledger por header y lineas relaciónadas.",
   "inventory.detail.summary_block_title": "Resumen",
   "inventory.detail.summary_block_description":
-    "Informacion principal de la entidad dentro del contexto tenant actual.",
+    "Información principal de la entidad dentro del contexto tenant actual.",
   "inventory.detail.created_at": "Creado",
-  "inventory.detail.map_title": "Ubicacion en mapa",
-  "inventory.detail.map_description": "Ubicacion geografica.",
-  "inventory.detail.no_location": "Sin ubicacion configurada",
+  "inventory.detail.map_title": "Ubicación en mapa",
+  "inventory.detail.map_description": "Ubicación geográfica.",
+  "inventory.detail.no_location": "Sin ubicación configurada",
   "inventory.detail.no_location_hint": "Edita el registro para agregar coordenadas en el mapa.",
   "inventory.dispatch.legend": "Leyenda",
   "inventory.dispatch.legend_pending": "Pendiente",
@@ -831,15 +831,15 @@ const esTranslations = {
   "inventory.dispatch.legend_warehouse": "Bodega origen",
   "inventory.dispatch.legend_zone": "Zona (area)",
   "inventory.dispatch.stops_label": "parada(s)",
-  "inventory.dispatch.stops_no_location": "sin ubicacion",
-  "inventory.dispatch.warehouse_no_location": "bodega sin ubicacion",
+  "inventory.dispatch.stops_no_location": "sin ubicación",
+  "inventory.dispatch.warehouse_no_location": "bodega sin ubicación",
   "inventory.dispatch.no_origin_warehouse": "sin bodega asignada",
   "inventory.dispatch.no_locations": "Sin ubicaciones en el mapa",
   "inventory.dispatch.no_locations_hint": "Las paradas apareceran aqui cuando tengan coordenadas",
   "inventory.dispatch.command_center": "Centro de Mando",
   "inventory.dispatch.pending_orders": "Pendientes",
   "inventory.dispatch.pending_count": "{count} pendiente(s)",
-  "inventory.dispatch.dispatches_today": "Despachos del dia",
+  "inventory.dispatch.dispatches_today": "Despachos del día",
   "inventory.dispatch.in_route": "En ruta",
   "inventory.dispatch.completed": "Completados",
   "inventory.dispatch.no_dispatch_orders": "No hay despachos",
@@ -849,12 +849,12 @@ const esTranslations = {
   "inventory.dispatch.no_pending_orders": "No hay ordenes pendientes de despacho",
   "inventory.dispatch.select_dispatch": "Selecciona un despacho para ver detalle",
   "inventory.dispatch.assign_to": "Asignar a...",
-  "inventory.dispatch.create_dispatch_with_selected": "Crear despacho con seleccionadas",
-  "inventory.dispatch.assign_selected": "Asignar {count} seleccionada(s)",
+  "inventory.dispatch.create_dispatch_with_selected": "Crear despacho con selecciónadas",
+  "inventory.dispatch.assign_selected": "Asignar {count} selecciónada(s)",
   "inventory.dispatch.to_existing_dispatch": "A despacho existente...",
   "inventory.dispatch.to_new_dispatch": "Crear nuevo despacho",
   "inventory.dispatch.stops_count": "{count} stop(s)",
-  "inventory.dispatch.no_vehicle": "Sin vehiculo",
+  "inventory.dispatch.no_vehicle": "Sin vehículo",
   "inventory.dispatch.no_driver": "Sin chofer",
   "inventory.dispatch.today_badge": "Hoy",
   "inventory.dispatch.overdue_badge": "Atrasada",
@@ -872,31 +872,31 @@ const esTranslations = {
   "inventory.detail.variants_block_description":
     "La fase actual expone variantes a traves de stock y movimientos aunque el mantenimiento siga centrado en producto.",
   "inventory.detail.no_variants_available":
-    "Todavia no hay variantes visibles en stock o movimientos para este producto.",
+    "Todavía no hay variantes visibles en stock o movimientos para este producto.",
   "inventory.detail.product_kpi_prices": "Precios configurados para este producto.",
-  "inventory.detail.product_kpi_stock": "Bodegas con stock relacionado.",
+  "inventory.detail.product_kpi_stock": "Bodegas con stock relaciónado.",
   "inventory.detail.product_kpi_lots": "Lotes asociados al producto.",
   "inventory.detail.product_kpi_promotions": "Promociones que incluyen este producto.",
   "inventory.detail.price_block_description":
     "Relacion comercial del producto con listas de precios activas o historicas.",
   "inventory.detail.stock_block_description":
-    "Lectura operacional de stock por bodega y variante default.",
+    "Lectura operaciónal de stock por bodega y variante default.",
   "inventory.detail.promotion_block_description":
-    "Promociones donde el producto aparece como item relacionado.",
+    "Promociones donde el producto aparece como item relaciónado.",
   "inventory.detail.lots_block_description":
     "Lotes que ya existen para este producto dentro del tenant.",
   "inventory.detail.movements_block_description":
     "Actividad reciente del ledger para seguir trazabilidad operativa.",
   "inventory.detail.recent_movements_title": "Movimientos recientes",
-  "inventory.detail.no_product_prices": "Todavia no hay precios configurados para este producto.",
-  "inventory.detail.no_stock_rows": "Todavia no hay stock materializado para esta entidad.",
-  "inventory.detail.no_related_promotions": "No hay promociones relacionadas actualmente.",
-  "inventory.detail.no_related_lots": "No hay lotes relacionados actualmente.",
+  "inventory.detail.no_product_prices": "Todavía no hay precios configurados para este producto.",
+  "inventory.detail.no_stock_rows": "Todavía no hay stock materializado para esta entidad.",
+  "inventory.detail.no_related_promotions": "No hay promociones relaciónadas actualmente.",
+  "inventory.detail.no_related_lots": "No hay lotes relaciónados actualmente.",
   "inventory.detail.no_recent_movements": "No hay movimientos recientes disponibles.",
   "inventory.detail.warehouse_kpi_locations": "Ubicaciones internas de esta bodega.",
   "inventory.detail.warehouse_kpi_stock": "Productos con balance en esta bodega.",
   "inventory.detail.warehouse_kpi_lots": "Lotes presentes dentro de la bodega.",
-  "inventory.detail.warehouse_kpi_movements": "Lineas recientes del ledger en esta bodega.",
+  "inventory.detail.warehouse_kpi_movements": "Líneas recientes del ledger en esta bodega.",
   "inventory.detail.locations_block_description":
     "Ubicaciones internas configuradas para esta bodega y su uso operativo.",
   "inventory.detail.branch_block_title": "Sucursal operativa",
@@ -909,16 +909,16 @@ const esTranslations = {
   "inventory.detail.price_list_kpi_prices": "Precios encontrados para esta lista.",
   "inventory.detail.price_list_kpi_active_prices": "Precios activos actualmente.",
   "inventory.detail.price_list_kpi_currency": "Moneda principal de la lista.",
-  "inventory.detail.price_list_kpi_promotions": "Promociones relacionadas de forma indirecta.",
+  "inventory.detail.price_list_kpi_promotions": "Promociones relaciónadas de forma indirecta.",
   "inventory.detail.pricing_phase_block_title": "Fase comercial actual",
   "inventory.detail.pricing_phase_block_description":
-    "Aclara los limites reales del backend de pricing en esta etapa.",
+    "Aclara los límites reales del backend de pricing en esta etapa.",
   "inventory.detail.price_list_phase_note_1":
     "Los precios siguen siendo product-level, no variant-level.",
   "inventory.detail.price_list_phase_note_2":
     "No existe todavia una capa expuesta de assignments o scopes comerciales avanzados.",
   "inventory.detail.price_list_phase_note_3":
-    "La relacion con promociones es indirecta y se infiere por productos que ya tienen precio en esta lista.",
+    "La relación con promociones es indirecta y se infiere por productos que ya tienen precio en esta lista.",
   "inventory.detail.price_list_prices_block_description":
     "Productos y precios que actualmente usan esta lista comercial.",
   "inventory.detail.price_list_promotions_block_description":
@@ -927,10 +927,10 @@ const esTranslations = {
     "La ruta oficial sigue publicando precios por producto. Si una fila trae variante, interpretala como refinamiento opcional dentro del mismo contrato publico.",
   "inventory.detail.no_price_list_prices":
     "No hay precios vinculados a esta lista en los productos consultados.",
-  "inventory.detail.line_no": "Linea",
+  "inventory.detail.line_no": "Línea",
   "inventory.detail.total_cost": "Costo total",
-  "inventory.detail.linked_line": "Linea vinculada",
-  "inventory.detail.line_items": "Lineas del movimiento",
+  "inventory.detail.linked_line": "Línea vinculada",
+  "inventory.detail.line_items": "Líneas del movimiento",
   "inventory.detail.line_items_description":
     "Cada linea refleja una mutacion del ledger y su impacto en balances.",
   "inventory.detail.no_movement_lines": "No se encontraron lineas para este movimiento.",
@@ -957,7 +957,7 @@ const esTranslations = {
     "Politicas comerciales de listas que despues usan precios y promociones.",
   "inventory.product_prices.delete_title": "Eliminar precio",
   "inventory.product_prices.delete_description":
-    "El precio seleccionado sera eliminado permanentemente.",
+    "El precio selecciónado sera eliminado permanentemente.",
   "inventory.product_prices.dialog_description":
     "Administra precios del producto {product} sobre las listas vigentes.",
   "inventory.product_prices.no_product_selected":
@@ -965,7 +965,7 @@ const esTranslations = {
   "inventory.product_prices.no_products_available":
     "No hay productos disponibles para asociar precios.",
   "inventory.product_prices.section_description":
-    "Precios del producto por lista, cantidad minima y rango de vigencia. La variante solo refina la fila cuando el backend la devuelve.",
+    "Precios del producto por lista, cantidad mínima y rango de vigencia. La variante solo refina la fila cuando el backend la devuelve.",
   "inventory.product_prices.public_contract_note":
     "El contrato publico de precios sigue siendo product-level. La variante es opcional y solo refina una fila especifica cuando aplica.",
   "inventory.measurement_unit_create_error_fallback":
@@ -989,7 +989,7 @@ const esTranslations = {
   "inventory.price_list_branch_assignments.section_description":
     "Define en que sucursales esta habilitada esta lista global y cual queda como predeterminada.",
   "inventory.price_list_branch_assignments.active_hint":
-    "Mantiene esta lista habilitada para la sucursal seleccionada.",
+    "Mantiene esta lista habilitada para la sucursal selecciónada.",
   "inventory.price_list_branch_assignments.default_hint":
     "El backend normaliza la lista predeterminada por sucursal.",
   "inventory.price_list_branch_assignments.create_title":
@@ -1024,43 +1024,43 @@ const esTranslations = {
   "inventory.price_list_branch_assignments.deactivate_description":
     "La asignacion por sucursal quedara inactiva para {branch}.",
   "inventory.promotion_create_error_fallback":
-    "No fue posible crear la promocion.",
+    "No fue posible crear la promoción.",
   "inventory.promotion_update_error_fallback":
-    "No fue posible actualizar la promocion.",
+    "No fue posible actualizar la promoción.",
   "inventory.promotion_branch_assignment_create_error_fallback":
-    "No fue posible crear la asignacion por sucursal de la promocion.",
+    "No fue posible crear la asignacion por sucursal de la promoción.",
   "inventory.promotion_branch_assignment_update_error_fallback":
-    "No fue posible actualizar la asignacion por sucursal de la promocion.",
+    "No fue posible actualizar la asignacion por sucursal de la promoción.",
   "inventory.promotion_branch_assignment_delete_error_fallback":
-    "No fue posible eliminar la asignacion por sucursal de la promocion.",
+    "No fue posible eliminar la asignacion por sucursal de la promoción.",
   "inventory.promotion_branch_assignments.manage_action": "Sucursales",
   "inventory.promotion_branch_assignments.section_title": "Sucursales",
   "inventory.promotion_branch_assignments.section_description":
-    "Define en que sucursales aplica la promocion global {promotion}. Esta capa solo controla alcance por sucursal; no resuelve el motor comercial final.",
+    "Define en que sucursales aplica la promoción global {promotion}. Esta capa solo controla alcance por sucursal; no resuelve el motor comercial final.",
   "inventory.promotion_branch_assignments.permission_hint":
-    "No tienes permiso para revisar las asignaciones por sucursal de esta promocion.",
+    "No tienes permiso para revisar las asignaciones por sucursal de esta promoción.",
   "inventory.promotion_branch_assignments.create_title":
     "Agregar asignacion por sucursal",
   "inventory.promotion_branch_assignments.edit_title":
     "Editar asignacion por sucursal",
   "inventory.promotion_branch_assignments.dialog_description":
-    "Activa o desactiva la aplicabilidad de esta promocion en una sucursal especifica.",
+    "Activa o desactiva la aplicabilidad de esta promoción en una sucursal especifica.",
   "inventory.promotion_branch_assignments.create_action": "Agregar asignacion",
   "inventory.promotion_branch_assignments.load_error":
-    "No fue posible cargar las asignaciones por sucursal de esta promocion.",
+    "No fue posible cargar las asignaciones por sucursal de esta promoción.",
   "inventory.promotion_branch_assignments.loading":
     "Cargando asignaciones por sucursal.",
   "inventory.promotion_branch_assignments.count": "{count} asignacion(es)",
   "inventory.promotion_branch_assignments.active_hint":
-    "Mantiene esta promocion disponible para la sucursal seleccionada.",
+    "Mantiene esta promoción disponible para la sucursal selecciónada.",
   "inventory.promotion_branch_assignments.branch_access_hint":
     "Las opciones de sucursal requieren `branches.view` en la sesion actual.",
   "inventory.promotion_branch_assignments.empty":
-    "Esta promocion todavia no tiene asignaciones explicitas por sucursal.",
+    "Esta promoción todavia no tiene asignaciones explicitas por sucursal.",
   "inventory.promotion_branch_assignments.delete_title":
     "Eliminar asignacion por sucursal",
   "inventory.promotion_branch_assignments.delete_description":
-    "Esto eliminara permanentemente la asignacion de la promocion para {branch}.",
+    "Esto eliminara permanentemente la asignacion de la promoción para {branch}.",
   "inventory.promotion_branch_assignments.reactivate_title":
     "Reactivar asignacion por sucursal",
   "inventory.promotion_branch_assignments.reactivate_description":
@@ -1075,13 +1075,13 @@ const esTranslations = {
   "inventory.promotions.item_label": "Item {index}",
   "inventory.promotions.items_count": "Items",
   "inventory.promotions.items_description":
-    "Cada item debe cumplir la forma requerida por el tipo de promocion.",
-  "inventory.promotions.items_title": "Items de promocion",
+    "Cada item debe cumplir la forma requerida por el tipo de promoción.",
+  "inventory.promotions.items_title": "Items de promoción",
   "inventory.promotions.no_items":
-    "Todavia no hay items en la promocion. Puedes guardar vacio si el backend lo permite, o agregar productos ahora.",
-  "inventory.promotions.delete_title": "Eliminar promocion",
+    "Todavía no hay items en la promoción. Puedes guardar vacio si el backend lo permite, o agregar productos ahora.",
+  "inventory.promotions.delete_title": "Eliminar promoción",
   "inventory.promotions.delete_description":
-    "La promocion \"{name}\" y todos sus items seran eliminados permanentemente.",
+    "La promoción \"{name}\" y todos sus items seran eliminados permanentemente.",
   "inventory.promotions.section_description":
     "Campanas promocionales con reglas por producto y vigencia temporal.",
   "inventory.products.deactivate_title": "Desactivar producto",
@@ -1091,28 +1091,28 @@ const esTranslations = {
     "Crea o actualiza productos y servicios usando el contrato actual de inventario del backend.",
   "inventory.products.general_information_description":
     "Identidad principal del producto y referencias comerciales.",
-  "inventory.products.general_information_title": "Informacion general",
+  "inventory.products.general_information_title": "Información general",
   "inventory.products.inventory_no_stock": "Sin stock",
   "inventory.products.inventory_service": "Servicio",
   "inventory.products.inventory_track_lots": "Rastrea lotes",
   "inventory.products.inventory_track_lots_expiration":
-    "Rastrea lotes + expiracion",
+    "Rastrea lotes + expiración",
   "inventory.products.inventory_track_only": "Rastrea inventario",
   "inventory.products.no_commercial_reference": "Sin referencia comercial",
   "inventory.products.operational_behavior_description":
     "Los flags de inventario solo aplican a productos reales, no a servicios.",
   "inventory.products.operational_behavior_title": "Comportamiento operativo",
   "inventory.products.relations_description":
-    "Relaciona el producto con categorias, unidades, marca y comportamiento fiscal.",
+    "Relaciona el producto con categorías, unidades, marca y comportamiento fiscal.",
   "inventory.products.relations_title": "Relaciones y referencias",
   "inventory.products.section_description":
-    "Catalogo principal de productos y servicios, enlazado con marca, categoria, unidades, impuestos y garantia.",
+    "Catálogo principal de productos y servicios, enlazado con marca, categoría, unidades, impuestos y garantía.",
   "inventory.product_create_error_fallback": "No fue posible crear el producto.",
   "inventory.product_update_error_fallback": "No fue posible actualizar el producto.",
   "inventory.tax_profiles.dialog_description":
     "Define el comportamiento fiscal para productos y servicios usando el contrato actual del backend.",
   "inventory.tax_profiles.section_description":
-    "Configuracion fiscal para bienes y servicios antes de activar productos.",
+    "Configuración fiscal para bienes y servicios antes de activar productos.",
   "inventory.tax_profile_create_error_fallback":
     "No fue posible crear el perfil fiscal.",
   "inventory.tax_profile_update_error_fallback":
@@ -1135,9 +1135,9 @@ const esTranslations = {
   "inventory.warehouse_locations.section_description":
     "Ubicaciones internas para picking, recepcion y despacho dentro de cada bodega.",
   "inventory.warehouse_location_create_error_fallback":
-    "No fue posible crear la ubicacion de bodega.",
+    "No fue posible crear la ubicación de bodega.",
   "inventory.warehouse_location_update_error_fallback":
-    "No fue posible actualizar la ubicacion de bodega.",
+    "No fue posible actualizar la ubicación de bodega.",
   "inventory.warehouse_stock.section_description":
     "Lectura materializada de balances por bodega, producto y variante default.",
   "inventory.inventory_lots.deactivate_title": "Desactivar lote",
@@ -1146,7 +1146,7 @@ const esTranslations = {
   "inventory.inventory_lots.dialog_description":
     "Administra lotes y sus cantidades iniciales usando la logica actual del backend.",
   "inventory.inventory_lots.section_description":
-    "Lotes inventariables ligados a producto, bodega, ubicacion opcional y proveedor.",
+    "Lotes inventariables ligados a producto, bodega, ubicación opcional y proveedor.",
   "inventory.inventory_lot_create_error_fallback":
     "No fue posible crear el lote.",
   "inventory.inventory_lot_update_error_fallback":
@@ -1193,7 +1193,7 @@ const esTranslations = {
   "inventory.variant_deactivate_error_fallback":
     "No fue posible desactivar la variante.",
   "inventory.variants.dialog_description":
-    "Configura los detalles de la variante incluyendo SKU, codigo de barras y perfil fiscal.",
+    "Configura los detalles de la variante incluyendo SKU, código de barras y perfil fiscal.",
   "inventory.variants.section_title": "Variantes",
   "inventory.variants.section_description":
     "Gestiona las variantes de este producto con sus atributos individuales.",
@@ -1238,12 +1238,12 @@ const esTranslations = {
   "inventory.form.variant_name_placeholder": "ej. Negro - 128GB",
   "inventory.form.track_serials": "Rastrear series",
   "inventory.warranty_profiles.dialog_description":
-    "Configura politicas reutilizables de garantia para productos con cobertura postventa.",
-  "inventory.warranty_profiles.delete_title": "Eliminar perfil de garantia",
+    "Configura politicas reutilizables de garantía para productos con cobertura postventa.",
+  "inventory.warranty_profiles.delete_title": "Eliminar perfil de garantía",
   "inventory.warranty_profiles.delete_description":
     "El perfil \"{name}\" sera eliminado permanentemente. Solo es posible si ningun producto o variante lo referencia.",
   "inventory.warranty_profiles.section_description":
-    "Politicas reutilizables de garantia que los productos pueden referenciar cuando aplica cobertura.",
+    "Politicas reutilizables de garantía que los productos pueden referenciar cuando aplica cobertura.",
   "inventory.enum.adjustment_type.adjustment_in": "Entrada",
   "inventory.enum.adjustment_type.adjustment_out": "Salida",
   "inventory.enum.inventory_movement_status.cancelled": "Cancelado",
@@ -1267,7 +1267,7 @@ const esTranslations = {
   "inventory.enum.ledger_movement_type.dispatch_return": "Devolucion por despacho",
   "inventory.enum.product_type.product": "Producto",
   "inventory.enum.product_type.service": "Servicio",
-  "inventory.enum.price_list_kind.credit": "Credito",
+  "inventory.enum.price_list_kind.credit": "Crédito",
   "inventory.enum.price_list_kind.retail": "Retail",
   "inventory.enum.price_list_kind.special": "Especial",
   "inventory.enum.price_list_kind.wholesale": "Mayoreo",
@@ -1293,66 +1293,66 @@ const esTranslations = {
   "inventory.enum.warehouse_purpose.returns": "Devoluciones",
   "inventory.enum.warehouse_purpose.saleable": "Venta",
   "inventory.enum.warehouse_purpose.transit": "Transito",
-  "inventory.enum.warranty_duration_unit.days": "Dias",
+  "inventory.enum.warranty_duration_unit.days": "Días",
   "inventory.enum.warranty_duration_unit.months": "Meses",
-  "inventory.enum.warranty_duration_unit.years": "Anos",
+  "inventory.enum.warranty_duration_unit.years": "Años",
   "inventory.warranty_profile_create_error_fallback":
-    "No fue posible crear el perfil de garantia.",
+    "No fue posible crear el perfil de garantía.",
   "inventory.warranty_profile_update_error_fallback":
-    "No fue posible actualizar el perfil de garantia.",
+    "No fue posible actualizar el perfil de garantía.",
   "inventory.delete_error_fallback": "No fue posible eliminar el elemento.",
   "inventory.brand_delete_error_fallback": "No fue posible eliminar la marca.",
-  "inventory.category_delete_error_fallback": "No fue posible eliminar la categoria.",
+  "inventory.category_delete_error_fallback": "No fue posible eliminar la categoría.",
   "inventory.measurement_unit_delete_error_fallback":
     "No fue posible eliminar la unidad de medida.",
   "inventory.warranty_profile_delete_error_fallback":
-    "No fue posible eliminar el perfil de garantia.",
+    "No fue posible eliminar el perfil de garantía.",
   "inventory.price_list_delete_error_fallback": "No fue posible eliminar la lista de precios.",
   "inventory.product_price_delete_error_fallback":
     "No fue posible eliminar el precio del producto.",
-  "inventory.promotion_delete_error_fallback": "No fue posible eliminar la promocion.",
+  "inventory.promotion_delete_error_fallback": "No fue posible eliminar la promoción.",
   "inventory.zone_delete_error_fallback": "No fue posible eliminar la zona.",
-  "inventory.vehicle_delete_error_fallback": "No fue posible eliminar el vehiculo.",
+  "inventory.vehicle_delete_error_fallback": "No fue posible eliminar el vehículo.",
   "inventory.route_delete_error_fallback": "No fue posible eliminar la ruta.",
   "inventory.product_deactivate_error_fallback": "No fue posible desactivar el producto.",
   "inventory.warehouse_deactivate_error_fallback": "No fue posible desactivar la bodega.",
   "inventory.inventory_lot_deactivate_error_fallback": "No fue posible desactivar el lote.",
   "inventory.brand_deactivate_error_fallback": "No fue posible desactivar la marca.",
-  "inventory.category_deactivate_error_fallback": "No fue posible desactivar la categoria.",
+  "inventory.category_deactivate_error_fallback": "No fue posible desactivar la categoría.",
   "inventory.measurement_unit_deactivate_error_fallback": "No fue posible desactivar la unidad de medida.",
   "inventory.tax_profile_deactivate_error_fallback": "No fue posible desactivar el perfil fiscal.",
   "inventory.price_list_deactivate_error_fallback": "No fue posible desactivar la lista de precios.",
   "inventory.error.BRAND_IN_USE": "La marca esta siendo usada por uno o mas productos.",
   "inventory.error.CATEGORY_HAS_CHILDREN":
-    "La categoria tiene subcategorias. Eliminalas primero.",
+    "La categoría tiene subcategorías. Eliminalas primero.",
   "inventory.error.CATEGORY_IN_USE":
-    "La categoria esta siendo usada por uno o mas productos.",
+    "La categoría esta siendo usada por uno o mas productos.",
   "inventory.error.MEASUREMENT_UNIT_IN_USE":
     "La unidad de medida esta siendo usada por uno o mas productos o variantes.",
   "inventory.error.WARRANTY_PROFILE_IN_USE":
-    "El perfil de garantia esta siendo usado por uno o mas productos o variantes.",
+    "El perfil de garantía esta siendo usado por uno o mas productos o variantes.",
   "inventory.error.CANNOT_DELETE_DEFAULT_PRICE_LIST":
     "No es posible eliminar la lista de precios predeterminada.",
   "inventory.form.track_serials_description":
     "Permite operar unidades por serie cuando el backend lo soporta.",
-  "inventory.form.origin_location": "Ubicacion origen",
-  "inventory.form.destination_location": "Ubicacion destino",
+  "inventory.form.origin_location": "Ubicación origen",
+  "inventory.form.destination_location": "Ubicación destino",
   "inventory.form.serial_ids": "IDs de seriales",
   "inventory.form.serial_ids_placeholder": "Ej: 101, 102, 103",
   "inventory.form.reserved_delta": "Delta reservado",
   "inventory.form.incoming_delta": "Delta entrante",
   "inventory.form.outgoing_delta": "Delta saliente",
   "inventory.serials.section_description":
-    "Consulta, registra y actualiza seriales para la variante operativa seleccionada.",
+    "Consulta, registra y actualiza seriales para la variante operativa selecciónada.",
   "inventory.serials.kpi_total": "Seriales",
   "inventory.serials.kpi_total_description":
     "Total de seriales visibles con los filtros activos.",
   "inventory.serials.kpi_available_description":
     "Seriales disponibles para la variante y filtros activos.",
   "inventory.serials.kpi_reserved_description":
-    "Seriales reservados actualmente para la variante seleccionada.",
+    "Seriales reservados actualmente para la variante selecciónada.",
   "inventory.serials.kpi_sold_description":
-    "Seriales vendidos historicamente en la variante seleccionada.",
+    "Seriales vendidos historicamente en la variante selecciónada.",
   "inventory.serials.status_filter": "Estado",
   "inventory.serials.all_statuses": "Todos los estados",
   "inventory.serials.warehouse_filter": "Bodega",
@@ -1366,13 +1366,13 @@ const esTranslations = {
     "Selecciona una bodega de origen para ver los seriales disponibles.",
   "inventory.serials.no_available_serials":
     "No hay seriales disponibles en la bodega de origen para esta variante.",
-  "inventory.serials.selected_count": "{count} serial(es) seleccionado(s)",
+  "inventory.serials.selected_count": "{count} serial(es) selecciónado(s)",
   "inventory.serials.no_serials":
-    "No hay seriales para la variante seleccionada con los filtros actuales.",
+    "No hay seriales para la variante selecciónada con los filtros actuales.",
   "inventory.serials.register_dialog_title": "Registrar seriales",
   "inventory.serials.register_dialog_description":
     "Agrega seriales para {variant} usando el contrato oficial confirmado.",
-  "inventory.serials.serial_numbers": "Numeros de serie",
+  "inventory.serials.serial_numbers": "Números de serie",
   "inventory.serials.serial_numbers_placeholder":
     "Uno por linea o separados por coma",
   "inventory.serials.register_hint":
@@ -1384,7 +1384,7 @@ const esTranslations = {
   "inventory.serials.received_at": "Recibido",
   "inventory.serials.sold_at": "Vendido",
   "inventory.detail.source_document": "Documento fuente",
-  "inventory.detail.source_document_number": "Numero documento",
+  "inventory.detail.source_document_number": "Número documento",
   "inventory.detail.transferred_serial_ids": "Seriales transferidos",
   "inventory.detail.legacy_reference": "Legacy",
   "inventory.product_serial_create_error_fallback":
@@ -1396,34 +1396,34 @@ const esTranslations = {
   "inventory.error.PRODUCT_NOT_FOUND": "Producto no encontrado.",
   "inventory.error.PRODUCT_VARIANT_NOT_FOUND": "Variante no encontrada.",
   "inventory.error.WAREHOUSE_NOT_FOUND": "Bodega no encontrada.",
-  "inventory.error.WAREHOUSE_LOCATION_NOT_FOUND": "Ubicacion no encontrada.",
+  "inventory.error.WAREHOUSE_LOCATION_NOT_FOUND": "Ubicación no encontrada.",
   "inventory.error.INVENTORY_LOT_NOT_FOUND": "Lote no encontrado.",
   "inventory.error.SERIAL_NOT_FOUND": "Serial no encontrado.",
   "inventory.error.PRICE_LIST_NOT_FOUND": "Lista de precios no encontrada.",
   "inventory.error.PRODUCT_PRICE_NOT_FOUND": "Precio de producto no encontrado.",
-  "inventory.error.PROMOTION_NOT_FOUND": "Promocion no encontrada.",
+  "inventory.error.PROMOTION_NOT_FOUND": "Promoción no encontrada.",
   "inventory.error.BRAND_NOT_FOUND": "Marca no encontrada.",
-  "inventory.error.CATEGORY_NOT_FOUND": "Categoria no encontrada.",
+  "inventory.error.CATEGORY_NOT_FOUND": "Categoría no encontrada.",
   "inventory.error.MEASUREMENT_UNIT_NOT_FOUND": "Unidad de medida no encontrada.",
   "inventory.error.TAX_PROFILE_NOT_FOUND": "Perfil fiscal no encontrado.",
-  "inventory.error.WARRANTY_PROFILE_NOT_FOUND": "Perfil de garantia no encontrado.",
+  "inventory.error.WARRANTY_PROFILE_NOT_FOUND": "Perfil de garantía no encontrado.",
   "inventory.error.BRANCH_NOT_FOUND": "Sucursal no encontrada.",
   "inventory.error.PRODUCT_INACTIVE": "El producto esta inactivo.",
   "inventory.error.VARIANT_INACTIVE": "La variante esta inactiva.",
   "inventory.error.WAREHOUSE_INACTIVE": "La bodega esta inactiva.",
-  "inventory.error.WAREHOUSE_LOCATION_INACTIVE": "La ubicacion esta inactiva.",
+  "inventory.error.WAREHOUSE_LOCATION_INACTIVE": "La ubicación esta inactiva.",
   "inventory.error.INVENTORY_LOT_INACTIVE": "El lote esta inactivo.",
   "inventory.error.PRICE_LIST_INACTIVE": "La lista de precios esta inactiva.",
   "inventory.error.BRAND_INACTIVE": "La marca esta inactiva.",
-  "inventory.error.CATEGORY_INACTIVE": "La categoria esta inactiva.",
+  "inventory.error.CATEGORY_INACTIVE": "La categoría esta inactiva.",
   "inventory.error.MEASUREMENT_UNIT_INACTIVE": "La unidad de medida esta inactiva.",
   "inventory.error.TAX_PROFILE_INACTIVE": "El perfil fiscal esta inactivo.",
-  "inventory.error.WARRANTY_PROFILE_INACTIVE": "El perfil de garantia esta inactivo.",
-  "inventory.error.PRODUCT_OR_VARIANT_REQUIRED": "Debes seleccionar un producto o una variante.",
+  "inventory.error.WARRANTY_PROFILE_INACTIVE": "El perfil de garantía esta inactivo.",
+  "inventory.error.PRODUCT_OR_VARIANT_REQUIRED": "Debes selecciónar un producto o una variante.",
   "inventory.error.VARIANT_REQUIRED_FOR_MULTI_VARIANT_PRODUCT":
-    "Debes seleccionar una variante para productos multivariante.",
+    "Debes selecciónar una variante para productos multivariante.",
   "inventory.error.VARIANT_PRODUCT_MISMATCH":
-    "La variante seleccionada no pertenece al producto indicado.",
+    "La variante selecciónada no pertenece al producto indicado.",
   "inventory.error.PRODUCT_DOES_NOT_SUPPORT_VARIANTS":
     "El producto no admite variantes.",
   "inventory.error.CANNOT_EDIT_DEFAULT_VARIANT_OF_SIMPLE_PRODUCT":
@@ -1433,18 +1433,18 @@ const esTranslations = {
   "inventory.error.CANNOT_DEACTIVATE_LAST_ACTIVE_VARIANT":
     "No se puede desactivar la ultima variante activa.",
   "inventory.error.PRODUCT_SKU_DUPLICATE": "El SKU del producto ya existe.",
-  "inventory.error.PRODUCT_BARCODE_DUPLICATE": "El codigo de barras del producto ya existe.",
+  "inventory.error.PRODUCT_BARCODE_DUPLICATE": "El código de barras del producto ya existe.",
   "inventory.error.VARIANT_SKU_DUPLICATE": "El SKU de la variante ya existe.",
   "inventory.error.VARIANT_BARCODE_DUPLICATE":
-    "El codigo de barras de la variante ya existe.",
+    "El código de barras de la variante ya existe.",
   "inventory.error.PRODUCT_VARIANT_DELETE_FORBIDDEN":
     "La variante no puede eliminarse permanentemente en su estado actual.",
   "inventory.error.PRODUCT_INVENTORY_TRACKING_REQUIRED":
-    "El producto debe rastrear inventario para esta operacion.",
+    "El producto debe rastrear inventario para esta operación.",
   "inventory.error.VARIANT_INVENTORY_TRACKING_REQUIRED":
-    "La variante debe rastrear inventario para esta operacion.",
+    "La variante debe rastrear inventario para esta operación.",
   "inventory.error.PRODUCT_LOT_TRACKING_REQUIRED":
-    "El producto debe rastrear lotes para esta operacion.",
+    "El producto debe rastrear lotes para esta operación.",
   "inventory.error.PRODUCT_LOT_TRACKING_REQUIRES_INVENTORY":
     "Rastrear lotes en producto requiere rastrear inventario.",
   "inventory.error.PRODUCT_EXPIRATION_REQUIRES_LOTS":
@@ -1456,32 +1456,32 @@ const esTranslations = {
   "inventory.error.VARIANT_SERIAL_TRACKING_REQUIRES_INVENTORY":
     "Rastrear seriales en variante requiere rastrear inventario.",
   "inventory.error.PRODUCT_WARRANTY_PROFILE_REQUIRED":
-    "Debes seleccionar un perfil de garantia para el producto.",
+    "Debes selecciónar un perfil de garantía para el producto.",
   "inventory.error.PRODUCT_UNIT_CONVERSION_NOT_SUPPORTED":
     "La conversion de unidades no esta soportada en esta fase.",
   "inventory.error.PRODUCT_TAX_PROFILE_ITEM_KIND_INVALID":
     "El perfil fiscal no coincide con el tipo de item del producto.",
-  "inventory.error.INVENTORY_LOT_REQUIRED": "Debes seleccionar un lote.",
-  "inventory.error.INVENTORY_LOT_NUMBER_DUPLICATE": "El numero de lote ya existe.",
+  "inventory.error.INVENTORY_LOT_REQUIRED": "Debes selecciónar un lote.",
+  "inventory.error.INVENTORY_LOT_NUMBER_DUPLICATE": "El número de lote ya existe.",
   "inventory.error.INVENTORY_LOT_EXPIRATION_REQUIRED":
     "La fecha de vencimiento es obligatoria para este lote.",
   "inventory.error.INVENTORY_LOT_WAREHOUSE_MISMATCH":
-    "El lote no pertenece a la bodega seleccionada.",
+    "El lote no pertenece a la bodega selecciónada.",
   "inventory.error.INVENTORY_LOT_PRODUCT_MISMATCH":
-    "El lote no pertenece al producto seleccionado.",
+    "El lote no pertenece al producto selecciónado.",
   "inventory.error.INVENTORY_LOT_VARIANT_MISMATCH":
-    "El lote no pertenece a la variante seleccionada.",
+    "El lote no pertenece a la variante selecciónada.",
   "inventory.error.INVENTORY_LOT_LOCATION_MISMATCH":
-    "El lote no pertenece a la ubicacion seleccionada.",
+    "El lote no pertenece a la ubicación selecciónada.",
   "inventory.error.INVENTORY_NEGATIVE_STOCK_FORBIDDEN":
-    "La operacion dejaria el inventario en negativo y no esta permitido.",
+    "La operación dejaria el inventario en negativo y no esta permitido.",
   "inventory.error.INVENTORY_LOT_NEGATIVE_BALANCE_FORBIDDEN":
-    "La operacion dejaria el lote con balance negativo.",
-  "inventory.error.INSUFFICIENT_STOCK": "No hay stock suficiente para completar la operacion.",
+    "La operación dejaria el lote con balance negativo.",
+  "inventory.error.INSUFFICIENT_STOCK": "No hay stock suficiente para completar la operación.",
   "inventory.error.TRANSFER_WAREHOUSE_DUPLICATE":
     "La bodega origen y destino deben ser distintas.",
   "inventory.error.WAREHOUSE_LOCATION_MISMATCH":
-    "La ubicacion no pertenece a la bodega seleccionada.",
+    "La ubicación no pertenece a la bodega selecciónada.",
   "inventory.error.WAREHOUSE_NOT_ALLOWED_FOR_BRANCH":
     "La bodega no pertenece a la sucursal activa.",
   "inventory.error.TENANT_MISMATCH":
@@ -1496,19 +1496,19 @@ const esTranslations = {
   "inventory.error.INVENTORY_MOVEMENT_RELATION_MISSING":
     "Faltan relaciones operativas del movimiento.",
   "inventory.error.SERIAL_NUMBERS_REQUIRED":
-    "Debes enviar al menos un numero de serie.",
+    "Debes enviar al menos un número de serie.",
   "inventory.error.SERIAL_NUMBER_DUPLICATE":
-    "Uno o mas numeros de serie ya existen.",
+    "Uno o mas números de serie ya existen.",
   "inventory.error.VARIANT_SERIAL_TRACKING_DISABLED":
     "La variante no tiene rastreo de seriales habilitado.",
   "inventory.error.SERIALS_REQUIRED_FOR_SERIAL_TRACKED_VARIANT":
-    "Debes seleccionar seriales para esta variante serializada.",
+    "Debes selecciónar seriales para esta variante serializada.",
   "inventory.error.SERIAL_TRANSFER_INTEGER_QUANTITY_REQUIRED":
     "La cantidad debe ser entera cuando la variante usa seriales.",
   "inventory.error.SERIAL_TRANSFER_QUANTITY_MISMATCH":
     "La cantidad debe coincidir con la cantidad de seriales enviados.",
   "inventory.error.SERIAL_VARIANT_MISMATCH":
-    "Uno o mas seriales no pertenecen a la variante seleccionada.",
+    "Uno o mas seriales no pertenecen a la variante selecciónada.",
   "inventory.error.SERIAL_WAREHOUSE_MISMATCH":
     "Uno o mas seriales no pertenecen a la bodega origen.",
   "inventory.error.SERIAL_STATUS_NOT_TRANSFERABLE":
@@ -1526,26 +1526,26 @@ const esTranslations = {
   "inventory.error.PRICE_VALID_RANGE_INVALID":
     "El rango de vigencia del precio no es valido.",
   "inventory.error.PROMOTION_NAME_DUPLICATE":
-    "Ya existe una promocion con ese nombre.",
-  "inventory.error.PROMOTION_INACTIVE": "La promocion esta inactiva.",
+    "Ya existe una promoción con ese nombre.",
+  "inventory.error.PROMOTION_INACTIVE": "La promoción esta inactiva.",
   "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_NOT_FOUND":
-    "No se encontro la asignacion de esta promocion para la sucursal indicada.",
+    "No se encontro la asignacion de esta promoción para la sucursal indicada.",
   "inventory.error.BRANCH_PROMOTION_ASSIGNMENT_DUPLICATE":
-    "Esta promocion ya tiene una asignacion para la sucursal indicada.",
+    "Esta promoción ya tiene una asignacion para la sucursal indicada.",
   "inventory.error.PROMOTION_PRODUCT_OR_VARIANT_REQUIRED":
-    "Cada item de promocion requiere producto o variante.",
+    "Cada item de promoción requiere producto o variante.",
   "inventory.error.PROMOTION_DUPLICATE_ITEMS":
-    "No puedes repetir el mismo producto o variante en la promocion.",
+    "No puedes repetir el mismo producto o variante en la promoción.",
   "inventory.error.PROMOTION_ITEMS_OUTSIDE_BUSINESS":
-    "La promocion incluye items fuera de la empresa activa.",
+    "La promoción incluye items fuera de la empresa activa.",
   "inventory.error.PROMOTION_DISCOUNT_VALUE_REQUIRED":
-    "Debes indicar el valor del descuento para esta promocion.",
+    "Debes indicar el valor del descuento para esta promoción.",
   "inventory.error.PROMOTION_OVERRIDE_PRICE_REQUIRED":
-    "Debes indicar el precio override para esta promocion.",
+    "Debes indicar el precio override para esta promoción.",
   "inventory.error.PROMOTION_BUY_X_GET_Y_FIELDS_REQUIRED":
-    "Debes indicar min quantity y bonus quantity para la promocion.",
+    "Debes indicar min quantity y bonus quantity para la promoción.",
   "inventory.error.PROMOTION_DATE_RANGE_INVALID":
-    "El rango de fechas de la promocion no es valido.",
+    "El rango de fechas de la promoción no es valido.",
   "sales.entity.sale_order": "Orden de Venta",
   "sales.entity.sale_orders": "Órdenes de Venta",
   "sales.section_description": "Gestiona las órdenes de venta.",
@@ -1553,13 +1553,13 @@ const esTranslations = {
     "Completa los campos para la orden de venta.",
   "sales.detail_description":
     "Detalle de la orden de venta.",
-  "sales.lines": "Lineas",
+  "sales.lines": "Líneas",
   "sales.no_lines": "No hay lineas en esta orden.",
   "sales.subtotal": "Subtotal",
   "sales.delivery_charges": "Cargos de entrega",
   "sales.delivery_address": "Direccion de entrega",
-  "sales.delivery_location": "Ubicacion de entrega",
-  "sales.use_contact_location": "Usar ubicacion del cliente",
+  "sales.delivery_location": "Ubicación de entrega",
+  "sales.use_contact_location": "Usar ubicación del cliente",
   "sales.delivery_zone": "Zona de entrega",
   "sales.delivery_requested_date": "Fecha de entrega solicitada",
   "sales.order_date": "Fecha de orden",
@@ -1616,7 +1616,7 @@ const esTranslations = {
   "sales.cancel_line_description": "Esta accion liberara la reserva de inventario para esta linea. Si el producto esta dañado, quedara marcado para ajuste manual.",
   "sales.cancel_line_reason": "Razon de cancelacion",
   "sales.cancel_line_confirm": "Cancelar linea",
-  "sales.cancel_line_success": "Linea cancelada exitosamente",
+  "sales.cancel_line_success": "Línea cancelada exitosamente",
   "sales.cancel_line_error_fallback": "Error al cancelar la linea",
   "sales.line_status_active": "Activa",
   "sales.line_status_cancelled": "Cancelada",
@@ -1633,7 +1633,7 @@ const esTranslations = {
   "sales.form.warehouse_id": "Bodega",
   "sales.form.delivery_address": "Dirección de entrega",
   "sales.form.delivery_province": "Provincia",
-  "sales.form.delivery_canton": "Cantón",
+  "sales.form.delivery_cantón": "Cantón",
   "sales.form.delivery_district": "Distrito",
   "sales.form.delivery_zone_id": "Zona de entrega",
   "sales.form.delivery_requested_date": "Fecha solicitada",
@@ -1658,10 +1658,10 @@ const esTranslations = {
   "sales.form.select_serials": "Seleccionar seriales",
   "sales.form.no_serials_available": "No hay seriales disponibles",
   "sales.form.select_warehouse_for_serials": "Selecciona una bodega para ver seriales",
-  "sales.form.serials_selected": "{count} serial(es) seleccionado(s)",
+  "sales.form.serials_selected": "{count} serial(es) selecciónado(s)",
   "sales.assigned_serials": "Seriales asignados",
   "sales.order_seller_required":
-    "El vendedor es requerido para el modo de venta seleccionado.",
+    "El vendedor es requerido para el modo de venta selecciónado.",
   "sales.order_route_requires_delivery":
     "El modo ruta de vendedor requiere cumplimiento por entrega.",
   "sales.order_pickup_no_delivery_charges":
@@ -1678,7 +1678,7 @@ const esTranslations = {
     "La orden no se puede editar en su estado actual.",
   "sales.order_already_cancelled": "La orden ya fue cancelada.",
   "sales.order_cannot_cancel_after_logistics":
-    "La orden no puede cancelarse porque ya tiene operaciones logisticas.",
+    "La orden no puede cancelarse porque ya tiene operaciones logísticas.",
   "sales.order_delete_not_allowed":
     "La orden no puede eliminarse en su estado actual.",
   "sales.order_not_found": "La orden de venta no existe.",
@@ -1688,13 +1688,13 @@ const esTranslations = {
   "sales.order_delete_forbidden":
     "La orden no puede eliminarse porque tiene dependencias asociadas.",
   "sales.order_customer_inactive":
-    "El cliente seleccionado no se encuentra activo.",
+    "El cliente selecciónado no se encuentra activo.",
   "sales.order_customer_type_invalid":
-    "El contacto seleccionado no esta habilitado como cliente.",
+    "El contacto selecciónado no esta habilitado como cliente.",
   "sales.order_seller_inactive":
-    "El vendedor seleccionado no se encuentra activo.",
+    "El vendedor selecciónado no se encuentra activo.",
   "sales.order_seller_branch_scope_invalid":
-    "El vendedor asignado no tiene alcance sobre la sucursal seleccionada.",
+    "El vendedor asignado no tiene alcance sobre la sucursal selecciónada.",
   "sales.order_has_no_lines":
     "La orden no tiene lineas de productos.",
   "sales.order_reservations_already_exist":
@@ -1726,9 +1726,9 @@ const esTranslations = {
   "inventory.dispatch_order_scheduled_date_required":
     "La fecha programada es requerida.",
   "inventory.dispatch_order_vehicle_required":
-    "El vehiculo es requerido.",
+    "El vehículo es requerido.",
   "inventory.dispatch_order_vehicle_inactive":
-    "El vehiculo asignado esta inactivo.",
+    "El vehículo asignado esta inactivo.",
   "inventory.dispatch_order_driver_required":
     "El chofer es requerido.",
   "inventory.dispatch_order_driver_inactive":
@@ -1744,13 +1744,13 @@ const esTranslations = {
   "inventory.brand_in_use":
     "La marca no puede eliminarse porque esta en uso.",
   "inventory.category_has_children":
-    "La categoria no puede eliminarse porque tiene subcategorias.",
+    "La categoría no puede eliminarse porque tiene subcategorías.",
   "inventory.category_in_use":
-    "La categoria no puede eliminarse porque esta en uso.",
+    "La categoría no puede eliminarse porque esta en uso.",
   "inventory.measurement_unit_in_use":
     "La unidad de medida no puede eliminarse porque esta en uso.",
   "inventory.warranty_profile_in_use":
-    "El perfil de garantia no puede eliminarse porque esta en uso.",
+    "El perfil de garantía no puede eliminarse porque esta en uso.",
   "inventory.cannot_deactivate_default_variant":
     "No se puede desactivar la variante por defecto.",
   "inventory.cannot_deactivate_last_active_variant":
@@ -1770,7 +1770,7 @@ const esTranslations = {
   "inventory.no_attributes_defined":
     "No hay atributos definidos para generar variantes.",
   "inventory.variant_barcode_duplicate":
-    "Ya existe una variante con ese codigo de barras.",
+    "Ya existe una variante con ese código de barras.",
   "inventory.variant_sku_duplicate":
     "Ya existe una variante con ese SKU.",
   "inventory.variant_product_mismatch":
@@ -1788,25 +1788,25 @@ const esTranslations = {
   "inventory.product_serial_tracking_disabled":
     "Este producto no tiene habilitado el seguimiento por serie.",
   "inventory.serial_not_found":
-    "El numero de serie no existe.",
+    "El número de serie no existe.",
   "inventory.serial_number_duplicate":
-    "El numero de serie ya existe.",
+    "El número de serie ya existe.",
   "inventory.serial_numbers_required":
-    "Se requieren numeros de serie.",
+    "Se requieren números de serie.",
   "inventory.serial_variant_mismatch":
-    "El numero de serie no pertenece a la variante indicada.",
+    "El número de serie no pertenece a la variante indicada.",
   "inventory.serial_warehouse_mismatch":
-    "El numero de serie no pertenece a la bodega indicada.",
+    "El número de serie no pertenece a la bodega indicada.",
   "inventory.serial_status_not_transferable":
-    "El numero de serie no esta en un estado transferible.",
+    "El número de serie no esta en un estado transferible.",
   "inventory.serial_transfer_integer_quantity_required":
     "Las transferencias con series requieren cantidades enteras.",
   "inventory.serial_transfer_quantity_mismatch":
     "La cantidad de series no coincide con la cantidad del movimiento.",
   "inventory.serials_outside_business":
-    "Uno o mas numeros de serie no pertenecen a la empresa activa.",
+    "Uno o mas números de serie no pertenecen a la empresa activa.",
   "inventory.serials_required_for_serial_tracked_variant":
-    "Se requieren numeros de serie para variantes con seguimiento por serie.",
+    "Se requieren números de serie para variantes con seguimiento por serie.",
   "inventory.transfer_warehouse_duplicate":
     "La bodega de origen y destino no pueden ser la misma.",
   "inventory.route_not_found":
@@ -1814,9 +1814,9 @@ const esTranslations = {
   "inventory.route_name_duplicate":
     "Ya existe una ruta con ese nombre.",
   "inventory.vehicle_not_found":
-    "El vehiculo no existe.",
+    "El vehículo no existe.",
   "inventory.vehicle_plate_duplicate":
-    "Ya existe un vehiculo con esa placa.",
+    "Ya existe un vehículo con esa placa.",
   "inventory.zone_not_found":
     "La zona no existe.",
   "inventory.zone_name_duplicate":
@@ -1852,9 +1852,9 @@ const esTranslations = {
   "inventory.sale_order_already_assigned_to_active_dispatch":
     "La orden de venta ya esta asignada a una orden de despacho activa.",
   "inventory.promotion_items_required":
-    "La promocion requiere al menos un item.",
+    "La promoción requiere al menos un item.",
   "inventory.promotion_product_or_variant_required":
-    "Cada item de la promocion requiere un producto o variante.",
+    "Cada item de la promoción requiere un producto o variante.",
   "sales.order_already_assigned_or_dispatched":
     "La orden de venta ya esta asignada o despachada.",
   "sales.order_dispatch_requires_delivery":
@@ -1864,13 +1864,13 @@ const esTranslations = {
   "sales.lines_required":
     "La orden requiere al menos una linea.",
   "sales.electronic_document_not_found":
-    "El documento electronico no existe.",
+    "El documento electrónico no existe.",
   "sales.electronic_document_not_submittable":
-    "El documento electronico no puede enviarse en su estado actual.",
+    "El documento electrónico no puede enviarse en su estado actual.",
   "sales.electronic_document_not_resubmittable":
-    "El documento electronico no puede reenviarse.",
+    "El documento electrónico no puede reenviarse.",
   "sales.electronic_document_sale_order_not_emittable":
-    "La orden de venta no es elegible para emitir documento electronico.",
+    "La orden de venta no es elegible para emitir documento electrónico.",
   "sales.order_dispatch_reset_requires_confirmed":
     "Solo las ordenes confirmadas pueden resetearse para re-despacho.",
   "sales.order_dispatch_reset_invalid_status":
@@ -1886,7 +1886,7 @@ const esTranslations = {
   "platform.clear_tenant_error_fallback": "No fue posible salir del contexto de empresa.",
   "platform.clear_tenant_success": "Contexto tenant limpiado correctamente.",
   "platform.enter_tenant_error_fallback":
-    "No fue posible entrar a la empresa seleccionada.",
+    "No fue posible entrar a la empresa selecciónada.",
   "platform.enter_tenant_success": "Ingreso al contexto de empresa completado.",
   "platform.business_onboarding_success": "Onboarding de empresa completado.",
   "platform.onboarding_error_fallback": "No fue posible completar el onboarding.",
@@ -1928,16 +1928,16 @@ const esTranslations = {
   "users.branches_update_error_fallback":
     "No fue posible actualizar las sucursales del usuario.",
   "users.create_error_fallback": "No fue posible crear el usuario.",
-  "users.form.email": "Correo electronico",
-  "users.form.max_discount": "Descuento maximo de venta (%)",
+  "users.form.email": "Correo electrónico",
+  "users.form.max_discount": "Descuento máximo de venta (%)",
   "users.form.name": "Nombre completo",
   "users.form.name_placeholder": "Nombre del usuario",
-  "users.form.password": "Contrasena",
-  "users.form.password_placeholder": "Contrasena temporal",
+  "users.form.password": "Contraseña",
+  "users.form.password_placeholder": "Contraseña temporal",
   "users.delete_error_fallback": "No fue posible eliminar el usuario.",
   "users.password_update_error_fallback":
-    "No fue posible actualizar la contrasena del usuario.",
-  "users.password_updated_success": "Contrasena actualizada correctamente.",
+    "No fue posible actualizar la contraseña del usuario.",
+  "users.password_updated_success": "Contraseña actualizada correctamente.",
   "users.roles_update_error_fallback":
     "No fue posible actualizar los roles del usuario.",
   "users.status_update_error_fallback":
@@ -2046,7 +2046,7 @@ const esTranslations = {
   "inventory.dispatch.receipt": "Recibo",
   "inventory.dispatch.select_sale_orders": "Órdenes de venta a despachar",
   "inventory.dispatch.select_sale_orders_description": "Selecciona las órdenes de venta confirmadas con entrega pendiente.",
-  "inventory.dispatch.orders_selected": "órdenes seleccionadas",
+  "inventory.dispatch.orders_selected": "órdenes selecciónadas",
   "inventory.dispatch.no_eligible_orders": "No hay órdenes de venta elegibles. Deben estar confirmadas, con modo de entrega y despacho pendiente.",
   "inventory.dispatch.add_stop_description": "Agrega una parada a esta orden de despacho.",
   "inventory.dispatch.select_sale_order": "Selecciona una orden de venta",
@@ -2075,7 +2075,7 @@ const esTranslations = {
   "inventory.dispatch.delivered": "Entregado",
   "inventory.dispatch.readiness_title": "Requisitos para marcar lista",
   "inventory.dispatch.readiness_scheduled_date": "Fecha programada asignada",
-  "inventory.dispatch.readiness_vehicle": "Vehiculo asignado",
+  "inventory.dispatch.readiness_vehicle": "Vehículo asignado",
   "inventory.dispatch.readiness_driver": "Chofer asignado",
   "inventory.dispatch.readiness_stops": "Al menos una parada agregada",
   "inventory.dispatch.readiness_incomplete": "Incompleta",
@@ -2112,7 +2112,7 @@ const esTranslations = {
   "inventory.branch_assignments.select_all": "Todas",
   "inventory.branch_assignments.deselect_all": "Ninguna",
   "inventory.branch_assignments.no_branches": "No hay sucursales activas disponibles.",
-  "inventory.branch_assignments.selected_count": "{count} seleccionadas",
+  "inventory.branch_assignments.selected_count": "{count} selecciónadas",
   "inventory.branch_assignments.save_action": "Guardar asignaciones",
   "inventory.branch_assignments_save_error_fallback":
     "Error guardando las asignaciones de sucursal.",
@@ -2134,8 +2134,8 @@ const esTranslations = {
   "sales.documents.document_key": "Clave",
   "sales.documents.consecutive": "Consecutivo",
   "sales.documents.type_factura_electronica": "Factura Electrónica",
-  "sales.documents.type_tiquete_electronico": "Tiquete Electrónico",
-  "sales.documents.type_nota_credito": "Nota de Crédito",
+  "sales.documents.type_tiquete_electrónico": "Tiquete Electrónico",
+  "sales.documents.type_nota_crédito": "Nota de Crédito",
   "sales.documents.type_nota_debito": "Nota de Débito",
   "auth.login_title": "Acceso administrativo",
   "auth.login_description": "Inicia sesión con tu cuenta actual. La sesión se mantiene con cookies HttpOnly.",
@@ -2270,7 +2270,7 @@ const esTranslations = {
   "branches.selected_section_description": "Revisa y gestiona los terminales asignados a esta sucursal.",
   "branches.use_as_context_button": "Usar como contexto activo",
   "branches.create_terminal_button": "Crear terminal",
-  "branches.selected_section_fallback": "Sucursal seleccionada",
+  "branches.selected_section_fallback": "Sucursal selecciónada",
   "branches.detail.status_title": "Estado de sucursal",
   "branches.detail.status_description": "Estado activo o inactivo devuelto por el backend.",
   "branches.detail.reference_title": "Referencia",
@@ -2281,7 +2281,7 @@ const esTranslations = {
   "branches.no_terminals_title": "Sin terminales",
   "branches.no_terminals_description": "Esta sucursal no tiene terminales todavía.",
   "branches.load_error_fallback": "No fue posible cargar las sucursales.",
-  "branches.selected_load_error_fallback": "No fue posible cargar la sucursal seleccionada.",
+  "branches.selected_load_error_fallback": "No fue posible cargar la sucursal selecciónada.",
   "branches.table.header_branch": "Sucursal",
   "branches.table.header_terminals": "Terminales",
   "branches.table.header_contact": "Contacto",

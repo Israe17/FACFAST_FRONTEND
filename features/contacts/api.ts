@@ -200,6 +200,21 @@ export type HaciendaActivity = z.infer<typeof haciendaActivitySchema>;
 export type HaciendaTaxpayer = z.infer<typeof haciendaTaxpayerSchema>;
 export type HaciendaExoneration = z.infer<typeof haciendaExonerationSchema>;
 
+export async function lookupTaxpayerEmail(identification: string): Promise<string | null> {
+  try {
+    const response = await http.get(
+      `/hacienda/email?identification=${encodeURIComponent(identification)}`,
+    );
+    const value = extractEntity(response.data, ["email"]);
+    return typeof value === "string" && value.length > 0 ? value : null;
+  } catch (error) {
+    if ((error as AxiosError | undefined)?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 export async function lookupTaxpayer(identification: string): Promise<HaciendaTaxpayer | null> {
   try {
     const response = await http.get(

@@ -131,16 +131,16 @@ export function getProductCategoryFormValues(
 }
 
 export const emptyTaxProfileFormValues: CreateTaxProfileInput = {
-  allows_exoneration: false,
+  allows_exoneration: true,
   cabys_code: "",
   code: "",
   description: "",
   is_active: true,
   item_kind: "goods",
-  iva_rate: undefined,
-  iva_rate_code: "",
+  iva_rate: 13,
+  iva_rate_code: "08",
   name: "",
-  requires_cabys: false,
+  requires_cabys: true,
   specific_tax_name: "",
   specific_tax_rate: undefined,
   tax_type: "iva",

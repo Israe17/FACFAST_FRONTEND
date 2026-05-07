@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
@@ -19,6 +20,7 @@ import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { CreateProductCategoryInput, ProductCategory } from "../types";
+import { CabysSearchInput } from "./cabys-search-input";
 import { FormFieldError } from "./form-field-error";
 
 const EMPTY_PARENT_VALUE = "__none__";
@@ -47,6 +49,15 @@ function ProductCategoryForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const cabysCode = form.watch("cabys_code");
+  const cabysDescripcion = form.watch("cabys_descripcion");
+  const cabysImpuesto = form.watch("cabys_impuesto");
+  const currentCabys = useMemo(() => {
+    if (cabysCode && cabysDescripcion != null) {
+      return { codigo: cabysCode, descripcion: cabysDescripcion, impuesto: cabysImpuesto ?? 0 };
+    }
+    return null;
+  }, [cabysCode, cabysDescripcion, cabysImpuesto]);
   const availableParents = categories.filter((category) => category.id !== currentCategoryId);
 
   return (
@@ -110,6 +121,21 @@ function ProductCategoryForm({
           />
           <FormFieldError message={errors.description?.message} />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>{t("inventory.form.cabys_section_title")}</Label>
+        <p className="text-sm text-muted-foreground">
+          {t("inventory.form.cabys_section_description")}
+        </p>
+        <CabysSearchInput
+          onChange={(result) => {
+            form.setValue("cabys_code", result?.codigo ?? "", { shouldDirty: true });
+            form.setValue("cabys_descripcion", result?.descripcion ?? "", { shouldDirty: true });
+            form.setValue("cabys_impuesto", result?.impuesto ?? null, { shouldDirty: true });
+          }}
+          value={currentCabys}
+        />
       </div>
 
       <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">

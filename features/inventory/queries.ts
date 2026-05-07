@@ -12,6 +12,7 @@ import { salesKeys } from "@/features/sales/queries";
 import {
   cancelInventoryMovement,
   createBrand,
+  searchCabys,
   createInventoryAdjustment,
   createInventoryLot,
   createInventoryTransfer,
@@ -236,6 +237,7 @@ export const inventoryKeys = {
   routes: () => [...inventoryKeys.all, "routes"] as const,
   routeBranches: (routeId: string) => [...inventoryKeys.routes(), routeId, "branches"] as const,
   dispatchOrders: () => [...inventoryKeys.all, "dispatch-orders"] as const,
+  cabysSearch: (q: string) => [...inventoryKeys.all, "cabys-search", q] as const,
   dispatchOrder: (id: string) => [...inventoryKeys.dispatchOrders(), id] as const,
 };
 
@@ -249,6 +251,15 @@ function invalidateInventoryQueries(
 ) {
   queryKeys.forEach((queryKey) => {
     queryClient.invalidateQueries({ queryKey });
+  });
+}
+
+export function useCabysSearchQuery(query: string) {
+  return useQuery({
+    enabled: query.length >= 3,
+    queryKey: inventoryKeys.cabysSearch(query),
+    queryFn: () => searchCabys(query),
+    staleTime: 24 * 60 * 60 * 1000,
   });
 }
 

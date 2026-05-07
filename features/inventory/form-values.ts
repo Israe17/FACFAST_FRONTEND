@@ -102,6 +102,9 @@ export function getMeasurementUnitFormValues(
 }
 
 export const emptyProductCategoryFormValues: CreateProductCategoryInput = {
+  cabys_code: "",
+  cabys_descripcion: "",
+  cabys_impuesto: null,
   code: "",
   description: "",
   is_active: true,
@@ -113,6 +116,9 @@ export function getProductCategoryFormValues(
   category: ProductCategory,
 ): CreateProductCategoryInput {
   return {
+    cabys_code: category.cabys_code ?? "",
+    cabys_descripcion: category.cabys_descripcion ?? "",
+    cabys_impuesto: category.cabys_impuesto ?? null,
     code: category.code ?? "",
     description: category.description ?? "",
     is_active: category.is_active,

@@ -138,6 +138,9 @@ function buildProductCategoryPayload(
   payload: CreateProductCategoryInput | UpdateProductCategoryInput,
 ) {
   return compactRecord({
+    cabys_code: payload.cabys_code || undefined,
+    cabys_descripcion: payload.cabys_descripcion || undefined,
+    cabys_impuesto: payload.cabys_impuesto ?? undefined,
     code: payload.code,
     description: payload.description,
     is_active: payload.is_active,
@@ -1278,4 +1281,15 @@ export async function updateDispatchStopStatus(
 ) {
   const response = await http.patch(`/dispatch-orders/${orderId}/stops/${stopId}/status`, payload);
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
+}
+
+export type CabysSearchResult = {
+  codigo: string;
+  descripcion: string;
+  impuesto: number;
+};
+
+export async function searchCabys(query: string, top = 10): Promise<CabysSearchResult[]> {
+  const response = await http.get(`/cabys/search?q=${encodeURIComponent(query)}&top=${top}`);
+  return (response.data ?? []) as CabysSearchResult[];
 }

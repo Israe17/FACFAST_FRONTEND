@@ -239,6 +239,9 @@ export const measurementUnitSchema = z
 const productCategoryBaseSchema = z
   .object({
     business_id: idSchema.optional().catch(undefined),
+    cabys_code: z.string().nullable().optional().catch(null),
+    cabys_descripcion: z.string().nullable().optional().catch(null),
+    cabys_impuesto: z.coerce.number().nullable().optional().catch(null),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
     description: z.string().nullable().optional().catch(undefined),
@@ -726,6 +729,9 @@ export const updateMeasurementUnitSchema = createMeasurementUnitSchema.partial()
 });
 
 export const createProductCategorySchema = z.object({
+  cabys_code: optionalTextSchema,
+  cabys_descripcion: optionalTextSchema,
+  cabys_impuesto: z.coerce.number().nullable().optional(),
   code: makeOptionalCodeSchema("CG"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),

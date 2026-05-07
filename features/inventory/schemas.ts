@@ -851,7 +851,14 @@ const productFormObjectSchema = z.object({
   sale_unit_id: makeOptionalIdSchema("Selecciona una unidad de venta valida."),
   sku: optionalTextSchema,
   stock_unit_id: makeOptionalIdSchema("Selecciona una unidad de inventario valida."),
-  tax_profile_id: z.string().regex(positiveIntegerPattern, "Selecciona un perfil fiscal valido."),
+  tax_profile_id: z
+    .string()
+    .regex(positiveIntegerPattern, "Selecciona un perfil fiscal valido.")
+    .optional()
+    .or(z.literal("")),
+  cabys_code: optionalTextSchema,
+  cabys_descripcion: optionalTextSchema,
+  cabys_impuesto: z.coerce.number().nullable().optional(),
   track_expiration: z.boolean().default(false),
   track_inventory: z.boolean().default(false),
   track_lots: z.boolean().default(false),
@@ -864,6 +871,18 @@ function applyProductRules(
   values: Partial<z.infer<typeof productFormObjectSchema>>,
   ctx: z.RefinementCtx,
 ) {
+  const hasTaxProfile =
+    typeof values.tax_profile_id === "string" && values.tax_profile_id.length > 0;
+  const hasCabys =
+    typeof values.cabys_code === "string" && values.cabys_code.trim().length > 0;
+  if (!hasTaxProfile && !hasCabys) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Selecciona un perfil fiscal o un código CABYS.",
+      path: ["tax_profile_id"],
+    });
+  }
+
   if (values.type === "service") {
     return;
   }

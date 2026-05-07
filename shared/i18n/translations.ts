@@ -491,6 +491,9 @@ const esTranslations = {
   "inventory.form.tax_profile_identity_section_description":
     "Nombre y descripción para identificar este perfil al asignarlo a productos o categorías.",
   "inventory.form.iva_rate_code_hint": "Código Hacienda derivado de la tasa: {code}",
+  "inventory.form.product_cabys_hint":
+    "Si se selecciona un CABYS, el perfil fiscal se asigna o crea automáticamente. Código Hacienda derivado: {code}.",
+  "inventory.form.product_tax_profile_auto": "Auto (desde CABYS o categoría)",
   "inventory.form.tax_inclusion_mode": "Impuesto sobre el precio",
   "inventory.form.select_tax_inclusion_mode": "Selecciona modo de inclusión",
   "inventory.form.tax_inclusion_mode_added_hint":
@@ -2873,6 +2876,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.tax_profile_identity_section_description":
       "Name and description used to identify this profile when assigning it to products or categories.",
     "inventory.form.iva_rate_code_hint": "Hacienda code derived from the rate: {code}",
+    "inventory.form.product_cabys_hint":
+      "Selecting a CABYS auto-assigns or creates the tax profile. Derived Hacienda code: {code}.",
+    "inventory.form.product_tax_profile_auto": "Auto (from CABYS or category)",
     "inventory.form.tax_inclusion_mode": "Tax on price",
     "inventory.form.select_tax_inclusion_mode": "Select inclusion mode",
     "inventory.form.tax_inclusion_mode_added_hint":

@@ -19,14 +19,17 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
+import { resolveHaciendaIvaRateCode } from "../constants";
 import type {
   Brand,
+  CabysSearchResult,
   CreateProductInput,
   MeasurementUnit,
   ProductCategory,
   TaxProfile,
   WarrantyProfile,
 } from "../types";
+import { CabysSearchInput } from "./cabys-search-input";
 import { FormFieldError } from "./form-field-error";
 
 export const EMPTY_SELECT_VALUE = "__none__";
@@ -104,6 +107,9 @@ export function ProductForm({
   const categoryId = form.watch("category_id");
   useEffect(() => {
     if (!categoryId) {
+      return;
+    }
+    if (form.getValues("cabys_code")) {
       return;
     }
     const selectedCategory = categories.find((c) => c.id === categoryId);
@@ -281,16 +287,62 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2">
+            <Label>{t("inventory.form.cabys_code")}</Label>
+            <CabysSearchInput
+              onChange={(result: CabysSearchResult | null) => {
+                if (!result) {
+                  form.setValue("cabys_code", "", { shouldDirty: true });
+                  form.setValue("cabys_descripcion", "", { shouldDirty: true });
+                  form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
+                  return;
+                }
+                form.setValue("cabys_code", result.codigo, { shouldDirty: true });
+                form.setValue("cabys_descripcion", result.descripcion, { shouldDirty: true });
+                form.setValue("cabys_impuesto", result.impuesto, { shouldDirty: true });
+                form.setValue("tax_profile_id", "", { shouldDirty: true });
+              }}
+              value={
+                form.watch("cabys_code")
+                  ? {
+                      codigo: form.watch("cabys_code") ?? "",
+                      descripcion: form.watch("cabys_descripcion") ?? "",
+                      impuesto: form.watch("cabys_impuesto") ?? 0,
+                    }
+                  : null
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("inventory.form.product_cabys_hint", {
+                code: resolveHaciendaIvaRateCode(form.watch("cabys_impuesto") ?? 13),
+              })}
+            </p>
+            <FormFieldError message={errors.cabys_code?.message} />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="product-tax-profile">{t("inventory.form.tax_profile")}</Label>
             <Controller
               control={form.control}
               name="tax_profile_id"
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange(value === EMPTY_SELECT_VALUE ? "" : value);
+                    if (value !== EMPTY_SELECT_VALUE) {
+                      form.setValue("cabys_code", "", { shouldDirty: true });
+                      form.setValue("cabys_descripcion", "", { shouldDirty: true });
+                      form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
+                    }
+                  }}
+                  value={field.value || EMPTY_SELECT_VALUE}
+                >
                   <SelectTrigger id="product-tax-profile">
                     <SelectValue placeholder={t("inventory.form.select_tax_profile")} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>
+                      {t("inventory.form.product_tax_profile_auto")}
+                    </SelectItem>
                     {compatibleTaxProfiles.filter((taxProfile) => taxProfile.is_active).map((taxProfile) => (
                       <SelectItem key={taxProfile.id} value={taxProfile.id}>
                         {taxProfile.name}

@@ -380,16 +380,6 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="contact-exoneration-type">{t("contacts.form.exoneration_type")}</Label>
-            <Input
-              id="contact-exoneration-type"
-              placeholder="PARTIAL"
-              {...form.register("exoneration_type")}
-            />
-            <FieldError message={errors.exoneration_type?.message} />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="contact-exoneration-document">{t("contacts.form.document_number")}</Label>
             <div className="flex gap-2">
               <Input
@@ -410,6 +400,16 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
               </ActionButton>
             </div>
             <FieldError message={errors.exoneration_document_number?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-exoneration-type">{t("contacts.form.exoneration_type")}</Label>
+            <Input
+              id="contact-exoneration-type"
+              placeholder="PARTIAL"
+              {...form.register("exoneration_type")}
+            />
+            <FieldError message={errors.exoneration_type?.message} />
           </div>
         </div>
 

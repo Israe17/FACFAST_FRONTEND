@@ -18,8 +18,10 @@ import {
   listContacts,
   listContactsPaginated,
   lookupContactByIdentification,
+  lookupTaxpayer,
   updateContactBranchAssignment,
   updateContact,
+  verifyExoneration,
 } from "./api";
 import type { PaginatedQueryParams } from "@/shared/lib/api-types";
 import type {
@@ -281,5 +283,17 @@ export function useDeleteContactBranchAssignmentMutation(
         });
       }
     },
+  });
+}
+
+export function useTaxpayerLookupMutation() {
+  return useMutation({
+    mutationFn: (identification: string) => lookupTaxpayer(identification),
+  });
+}
+
+export function useExonerationVerifyMutation() {
+  return useMutation({
+    mutationFn: (authorization: string) => verifyExoneration(authorization),
   });
 }

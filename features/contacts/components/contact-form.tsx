@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
-import { ChevronDown, MapPin } from "lucide-react";
+import { ChevronDown, MapPin, Search, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,10 @@ import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LocationPicker } from "@/shared/components/location-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
+import type { HaciendaActivity } from "../api";
 import { contactTypeOptions, identificationTypeOptions } from "../constants";
+import { useTaxpayerLookupMutation, useExonerationVerifyMutation } from "../queries";
+import { ActivityPickerDialog } from "./activity-picker-dialog";
 
 type ContactFormValues = {
   address?: string;
@@ -102,6 +106,62 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+
+  const taxpayerLookup = useTaxpayerLookupMutation();
+  const exonerationVerify = useExonerationVerifyMutation();
+  const [activityPickerState, setActivityPickerState] = useState<{
+    open: boolean;
+    activities: HaciendaActivity[];
+  }>({ open: false, activities: [] });
+
+  const handleTaxpayerLookup = useCallback(async () => {
+    const identification = form.getValues("identification_number")?.trim();
+    if (!identification) {
+      toast.info(t("contacts.hacienda.empty_identification"));
+      return;
+    }
+    try {
+      const result = await taxpayerLookup.mutateAsync(identification);
+      if (!result) {
+        toast.info(t("contacts.hacienda.not_found"));
+        return;
+      }
+      form.setValue("name", result.nombre, { shouldDirty: true });
+      form.setValue("identification_type", result.tipoIdentificacion, { shouldDirty: true });
+      form.setValue("tax_condition", result.regimen.descripcion, { shouldDirty: true });
+      const activeActivities = result.actividades.filter((a) => a.estado === "A");
+      if (activeActivities.length === 1) {
+        form.setValue("economic_activity_code", activeActivities[0].codigo, { shouldDirty: true });
+      } else if (activeActivities.length > 1) {
+        setActivityPickerState({ open: true, activities: activeActivities });
+      }
+      toast.success(t("contacts.hacienda.lookup_success"));
+    } catch {
+      toast.error(t("contacts.hacienda.lookup_error"));
+    }
+  }, [form, taxpayerLookup, t]);
+
+  const handleExonerationVerify = useCallback(async () => {
+    const authorization = form.getValues("exoneration_document_number")?.trim();
+    if (!authorization) {
+      toast.info(t("contacts.hacienda.empty_document"));
+      return;
+    }
+    try {
+      const result = await exonerationVerify.mutateAsync(authorization);
+      if (!result) {
+        toast.info(t("contacts.hacienda.exoneration_not_found"));
+        return;
+      }
+      form.setValue("exoneration_type", result.tipoDocumento.descripcion, { shouldDirty: true });
+      form.setValue("exoneration_institution", result.nombreInstitucion, { shouldDirty: true });
+      form.setValue("exoneration_issue_date", result.fechaEmision.split("T")[0], { shouldDirty: true });
+      form.setValue("exoneration_percentage", result.porcentajeExoneracion, { shouldDirty: true });
+      toast.success(t("contacts.hacienda.verify_success"));
+    } catch {
+      toast.error(t("contacts.hacienda.verify_error"));
+    }
+  }, [form, exonerationVerify, t]);
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -214,11 +274,24 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
 
           <div className="space-y-2">
             <Label htmlFor="contact-identification-number">{t("contacts.form.identification_number")}</Label>
-            <Input
-              id="contact-identification-number"
-              placeholder="3101123456"
-              {...form.register("identification_number")}
-            />
+            <div className="flex gap-2">
+              <Input
+                className="flex-1"
+                id="contact-identification-number"
+                placeholder="3101123456"
+                {...form.register("identification_number")}
+              />
+              <ActionButton
+                icon={Search}
+                isLoading={taxpayerLookup.isPending}
+                loadingText={t("contacts.hacienda.looking_up")}
+                onClick={handleTaxpayerLookup}
+                type="button"
+                variant="outline"
+              >
+                {t("contacts.hacienda.lookup_button")}
+              </ActionButton>
+            </div>
             <FieldError message={errors.identification_number?.message} />
           </div>
         </div>
@@ -318,11 +391,24 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
 
           <div className="space-y-2">
             <Label htmlFor="contact-exoneration-document">{t("contacts.form.document_number")}</Label>
-            <Input
-              id="contact-exoneration-document"
-              placeholder="EXO-2026-001"
-              {...form.register("exoneration_document_number")}
-            />
+            <div className="flex gap-2">
+              <Input
+                className="flex-1"
+                id="contact-exoneration-document"
+                placeholder="AL-00460853-20"
+                {...form.register("exoneration_document_number")}
+              />
+              <ActionButton
+                icon={ShieldCheck}
+                isLoading={exonerationVerify.isPending}
+                loadingText={t("contacts.hacienda.verifying")}
+                onClick={handleExonerationVerify}
+                type="button"
+                variant="outline"
+              >
+                {t("contacts.hacienda.verify_button")}
+              </ActionButton>
+            </div>
             <FieldError message={errors.exoneration_document_number?.message} />
           </div>
         </div>
@@ -370,6 +456,16 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
           {submitLabel}
         </ActionButton>
       </div>
+
+      <ActivityPickerDialog
+        activities={activityPickerState.activities}
+        onClose={() => setActivityPickerState({ open: false, activities: [] })}
+        onSelect={(activity) => {
+          form.setValue("economic_activity_code", activity.codigo, { shouldDirty: true });
+          setActivityPickerState({ open: false, activities: [] });
+        }}
+        open={activityPickerState.open}
+      />
     </form>
   );
 }

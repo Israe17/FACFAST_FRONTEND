@@ -182,7 +182,9 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
               <Input
                 className="flex-1"
                 id="contact-identification-number"
-                placeholder="3101123456"
+                inputMode="numeric"
+                maxLength={12}
+                placeholder={t("contacts.form.identification_number_placeholder")}
                 {...form.register("identification_number")}
               />
               <ActionButton
@@ -228,7 +230,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             <Label htmlFor="contact-tax-condition">{t("contacts.form.tax_condition")}</Label>
             <Input
               id="contact-tax-condition"
-              placeholder="TAXPAYER"
+              placeholder={t("contacts.form.tax_condition_placeholder")}
               {...form.register("tax_condition")}
             />
             <FieldError message={errors.tax_condition?.message} />
@@ -238,7 +240,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             <Label htmlFor="contact-activity-code">{t("contacts.form.economic_activity_code")}</Label>
             <Input
               id="contact-activity-code"
-              placeholder="620100"
+              placeholder={t("contacts.form.economic_activity_code_placeholder")}
               {...form.register("economic_activity_code")}
             />
             <FieldError message={errors.economic_activity_code?.message} />
@@ -324,13 +326,13 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="contact-email">{t("contacts.form.email")}</Label>
-            <Input id="contact-email" placeholder="contact@company.com" {...form.register("email")} />
+            <Input id="contact-email" placeholder={t("contacts.form.email_placeholder")} type="email" {...form.register("email")} />
             <FieldError message={errors.email?.message} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="contact-phone">{t("contacts.form.phone")}</Label>
-            <Input id="contact-phone" placeholder="+506 2222-2222" {...form.register("phone")} />
+            <Input id="contact-phone" placeholder={t("contacts.form.phone_placeholder")} type="tel" {...form.register("phone")} />
             <FieldError message={errors.phone?.message} />
           </div>
         </div>
@@ -344,19 +346,19 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="contact-province">{t("contacts.form.province")}</Label>
-            <Input id="contact-province" placeholder="San Jose" {...form.register("province")} />
+            <Input id="contact-province" placeholder={t("contacts.form.province_placeholder")} {...form.register("province")} />
             <FieldError message={errors.province?.message} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="contact-canton">{t("contacts.form.canton")}</Label>
-            <Input id="contact-canton" placeholder="Central" {...form.register("canton")} />
+            <Input id="contact-canton" placeholder={t("contacts.form.canton_placeholder")} {...form.register("canton")} />
             <FieldError message={errors.canton?.message} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="contact-district">{t("contacts.form.district")}</Label>
-            <Input id="contact-district" placeholder="Carmen" {...form.register("district")} />
+            <Input id="contact-district" placeholder={t("contacts.form.district_placeholder")} {...form.register("district")} />
             <FieldError message={errors.district?.message} />
           </div>
         </div>
@@ -379,7 +381,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
               <Input
                 className="flex-1"
                 id="contact-exoneration-document"
-                placeholder="AL-00460853-20"
+                placeholder={t("contacts.form.exoneration_document_placeholder")}
                 {...form.register("exoneration_document_number")}
               />
               <ActionButton
@@ -400,7 +402,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             <Label htmlFor="contact-exoneration-type">{t("contacts.form.exoneration_type")}</Label>
             <Input
               id="contact-exoneration-type"
-              placeholder="PARTIAL"
+              placeholder={t("contacts.form.exoneration_type_placeholder")}
               {...form.register("exoneration_type")}
             />
             <FieldError message={errors.exoneration_type?.message} />
@@ -412,7 +414,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             <Label htmlFor="contact-exoneration-institution">{t("contacts.form.institution")}</Label>
             <Input
               id="contact-exoneration-institution"
-              placeholder="Institution name"
+              placeholder={t("contacts.form.exoneration_institution_placeholder")}
               {...form.register("exoneration_institution")}
             />
             <FieldError message={errors.exoneration_institution?.message} />
@@ -435,6 +437,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             id="contact-exoneration-percentage"
             max={100}
             min={0}
+            placeholder={t("contacts.form.exoneration_percentage_placeholder")}
             step="0.01"
             type="number"
             {...form.register("exoneration_percentage", {

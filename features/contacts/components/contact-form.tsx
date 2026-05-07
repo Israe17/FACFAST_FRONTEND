@@ -255,20 +255,10 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
             <Label htmlFor="contact-name">{t("contacts.form.name")}</Label>
             <Input id="contact-name" placeholder={t("contacts.form.name_placeholder")} {...form.register("name")} />
             <FieldError message={errors.name?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-commercial-name">{t("contacts.form.commercial_name")}</Label>
-            <Input
-              id="contact-commercial-name"
-              placeholder={t("contacts.form.commercial_name_placeholder")}
-              {...form.register("commercial_name")}
-            />
-            <FieldError message={errors.commercial_name?.message} />
           </div>
 
           <div className="space-y-2">
@@ -297,9 +287,13 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="contact-code">{t("contacts.form.code")}</Label>
-            <Input id="contact-code" placeholder="CT-0001" {...form.register("code")} />
-            <FieldError message={errors.code?.message} />
+            <Label htmlFor="contact-commercial-name">{t("contacts.form.commercial_name")}</Label>
+            <Input
+              id="contact-commercial-name"
+              placeholder={t("contacts.form.commercial_name_placeholder")}
+              {...form.register("commercial_name")}
+            />
+            <FieldError message={errors.commercial_name?.message} />
           </div>
 
           <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">

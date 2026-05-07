@@ -5,6 +5,7 @@ import { paginatedSchema, cursorSchema, type PaginatedQueryParams, type CursorQu
 
 import {
   brandSchema,
+  cabysSearchResultSchema,
   hardDeleteResponseSchema,
   inventoryAdjustmentResponseSchema,
   inventoryLotSchema,
@@ -1283,13 +1284,9 @@ export async function updateDispatchStopStatus(
   return dispatchOrderSchema.parse(extractEntity(response.data, ["dispatch_order"]));
 }
 
-export type CabysSearchResult = {
-  codigo: string;
-  descripcion: string;
-  impuesto: number;
-};
-
-export async function searchCabys(query: string, top = 10): Promise<CabysSearchResult[]> {
+export async function searchCabys(query: string, top = 10) {
   const response = await http.get(`/cabys/search?q=${encodeURIComponent(query)}&top=${top}`);
-  return (response.data ?? []) as CabysSearchResult[];
+  return extractCollection(response.data, ["results", "cabys"]).map((item) =>
+    cabysSearchResultSchema.parse(item),
+  );
 }

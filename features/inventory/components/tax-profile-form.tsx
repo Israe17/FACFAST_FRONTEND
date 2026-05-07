@@ -46,6 +46,11 @@ function TaxProfileForm({
   const taxType = form.watch("tax_type");
   const requiresCabys = form.watch("requires_cabys");
   const allowsExoneration = form.watch("allows_exoneration");
+  const cabysCode = form.watch("cabys_code");
+  const currentCabys = useMemo(
+    () => (cabysCode ? { codigo: cabysCode, descripcion: "", impuesto: 0 } : null),
+    [cabysCode],
+  );
   const taxProfileItemKindOptions = useMemo(
     () => [
       { label: t("inventory.enum.tax_profile_item_kind.goods"), value: "goods" },
@@ -134,11 +139,7 @@ function TaxProfileForm({
             onChange={(result) => {
               form.setValue("cabys_code", result?.codigo ?? "", { shouldDirty: true });
             }}
-            value={
-              form.watch("cabys_code")
-                ? { codigo: form.watch("cabys_code"), descripcion: "", impuesto: 0 }
-                : null
-            }
+            value={currentCabys}
           />
           <FormFieldError message={errors.cabys_code?.message} />
         </div>

@@ -1698,3 +1698,10 @@ export const updateDispatchStopStatusSchema = z
       });
     }
   });
+
+export const cabysSearchResultSchema = z.object({
+  codigo: z.string(),
+  descripcion: z.string().catch(""),
+  impuesto: z.coerce.number().catch(0),
+});
+

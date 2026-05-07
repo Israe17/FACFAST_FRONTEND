@@ -395,6 +395,7 @@ export function useCreateProductCategoryMutation(options: MutationFeedbackOption
       invalidateInventoryQueries(queryClient, [
         inventoryKeys.productCategories(),
         inventoryKeys.productCategoryTree(),
+        inventoryKeys.taxProfiles(),
       ]);
       toast.success(t("common.create_success"));
     },
@@ -422,6 +423,7 @@ export function useUpdateProductCategoryMutation(
       invalidateInventoryQueries(queryClient, [
         inventoryKeys.productCategories(),
         inventoryKeys.productCategoryTree(),
+        inventoryKeys.taxProfiles(),
       ]);
       toast.success(t("common.update_success"));
     },

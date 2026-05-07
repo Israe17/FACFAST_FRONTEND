@@ -259,7 +259,7 @@ export function useCabysSearchQuery(query: string) {
     enabled: query.length >= 3,
     queryKey: inventoryKeys.cabysSearch(query),
     queryFn: () => searchCabys(query),
-    staleTime: 24 * 60 * 60 * 1000,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 

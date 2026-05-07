@@ -1,12 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { z } from "zod/v4";
 
 import { Input } from "@/components/ui/input";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { CabysSearchResult } from "../api";
+import type { cabysSearchResultSchema } from "../schemas";
 import { useCabysSearchQuery } from "../queries";
+
+type CabysSearchResult = z.infer<typeof cabysSearchResultSchema>;
 
 type CabysSearchInputProps = {
   value: CabysSearchResult | null;
@@ -78,12 +81,17 @@ function CabysSearchInput({ value, onChange }: CabysSearchInputProps) {
       <div className="flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{value.codigo}</p>
-          <p className="truncate text-xs text-muted-foreground">{value.descripcion}</p>
+          {value.descripcion ? (
+            <p className="truncate text-xs text-muted-foreground">{value.descripcion}</p>
+          ) : null}
         </div>
-        <span className="shrink-0 rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-          {t("inventory.cabys.tax_rate")} {value.impuesto}%
-        </span>
+        {value.descripcion ? (
+          <span className="shrink-0 rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            {t("inventory.cabys.tax_rate")} {value.impuesto}%
+          </span>
+        ) : null}
         <button
+          aria-label={t("inventory.cabys.clear")}
           className="shrink-0 rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
           onClick={handleClear}
           type="button"

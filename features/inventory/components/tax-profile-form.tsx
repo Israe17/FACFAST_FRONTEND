@@ -81,7 +81,7 @@ function TaxProfileForm({
 
         <div className="space-y-2">
           <Label htmlFor="tax-profile-name">{t("inventory.common.name")}</Label>
-          <Input id="tax-profile-name" placeholder="IVA General Bienes" {...form.register("name")} />
+          <Input id="tax-profile-name" placeholder={t("inventory.form.tax_profile_name_placeholder")} {...form.register("name")} />
           <FormFieldError message={errors.name?.message} />
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { z } from "zod/v4";
 
 import {
   brandSchema,
+  cabysSearchResultSchema,
   cancelInventoryMovementSchema,
   createBrandSchema,
   createInventoryAdjustmentSchema,
@@ -189,3 +190,4 @@ export type DispatchOrder = z.infer<typeof dispatchOrderSchema>;
 export type CreateDispatchOrderInput = z.infer<typeof createDispatchOrderSchema>;
 export type UpdateDispatchOrderInput = z.infer<typeof updateDispatchOrderSchema>;
 export type UpdateDispatchStopStatusInput = z.infer<typeof updateDispatchStopStatusSchema>;
+export type CabysSearchResult = z.infer<typeof cabysSearchResultSchema>;

@@ -485,6 +485,7 @@ const esTranslations = {
   "inventory.form.cabys_section_description":
     "Código del Catálogo de Bienes y Servicios de Hacienda (opcional)",
   "inventory.form.cabys_section_title": "Clasificación CABYS",
+  "inventory.form.category_code_placeholder": "Ej: CG-0001",
   "inventory.form.category_item_kind": "Tipo de bien o servicio",
   "inventory.form.category_item_kind_description":
     "Determina el tipo del perfil fiscal que se crea automáticamente al asignar un código CABYS",
@@ -582,6 +583,7 @@ const esTranslations = {
   "inventory.form.select_tax_type": "Selecciona el tipo de impuesto",
   "inventory.form.select_type": "Selecciona un tipo",
   "inventory.form.select_warehouse": "Selecciona una bodega",
+  "inventory.form.tax_profile_name_placeholder": "Ej: IVA General Bienes",
   "inventory.form.specific_tax_name": "Nombre del impuesto especifico",
   "inventory.form.specific_tax_rate": "Tasa del impuesto especifico",
   "inventory.form.stock_unit": "Unidad de inventario",
@@ -2851,6 +2853,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.cabys_section_description":
       "Code from the Goods and Services Catalog of Hacienda (optional)",
     "inventory.form.cabys_section_title": "CABYS Classification",
+    "inventory.form.category_code_placeholder": "E.g.: CG-0001",
     "inventory.form.category_item_kind": "Type of good or service",
     "inventory.form.category_item_kind_description":
       "Determines the type of tax profile created automatically when a CABYS code is assigned",
@@ -2948,6 +2951,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.select_tax_type": "Select tax type",
     "inventory.form.select_type": "Select a type",
     "inventory.form.select_warehouse": "Select a warehouse",
+    "inventory.form.tax_profile_name_placeholder": "E.g.: General IVA Goods",
     "inventory.form.specific_tax_name": "Specific tax name",
     "inventory.form.specific_tax_rate": "Specific tax rate",
     "inventory.form.stock_unit": "Stock unit",

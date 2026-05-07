@@ -491,6 +491,14 @@ const esTranslations = {
   "inventory.form.tax_profile_identity_section_description":
     "Nombre y descripción para identificar este perfil al asignarlo a productos o categorías.",
   "inventory.form.iva_rate_code_hint": "Código Hacienda derivado de la tasa: {code}",
+  "inventory.form.tax_inclusion_mode": "Impuesto sobre el precio",
+  "inventory.form.select_tax_inclusion_mode": "Selecciona modo de inclusión",
+  "inventory.form.tax_inclusion_mode_added_hint":
+    "El precio del producto es neto. El IVA se suma al vender.",
+  "inventory.form.tax_inclusion_mode_included_hint":
+    "El precio del producto ya incluye IVA. Al vender, se desglosa el monto del IVA.",
+  "inventory.enum.tax_inclusion_mode.added": "Adicional al precio",
+  "inventory.enum.tax_inclusion_mode.included": "Incluido en el precio",
   "inventory.form.category_code_placeholder": "Ej: CG-0001",
   "inventory.form.category_item_kind": "Tipo de bien o servicio",
   "inventory.form.category_item_kind_description":
@@ -2865,6 +2873,14 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.tax_profile_identity_section_description":
       "Name and description used to identify this profile when assigning it to products or categories.",
     "inventory.form.iva_rate_code_hint": "Hacienda code derived from the rate: {code}",
+    "inventory.form.tax_inclusion_mode": "Tax on price",
+    "inventory.form.select_tax_inclusion_mode": "Select inclusion mode",
+    "inventory.form.tax_inclusion_mode_added_hint":
+      "Product price is net. Tax is added on top when invoicing.",
+    "inventory.form.tax_inclusion_mode_included_hint":
+      "Product price already includes tax. The tax amount is broken out at sale time.",
+    "inventory.enum.tax_inclusion_mode.added": "Added to price",
+    "inventory.enum.tax_inclusion_mode.included": "Included in price",
     "inventory.form.category_code_placeholder": "E.g.: CG-0001",
     "inventory.form.category_item_kind": "Type of good or service",
     "inventory.form.category_item_kind_description":

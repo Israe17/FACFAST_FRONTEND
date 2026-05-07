@@ -8,6 +8,7 @@ export const promotionTypeValues = [
 ] as const;
 export const taxTypeValues = ["iva", "exento", "no_sujeto", "specific_tax"] as const;
 export const taxProfileItemKindValues = ["goods", "service"] as const;
+export const taxInclusionModeValues = ["included", "added"] as const;
 export const warrantyDurationUnitValues = ["days", "months", "years"] as const;
 export const warehousePurposeValues = [
   "saleable",

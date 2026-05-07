@@ -22,6 +22,7 @@ import {
   promotionTypeValues,
   serialEventTypeValues,
   serialStatusValues,
+  taxInclusionModeValues,
   taxProfileItemKindValues,
   taxTypeValues,
   warehousePurposeValues,
@@ -101,6 +102,7 @@ function createDateRangeRefiner(
 }
 
 const taxProfileItemKindSchema = z.enum(taxProfileItemKindValues);
+const taxInclusionModeSchema = z.enum(taxInclusionModeValues);
 const taxTypeSchema = z.enum(taxTypeValues);
 const warrantyDurationUnitSchema = z.enum(warrantyDurationUnitValues);
 const productTypeSchema = z.enum(productTypeValues);
@@ -293,6 +295,7 @@ export const taxProfileSchema = z
     lifecycle: lifecycleFieldSchema,
     name: z.string().catch("Tax profile"),
     requires_cabys: z.boolean().optional().default(false),
+    tax_inclusion_mode: taxInclusionModeSchema.optional().default("added"),
     specific_tax_name: z.string().nullable().optional().catch(undefined),
     specific_tax_rate: z.coerce.number().optional().catch(undefined),
     tax_type: taxTypeSchema.optional().catch(undefined),
@@ -773,6 +776,7 @@ const taxProfileFormObjectSchema = z.object({
   iva_rate_code: optionalTextSchema,
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   requires_cabys: z.boolean().default(false),
+  tax_inclusion_mode: taxInclusionModeSchema.default("added"),
   specific_tax_name: optionalTextSchema,
   specific_tax_rate: optionalNumberSchema(
     z.coerce.number().min(0, "La tasa de impuesto especifico debe ser al menos 0."),

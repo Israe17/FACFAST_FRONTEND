@@ -50,6 +50,7 @@ function TaxProfileForm({
   const cabysCode = form.watch("cabys_code");
   const ivaRate = form.watch("iva_rate");
   const ivaRateCode = form.watch("iva_rate_code");
+  const taxInclusionMode = form.watch("tax_inclusion_mode");
   const currentCabys = useMemo(
     () => (cabysCode ? { codigo: cabysCode, descripcion: "", impuesto: ivaRate ?? 0 } : null),
     [cabysCode, ivaRate],
@@ -67,6 +68,13 @@ function TaxProfileForm({
       { label: t("inventory.enum.tax_type.exento"), value: "exento" },
       { label: t("inventory.enum.tax_type.no_sujeto"), value: "no_sujeto" },
       { label: t("inventory.enum.tax_type.specific_tax"), value: "specific_tax" },
+    ],
+    [t],
+  );
+  const taxInclusionModeOptions = useMemo(
+    () => [
+      { label: t("inventory.enum.tax_inclusion_mode.added"), value: "added" },
+      { label: t("inventory.enum.tax_inclusion_mode.included"), value: "included" },
     ],
     [t],
   );
@@ -205,6 +213,38 @@ function TaxProfileForm({
             />
             <FormFieldError message={errors.item_kind?.message} />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tax-profile-tax-inclusion-mode">
+            {t("inventory.form.tax_inclusion_mode")}
+          </Label>
+          <Controller
+            control={form.control}
+            name="tax_inclusion_mode"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger id="tax-profile-tax-inclusion-mode">
+                  <SelectValue
+                    placeholder={t("inventory.form.select_tax_inclusion_mode")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {taxInclusionModeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <p className="text-xs text-muted-foreground">
+            {taxInclusionMode === "included"
+              ? t("inventory.form.tax_inclusion_mode_included_hint")
+              : t("inventory.form.tax_inclusion_mode_added_hint")}
+          </p>
+          <FormFieldError message={errors.tax_inclusion_mode?.message} />
         </div>
       </section>
 

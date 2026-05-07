@@ -143,6 +143,7 @@ export const emptyTaxProfileFormValues: CreateTaxProfileInput = {
   requires_cabys: true,
   specific_tax_name: "",
   specific_tax_rate: undefined,
+  tax_inclusion_mode: "added",
   tax_type: "iva",
 };
 
@@ -160,6 +161,7 @@ export function getTaxProfileFormValues(taxProfile: TaxProfile): CreateTaxProfil
     requires_cabys: taxProfile.requires_cabys,
     specific_tax_name: taxProfile.specific_tax_name ?? "",
     specific_tax_rate: taxProfile.specific_tax_rate,
+    tax_inclusion_mode: taxProfile.tax_inclusion_mode ?? "added",
     tax_type: taxProfile.tax_type ?? "iva",
   };
 }

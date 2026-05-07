@@ -169,79 +169,6 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
 
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
         <div className="space-y-1">
-          <h3 className="font-semibold">{t("contacts.form.general_title")}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t("contacts.form.general_description")}
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="contact-type">{t("contacts.form.type")}</Label>
-            <Controller
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                  <SelectTrigger id="contact-type">
-                    <SelectValue placeholder={t("contacts.form.select_type")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {contactTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError message={errors.type?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-name">{t("contacts.form.name")}</Label>
-            <Input id="contact-name" placeholder={t("contacts.form.name_placeholder")} {...form.register("name")} />
-            <FieldError message={errors.name?.message} />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="contact-code">{t("contacts.form.code")}</Label>
-            <Input id="contact-code" placeholder="CT-0001" {...form.register("code")} />
-            <FieldError message={errors.code?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-commercial-name">{t("contacts.form.commercial_name")}</Label>
-            <Input
-              id="contact-commercial-name"
-              placeholder={t("contacts.form.commercial_name_placeholder")}
-              {...form.register("commercial_name")}
-            />
-            <FieldError message={errors.commercial_name?.message} />
-          </div>
-
-          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
-            <Checkbox
-              checked={Boolean(isActive)}
-              onCheckedChange={(checked) => {
-                form.setValue("is_active", checked === true, { shouldDirty: true });
-              }}
-            />
-            <div className="space-y-1">
-              <p className="font-medium">{t("contacts.form.active_contact")}</p>
-              <p className="text-sm text-muted-foreground">
-                {t("contacts.form.active_contact_description")}
-              </p>
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <section className="space-y-4 rounded-xl border border-border/70 p-4">
-        <div className="space-y-1">
           <h3 className="font-semibold">{t("contacts.form.identification_title")}</h3>
           <p className="text-sm text-muted-foreground">
             {t("contacts.form.identification_description")}
@@ -249,29 +176,6 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="contact-identification-type">{t("contacts.form.identification_type")}</Label>
-            <Controller
-              control={form.control}
-              name="identification_type"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                  <SelectTrigger id="contact-identification-type">
-                    <SelectValue placeholder={t("contacts.form.select_identification_type")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {identificationTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError message={errors.identification_type?.message} />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="contact-identification-number">{t("contacts.form.identification_number")}</Label>
             <div className="flex gap-2">
@@ -293,6 +197,29 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
               </ActionButton>
             </div>
             <FieldError message={errors.identification_number?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-identification-type">{t("contacts.form.identification_type")}</Label>
+            <Controller
+              control={form.control}
+              name="identification_type"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                  <SelectTrigger id="contact-identification-type">
+                    <SelectValue placeholder={t("contacts.form.select_identification_type")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {identificationTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError message={errors.identification_type?.message} />
           </div>
         </div>
 
@@ -316,6 +243,79 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
             />
             <FieldError message={errors.economic_activity_code?.message} />
           </div>
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-xl border border-border/70 p-4">
+        <div className="space-y-1">
+          <h3 className="font-semibold">{t("contacts.form.general_title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("contacts.form.general_description")}
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="contact-name">{t("contacts.form.name")}</Label>
+            <Input id="contact-name" placeholder={t("contacts.form.name_placeholder")} {...form.register("name")} />
+            <FieldError message={errors.name?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-commercial-name">{t("contacts.form.commercial_name")}</Label>
+            <Input
+              id="contact-commercial-name"
+              placeholder={t("contacts.form.commercial_name_placeholder")}
+              {...form.register("commercial_name")}
+            />
+            <FieldError message={errors.commercial_name?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-type">{t("contacts.form.type")}</Label>
+            <Controller
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                  <SelectTrigger id="contact-type">
+                    <SelectValue placeholder={t("contacts.form.select_type")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {contactTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError message={errors.type?.message} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="contact-code">{t("contacts.form.code")}</Label>
+            <Input id="contact-code" placeholder="CT-0001" {...form.register("code")} />
+            <FieldError message={errors.code?.message} />
+          </div>
+
+          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
+            <Checkbox
+              checked={Boolean(isActive)}
+              onCheckedChange={(checked) => {
+                form.setValue("is_active", checked === true, { shouldDirty: true });
+              }}
+            />
+            <div className="space-y-1">
+              <p className="font-medium">{t("contacts.form.active_contact")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("contacts.form.active_contact_description")}
+              </p>
+            </div>
+          </label>
         </div>
       </section>
 

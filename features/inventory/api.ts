@@ -138,13 +138,15 @@ function buildMeasurementUnitPayload(
 function buildProductCategoryPayload(
   payload: CreateProductCategoryInput | UpdateProductCategoryInput,
 ) {
-  return compactRecord({
-    cabys_code: payload.cabys_code || undefined,
-    cabys_descripcion: payload.cabys_descripcion || undefined,
-    cabys_impuesto: payload.cabys_impuesto ?? undefined,
+  const has_cabys_field = "cabys_code" in payload;
+  return compactNullableRecord({
+    cabys_code: has_cabys_field ? payload.cabys_code || null : undefined,
+    cabys_descripcion: has_cabys_field ? payload.cabys_descripcion || null : undefined,
+    cabys_impuesto: has_cabys_field ? payload.cabys_impuesto ?? null : undefined,
     code: payload.code,
     description: payload.description,
     is_active: payload.is_active,
+    item_kind: payload.item_kind,
     name: payload.name,
     parent_id: toOptionalNumberId(payload.parent_id),
   });

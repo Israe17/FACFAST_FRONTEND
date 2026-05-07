@@ -236,14 +236,24 @@ export const measurementUnitSchema = z
   })
   .passthrough();
 
+const categoryDefaultTaxProfileSummarySchema = z
+  .object({
+    id: idSchema,
+    name: z.string().catch(""),
+    cabys_code: z.string().nullable().optional().catch(null),
+    description: z.string().nullable().optional().catch(null),
+    iva_rate: z.coerce.number().nullable().optional().catch(null),
+    item_kind: taxProfileItemKindSchema.optional().catch(undefined),
+  })
+  .passthrough();
+
 const productCategoryBaseSchema = z
   .object({
     business_id: idSchema.optional().catch(undefined),
-    cabys_code: z.string().nullable().optional().catch(null),
-    cabys_descripcion: z.string().nullable().optional().catch(null),
-    cabys_impuesto: z.coerce.number().nullable().optional().catch(null),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
+    default_tax_profile: categoryDefaultTaxProfileSummarySchema.nullable().optional().catch(null),
+    default_tax_profile_id: nullableIdSchema.default(null),
     description: z.string().nullable().optional().catch(undefined),
     id: idSchema,
     is_active: z.boolean().optional().default(true),
@@ -735,6 +745,7 @@ export const createProductCategorySchema = z.object({
   code: makeOptionalCodeSchema("CG"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
+  item_kind: taxProfileItemKindSchema.default("goods"),
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   parent_id: makeOptionalIdSchema("Selecciona una categoria padre valida."),
 });

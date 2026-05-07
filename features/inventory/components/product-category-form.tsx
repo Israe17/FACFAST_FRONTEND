@@ -49,6 +49,7 @@ function ProductCategoryForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const itemKind = form.watch("item_kind");
   const cabysCode = form.watch("cabys_code");
   const cabysDescripcion = form.watch("cabys_descripcion");
   const cabysImpuesto = form.watch("cabys_impuesto");
@@ -123,11 +124,41 @@ function ProductCategoryForm({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>{t("inventory.form.cabys_section_title")}</Label>
-        <p className="text-sm text-muted-foreground">
-          {t("inventory.form.cabys_section_description")}
-        </p>
+      <div className="space-y-3">
+        <div>
+          <Label>{t("inventory.form.cabys_section_title")}</Label>
+          <p className="text-sm text-muted-foreground">
+            {t("inventory.form.cabys_section_description")}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="category-item-kind">{t("inventory.form.category_item_kind")}</Label>
+          <Controller
+            control={form.control}
+            name="item_kind"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value ?? "goods"}>
+                <SelectTrigger id="category-item-kind">
+                  <SelectValue placeholder={t("inventory.form.select_item_kind")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="goods">
+                    {t("inventory.enum.tax_profile_item_kind.goods")}
+                  </SelectItem>
+                  <SelectItem value="service">
+                    {t("inventory.enum.tax_profile_item_kind.service")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <p className="text-xs text-muted-foreground">
+            {t("inventory.form.category_item_kind_description")}
+          </p>
+          <FormFieldError message={errors.item_kind?.message} />
+        </div>
+
         <CabysSearchInput
           onChange={(result) => {
             form.setValue("cabys_code", result?.codigo ?? "", { shouldDirty: true });

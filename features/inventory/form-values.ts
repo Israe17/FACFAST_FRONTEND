@@ -108,6 +108,7 @@ export const emptyProductCategoryFormValues: CreateProductCategoryInput = {
   code: "",
   description: "",
   is_active: true,
+  item_kind: "goods",
   name: "",
   parent_id: "",
 };
@@ -115,13 +116,15 @@ export const emptyProductCategoryFormValues: CreateProductCategoryInput = {
 export function getProductCategoryFormValues(
   category: ProductCategory,
 ): CreateProductCategoryInput {
+  const default_profile = category.default_tax_profile;
   return {
-    cabys_code: category.cabys_code ?? "",
-    cabys_descripcion: category.cabys_descripcion ?? "",
-    cabys_impuesto: category.cabys_impuesto ?? null,
+    cabys_code: default_profile?.cabys_code ?? "",
+    cabys_descripcion: default_profile?.description ?? "",
+    cabys_impuesto: default_profile?.iva_rate ?? null,
     code: category.code ?? "",
     description: category.description ?? "",
     is_active: category.is_active,
+    item_kind: default_profile?.item_kind ?? "goods",
     name: category.name,
     parent_id: category.parent_id ?? "",
   };

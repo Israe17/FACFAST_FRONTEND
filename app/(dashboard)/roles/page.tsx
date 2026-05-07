@@ -14,10 +14,12 @@ import { LoadingState } from "@/shared/components/loading-state";
 import { PageHeader } from "@/shared/components/page-header";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
-import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 
 export default function RolesPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const { t } = useAppTranslator();
   const { can } = usePermissions();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
@@ -29,11 +31,13 @@ export default function RolesPage() {
   if (!can("roles.view")) {
     return (
       <ErrorState
-        description="You do not have permission to view roles."
-        title="Access denied"
+        description={t("roles.page_access_denied")}
+        title={t("common.access_denied_title")}
       />
     );
   }
+
+  const permissionsCount = permissionsQuery.data?.length ?? (permissionsQuery.isSuccess ? 0 : null);
 
   return (
     <>
@@ -42,27 +46,31 @@ export default function RolesPage() {
           can("roles.create") ? (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="size-4" />
-              Create role
+              {t("roles.create_button")}
             </Button>
           ) : null
         }
-        description="Manage roles, edit metadata and assign permission sets for RBAC."
-        eyebrow="Administration"
-        title="Roles"
+        description={t("roles.page_description")}
+        eyebrow={t("roles.page_eyebrow")}
+        title={t("roles.page_title")}
       />
 
       <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">Roles source: /api/roles</Badge>
+        <Badge variant="outline">{t("roles.source_badge")}</Badge>
         <Badge variant="outline">
-          Permissions catalog:{" "}
-          {permissionsQuery.data?.length ?? (permissionsQuery.isSuccess ? 0 : "loading")}
+          {permissionsCount !== null
+            ? t("roles.permissions_catalog_badge", { count: String(permissionsCount) })
+            : t("roles.permissions_catalog_badge", { count: t("roles.permissions_catalog_loading") })}
         </Badge>
       </div>
 
-      {rolesQuery.isLoading ? <LoadingState description="Loading roles." /> : null}
+      {rolesQuery.isLoading ? <LoadingState description={t("roles.loading")} /> : null}
       {rolesQuery.isError ? (
         <ErrorState
-          description={getBackendErrorMessage(rolesQuery.error, "Unable to load roles.")}
+          description={getTranslatedBackendErrorMessage(rolesQuery.error, {
+            fallbackMessage: t("roles.load_error_fallback"),
+            translateMessage: t,
+          }) ?? undefined}
           onRetry={() => rolesQuery.refetch()}
         />
       ) : null}
@@ -72,13 +80,13 @@ export default function RolesPage() {
             can("roles.create") ? (
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="size-4" />
-                Create role
+                {t("roles.create_button")}
               </Button>
             ) : null
           }
-          description="Create the first role to start structuring RBAC."
+          description={t("roles.empty_description")}
           icon={ShieldCheck}
-          title="No roles found"
+          title={t("roles.empty_title")}
         />
       ) : null}
       {rolesQuery.data?.length ? <RolesTable data={rolesQuery.data} /> : null}

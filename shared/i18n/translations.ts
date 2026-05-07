@@ -457,6 +457,9 @@ const esTranslations = {
   "inventory.form.cabys_section_description":
     "Código del Catálogo de Bienes y Servicios de Hacienda (opcional)",
   "inventory.form.cabys_section_title": "Clasificación CABYS",
+  "inventory.form.category_item_kind": "Tipo de bien o servicio",
+  "inventory.form.category_item_kind_description":
+    "Determina el tipo del perfil fiscal que se crea automáticamente al asignar un código CABYS",
   "inventory.cabys.clear": "Quitar CABYS",
   "inventory.cabys.loading": "Buscando en Hacienda...",
   "inventory.cabys.min_chars": "Escribe al menos 3 caracteres",
@@ -2791,6 +2794,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.cabys_section_description":
       "Code from the Goods and Services Catalog of Hacienda (optional)",
     "inventory.form.cabys_section_title": "CABYS Classification",
+    "inventory.form.category_item_kind": "Type of good or service",
+    "inventory.form.category_item_kind_description":
+      "Determines the type of tax profile created automatically when a CABYS code is assigned",
     "inventory.cabys.clear": "Remove CABYS",
     "inventory.cabys.loading": "Searching Hacienda...",
     "inventory.cabys.min_chars": "Type at least 3 characters",

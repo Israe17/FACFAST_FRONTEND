@@ -108,6 +108,7 @@ export const emptyProductCategoryFormValues: CreateProductCategoryInput = {
   code: "",
   description: "",
   is_active: true,
+  item_kind: "goods",
   name: "",
   parent_id: "",
 };
@@ -123,6 +124,7 @@ export function getProductCategoryFormValues(
     code: category.code ?? "",
     description: category.description ?? "",
     is_active: category.is_active,
+    item_kind: default_profile?.item_kind ?? "goods",
     name: category.name,
     parent_id: category.parent_id ?? "",
   };

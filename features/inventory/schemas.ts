@@ -243,6 +243,7 @@ const categoryDefaultTaxProfileSummarySchema = z
     cabys_code: z.string().nullable().optional().catch(null),
     description: z.string().nullable().optional().catch(null),
     iva_rate: z.coerce.number().nullable().optional().catch(null),
+    item_kind: taxProfileItemKindSchema.optional().catch(undefined),
   })
   .passthrough();
 
@@ -744,6 +745,7 @@ export const createProductCategorySchema = z.object({
   code: makeOptionalCodeSchema("CG"),
   description: optionalTextSchema,
   is_active: z.boolean().default(true),
+  item_kind: taxProfileItemKindSchema.default("goods"),
   name: requiredTrimmedString("El nombre debe tener al menos 2 caracteres.", 2),
   parent_id: makeOptionalIdSchema("Selecciona una categoria padre valida."),
 });

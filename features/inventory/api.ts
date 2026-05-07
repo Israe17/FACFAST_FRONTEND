@@ -146,6 +146,7 @@ function buildProductCategoryPayload(
     code: payload.code,
     description: payload.description,
     is_active: payload.is_active,
+    item_kind: payload.item_kind,
     name: payload.name,
     parent_id: toOptionalNumberId(payload.parent_id),
   });

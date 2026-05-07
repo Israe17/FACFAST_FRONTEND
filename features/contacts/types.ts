@@ -7,6 +7,9 @@ import {
   contactSchema,
   createContactBranchAssignmentSchema,
   createContactSchema,
+  haciendaActivitySchema,
+  haciendaExonerationSchema,
+  haciendaTaxpayerSchema,
   updateContactBranchAssignmentSchema,
   updateContactSchema,
 } from "./schemas";
@@ -25,3 +28,7 @@ export type UpdateContactBranchAssignmentInput = z.infer<
 >;
 export type ContactType = (typeof contactTypeValues)[number];
 export type IdentificationType = (typeof identificationTypeValues)[number];
+
+export type HaciendaActivity = z.infer<typeof haciendaActivitySchema>;
+export type HaciendaTaxpayer = z.infer<typeof haciendaTaxpayerSchema>;
+export type HaciendaExoneration = z.infer<typeof haciendaExonerationSchema>;

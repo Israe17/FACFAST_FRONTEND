@@ -5,10 +5,18 @@ import { http } from "@/shared/lib/http";
 import { extractCollection, extractEntity, compactRecord, compactNullableRecord } from "@/shared/lib/api-helpers";
 import { paginatedSchema, type PaginatedQueryParams } from "@/shared/lib/api-types";
 
-import { contactBranchAssignmentSchema, contactBranchContextSchema, contactSchema } from "./schemas";
+import {
+  contactBranchAssignmentSchema,
+  contactBranchContextSchema,
+  contactSchema,
+  haciendaExonerationSchema,
+  haciendaTaxpayerSchema,
+} from "./schemas";
 import type {
   CreateContactBranchAssignmentInput,
   CreateContactInput,
+  HaciendaExoneration,
+  HaciendaTaxpayer,
   UpdateContactBranchAssignmentInput,
   UpdateContactInput,
 } from "./types";
@@ -163,42 +171,6 @@ export async function lookupContactByIdentification(identification: string) {
     throw error;
   }
 }
-
-const haciendaActivitySchema = z.object({
-  codigo: z.string(),
-  descripcion: z.string(),
-  estado: z.string(),
-  tipo: z.string(),
-});
-
-const haciendaTaxpayerSchema = z.object({
-  actividades: z.array(haciendaActivitySchema).default([]),
-  nombre: z.string(),
-  regimen: z.object({ codigo: z.number(), descripcion: z.string() }),
-  situacion: z.object({
-    administracionTributaria: z.string(),
-    estado: z.string(),
-    moroso: z.string(),
-    omiso: z.string(),
-  }),
-  tipoIdentificacion: z.string(),
-});
-
-const haciendaExonerationSchema = z.object({
-  cabys: z.array(z.string()).default([]),
-  fechaEmision: z.string(),
-  fechaVencimiento: z.string(),
-  identificacion: z.string(),
-  nombreInstitucion: z.string(),
-  numeroDocumento: z.string(),
-  porcentajeExoneracion: z.coerce.number(),
-  poseeCabys: z.boolean().default(false),
-  tipoDocumento: z.object({ codigo: z.string(), descripcion: z.string() }),
-});
-
-export type HaciendaActivity = z.infer<typeof haciendaActivitySchema>;
-export type HaciendaTaxpayer = z.infer<typeof haciendaTaxpayerSchema>;
-export type HaciendaExoneration = z.infer<typeof haciendaExonerationSchema>;
 
 export async function lookupTaxpayerEmail(identification: string): Promise<string | null> {
   try {

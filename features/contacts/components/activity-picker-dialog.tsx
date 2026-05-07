@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { HaciendaActivity } from "../api";
+import type { HaciendaActivity } from "../types";
 
 type ActivityPickerDialogProps = {
   activities: HaciendaActivity[];

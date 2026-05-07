@@ -21,10 +21,13 @@ import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LocationPicker } from "@/shared/components/location-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { HaciendaActivity } from "../api";
-import { lookupTaxpayerEmail } from "../api";
 import { contactTypeOptions, identificationTypeOptions } from "../constants";
-import { useTaxpayerLookupMutation, useExonerationVerifyMutation } from "../queries";
+import {
+  useExonerationVerifyMutation,
+  useTaxpayerEmailLookupMutation,
+  useTaxpayerLookupMutation,
+} from "../queries";
+import type { HaciendaActivity } from "../types";
 import { ActivityPickerDialog } from "./activity-picker-dialog";
 
 type ContactFormValues = {
@@ -108,8 +111,9 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
   } = form;
   const isActive = form.watch("is_active");
 
-  const taxpayerLookup = useTaxpayerLookupMutation();
-  const exonerationVerify = useExonerationVerifyMutation();
+  const taxpayerLookup = useTaxpayerLookupMutation({ showErrorToast: false });
+  const taxpayerEmailLookup = useTaxpayerEmailLookupMutation({ showErrorToast: false });
+  const exonerationVerify = useExonerationVerifyMutation({ showErrorToast: false });
   const [activityPickerState, setActivityPickerState] = useState<{
     open: boolean;
     activities: HaciendaActivity[];
@@ -124,7 +128,7 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
     try {
       const [result, email] = await Promise.all([
         taxpayerLookup.mutateAsync(identification),
-        lookupTaxpayerEmail(identification).catch(() => null),
+        taxpayerEmailLookup.mutateAsync(identification).catch(() => null),
       ]);
       if (!result) {
         toast.info(t("contacts.hacienda.not_found"));

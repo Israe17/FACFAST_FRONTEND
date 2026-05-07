@@ -210,7 +210,7 @@ const esTranslations = {
   "contacts.form.active_contact_description": "Los registros inactivos se mantienen para historial sin usarse operativamente.",
   "contacts.form.address": "Direccion",
   "contacts.form.address_placeholder": "Direccion exacta y referencias",
-  "contacts.form.cantón": "Cantón",
+  "contacts.form.canton": "Cantón",
   "contacts.form.canton_placeholder": "Ej: Central",
   "contacts.form.code": "Código",
   "contacts.form.commercial_name": "Nombre comercial",

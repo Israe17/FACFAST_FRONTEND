@@ -341,3 +341,35 @@ export const updateContactBranchAssignmentSchema = createContactBranchAssignment
     purchases_enabled: z.boolean().optional(),
     sales_enabled: z.boolean().optional(),
   });
+
+export const haciendaActivitySchema = z.object({
+  codigo: z.string(),
+  descripcion: z.string(),
+  estado: z.string(),
+  tipo: z.string(),
+});
+
+export const haciendaTaxpayerSchema = z.object({
+  actividades: z.array(haciendaActivitySchema).default([]),
+  nombre: z.string(),
+  regimen: z.object({ codigo: z.number(), descripcion: z.string() }),
+  situacion: z.object({
+    administracionTributaria: z.string(),
+    estado: z.string(),
+    moroso: z.string(),
+    omiso: z.string(),
+  }),
+  tipoIdentificacion: z.string(),
+});
+
+export const haciendaExonerationSchema = z.object({
+  cabys: z.array(z.string()).default([]),
+  fechaEmision: z.string(),
+  fechaVencimiento: z.string(),
+  identificacion: z.string(),
+  nombreInstitucion: z.string(),
+  numeroDocumento: z.string(),
+  porcentajeExoneracion: z.coerce.number(),
+  poseeCabys: z.boolean().default(false),
+  tipoDocumento: z.object({ codigo: z.string(), descripcion: z.string() }),
+});

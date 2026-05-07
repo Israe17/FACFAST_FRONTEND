@@ -316,6 +316,9 @@ export function ProductForm({
                 code: resolveHaciendaIvaRateCode(form.watch("cabys_impuesto") ?? 13),
               })}
             </p>
+            <p className="text-xs text-muted-foreground">
+              {t("inventory.form.product_cabys_optional_hint")}
+            </p>
             <FormFieldError message={errors.cabys_code?.message} />
           </div>
 

@@ -871,17 +871,10 @@ function applyProductRules(
   values: Partial<z.infer<typeof productFormObjectSchema>>,
   ctx: z.RefinementCtx,
 ) {
-  const hasTaxProfile =
-    typeof values.tax_profile_id === "string" && values.tax_profile_id.length > 0;
-  const hasCabys =
-    typeof values.cabys_code === "string" && values.cabys_code.trim().length > 0;
-  if (!hasTaxProfile && !hasCabys) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Selecciona un perfil fiscal o un código CABYS.",
-      path: ["tax_profile_id"],
-    });
-  }
+  // tax_profile_id and cabys_code are both optional. The product can be
+  // saved without fiscal data and completed later. The backend allows null
+  // tax_profile_id; sales/invoicing will reject the product at sale time
+  // if it remains incomplete.
 
   if (values.type === "service") {
     return;

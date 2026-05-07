@@ -493,6 +493,8 @@ const esTranslations = {
   "inventory.form.iva_rate_code_hint": "Código Hacienda derivado de la tasa: {code}",
   "inventory.form.product_cabys_hint":
     "Si se selecciona un CABYS, el perfil fiscal se asigna o crea automáticamente. Código Hacienda derivado: {code}.",
+  "inventory.form.product_cabys_optional_hint":
+    "Puedes dejarlo vacío y completarlo después. No podrás vender el producto en factura electrónica hasta que tenga CABYS o perfil fiscal.",
   "inventory.form.product_tax_profile_auto": "Auto (desde CABYS o categoría)",
   "inventory.form.tax_inclusion_mode": "Impuesto sobre el precio",
   "inventory.form.select_tax_inclusion_mode": "Selecciona modo de inclusión",
@@ -2878,6 +2880,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.iva_rate_code_hint": "Hacienda code derived from the rate: {code}",
     "inventory.form.product_cabys_hint":
       "Selecting a CABYS auto-assigns or creates the tax profile. Derived Hacienda code: {code}.",
+    "inventory.form.product_cabys_optional_hint":
+      "You can leave this empty and complete it later. The product cannot be sold via electronic invoice until it has a CABYS or tax profile.",
     "inventory.form.product_tax_profile_auto": "Auto (from CABYS or category)",
     "inventory.form.tax_inclusion_mode": "Tax on price",
     "inventory.form.select_tax_inclusion_mode": "Select inclusion mode",

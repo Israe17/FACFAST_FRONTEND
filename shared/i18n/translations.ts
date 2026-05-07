@@ -689,6 +689,7 @@ const esTranslations = {
     "Mantiene la jerarquia de categorías de producto usada por inventario.",
   "inventory.categories.section_description":
     "Clasificacion jerarquica para productos y futura analítica de inventario.",
+  "inventory.categories.subcategories_count": "Subcategorías",
   "inventory.measurement_units.delete_title": "Eliminar unidad de medida",
   "inventory.measurement_units.delete_description":
     "La unidad \"{name}\" sera eliminada permanentemente. Solo es posible si ningun producto o variante la usa.",
@@ -3026,6 +3027,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Maintain the product category hierarchy used by inventory.",
     "inventory.categories.section_description":
       "Hierarchical classification for products and future inventory analytics.",
+    "inventory.categories.subcategories_count": "Subcategories",
     "inventory.measurement_units.delete_title": "Delete measurement unit",
     "inventory.measurement_units.delete_description":
       "The unit \"{name}\" will be permanently deleted. This is only possible if no product or variant uses it.",

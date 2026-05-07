@@ -43,8 +43,37 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
   const categoriesQuery = useProductCategoriesQuery(enabled && canView);
   const deleteMutation = useDeleteProductCategoryMutation({ showErrorToast: true });
 
-  const parentNameById = useMemo(() => {
-    return new Map((categoriesQuery.data ?? []).map((category) => [category.id, category.name]));
+  const childrenCountById = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const category of categoriesQuery.data ?? []) {
+      if (category.parent_id) {
+        counts.set(category.parent_id, (counts.get(category.parent_id) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [categoriesQuery.data]);
+
+  const sortedCategories = useMemo(() => {
+    const all = categoriesQuery.data ?? [];
+    const childrenByParent = new Map<string | null, ProductCategory[]>();
+    for (const category of all) {
+      const key = category.parent_id ?? null;
+      const existing = childrenByParent.get(key) ?? [];
+      existing.push(category);
+      childrenByParent.set(key, existing);
+    }
+    for (const list of childrenByParent.values()) {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    const result: ProductCategory[] = [];
+    const visit = (parentId: string | null) => {
+      for (const category of childrenByParent.get(parentId) ?? []) {
+        result.push(category);
+        visit(category.id);
+      }
+    };
+    visit(null);
+    return result;
   }, [categoriesQuery.data]);
 
   const handleEdit = useCallback((category: ProductCategory) => {
@@ -63,12 +92,12 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
       getProductCategoriesColumns({
         canDelete,
         canUpdate,
+        childrenCountById,
         onDelete: setDeleteTarget,
         onEdit: handleEdit,
-        parentNameById,
         t,
       }),
-    [canDelete, canUpdate, handleEdit, parentNameById, t],
+    [canDelete, canUpdate, childrenCountById, handleEdit, t],
   );
 
   if (!canView) {
@@ -112,7 +141,7 @@ function ProductCategoriesSection({ enabled = true }: ProductCategoriesSectionPr
         >
           <DataTable
             columns={columns}
-            data={categoriesQuery.data ?? []}
+            data={sortedCategories}
             emptyMessage={t("inventory.common.empty_entity", {
               entity: t("inventory.entity.product_categories"),
             })}

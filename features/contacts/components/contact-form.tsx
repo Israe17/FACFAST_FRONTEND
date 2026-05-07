@@ -22,6 +22,7 @@ import { LocationPicker } from "@/shared/components/location-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { HaciendaActivity } from "../api";
+import { lookupTaxpayerEmail } from "../api";
 import { contactTypeOptions, identificationTypeOptions } from "../constants";
 import { useTaxpayerLookupMutation, useExonerationVerifyMutation } from "../queries";
 import { ActivityPickerDialog } from "./activity-picker-dialog";
@@ -121,7 +122,10 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
       return;
     }
     try {
-      const result = await taxpayerLookup.mutateAsync(identification);
+      const [result, email] = await Promise.all([
+        taxpayerLookup.mutateAsync(identification),
+        lookupTaxpayerEmail(identification).catch(() => null),
+      ]);
       if (!result) {
         toast.info(t("contacts.hacienda.not_found"));
         return;
@@ -129,6 +133,9 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
       form.setValue("name", result.nombre, { shouldDirty: true });
       form.setValue("identification_type", result.tipoIdentificacion, { shouldDirty: true });
       form.setValue("tax_condition", result.regimen.descripcion, { shouldDirty: true });
+      if (email && !form.getValues("email")) {
+        form.setValue("email", email, { shouldDirty: true });
+      }
       const activeActivities = result.actividades.filter((a) => a.estado === "A");
       if (activeActivities.length === 1) {
         form.setValue("economic_activity_code", activeActivities[0].codigo, { shouldDirty: true });

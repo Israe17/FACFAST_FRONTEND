@@ -68,7 +68,7 @@ function ProductCategoryForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="category-code">{t("inventory.common.code")}</Label>
-          <Input id="category-code" placeholder="CG-0001" {...form.register("code")} />
+          <Input id="category-code" placeholder={t("inventory.form.category_code_placeholder")} {...form.register("code")} />
           <FormFieldError message={errors.code?.message} />
         </div>
 

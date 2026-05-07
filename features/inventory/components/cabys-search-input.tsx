@@ -1,15 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { z } from "zod/v4";
 
 import { Input } from "@/components/ui/input";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import type { cabysSearchResultSchema } from "../schemas";
 import { useCabysSearchQuery } from "../queries";
-
-type CabysSearchResult = z.infer<typeof cabysSearchResultSchema>;
+import type { CabysSearchResult } from "../types";
 
 type CabysSearchInputProps = {
   value: CabysSearchResult | null;

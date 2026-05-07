@@ -11,6 +11,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { Branch } from "../types";
@@ -24,8 +25,7 @@ type BranchesTableProps = {
 };
 
 function BranchStatusBadge({ isActive }: { isActive: boolean }) {
-  const label = isActive ? "ACTIVE" : "INACTIVE";
-
+  const { t } = useAppTranslator();
   return (
     <Badge
       className={
@@ -35,7 +35,7 @@ function BranchStatusBadge({ isActive }: { isActive: boolean }) {
       }
       variant="outline"
     >
-      {label}
+      {isActive ? t("common.active_status") : t("common.inactive_status")}
     </Badge>
   );
 }
@@ -47,27 +47,28 @@ function BranchRowActions({
   branch: Branch;
   onSelectBranch: (branchId: string) => void;
 }) {
+  const { t } = useAppTranslator();
   const { can } = usePermissions();
   const [activeDialog, setActiveDialog] = useState<"deactivate" | "delete" | "edit" | "reactivate" | null>(null);
   const updateBranchMutation = useUpdateBranchMutation(branch.id);
   const deleteBranchMutation = useDeleteBranchMutation(branch.id);
 
   const actions: TableAction[] = [
-    { icon: Monitor, label: "View terminals", onClick: () => onSelectBranch(branch.id) },
+    { icon: Monitor, label: t("branches.actions.view_terminals"), onClick: () => onSelectBranch(branch.id) },
   ];
   if (can("branches.update")) {
-    actions.push({ icon: Pencil, label: "Edit branch", onClick: () => setActiveDialog("edit") });
+    actions.push({ icon: Pencil, label: t("branches.actions.edit"), onClick: () => setActiveDialog("edit") });
     actions.push(
       branch.is_active
         ? {
             icon: Power,
-            label: "Deactivate",
+            label: t("branches.actions.deactivate"),
             onClick: () => setActiveDialog("deactivate"),
             variant: "destructive",
           }
         : {
             icon: RotateCcw,
-            label: "Reactivate",
+            label: t("branches.actions.reactivate"),
             onClick: () => setActiveDialog("reactivate"),
           },
     );
@@ -75,7 +76,7 @@ function BranchRowActions({
   if (can("branches.delete")) {
     actions.push({
       icon: Trash2,
-      label: "Delete permanently",
+      label: t("branches.actions.delete"),
       onClick: () => setActiveDialog("delete"),
       variant: "destructive",
     });
@@ -98,22 +99,21 @@ function BranchRowActions({
   const dialogCopy =
     activeDialog === "delete"
       ? {
-          confirmLabel: "Delete permanently",
-          description:
-            "This permanently deletes the branch if the backend confirms there are no operational dependencies.",
-          title: "Delete branch permanently",
+          confirmLabel: t("branches.actions.delete"),
+          description: t("branches.delete_dialog_description"),
+          title: t("branches.delete_dialog_title"),
         }
       : activeDialog === "deactivate"
         ? {
-            confirmLabel: "Deactivate",
-            description: `${branch.name} will stay registered, but it should stop being used for new operations.`,
-            title: "Deactivate branch",
+            confirmLabel: t("branches.actions.deactivate"),
+            description: t("branches.deactivate_dialog_description", { name: branch.name }),
+            title: t("branches.deactivate_dialog_title"),
           }
         : activeDialog === "reactivate"
           ? {
-              confirmLabel: "Reactivate",
-              description: `${branch.name} will become available again for branch selection and operational use.`,
-              title: "Reactivate branch",
+              confirmLabel: t("branches.actions.reactivate"),
+              description: t("branches.reactivate_dialog_description", { name: branch.name }),
+              title: t("branches.reactivate_dialog_title"),
             }
           : null;
 
@@ -144,60 +144,65 @@ function BranchRowActions({
 }
 
 function BranchesTable({ data, onSelectBranch, selectedBranchId }: BranchesTableProps) {
+  const { t } = useAppTranslator();
   const { activeBranchId } = useActiveBranch();
 
   const columns: ColumnDef<Branch>[] = [
     {
       accessorKey: "name",
-      header: "Branch",
+      header: t("branches.table.header_branch"),
       cell: ({ row }) => (
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-medium">{row.original.name}</p>
-            {row.original.id === activeBranchId ? <Badge variant="outline">Active context</Badge> : null}
+            {row.original.id === activeBranchId ? (
+              <Badge variant="outline">{t("branches.table.active_context_badge")}</Badge>
+            ) : null}
             {row.original.id === selectedBranchId ? (
-              <Badge variant="outline">Viewing terminals</Badge>
+              <Badge variant="outline">{t("branches.table.viewing_terminals_badge")}</Badge>
             ) : null}
           </div>
           <p className="text-sm text-muted-foreground">
-            {row.original.code ? `Code: ${row.original.code}` : row.original.address || "No address provided."}
+            {row.original.code
+              ? t("branches.table.code_prefix", { code: row.original.code })
+              : row.original.address || t("branches.table.no_address")}
           </p>
         </div>
       ),
     },
     {
       accessorKey: "is_active",
-      header: "Status",
+      header: t("common.status"),
       cell: ({ row }) => <BranchStatusBadge isActive={row.original.is_active} />,
     },
     {
       accessorKey: "terminals",
-      header: "Terminals",
+      header: t("branches.table.header_terminals"),
       cell: ({ row }) => <Badge variant="outline">{row.original.terminals.length}</Badge>,
     },
     {
       accessorKey: "phone",
-      header: "Contact",
+      header: t("branches.table.header_contact"),
       cell: ({ row }) => (
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p>{row.original.phone || "No phone"}</p>
-          <p>{row.original.email || "No email"}</p>
+          <p>{row.original.phone || t("common.no_phone")}</p>
+          <p>{row.original.email || t("common.no_email")}</p>
         </div>
       ),
     },
     {
       accessorKey: "updated_at",
-      header: "Updated",
+      header: t("common.updated"),
       cell: ({ row }) => <span>{formatDateTime(row.original.updated_at)}</span>,
     },
     {
       id: "actions",
-      header: "Actions",
+      header: t("common.actions"),
       cell: ({ row }) => <BranchRowActions branch={row.original} onSelectBranch={onSelectBranch} />,
     },
   ];
 
-  return <DataTable columns={columns} data={data} emptyMessage="No branches found." />;
+  return <DataTable columns={columns} data={data} emptyMessage={t("branches.table.empty")} />;
 }
 
 export { BranchesTable };

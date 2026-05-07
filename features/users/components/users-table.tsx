@@ -19,6 +19,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useSession } from "@/shared/hooks/use-session";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { User } from "../types";
@@ -35,6 +36,7 @@ type UsersTableProps = {
 };
 
 function StatusBadge({ status }: { status: User["status"] }) {
+  const { t } = useAppTranslator();
   const statusClassName =
     status === "active"
       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -44,14 +46,22 @@ function StatusBadge({ status }: { status: User["status"] }) {
           ? "border-rose-200 bg-rose-50 text-rose-700"
           : "border-zinc-200 bg-zinc-100 text-zinc-700";
 
+  const statusLabel =
+    status === "active"
+      ? t("common.active_status")
+      : status === "inactive"
+        ? t("common.inactive_status")
+        : status;
+
   return (
     <Badge className={statusClassName} variant="outline">
-      {status}
+      {statusLabel}
     </Badge>
   );
 }
 
 function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }) {
+  const { t } = useAppTranslator();
   const { can } = usePermissions();
   const { user: sessionUser } = useSession();
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
@@ -60,22 +70,22 @@ function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }
 
   const actions: TableAction[] = [];
   if (can("users.update")) {
-    actions.push({ icon: Pencil, label: "Edit user", onClick: () => setActiveDialog("edit") });
+    actions.push({ icon: Pencil, label: t("users.actions.edit"), onClick: () => setActiveDialog("edit") });
   }
   if (can("users.change_status")) {
-    actions.push({ icon: ToggleLeft, label: "Change status", onClick: () => setActiveDialog("status") });
+    actions.push({ icon: ToggleLeft, label: t("users.actions.change_status"), onClick: () => setActiveDialog("status") });
   }
   if (can("users.change_password")) {
-    actions.push({ icon: KeyRound, label: "Change password", onClick: () => setActiveDialog("password") });
+    actions.push({ icon: KeyRound, label: t("users.actions.change_password"), onClick: () => setActiveDialog("password") });
   }
   if (can("users.assign_roles")) {
-    actions.push({ icon: ShieldCheck, label: "Assign roles", onClick: () => setActiveDialog("roles") });
+    actions.push({ icon: ShieldCheck, label: t("users.actions.assign_roles"), onClick: () => setActiveDialog("roles") });
   }
   if (can("users.assign_branches")) {
-    actions.push({ icon: Waypoints, label: "Assign branches", onClick: () => setActiveDialog("branches") });
+    actions.push({ icon: Waypoints, label: t("users.actions.assign_branches"), onClick: () => setActiveDialog("branches") });
   }
   if (can("users.view")) {
-    actions.push({ icon: Eye, label: "Effective permissions", onClick: () => setActiveDialog("permissions") });
+    actions.push({ icon: Eye, label: t("users.actions.view_permissions"), onClick: () => setActiveDialog("permissions") });
   }
   if (
     can("users.delete") &&
@@ -85,7 +95,7 @@ function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }
   ) {
     actions.push({
       icon: Trash2,
-      label: "Delete permanently",
+      label: t("users.actions.delete"),
       onClick: () => setActiveDialog("delete"),
       variant: "destructive",
     });
@@ -134,8 +144,8 @@ function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }
         userName={user.name}
       />
       <ConfirmDialog
-        confirmLabel="Delete permanently"
-        description={`This permanently deletes ${user.name}. Use status changes for regular administration and reserve delete for cleanup of users without operational history.`}
+        confirmLabel={t("users.actions.delete")}
+        description={t("users.delete_dialog_description", { name: user.name })}
         onConfirm={handleDeleteConfirm}
         onOpenChange={(open) => {
           if (!open) {
@@ -143,18 +153,19 @@ function UserRowActions({ ownerCount, user }: { ownerCount: number; user: User }
           }
         }}
         open={activeDialog === "delete"}
-        title="Delete user permanently"
+        title={t("users.delete_dialog_title")}
       />
     </>
   );
 }
 
 function UsersTable({ data }: UsersTableProps) {
+  const { t } = useAppTranslator();
   const ownerCount = data.filter((user) => user.user_type === "owner").length;
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "name",
-      header: "User",
+      header: t("users.table.header_user"),
       cell: ({ row }) => (
         <div className="space-y-1">
           <p className="font-medium">{row.original.name}</p>
@@ -164,12 +175,12 @@ function UsersTable({ data }: UsersTableProps) {
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: t("users.table.header_status"),
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
     {
       accessorKey: "roles",
-      header: "Roles",
+      header: t("users.table.header_roles"),
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1.5">
           {row.original.roles.length ? (
@@ -179,36 +190,38 @@ function UsersTable({ data }: UsersTableProps) {
               </Badge>
             ))
           ) : (
-            <span className="text-sm text-muted-foreground">No roles</span>
+            <span className="text-sm text-muted-foreground">{t("users.table.no_roles")}</span>
           )}
         </div>
       ),
     },
     {
       accessorKey: "branch_ids",
-      header: "Branches",
+      header: t("users.table.header_branches"),
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">{row.original.branch_ids.length} assigned</span>
+        <span className="text-sm text-muted-foreground">
+          {t("users.table.branches_assigned", { count: String(row.original.branch_ids.length) })}
+        </span>
       ),
     },
     {
       accessorKey: "max_sale_discount",
-      header: "Max discount",
+      header: t("users.table.header_max_discount"),
       cell: ({ row }) => <span>{row.original.max_sale_discount}%</span>,
     },
     {
       accessorKey: "updated_at",
-      header: "Updated",
+      header: t("users.table.header_updated"),
       cell: ({ row }) => <span>{formatDateTime(row.original.updated_at)}</span>,
     },
     {
       id: "actions",
-      header: "Actions",
+      header: t("users.table.header_actions"),
       cell: ({ row }) => <UserRowActions ownerCount={ownerCount} user={row.original} />,
     },
   ];
 
-  return <DataTable columns={columns} data={data} emptyMessage="No users found." />;
+  return <DataTable columns={columns} data={data} emptyMessage={t("users.table.empty")} />;
 }
 
 export { UsersTable };

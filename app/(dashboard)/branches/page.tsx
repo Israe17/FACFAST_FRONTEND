@@ -16,6 +16,7 @@ import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { PageHeader } from "@/shared/components/page-header";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
 import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
@@ -24,6 +25,7 @@ export default function BranchesPage() {
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
   const [createTerminalOpen, setCreateTerminalOpen] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState<string>("");
+  const { t } = useAppTranslator();
   const {
     activeBranchId,
     availableBranchIds,
@@ -61,11 +63,15 @@ export default function BranchesPage() {
   if (!can("branches.view")) {
     return (
       <ErrorState
-        description="You do not have permission to view branches."
-        title="Access denied"
+        description={t("branches.page_access_denied")}
+        title={t("common.access_denied_title")}
       />
     );
   }
+
+  const activeBranchValue = isBusinessLevelContext
+    ? t("common.enterprise_level")
+    : (activeBranchId ?? t("common.none"));
 
   return (
     <>
@@ -74,49 +80,54 @@ export default function BranchesPage() {
           can("branches.create") ? (
             <Button onClick={() => setCreateBranchOpen(true)}>
               <Plus className="size-4" />
-              Create branch
+              {t("branches.create_button")}
             </Button>
           ) : null
         }
-        description="Manage branch metadata and terminal configuration without leaving the admin shell."
-        eyebrow="Administration"
-        title="Branches"
+        description={t("branches.page_description")}
+        eyebrow={t("branches.page_eyebrow")}
+        title={t("branches.page_title")}
       />
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">
-          Active context: {isBusinessLevelContext ? "Company level" : (activeBranchId ?? "None")}
+          {t("branches.active_context_badge", { value: activeBranchValue })}
         </Badge>
         <Badge variant="outline">Query source: /api/branches</Badge>
-        {selectedBranch ? <Badge variant="outline">Selected: {selectedBranch.name}</Badge> : null}
+        {selectedBranch ? (
+          <Badge variant="outline">
+            {t("branches.selected_badge", { name: selectedBranch.name })}
+          </Badge>
+        ) : null}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <DataCard
-          description="Branches returned by the backend for the authenticated tenant."
+          description={t("branches.stats.visible_branches_description")}
           icon={<Building2 className="size-5" />}
-          title="Visible branches"
+          title={t("branches.stats.visible_branches_title")}
           value={totalBranches}
         />
         <DataCard
-          description="Terminal count aggregated from the current branch list."
+          description={t("branches.stats.visible_terminals_description")}
           icon={<Monitor className="size-5" />}
-          title="Visible terminals"
+          title={t("branches.stats.visible_terminals_title")}
           value={totalTerminals}
         />
         <DataCard
-          description="The branch context used by the shared shell and switcher."
+          description={t("branches.stats.context_description")}
           icon={<Waypoints className="size-5" />}
-          title="Current branch context"
-          value={isBusinessLevelContext ? "Company level" : (activeBranchId ?? "None")}
+          title={t("branches.stats.context_title")}
+          value={activeBranchValue}
         />
       </div>
 
-      {branchesQuery.isLoading ? <LoadingState description="Loading branches." /> : null}
+      {branchesQuery.isLoading ? <LoadingState description={t("branches.loading_branches")} /> : null}
       {branchesQuery.isError ? (
         <ErrorState
           description={getTranslatedBackendErrorMessage(branchesQuery.error, {
-            fallbackMessage: "Unable to load branches.",
+            fallbackMessage: t("branches.load_error_fallback"),
+            translateMessage: t,
           }) ?? undefined}
           onRetry={() => branchesQuery.refetch()}
         />
@@ -127,13 +138,13 @@ export default function BranchesPage() {
             can("branches.create") ? (
               <Button onClick={() => setCreateBranchOpen(true)}>
                 <Plus className="size-4" />
-                Create branch
+                {t("branches.create_button")}
               </Button>
             ) : null
           }
-          description="Create the first branch to start configuring the multisucursal context."
+          description={t("branches.empty_description")}
           icon={Building2}
-          title="No branches found"
+          title={t("branches.empty_title")}
         />
       ) : null}
       {branchesQuery.data?.length ? (
@@ -149,10 +160,10 @@ export default function BranchesPage() {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
               <h2 className="text-2xl font-semibold tracking-tight">
-                {selectedBranch?.name ?? "Selected branch"}
+                {selectedBranch?.name ?? t("branches.selected_section_fallback")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Review and manage the terminals assigned to this branch.
+                {t("branches.selected_section_description")}
               </p>
             </div>
 
@@ -166,25 +177,26 @@ export default function BranchesPage() {
                   }}
                   variant="outline"
                 >
-                  Use as active context
+                  {t("branches.use_as_context_button")}
                 </Button>
               ) : null}
               {can("branches.create_terminal") && selectedBranch ? (
                 <Button onClick={() => setCreateTerminalOpen(true)}>
                   <Plus className="size-4" />
-                  Create terminal
+                  {t("branches.create_terminal_button")}
                 </Button>
               ) : null}
             </div>
           </div>
 
           {selectedBranchQuery.isLoading ? (
-            <LoadingState description="Loading branch detail and terminals." />
+            <LoadingState description={t("branches.detail.loading")} />
           ) : null}
           {selectedBranchQuery.isError ? (
             <ErrorState
               description={getTranslatedBackendErrorMessage(selectedBranchQuery.error, {
-                fallbackMessage: "Unable to load the selected branch.",
+                fallbackMessage: t("branches.selected_load_error_fallback"),
+                translateMessage: t,
               }) ?? undefined}
               onRetry={() => selectedBranchQuery.refetch()}
             />
@@ -193,21 +205,21 @@ export default function BranchesPage() {
             <>
               <div className="grid gap-4 lg:grid-cols-3">
                 <DataCard
-                  description="Active or inactive state returned by the backend."
+                  description={t("branches.detail.status_description")}
                   icon={<Building2 className="size-5" />}
-                  title="Branch status"
-                  value={selectedBranch.is_active ? "ACTIVE" : "INACTIVE"}
+                  title={t("branches.detail.status_title")}
+                  value={selectedBranch.is_active ? t("common.active_status") : t("common.inactive_status")}
                 />
                 <DataCard
-                  description="Branch code if available, otherwise the internal id."
+                  description={t("branches.detail.reference_description")}
                   icon={<Waypoints className="size-5" />}
-                  title="Reference"
+                  title={t("branches.detail.reference_title")}
                   value={selectedBranch.code ?? selectedBranch.id}
                 />
                 <DataCard
-                  description="Terminal count resolved from the branch detail endpoint."
+                  description={t("branches.detail.assigned_terminals_description")}
                   icon={<Monitor className="size-5" />}
-                  title="Assigned terminals"
+                  title={t("branches.detail.assigned_terminals_title")}
                   value={selectedBranch.terminals.length}
                 />
               </div>
@@ -220,13 +232,13 @@ export default function BranchesPage() {
                     can("branches.create_terminal") ? (
                       <Button onClick={() => setCreateTerminalOpen(true)}>
                         <Plus className="size-4" />
-                        Create terminal
+                        {t("branches.create_terminal_button")}
                       </Button>
                     ) : null
                   }
-                  description="This branch has no terminals yet."
+                  description={t("branches.no_terminals_description")}
                   icon={Monitor}
-                  title="No terminals found"
+                  title={t("branches.no_terminals_title")}
                 />
               )}
             </>

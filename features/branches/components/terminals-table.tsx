@@ -10,6 +10,7 @@ import { DataTable } from "@/shared/components/data-table";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import type { TableAction } from "@/shared/components/table-row-actions";
 import { usePermissions } from "@/shared/hooks/use-permissions";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { Terminal } from "../types";
@@ -22,8 +23,7 @@ type TerminalsTableProps = {
 };
 
 function TerminalStatusBadge({ isActive }: { isActive: boolean }) {
-  const label = isActive ? "ACTIVE" : "INACTIVE";
-
+  const { t } = useAppTranslator();
   return (
     <Badge
       className={
@@ -33,12 +33,13 @@ function TerminalStatusBadge({ isActive }: { isActive: boolean }) {
       }
       variant="outline"
     >
-      {label}
+      {isActive ? t("common.active_status") : t("common.inactive_status")}
     </Badge>
   );
 }
 
 function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal: Terminal }) {
+  const { t } = useAppTranslator();
   const { can } = usePermissions();
   const [activeDialog, setActiveDialog] = useState<"deactivate" | "delete" | "edit" | "reactivate" | null>(null);
   const updateTerminalMutation = useUpdateTerminalMutation(branchId, terminal.id);
@@ -46,18 +47,18 @@ function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal
 
   const actions: TableAction[] = [];
   if (can("branches.update_terminal")) {
-    actions.push({ icon: Pencil, label: "Edit terminal", onClick: () => setActiveDialog("edit") });
+    actions.push({ icon: Pencil, label: t("branches.terminals.actions.edit"), onClick: () => setActiveDialog("edit") });
     actions.push(
       terminal.is_active
         ? {
             icon: Power,
-            label: "Deactivate",
+            label: t("common.deactivate"),
             onClick: () => setActiveDialog("deactivate"),
             variant: "destructive",
           }
         : {
             icon: RotateCcw,
-            label: "Reactivate",
+            label: t("common.reactivate"),
             onClick: () => setActiveDialog("reactivate"),
           },
     );
@@ -65,7 +66,7 @@ function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal
   if (can("branches.delete_terminal")) {
     actions.push({
       icon: Trash2,
-      label: "Delete permanently",
+      label: t("common.delete_permanently"),
       onClick: () => setActiveDialog("delete"),
       variant: "destructive",
     });
@@ -88,21 +89,21 @@ function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal
   const dialogCopy =
     activeDialog === "delete"
       ? {
-          confirmLabel: "Delete permanently",
-          description: `This permanently deletes terminal ${terminal.name}. This action cannot be undone.`,
-          title: "Delete terminal permanently",
+          confirmLabel: t("common.delete_permanently"),
+          description: t("branches.terminals.delete_description", { name: terminal.name }),
+          title: t("branches.terminals.delete_title"),
         }
       : activeDialog === "deactivate"
         ? {
-            confirmLabel: "Deactivate",
-            description: `${terminal.name} will remain registered, but it should stop being used operationally.`,
-            title: "Deactivate terminal",
+            confirmLabel: t("common.deactivate"),
+            description: t("branches.terminals.deactivate_description", { name: terminal.name }),
+            title: t("branches.terminals.deactivate_title"),
           }
         : activeDialog === "reactivate"
           ? {
-              confirmLabel: "Reactivate",
-              description: `${terminal.name} will become available again for operational use.`,
-              title: "Reactivate terminal",
+              confirmLabel: t("common.reactivate"),
+              description: t("branches.terminals.reactivate_description", { name: terminal.name }),
+              title: t("branches.terminals.reactivate_title"),
             }
           : null;
 
@@ -134,37 +135,40 @@ function TerminalRowActions({ branchId, terminal }: { branchId: string; terminal
 }
 
 function TerminalsTable({ branchId, data }: TerminalsTableProps) {
+  const { t } = useAppTranslator();
   const columns: ColumnDef<Terminal>[] = [
     {
       accessorKey: "name",
-      header: "Terminal",
+      header: t("branches.terminals.table.header_terminal"),
       cell: ({ row }) => (
         <div className="space-y-1">
           <p className="font-medium">{row.original.name}</p>
           <p className="text-sm text-muted-foreground">
-            {row.original.code ? `Code: ${row.original.code}` : "No code provided."}
+            {row.original.code
+              ? t("branches.terminals.table.code_prefix", { code: row.original.code })
+              : t("branches.terminals.table.no_code")}
           </p>
         </div>
       ),
     },
     {
       accessorKey: "is_active",
-      header: "Status",
+      header: t("common.status"),
       cell: ({ row }) => <TerminalStatusBadge isActive={row.original.is_active} />,
     },
     {
       accessorKey: "updated_at",
-      header: "Updated",
+      header: t("common.updated"),
       cell: ({ row }) => <span>{formatDateTime(row.original.updated_at)}</span>,
     },
     {
       id: "actions",
-      header: "Actions",
+      header: t("common.actions"),
       cell: ({ row }) => <TerminalRowActions branchId={branchId} terminal={row.original} />,
     },
   ];
 
-  return <DataTable columns={columns} data={data} emptyMessage="No terminals found for this branch." />;
+  return <DataTable columns={columns} data={data} emptyMessage={t("branches.terminals.table.empty")} />;
 }
 
 export { TerminalsTable };

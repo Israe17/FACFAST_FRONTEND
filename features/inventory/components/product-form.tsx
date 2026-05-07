@@ -101,6 +101,23 @@ export function ProductForm({
     }
   }, [form, hasWarranty]);
 
+  const categoryId = form.watch("category_id");
+  useEffect(() => {
+    if (!categoryId) {
+      return;
+    }
+    const selectedCategory = categories.find((c) => c.id === categoryId);
+    if (!selectedCategory?.cabys_code) {
+      return;
+    }
+    const matchingProfile = taxProfiles.find(
+      (tp) => tp.cabys_code === selectedCategory.cabys_code && tp.is_active,
+    );
+    if (matchingProfile) {
+      form.setValue("tax_profile_id", matchingProfile.id, { shouldDirty: true });
+    }
+  }, [categoryId, categories, form, taxProfiles]);
+
   const compatibleTaxProfiles = taxProfiles.filter((taxProfile) => {
     if (!taxProfile.item_kind) {
       return true;

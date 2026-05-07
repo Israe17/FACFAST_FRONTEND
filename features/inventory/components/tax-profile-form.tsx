@@ -20,6 +20,7 @@ import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import type { CreateTaxProfileInput } from "../types";
+import { CabysSearchInput } from "./cabys-search-input";
 import { FormFieldError } from "./form-field-error";
 
 type TaxProfileFormProps = {
@@ -128,8 +129,17 @@ function TaxProfileForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="tax-profile-cabys">{t("inventory.form.cabys_code")}</Label>
-          <Input id="tax-profile-cabys" placeholder="1234567890123" {...form.register("cabys_code")} />
+          <Label>{t("inventory.form.cabys_code")}</Label>
+          <CabysSearchInput
+            onChange={(result) => {
+              form.setValue("cabys_code", result?.codigo ?? "", { shouldDirty: true });
+            }}
+            value={
+              form.watch("cabys_code")
+                ? { codigo: form.watch("cabys_code"), descripcion: "", impuesto: 0 }
+                : null
+            }
+          />
           <FormFieldError message={errors.cabys_code?.message} />
         </div>
       </div>

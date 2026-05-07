@@ -163,3 +163,71 @@ export async function lookupContactByIdentification(identification: string) {
     throw error;
   }
 }
+
+const haciendaActivitySchema = z.object({
+  codigo: z.string(),
+  descripcion: z.string(),
+  estado: z.string(),
+  tipo: z.string(),
+});
+
+const haciendaTaxpayerSchema = z.object({
+  actividades: z.array(haciendaActivitySchema).default([]),
+  nombre: z.string(),
+  regimen: z.object({ codigo: z.number(), descripcion: z.string() }),
+  situacion: z.object({
+    administracionTributaria: z.string(),
+    estado: z.string(),
+    moroso: z.string(),
+    omiso: z.string(),
+  }),
+  tipoIdentificacion: z.string(),
+});
+
+const haciendaExonerationSchema = z.object({
+  cabys: z.array(z.string()).default([]),
+  fechaEmision: z.string(),
+  fechaVencimiento: z.string(),
+  identificacion: z.string(),
+  nombreInstitucion: z.string(),
+  numeroDocumento: z.string(),
+  porcentajeExoneracion: z.coerce.number(),
+  poseeCabys: z.boolean().default(false),
+  tipoDocumento: z.object({ codigo: z.string(), descripcion: z.string() }),
+});
+
+export type HaciendaActivity = z.infer<typeof haciendaActivitySchema>;
+export type HaciendaTaxpayer = z.infer<typeof haciendaTaxpayerSchema>;
+export type HaciendaExoneration = z.infer<typeof haciendaExonerationSchema>;
+
+export async function lookupTaxpayer(identification: string): Promise<HaciendaTaxpayer | null> {
+  try {
+    const response = await http.get(
+      `/hacienda/taxpayer?identification=${encodeURIComponent(identification)}`,
+    );
+    return haciendaTaxpayerSchema.parse(
+      extractEntity(response.data, ["taxpayer"]),
+    );
+  } catch (error) {
+    if ((error as AxiosError | undefined)?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function verifyExoneration(authorization: string): Promise<HaciendaExoneration | null> {
+  try {
+    const response = await http.get(
+      `/hacienda/exoneration?authorization=${encodeURIComponent(authorization)}`,
+    );
+    return haciendaExonerationSchema.parse(
+      extractEntity(response.data, ["exoneration"]),
+    );
+  } catch (error) {
+    if ((error as AxiosError | undefined)?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}

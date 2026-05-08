@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,7 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import { resolveHaciendaIvaRateCode } from "../constants";
+import { deriveItemKindFromCabys, resolveHaciendaIvaRateCode } from "../constants";
 import type {
   Brand,
   CabysSearchResult,
@@ -105,25 +106,41 @@ export function ProductForm({
   }, [form, hasWarranty]);
 
   const categoryId = form.watch("category_id");
+  const cabysCode = form.watch("cabys_code");
   useEffect(() => {
     if (!categoryId) {
       return;
     }
-    if (form.getValues("cabys_code")) {
+    // If the operator already picked a CABYS manually, don't override.
+    if (cabysCode) {
       return;
     }
     const selectedCategory = categories.find((c) => c.id === categoryId);
-    const defaultTaxProfileId = selectedCategory?.default_tax_profile_id;
-    if (!defaultTaxProfileId) {
+    const profile = selectedCategory?.default_tax_profile;
+    if (!profile) {
       return;
     }
+    // Inherit CABYS + tax profile + product type from the category.
+    if (profile.cabys_code) {
+      form.setValue("cabys_code", profile.cabys_code, { shouldDirty: true });
+      form.setValue("cabys_descripcion", profile.description ?? profile.name, {
+        shouldDirty: true,
+      });
+      form.setValue("cabys_impuesto", profile.iva_rate ?? 13, {
+        shouldDirty: true,
+      });
+      const derived = deriveItemKindFromCabys(profile.cabys_code);
+      form.setValue("type", derived === "service" ? "service" : "product", {
+        shouldDirty: true,
+      });
+    }
     const matchingProfile = taxProfiles.find(
-      (tp) => tp.id === defaultTaxProfileId && tp.is_active,
+      (tp) => tp.id === profile.id && tp.is_active,
     );
     if (matchingProfile) {
       form.setValue("tax_profile_id", matchingProfile.id, { shouldDirty: true });
     }
-  }, [categoryId, categories, form, taxProfiles]);
+  }, [categoryId, categories, form, taxProfiles, cabysCode]);
 
   const compatibleTaxProfiles = taxProfiles.filter((taxProfile) => {
     if (!taxProfile.item_kind) {
@@ -156,12 +173,6 @@ export function ProductForm({
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="product-code">{t("inventory.common.code")}</Label>
-            <Input id="product-code" placeholder="PD-0001" {...form.register("code")} />
-            <FormFieldError message={errors.code?.message} />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="product-type">{t("inventory.form.type")}</Label>
             <Controller
@@ -254,6 +265,15 @@ export function ProductForm({
                 </Select>
               )}
             />
+            {(() => {
+              const cat = categories.find((c) => c.id === categoryId);
+              return cat?.default_tax_profile?.cabys_code ? (
+                <p className="text-xs text-muted-foreground">
+                  CABYS: <Badge variant="secondary" className="text-xs font-mono">{cat.default_tax_profile.cabys_code}</Badge>
+                  {cat.default_tax_profile.iva_rate != null ? ` — IVA ${cat.default_tax_profile.iva_rate}%` : null}
+                </p>
+              ) : null;
+            })()}
             <FormFieldError message={errors.category_id?.message} />
           </div>
 
@@ -300,6 +320,10 @@ export function ProductForm({
                 form.setValue("cabys_descripcion", result.descripcion, { shouldDirty: true });
                 form.setValue("cabys_impuesto", result.impuesto, { shouldDirty: true });
                 form.setValue("tax_profile_id", "", { shouldDirty: true });
+                const derivedType = deriveItemKindFromCabys(result.codigo);
+                form.setValue("type", derivedType === "service" ? "service" : "product", {
+                  shouldDirty: true,
+                });
               }}
               value={
                 form.watch("cabys_code")
@@ -311,14 +335,6 @@ export function ProductForm({
                   : null
               }
             />
-            <p className="text-xs text-muted-foreground">
-              {t("inventory.form.product_cabys_hint", {
-                code: resolveHaciendaIvaRateCode(form.watch("cabys_impuesto") ?? 13),
-              })}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t("inventory.form.product_cabys_optional_hint")}
-            </p>
             <FormFieldError message={errors.cabys_code?.message} />
           </div>
 

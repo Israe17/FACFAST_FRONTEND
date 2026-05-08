@@ -216,20 +216,18 @@ export function ProductForm({
         </div>
 
         {categoryHasCabys ? (
-          <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Badge variant="outline" className="text-xs">
-                {t(productTypeTranslationMap[productType] ?? "inventory.common.not_available")}
-              </Badge>
-              <span className="text-xs text-muted-foreground">/</span>
-              <span className="font-mono text-xs text-muted-foreground">{categoryProfile!.cabys_code}</span>
-              {categoryProfile!.iva_rate != null ? (
-                <>
-                  <span className="text-xs text-muted-foreground">/</span>
-                  <span className="text-xs font-medium">IVA {categoryProfile!.iva_rate}%</span>
-                </>
-              ) : null}
-            </div>
+          <div className="-mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-muted/50 px-3 py-2">
+            <Badge variant="outline" className="text-xs">
+              {t(productTypeTranslationMap[productType] ?? "inventory.common.not_available")}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              CABYS <span className="font-mono">{categoryProfile!.cabys_code}</span>
+            </span>
+            {categoryProfile!.iva_rate != null ? (
+              <span className="text-xs font-medium">
+                IVA {categoryProfile!.iva_rate}%
+              </span>
+            ) : null}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">

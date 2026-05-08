@@ -193,24 +193,13 @@ function TaxProfileForm({
             </div>
           ) : null}
 
-          <div className="space-y-2">
-            <Label>{t("inventory.form.item_kind")}</Label>
-            <div>
-              {cabysCode ? (
-                <Badge variant="outline">
-                  {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
-                </Badge>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  {t("inventory.form.item_kind_pending_cabys")}
-                </p>
-              )}
+          {cabysCode ? (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">
+                {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
+              </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t("inventory.form.item_kind_derived_hint")}
-            </p>
-            <FormFieldError message={errors.item_kind?.message} />
-          </div>
+          ) : null}
         </div>
 
         <div className="space-y-2">

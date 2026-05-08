@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
+import { deriveItemKindFromCabys, taxProfileItemKindTranslationMap } from "../constants";
 import type { CreateProductCategoryInput, ProductCategory } from "../types";
 import { CabysSearchInput } from "./cabys-search-input";
 import { FormFieldError } from "./form-field-error";
@@ -49,7 +51,7 @@ function ProductCategoryForm({
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
-  const itemKind = form.watch("item_kind");
+  const itemKind = form.watch("item_kind") ?? "goods";
   const cabysCode = form.watch("cabys_code");
   const cabysDescripcion = form.watch("cabys_descripcion");
   const cabysImpuesto = form.watch("cabys_impuesto");
@@ -59,28 +61,30 @@ function ProductCategoryForm({
     }
     return null;
   }, [cabysCode, cabysDescripcion, cabysImpuesto]);
+
+  // Keep item_kind in sync with whatever CABYS is currently selected.
+  // Auto-derives on mount (loading existing category) and on every CABYS change.
+  useEffect(() => {
+    const derived = deriveItemKindFromCabys(cabysCode);
+    if (derived !== form.getValues("item_kind")) {
+      form.setValue("item_kind", derived, { shouldDirty: true });
+    }
+  }, [cabysCode, form]);
+
   const availableParents = categories.filter((category) => category.id !== currentCategoryId);
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="category-code">{t("inventory.common.code")}</Label>
-          <Input id="category-code" placeholder={t("inventory.form.category_code_placeholder")} {...form.register("code")} />
-          <FormFieldError message={errors.code?.message} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="category-name">{t("inventory.common.name")}</Label>
-          <Input
-            id="category-name"
-            placeholder={t("inventory.entity.product_category")}
-            {...form.register("name")}
-          />
-          <FormFieldError message={errors.name?.message} />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="category-name">{t("inventory.common.name")}</Label>
+        <Input
+          id="category-name"
+          placeholder={t("inventory.entity.product_category")}
+          {...form.register("name")}
+        />
+        <FormFieldError message={errors.name?.message} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -132,33 +136,6 @@ function ProductCategoryForm({
           </p>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="category-item-kind">{t("inventory.form.category_item_kind")}</Label>
-          <Controller
-            control={form.control}
-            name="item_kind"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value ?? "goods"}>
-                <SelectTrigger id="category-item-kind">
-                  <SelectValue placeholder={t("inventory.form.select_item_kind")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="goods">
-                    {t("inventory.enum.tax_profile_item_kind.goods")}
-                  </SelectItem>
-                  <SelectItem value="service">
-                    {t("inventory.enum.tax_profile_item_kind.service")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <p className="text-xs text-muted-foreground">
-            {t("inventory.form.category_item_kind_description")}
-          </p>
-          <FormFieldError message={errors.item_kind?.message} />
-        </div>
-
         <CabysSearchInput
           onChange={(result) => {
             form.setValue("cabys_code", result?.codigo ?? "", { shouldDirty: true });
@@ -167,6 +144,18 @@ function ProductCategoryForm({
           }}
           value={currentCabys}
         />
+
+        <div className="space-y-1">
+          <Label>{t("inventory.form.category_item_kind")}</Label>
+          <div>
+            <Badge variant="outline">
+              {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("inventory.form.category_item_kind_derived_hint")}
+          </p>
+        </div>
       </div>
 
       <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">

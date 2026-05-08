@@ -396,7 +396,7 @@ const esTranslations = {
   "inventory.common.view": "Ver",
   "inventory.entity.brand": "marca",
   "inventory.entity.brands": "marcas",
-  "inventory.entity.category": "categoría",
+  "inventory.entity.category": "Categoría",
   "inventory.entity.measurement_unit": "unidad de medida",
   "inventory.entity.measurement_units": "unidades de medida",
   "inventory.entity.price_list": "lista de precios",

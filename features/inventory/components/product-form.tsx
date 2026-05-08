@@ -20,7 +20,7 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import { deriveItemKindFromCabys, resolveHaciendaIvaRateCode } from "../constants";
+import { deriveItemKindFromCabys, productTypeTranslationMap, resolveHaciendaIvaRateCode } from "../constants";
 import type {
   Brand,
   CabysSearchResult,
@@ -107,40 +107,33 @@ export function ProductForm({
 
   const categoryId = form.watch("category_id");
   const cabysCode = form.watch("cabys_code");
+  const selectedCategory = categories.find((c) => c.id === categoryId);
+  const categoryProfile = selectedCategory?.default_tax_profile ?? null;
+  const categoryHasCabys = Boolean(categoryProfile?.cabys_code);
+
   useEffect(() => {
-    if (!categoryId) {
+    if (!categoryId || !categoryProfile?.cabys_code) {
       return;
     }
-    // If the operator already picked a CABYS manually, don't override.
-    if (cabysCode) {
-      return;
-    }
-    const selectedCategory = categories.find((c) => c.id === categoryId);
-    const profile = selectedCategory?.default_tax_profile;
-    if (!profile) {
-      return;
-    }
-    // Inherit CABYS + tax profile + product type from the category.
-    if (profile.cabys_code) {
-      form.setValue("cabys_code", profile.cabys_code, { shouldDirty: true });
-      form.setValue("cabys_descripcion", profile.description ?? profile.name, {
-        shouldDirty: true,
-      });
-      form.setValue("cabys_impuesto", profile.iva_rate ?? 13, {
-        shouldDirty: true,
-      });
-      const derived = deriveItemKindFromCabys(profile.cabys_code);
-      form.setValue("type", derived === "service" ? "service" : "product", {
-        shouldDirty: true,
-      });
-    }
+    // Auto-fill everything from the category's tax profile.
+    form.setValue("cabys_code", categoryProfile.cabys_code, { shouldDirty: true });
+    form.setValue("cabys_descripcion", categoryProfile.description ?? categoryProfile.name, {
+      shouldDirty: true,
+    });
+    form.setValue("cabys_impuesto", categoryProfile.iva_rate ?? 13, {
+      shouldDirty: true,
+    });
+    const derived = deriveItemKindFromCabys(categoryProfile.cabys_code);
+    form.setValue("type", derived === "service" ? "service" : "product", {
+      shouldDirty: true,
+    });
     const matchingProfile = taxProfiles.find(
-      (tp) => tp.id === profile.id && tp.is_active,
+      (tp) => tp.id === categoryProfile.id && tp.is_active,
     );
     if (matchingProfile) {
       form.setValue("tax_profile_id", matchingProfile.id, { shouldDirty: true });
     }
-  }, [categoryId, categories, form, taxProfiles, cabysCode]);
+  }, [categoryId, categoryProfile, form, taxProfiles]);
 
   const compatibleTaxProfiles = taxProfiles.filter((taxProfile) => {
     if (!taxProfile.item_kind) {
@@ -172,30 +165,39 @@ export function ProductForm({
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="product-type">{t("inventory.form.type")}</Label>
-            <Controller
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="product-type">
-                    <SelectValue placeholder={t("inventory.form.select_type")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {productTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FormFieldError message={errors.type?.message} />
+        {categoryHasCabys ? (
+          <div className="flex items-center gap-2">
+            <Label>{t("inventory.form.type")}</Label>
+            <Badge variant="outline">
+              {t(productTypeTranslationMap[productType] ?? "inventory.common.not_available")}
+            </Badge>
           </div>
-        </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="product-type">{t("inventory.form.type")}</Label>
+              <Controller
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="product-type">
+                      <SelectValue placeholder={t("inventory.form.select_type")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {productTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FormFieldError message={errors.type?.message} />
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
@@ -265,15 +267,13 @@ export function ProductForm({
                 </Select>
               )}
             />
-            {(() => {
-              const cat = categories.find((c) => c.id === categoryId);
-              return cat?.default_tax_profile?.cabys_code ? (
-                <p className="text-xs text-muted-foreground">
-                  CABYS: <Badge variant="secondary" className="text-xs font-mono">{cat.default_tax_profile.cabys_code}</Badge>
-                  {cat.default_tax_profile.iva_rate != null ? ` — IVA ${cat.default_tax_profile.iva_rate}%` : null}
-                </p>
-              ) : null;
-            })()}
+              {categoryHasCabys ? (
+              <p className="text-xs text-muted-foreground">
+                CABYS: <Badge variant="secondary" className="text-xs font-mono">{categoryProfile!.cabys_code}</Badge>
+                {categoryProfile!.iva_rate != null ? ` — IVA ${categoryProfile!.iva_rate}%` : null}
+                {` — ${categoryProfile!.name}`}
+              </p>
+            ) : null}
             <FormFieldError message={errors.category_id?.message} />
           </div>
 
@@ -306,73 +306,77 @@ export function ProductForm({
             <FormFieldError message={errors.brand_id?.message} />
           </div>
 
-          <div className="space-y-2">
-            <Label>{t("inventory.form.cabys_code")}</Label>
-            <CabysSearchInput
-              onChange={(result: CabysSearchResult | null) => {
-                if (!result) {
-                  form.setValue("cabys_code", "", { shouldDirty: true });
-                  form.setValue("cabys_descripcion", "", { shouldDirty: true });
-                  form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
-                  return;
+          {categoryHasCabys ? null : (
+            <div className="space-y-2">
+              <Label>{t("inventory.form.cabys_code")}</Label>
+              <CabysSearchInput
+                onChange={(result: CabysSearchResult | null) => {
+                  if (!result) {
+                    form.setValue("cabys_code", "", { shouldDirty: true });
+                    form.setValue("cabys_descripcion", "", { shouldDirty: true });
+                    form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
+                    return;
+                  }
+                  form.setValue("cabys_code", result.codigo, { shouldDirty: true });
+                  form.setValue("cabys_descripcion", result.descripcion, { shouldDirty: true });
+                  form.setValue("cabys_impuesto", result.impuesto, { shouldDirty: true });
+                  form.setValue("tax_profile_id", "", { shouldDirty: true });
+                  const derivedType = deriveItemKindFromCabys(result.codigo);
+                  form.setValue("type", derivedType === "service" ? "service" : "product", {
+                    shouldDirty: true,
+                  });
+                }}
+                value={
+                  form.watch("cabys_code")
+                    ? {
+                        codigo: form.watch("cabys_code") ?? "",
+                        descripcion: form.watch("cabys_descripcion") ?? "",
+                        impuesto: form.watch("cabys_impuesto") ?? 0,
+                      }
+                    : null
                 }
-                form.setValue("cabys_code", result.codigo, { shouldDirty: true });
-                form.setValue("cabys_descripcion", result.descripcion, { shouldDirty: true });
-                form.setValue("cabys_impuesto", result.impuesto, { shouldDirty: true });
-                form.setValue("tax_profile_id", "", { shouldDirty: true });
-                const derivedType = deriveItemKindFromCabys(result.codigo);
-                form.setValue("type", derivedType === "service" ? "service" : "product", {
-                  shouldDirty: true,
-                });
-              }}
-              value={
-                form.watch("cabys_code")
-                  ? {
-                      codigo: form.watch("cabys_code") ?? "",
-                      descripcion: form.watch("cabys_descripcion") ?? "",
-                      impuesto: form.watch("cabys_impuesto") ?? 0,
-                    }
-                  : null
-              }
-            />
-            <FormFieldError message={errors.cabys_code?.message} />
-          </div>
+              />
+              <FormFieldError message={errors.cabys_code?.message} />
+            </div>
+          )}
 
-          <div className="space-y-2">
-            <Label htmlFor="product-tax-profile">{t("inventory.form.tax_profile")}</Label>
-            <Controller
-              control={form.control}
-              name="tax_profile_id"
-              render={({ field }) => (
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value === EMPTY_SELECT_VALUE ? "" : value);
-                    if (value !== EMPTY_SELECT_VALUE) {
-                      form.setValue("cabys_code", "", { shouldDirty: true });
-                      form.setValue("cabys_descripcion", "", { shouldDirty: true });
-                      form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
-                    }
-                  }}
-                  value={field.value || EMPTY_SELECT_VALUE}
-                >
-                  <SelectTrigger id="product-tax-profile">
-                    <SelectValue placeholder={t("inventory.form.select_tax_profile")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={EMPTY_SELECT_VALUE}>
-                      {t("inventory.form.product_tax_profile_auto")}
-                    </SelectItem>
-                    {compatibleTaxProfiles.filter((taxProfile) => taxProfile.is_active).map((taxProfile) => (
-                      <SelectItem key={taxProfile.id} value={taxProfile.id}>
-                        {taxProfile.name}
+          {categoryHasCabys ? null : (
+            <div className="space-y-2">
+              <Label htmlFor="product-tax-profile">{t("inventory.form.tax_profile")}</Label>
+              <Controller
+                control={form.control}
+                name="tax_profile_id"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value === EMPTY_SELECT_VALUE ? "" : value);
+                      if (value !== EMPTY_SELECT_VALUE) {
+                        form.setValue("cabys_code", "", { shouldDirty: true });
+                        form.setValue("cabys_descripcion", "", { shouldDirty: true });
+                        form.setValue("cabys_impuesto", undefined, { shouldDirty: true });
+                      }
+                    }}
+                    value={field.value || EMPTY_SELECT_VALUE}
+                  >
+                    <SelectTrigger id="product-tax-profile">
+                      <SelectValue placeholder={t("inventory.form.select_tax_profile")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>
+                        {t("inventory.form.product_tax_profile_auto")}
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FormFieldError message={errors.tax_profile_id?.message} />
-          </div>
+                      {compatibleTaxProfiles.filter((taxProfile) => taxProfile.is_active).map((taxProfile) => (
+                        <SelectItem key={taxProfile.id} value={taxProfile.id}>
+                          {taxProfile.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FormFieldError message={errors.tax_profile_id?.message} />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="product-stock-unit">{t("inventory.form.stock_unit")}</Label>

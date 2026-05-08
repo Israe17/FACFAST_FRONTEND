@@ -36,6 +36,7 @@ import type {
   CancelInventoryMovementInput,
   InventoryMovementLine,
 } from "../types";
+import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -193,12 +194,12 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           <>
             {movement.status ? (
               <Badge variant="outline">
-                {t(`inventory.enum.inventory_movement_status.${movement.status}` as const)}
+                {t(inventoryMovementStatusTranslationMap[movement.status] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
             {movement.movement_type ? (
               <Badge variant="outline">
-                {t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as const)}
+                {t(ledgerMovementTypeTranslationMap[movement.movement_type] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
             {movement.source_document_type === "SaleOrder" ||
@@ -253,7 +254,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">{t("inventory.form.movement_type")}</dt>
               <dd className="font-medium">
                 {movement.movement_type
-                  ? t(`inventory.enum.ledger_movement_type.${movement.movement_type}` as const)
+                  ? t(ledgerMovementTypeTranslationMap[movement.movement_type] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
               </dd>
             </div>
@@ -261,7 +262,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">{t("inventory.common.status")}</dt>
               <dd className="font-medium">
                 {movement.status
-                  ? t(`inventory.enum.inventory_movement_status.${movement.status}` as const)
+                  ? t(inventoryMovementStatusTranslationMap[movement.status] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
               </dd>
             </div>

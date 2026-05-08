@@ -187,6 +187,69 @@ export const productTypeTranslationMap: Record<string, FrontendTranslationKey> =
   service: "inventory.enum.product_type.service",
 };
 
+export const inventoryMovementStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  draft: "inventory.enum.inventory_movement_status.draft",
+  posted: "inventory.enum.inventory_movement_status.posted",
+  cancelled: "inventory.enum.inventory_movement_status.cancelled",
+  in_transit: "inventory.enum.inventory_movement_status.in_transit",
+  received: "inventory.enum.inventory_movement_status.received",
+  partially_received: "inventory.enum.inventory_movement_status.partially_received",
+};
+
+export const ledgerMovementTypeTranslationMap: Record<string, FrontendTranslationKey> = {
+  purchase_receipt: "inventory.enum.ledger_movement_type.purchase_receipt",
+  sales_dispatch: "inventory.enum.ledger_movement_type.sales_dispatch",
+  stock_adjustment: "inventory.enum.ledger_movement_type.stock_adjustment",
+  transfer: "inventory.enum.ledger_movement_type.transfer",
+  manual_correction: "inventory.enum.ledger_movement_type.manual_correction",
+  reservation: "inventory.enum.ledger_movement_type.reservation",
+  release: "inventory.enum.ledger_movement_type.release",
+  return_in: "inventory.enum.ledger_movement_type.return_in",
+  return_out: "inventory.enum.ledger_movement_type.return_out",
+  purchase_expected: "inventory.enum.ledger_movement_type.purchase_expected",
+  sales_allocated: "inventory.enum.ledger_movement_type.sales_allocated",
+  dispatch_cancelled: "inventory.enum.ledger_movement_type.dispatch_cancelled",
+  dispatch_return: "inventory.enum.ledger_movement_type.dispatch_return",
+};
+
+export const priceListKindTranslationMap: Record<string, FrontendTranslationKey> = {
+  retail: "inventory.enum.price_list_kind.retail",
+  wholesale: "inventory.enum.price_list_kind.wholesale",
+  credit: "inventory.enum.price_list_kind.credit",
+  special: "inventory.enum.price_list_kind.special",
+};
+
+export const promotionTypeTranslationMap: Record<string, FrontendTranslationKey> = {
+  percentage: "inventory.enum.promotion_type.percentage",
+  fixed_amount: "inventory.enum.promotion_type.fixed_amount",
+  buy_x_get_y: "inventory.enum.promotion_type.buy_x_get_y",
+  price_override: "inventory.enum.promotion_type.price_override",
+};
+
+export const serialStatusTranslationMap: Record<string, FrontendTranslationKey> = {
+  available: "inventory.enum.serial_status.available",
+  reserved: "inventory.enum.serial_status.reserved",
+  sold: "inventory.enum.serial_status.sold",
+  defective: "inventory.enum.serial_status.defective",
+  returned: "inventory.enum.serial_status.returned",
+};
+
+export const warehousePurposeTranslationMap: Record<string, FrontendTranslationKey> = {
+  saleable: "inventory.enum.warehouse_purpose.saleable",
+  reserve: "inventory.enum.warehouse_purpose.reserve",
+  damaged: "inventory.enum.warehouse_purpose.damaged",
+  returns: "inventory.enum.warehouse_purpose.returns",
+  transit: "inventory.enum.warehouse_purpose.transit",
+  production: "inventory.enum.warehouse_purpose.production",
+  general_storage: "inventory.enum.warehouse_purpose.general_storage",
+};
+
+export const warrantyDurationUnitTranslationMap: Record<string, FrontendTranslationKey> = {
+  days: "inventory.enum.warranty_duration_unit.days",
+  months: "inventory.enum.warranty_duration_unit.months",
+  years: "inventory.enum.warranty_duration_unit.years",
+};
+
 export const dispatchStatusColorMap: Record<string, string> = {
   draft: "bg-yellow-100 text-yellow-800",
   ready: "bg-blue-100 text-blue-800",

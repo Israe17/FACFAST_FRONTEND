@@ -2207,7 +2207,7 @@ const esTranslations = {
   "sales.documents.consecutive": "Consecutivo",
   "sales.documents.type_factura_electronica": "Factura Electrónica",
   "sales.documents.type_tiquete_electronico": "Tiquete Electrónico",
-  "sales.documents.type_nota_crédito": "Nota de Crédito",
+  "sales.documents.type_nota_credito": "Nota de Crédito",
   "sales.documents.type_nota_debito": "Nota de Débito",
   "auth.login_title": "Acceso administrativo",
   "auth.login_description": "Inicia sesión con tu cuenta actual. La sesión se mantiene con cookies HttpOnly.",

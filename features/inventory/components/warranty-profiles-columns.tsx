@@ -7,6 +7,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { WarrantyProfile } from "../types";
+import { warrantyDurationUnitTranslationMap } from "../constants";
 
 type GetWarrantyProfilesColumnsParams = {
   canDelete: boolean;
@@ -45,7 +46,7 @@ function getWarrantyProfilesColumns({
         <Badge variant="outline">
           {row.original.duration_value ?? 0}{" "}
           {row.original.duration_unit
-            ? t(`inventory.enum.warranty_duration_unit.${row.original.duration_unit}` as const)
+            ? t(warrantyDurationUnitTranslationMap[row.original.duration_unit] ?? "inventory.common.not_available")
             : t("inventory.enum.warranty_duration_unit.months")}
         </Badge>
       ),

@@ -10,6 +10,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryPriceListRoute } from "@/shared/lib/routes";
 
 import type { PriceList } from "../types";
+import { priceListKindTranslationMap } from "../constants";
 
 type GetPriceListsColumnsParams = {
   canDelete: boolean;
@@ -59,7 +60,7 @@ function getPriceListsColumns({
       cell: ({ row }) => (
         <Badge variant="outline">
           {row.original.kind
-            ? t(`inventory.enum.price_list_kind.${row.original.kind}` as const)
+            ? t(priceListKindTranslationMap[row.original.kind] ?? "inventory.common.not_available")
             : t("inventory.common.not_available")}
         </Badge>
       ),

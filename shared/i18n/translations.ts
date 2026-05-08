@@ -512,6 +512,8 @@ const esTranslations = {
     "Se determina automáticamente según el código CABYS seleccionado.",
   "inventory.form.item_kind_derived_hint":
     "Se determina automáticamente según el código CABYS seleccionado.",
+  "inventory.form.item_kind_pending_cabys":
+    "Selecciona un código CABYS para determinar si es bien o servicio.",
   "inventory.cabys.clear": "Quitar CABYS",
   "inventory.cabys.loading": "Buscando en Hacienda...",
   "inventory.cabys.min_chars": "Escribe al menos 3 caracteres",
@@ -2913,6 +2915,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Automatically derived from the selected CABYS code.",
     "inventory.form.item_kind_derived_hint":
       "Automatically derived from the selected CABYS code.",
+    "inventory.form.item_kind_pending_cabys":
+      "Pick a CABYS code to determine whether it is goods or service.",
     "inventory.cabys.clear": "Remove CABYS",
     "inventory.cabys.loading": "Searching Hacienda...",
     "inventory.cabys.min_chars": "Type at least 3 characters",

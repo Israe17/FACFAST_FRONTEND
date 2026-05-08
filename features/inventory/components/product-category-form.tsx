@@ -148,9 +148,15 @@ function ProductCategoryForm({
         <div className="space-y-1">
           <Label>{t("inventory.form.category_item_kind")}</Label>
           <div>
-            <Badge variant="outline">
-              {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
-            </Badge>
+            {cabysCode ? (
+              <Badge variant="outline">
+                {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
+              </Badge>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t("inventory.form.item_kind_pending_cabys")}
+              </p>
+            )}
           </div>
           <p className="text-xs text-muted-foreground">
             {t("inventory.form.category_item_kind_derived_hint")}

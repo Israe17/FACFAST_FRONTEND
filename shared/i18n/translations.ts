@@ -508,6 +508,10 @@ const esTranslations = {
   "inventory.form.category_item_kind": "Tipo de bien o servicio",
   "inventory.form.category_item_kind_description":
     "Determina el tipo del perfil fiscal que se crea automáticamente al asignar un código CABYS",
+  "inventory.form.category_item_kind_derived_hint":
+    "Se determina automáticamente según el código CABYS seleccionado.",
+  "inventory.form.item_kind_derived_hint":
+    "Se determina automáticamente según el código CABYS seleccionado.",
   "inventory.cabys.clear": "Quitar CABYS",
   "inventory.cabys.loading": "Buscando en Hacienda...",
   "inventory.cabys.min_chars": "Escribe al menos 3 caracteres",
@@ -2905,6 +2909,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.category_item_kind": "Type of good or service",
     "inventory.form.category_item_kind_description":
       "Determines the type of tax profile created automatically when a CABYS code is assigned",
+    "inventory.form.category_item_kind_derived_hint":
+      "Automatically derived from the selected CABYS code.",
+    "inventory.form.item_kind_derived_hint":
+      "Automatically derived from the selected CABYS code.",
     "inventory.cabys.clear": "Remove CABYS",
     "inventory.cabys.loading": "Searching Hacienda...",
     "inventory.cabys.min_chars": "Type at least 3 characters",

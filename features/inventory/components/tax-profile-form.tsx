@@ -4,6 +4,7 @@ import { useCallback, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,11 @@ import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
-import { resolveHaciendaIvaRateCode } from "../constants";
+import {
+  deriveItemKindFromCabys,
+  resolveHaciendaIvaRateCode,
+  taxProfileItemKindTranslationMap,
+} from "../constants";
 import type { CabysSearchResult, CreateTaxProfileInput } from "../types";
 import { CabysSearchInput } from "./cabys-search-input";
 import { FormFieldError } from "./form-field-error";
@@ -48,19 +53,13 @@ function TaxProfileForm({
   const requiresCabys = form.watch("requires_cabys");
   const allowsExoneration = form.watch("allows_exoneration");
   const cabysCode = form.watch("cabys_code");
+  const itemKind = form.watch("item_kind") ?? "goods";
   const ivaRate = form.watch("iva_rate");
   const ivaRateCode = form.watch("iva_rate_code");
   const taxInclusionMode = form.watch("tax_inclusion_mode");
   const currentCabys = useMemo(
     () => (cabysCode ? { codigo: cabysCode, descripcion: "", impuesto: ivaRate ?? 0 } : null),
     [cabysCode, ivaRate],
-  );
-  const taxProfileItemKindOptions = useMemo(
-    () => [
-      { label: t("inventory.enum.tax_profile_item_kind.goods"), value: "goods" },
-      { label: t("inventory.enum.tax_profile_item_kind.service"), value: "service" },
-    ],
-    [t],
   );
   const taxTypeOptions = useMemo(
     () => [
@@ -86,6 +85,9 @@ function TaxProfileForm({
         return;
       }
       form.setValue("cabys_code", result.codigo, { shouldDirty: true });
+      form.setValue("item_kind", deriveItemKindFromCabys(result.codigo), {
+        shouldDirty: true,
+      });
       const rate = result.impuesto;
       const nextTaxType = rate === 0 ? "exento" : "iva";
       form.setValue("tax_type", nextTaxType, { shouldDirty: true });
@@ -192,25 +194,15 @@ function TaxProfileForm({
           ) : null}
 
           <div className="space-y-2">
-            <Label htmlFor="tax-profile-item-kind">{t("inventory.form.item_kind")}</Label>
-            <Controller
-              control={form.control}
-              name="item_kind"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="tax-profile-item-kind">
-                    <SelectValue placeholder={t("inventory.form.select_item_kind")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {taxProfileItemKindOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
+            <Label>{t("inventory.form.item_kind")}</Label>
+            <div>
+              <Badge variant="outline">
+                {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("inventory.form.item_kind_derived_hint")}
+            </p>
             <FormFieldError message={errors.item_kind?.message} />
           </div>
         </div>

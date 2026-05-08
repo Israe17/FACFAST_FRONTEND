@@ -136,6 +136,36 @@ export function resolveHaciendaIvaRateCode(rate: number): string {
   return HACIENDA_IVA_RATE_CODES[rate] ?? "08";
 }
 
+/**
+ * Derive item_kind (goods | service) from a CABYS code.
+ *
+ * Based on the official Costa Rica CABYS catalog (Hacienda) sections:
+ *  - Sections 1-4 (codes starting with 1-4): physical goods (bienes)
+ *      1: Agricultural / forestry / fishing products
+ *      2: Minerals, electricity, gas, water
+ *      3: Food, beverages, tobacco
+ *      4: Other transportable goods
+ *  - Sections 5-9 (codes starting with 5-9): services
+ *      5: Construction services
+ *      6: Distributive trade services
+ *      7: Lodging, food, transport services
+ *      8: Business services
+ *      9: Community / personal services
+ *
+ * Returns "goods" for empty / non-numeric input as a safe default.
+ */
+export function deriveItemKindFromCabys(cabysCode: string | null | undefined): "goods" | "service" {
+  const trimmed = (cabysCode ?? "").trim();
+  if (trimmed.length === 0) {
+    return "goods";
+  }
+  const firstDigit = trimmed.charAt(0);
+  if (firstDigit >= "5" && firstDigit <= "9") {
+    return "service";
+  }
+  return "goods";
+}
+
 export const productTypeOptions = [
   { label: "Product", value: "product" },
   { label: "Service", value: "service" },

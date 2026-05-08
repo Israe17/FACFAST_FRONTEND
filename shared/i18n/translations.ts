@@ -1160,6 +1160,9 @@ const esTranslations = {
   "inventory.products.inventory_track_lots_expiration":
     "Rastrea lotes + expiración",
   "inventory.products.inventory_track_only": "Rastrea inventario",
+  "inventory.product_fiscal_data_required":
+    "El producto no tiene perfil fiscal asignado. Completa los datos fiscales antes de venderlo.",
+  "inventory.products.missing_tax_profile": "⚠ Sin perfil fiscal",
   "inventory.products.no_commercial_reference": "Sin referencia comercial",
   "inventory.products.operational_behavior_description":
     "Los flags de inventario solo aplican a productos reales, no a servicios.",
@@ -1743,6 +1746,13 @@ const esTranslations = {
     "La orden no puede cancelarse porque ya tiene operaciones logísticas.",
   "sales.order_delete_not_allowed":
     "La orden no puede eliminarse en su estado actual.",
+  "sales.final_consumer": "Cliente final",
+  "sales.final_consumer_description":
+    "Venta a consumidor final sin identificacion. La factura se emite sin receptor especifico.",
+  "sales.invoice_readiness.email_or_phone_required":
+    "El contacto necesita al menos correo o telefono para recibir la factura electronica.",
+  "sales.order_customer_contact_required":
+    "Selecciona un cliente para la orden. Solo se puede omitir para ventas a cliente final.",
   "sales.order_not_found": "La orden de venta no existe.",
   "sales.order_not_confirmed": "La orden de venta no esta confirmada.",
   "sales.line_not_found": "La linea de la orden no existe.",
@@ -3549,6 +3559,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.products.inventory_track_lots_expiration":
       "Track lots + expiration",
     "inventory.products.inventory_track_only": "Track inventory",
+    "inventory.product_fiscal_data_required":
+      "Product has no tax profile. Complete its fiscal data before selling.",
+    "inventory.products.missing_tax_profile": "⚠ No tax profile",
     "inventory.products.no_commercial_reference": "No commercial reference",
     "inventory.products.operational_behavior_description":
       "Inventory flags are only available for real products, not services.",
@@ -4143,6 +4156,13 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The order cannot be cancelled because it already has logistics operations.",
     "sales.order_delete_not_allowed":
       "The order cannot be deleted in its current state.",
+    "sales.final_consumer": "Final consumer",
+    "sales.final_consumer_description":
+      "Sale to final consumer without identification. Invoice is emitted without a specific receiver.",
+    "sales.invoice_readiness.email_or_phone_required":
+      "Contact needs at least email or phone to receive the electronic invoice.",
+    "sales.order_customer_contact_required":
+      "Select a customer for the order. Only final consumer orders can omit the customer.",
     "sales.order_not_found": "The sale order does not exist.",
     "sales.order_not_confirmed": "The sale order is not confirmed.",
     "sales.line_not_found": "The order line does not exist.",

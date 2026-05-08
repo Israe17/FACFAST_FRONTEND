@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { formatDateTime } from "@/shared/lib/utils";
 
+import { taxProfileItemKindTranslationMap, taxTypeTranslationMap } from "../constants";
 import type { TaxProfile } from "../types";
 
 type GetTaxProfilesColumnsParams = {
@@ -40,7 +41,7 @@ export function getTaxProfilesColumns({
       cell: ({ row }) => (
         <Badge variant="outline">
           {row.original.item_kind
-            ? t(`inventory.enum.tax_profile_item_kind.${row.original.item_kind}` as const)
+            ? t(taxProfileItemKindTranslationMap[row.original.item_kind] ?? "inventory.common.not_available")
             : t("inventory.common.not_available")}
         </Badge>
       ),
@@ -52,7 +53,7 @@ export function getTaxProfilesColumns({
         <div className="space-y-1">
           <Badge variant="outline">
             {row.original.tax_type
-              ? t(`inventory.enum.tax_type.${row.original.tax_type}` as const)
+              ? t(taxTypeTranslationMap[row.original.tax_type] ?? "inventory.common.not_available")
               : t("inventory.common.not_available")}
           </Badge>
           {row.original.tax_type === "iva" && row.original.iva_rate !== undefined ? (

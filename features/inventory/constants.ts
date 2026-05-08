@@ -170,6 +170,23 @@ export const dispatchExpenseTypeValues = ["fuel", "tolls", "per_diem", "driver_p
 
 import type { FrontendTranslationKey } from "@/shared/i18n/translations";
 
+export const taxProfileItemKindTranslationMap: Record<string, FrontendTranslationKey> = {
+  goods: "inventory.enum.tax_profile_item_kind.goods",
+  service: "inventory.enum.tax_profile_item_kind.service",
+};
+
+export const taxTypeTranslationMap: Record<string, FrontendTranslationKey> = {
+  iva: "inventory.enum.tax_type.iva",
+  exento: "inventory.enum.tax_type.exento",
+  no_sujeto: "inventory.enum.tax_type.no_sujeto",
+  specific_tax: "inventory.enum.tax_type.specific_tax",
+};
+
+export const productTypeTranslationMap: Record<string, FrontendTranslationKey> = {
+  product: "inventory.enum.product_type.product",
+  service: "inventory.enum.product_type.service",
+};
+
 export const dispatchStatusColorMap: Record<string, string> = {
   draft: "bg-yellow-100 text-yellow-800",
   ready: "bg-blue-100 text-blue-800",

@@ -157,55 +157,39 @@ export function ProductForm({
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
-      {/* --- Categoría primero: define el comportamiento fiscal --- */}
+      {/* --- 1. Categoría + clasificación fiscal --- */}
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
-        <div className="space-y-2">
-          <Label htmlFor="product-category">{t("inventory.entity.category")}</Label>
-          <Controller
-            control={form.control}
-            name="category_id"
-            render={({ field }) => (
-              <Select
-                onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)}
-                value={field.value || EMPTY_SELECT_VALUE}
-              >
-                <SelectTrigger id="product-category">
-                  <SelectValue placeholder={t("inventory.form.no_category")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={EMPTY_SELECT_VALUE}>
-                    {t("inventory.form.no_category")}
-                  </SelectItem>
-                  {categories.filter((category) => category.is_active).map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="product-category">{t("inventory.entity.category")}</Label>
+            <Controller
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <Select
+                  onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)}
+                  value={field.value || EMPTY_SELECT_VALUE}
+                >
+                  <SelectTrigger id="product-category">
+                    <SelectValue placeholder={t("inventory.form.no_category")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>
+                      {t("inventory.form.no_category")}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FormFieldError message={errors.category_id?.message} />
-        </div>
-
-        {categoryHasCabys ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">
-              {t(productTypeTranslationMap[productType] ?? "inventory.common.not_available")}
-            </Badge>
-            <Badge variant="secondary" className="font-mono text-xs">
-              {categoryProfile!.cabys_code}
-            </Badge>
-            {categoryProfile!.iva_rate != null ? (
-              <Badge variant="secondary" className="text-xs">
-                IVA {categoryProfile!.iva_rate}%
-              </Badge>
-            ) : null}
+                    {categories.filter((category) => category.is_active).map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FormFieldError message={errors.category_id?.message} />
           </div>
-        ) : null}
 
-        {categoryHasCabys ? null : (
-          <div className="grid gap-4 md:grid-cols-2">
+          {categoryHasCabys ? null : (
             <div className="space-y-2">
               <Label htmlFor="product-type">{t("inventory.form.type")}</Label>
               <Controller
@@ -228,7 +212,27 @@ export function ProductForm({
               />
               <FormFieldError message={errors.type?.message} />
             </div>
+          )}
+        </div>
 
+        {categoryHasCabys ? (
+          <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline" className="text-xs">
+                {t(productTypeTranslationMap[productType] ?? "inventory.common.not_available")}
+              </Badge>
+              <span className="text-xs text-muted-foreground">/</span>
+              <span className="font-mono text-xs text-muted-foreground">{categoryProfile!.cabys_code}</span>
+              {categoryProfile!.iva_rate != null ? (
+                <>
+                  <span className="text-xs text-muted-foreground">/</span>
+                  <span className="text-xs font-medium">IVA {categoryProfile!.iva_rate}%</span>
+                </>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>{t("inventory.form.cabys_code")}</Label>
               <CabysSearchInput
@@ -300,7 +304,7 @@ export function ProductForm({
         )}
       </section>
 
-      {/* --- Identidad del producto --- */}
+      {/* --- 2. Identidad del producto --- */}
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">

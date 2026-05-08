@@ -10,6 +10,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryWarehouseRoute } from "@/shared/lib/routes";
 
 import type { Warehouse } from "../types";
+import { warehousePurposeTranslationMap } from "../constants";
 
 type GetWarehousesColumnsParams = {
   branchNameById: Map<string, string>;
@@ -63,7 +64,7 @@ function getWarehousesColumns({
       header: t("inventory.form.purpose"),
       cell: ({ row }) =>
         row.original.purpose
-          ? t(`inventory.enum.warehouse_purpose.${row.original.purpose}` as const)
+          ? t(warehousePurposeTranslationMap[row.original.purpose] ?? "inventory.common.not_available")
           : t("inventory.common.not_available"),
     },
     {

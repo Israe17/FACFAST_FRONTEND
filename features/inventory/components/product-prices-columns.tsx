@@ -7,6 +7,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { ProductPrice } from "../types";
+import { priceListKindTranslationMap } from "../constants";
 
 function formatPrice(value: number | undefined, currency = "CRC") {
   if (value === undefined) {
@@ -46,7 +47,7 @@ export function getProductPricesColumns({
           </p>
           <Badge variant="outline">
             {row.original.price_list?.kind
-              ? t(`inventory.enum.price_list_kind.${row.original.price_list.kind}` as const)
+              ? t(priceListKindTranslationMap[row.original.price_list.kind] ?? "inventory.common.not_available")
               : t("inventory.common.not_available")}
           </Badge>
         </div>

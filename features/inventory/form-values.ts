@@ -143,6 +143,7 @@ export const emptyTaxProfileFormValues: CreateTaxProfileInput = {
   requires_cabys: true,
   specific_tax_name: "",
   specific_tax_rate: undefined,
+  tax_inclusion_mode: "added",
   tax_type: "iva",
 };
 
@@ -160,6 +161,7 @@ export function getTaxProfileFormValues(taxProfile: TaxProfile): CreateTaxProfil
     requires_cabys: taxProfile.requires_cabys,
     specific_tax_name: taxProfile.specific_tax_name ?? "",
     specific_tax_rate: taxProfile.specific_tax_rate,
+    tax_inclusion_mode: taxProfile.tax_inclusion_mode ?? "added",
     tax_type: taxProfile.tax_type ?? "iva",
   };
 }
@@ -190,6 +192,9 @@ export const emptyProductFormValues: CreateProductInput = {
   allow_negative_stock: false,
   barcode: "",
   brand_id: "",
+  cabys_code: "",
+  cabys_descripcion: "",
+  cabys_impuesto: undefined,
   category_id: "",
   code: "",
   description: "",
@@ -214,6 +219,9 @@ export function getProductFormValues(product: Product): CreateProductInput {
     allow_negative_stock: product.allow_negative_stock,
     barcode: product.barcode ?? "",
     brand_id: product.brand?.id ?? "",
+    cabys_code: product.tax_profile?.cabys_code ?? "",
+    cabys_descripcion: "",
+    cabys_impuesto: undefined,
     category_id: product.category?.id ?? "",
     code: product.code ?? "",
     description: product.description ?? "",

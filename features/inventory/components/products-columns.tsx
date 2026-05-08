@@ -9,6 +9,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryProductRoute } from "@/shared/lib/routes";
 
+import { productTypeTranslationMap } from "../constants";
 import type { Product } from "../types";
 
 export function getProductsColumns({
@@ -56,7 +57,7 @@ export function getProductsColumns({
       cell: ({ row }) => (
         <Badge variant="outline">
           {row.original.type
-            ? t(`inventory.enum.product_type.${row.original.type}` as const)
+            ? t(productTypeTranslationMap[row.original.type] ?? "inventory.common.not_available")
             : t("inventory.common.not_available")}
         </Badge>
       ),
@@ -64,7 +65,14 @@ export function getProductsColumns({
     {
       accessorKey: "tax_profile",
       header: t("inventory.form.tax_profile"),
-      cell: ({ row }) => row.original.tax_profile?.name ?? t("inventory.common.not_available"),
+      cell: ({ row }) =>
+        row.original.tax_profile ? (
+          <span>{row.original.tax_profile.name}</span>
+        ) : (
+          <Badge className="border-transparent bg-amber-100 text-amber-700">
+            {t("inventory.products.missing_tax_profile")}
+          </Badge>
+        ),
     },
     {
       accessorKey: "track_inventory",

@@ -21,7 +21,7 @@ const esTranslations = {
   "branches.form.branch_name": "Nombre de sucursal",
   "branches.form.branch_number": "Número de sucursal",
   "branches.form.business_name": "Nombre comercial",
-  "branches.form.cantón": "Cantón",
+  "branches.form.canton": "Cantón",
   "branches.form.cedula_juridica": "Cedula juridica",
   "branches.form.cert_path": "Ruta del certificado",
   "branches.form.city": "Ciudad",
@@ -282,7 +282,7 @@ const esTranslations = {
   "contacts.field.economic_activity": "Actividad economica",
   "contacts.field.address": "Direccion",
   "contacts.field.province": "Provincia",
-  "contacts.field.cantón": "Cantón",
+  "contacts.field.canton": "Cantón",
   "contacts.field.district": "Distrito",
   "contacts.field.exoneration_type": "Tipo de exoneración",
   "contacts.field.exoneration_document": "Número de documento",
@@ -491,6 +491,19 @@ const esTranslations = {
   "inventory.form.tax_profile_identity_section_description":
     "Nombre y descripción para identificar este perfil al asignarlo a productos o categorías.",
   "inventory.form.iva_rate_code_hint": "Código Hacienda derivado de la tasa: {code}",
+  "inventory.form.product_cabys_hint":
+    "Si se selecciona un CABYS, el perfil fiscal se asigna o crea automáticamente. Código Hacienda derivado: {code}.",
+  "inventory.form.product_cabys_optional_hint":
+    "Puedes dejarlo vacío y completarlo después. No podrás vender el producto en factura electrónica hasta que tenga CABYS o perfil fiscal.",
+  "inventory.form.product_tax_profile_auto": "Auto (desde CABYS o categoría)",
+  "inventory.form.tax_inclusion_mode": "Impuesto sobre el precio",
+  "inventory.form.select_tax_inclusion_mode": "Selecciona modo de inclusión",
+  "inventory.form.tax_inclusion_mode_added_hint":
+    "El precio del producto es neto. El IVA se suma al vender.",
+  "inventory.form.tax_inclusion_mode_included_hint":
+    "El precio del producto ya incluye IVA. Al vender, se desglosa el monto del IVA.",
+  "inventory.enum.tax_inclusion_mode.added": "Adicional al precio",
+  "inventory.enum.tax_inclusion_mode.included": "Incluido en el precio",
   "inventory.form.category_code_placeholder": "Ej: CG-0001",
   "inventory.form.category_item_kind": "Tipo de bien o servicio",
   "inventory.form.category_item_kind_description":
@@ -638,7 +651,7 @@ const esTranslations = {
   "inventory.zones.detail.global": "Global",
   "inventory.zones.detail.scoped": "Por sucursal",
   "inventory.zones.detail.province": "Provincia",
-  "inventory.zones.detail.cantón": "Cantón",
+  "inventory.zones.detail.canton": "Cantón",
   "inventory.zones.detail.district": "Distrito",
   "inventory.zones.detail.branches_count": "Sucursales",
   "inventory.zones.detail.branches_assigned": "Sucursales asignadas a esta zona.",
@@ -658,7 +671,7 @@ const esTranslations = {
   "inventory.form.active_route": "Ruta activa",
   "inventory.form.active_route_description": "Las rutas inactivas se conservan para historial sin usarse operativamente.",
   "inventory.form.province": "Provincia",
-  "inventory.form.cantón": "Cantón",
+  "inventory.form.canton": "Cantón",
   "inventory.form.district": "Distrito",
   "inventory.brands.delete_title": "Eliminar marca",
   "inventory.brands.delete_description":
@@ -668,7 +681,7 @@ const esTranslations = {
   "inventory.brands.section_description":
     "Catálogo comercial de marcas que luego usan productos y precios.",
   "inventory.zones.province": "Provincia",
-  "inventory.zones.cantón": "Cantón",
+  "inventory.zones.canton": "Cantón",
   "inventory.zones.district": "Distrito",
   "inventory.zones.location": "Ubicación",
   "inventory.vehicles.plate_number": "Placa",
@@ -1147,6 +1160,9 @@ const esTranslations = {
   "inventory.products.inventory_track_lots_expiration":
     "Rastrea lotes + expiración",
   "inventory.products.inventory_track_only": "Rastrea inventario",
+  "inventory.product_fiscal_data_required":
+    "El producto no tiene perfil fiscal asignado. Completa los datos fiscales antes de venderlo.",
+  "inventory.products.missing_tax_profile": "⚠ Sin perfil fiscal",
   "inventory.products.no_commercial_reference": "Sin referencia comercial",
   "inventory.products.operational_behavior_description":
     "Los flags de inventario solo aplican a productos reales, no a servicios.",
@@ -1682,7 +1698,7 @@ const esTranslations = {
   "sales.form.warehouse_id": "Bodega",
   "sales.form.delivery_address": "Dirección de entrega",
   "sales.form.delivery_province": "Provincia",
-  "sales.form.delivery_cantón": "Cantón",
+  "sales.form.delivery_canton": "Cantón",
   "sales.form.delivery_district": "Distrito",
   "sales.form.delivery_zone_id": "Zona de entrega",
   "sales.form.delivery_requested_date": "Fecha solicitada",
@@ -1730,6 +1746,13 @@ const esTranslations = {
     "La orden no puede cancelarse porque ya tiene operaciones logísticas.",
   "sales.order_delete_not_allowed":
     "La orden no puede eliminarse en su estado actual.",
+  "sales.final_consumer": "Cliente final",
+  "sales.final_consumer_description":
+    "Venta a consumidor final sin identificacion. La factura se emite sin receptor especifico.",
+  "sales.invoice_readiness.email_or_phone_required":
+    "El contacto necesita al menos correo o telefono para recibir la factura electronica.",
+  "sales.order_customer_contact_required":
+    "Selecciona un cliente para la orden. Solo se puede omitir para ventas a cliente final.",
   "sales.order_not_found": "La orden de venta no existe.",
   "sales.order_not_confirmed": "La orden de venta no esta confirmada.",
   "sales.line_not_found": "La linea de la orden no existe.",
@@ -2183,8 +2206,8 @@ const esTranslations = {
   "sales.documents.document_key": "Clave",
   "sales.documents.consecutive": "Consecutivo",
   "sales.documents.type_factura_electronica": "Factura Electrónica",
-  "sales.documents.type_tiquete_electrónico": "Tiquete Electrónico",
-  "sales.documents.type_nota_crédito": "Nota de Crédito",
+  "sales.documents.type_tiquete_electronico": "Tiquete Electrónico",
+  "sales.documents.type_nota_credito": "Nota de Crédito",
   "sales.documents.type_nota_debito": "Nota de Débito",
   "auth.login_title": "Acceso administrativo",
   "auth.login_description": "Inicia sesión con tu cuenta actual. La sesión se mantiene con cookies HttpOnly.",
@@ -2865,6 +2888,19 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.form.tax_profile_identity_section_description":
       "Name and description used to identify this profile when assigning it to products or categories.",
     "inventory.form.iva_rate_code_hint": "Hacienda code derived from the rate: {code}",
+    "inventory.form.product_cabys_hint":
+      "Selecting a CABYS auto-assigns or creates the tax profile. Derived Hacienda code: {code}.",
+    "inventory.form.product_cabys_optional_hint":
+      "You can leave this empty and complete it later. The product cannot be sold via electronic invoice until it has a CABYS or tax profile.",
+    "inventory.form.product_tax_profile_auto": "Auto (from CABYS or category)",
+    "inventory.form.tax_inclusion_mode": "Tax on price",
+    "inventory.form.select_tax_inclusion_mode": "Select inclusion mode",
+    "inventory.form.tax_inclusion_mode_added_hint":
+      "Product price is net. Tax is added on top when invoicing.",
+    "inventory.form.tax_inclusion_mode_included_hint":
+      "Product price already includes tax. The tax amount is broken out at sale time.",
+    "inventory.enum.tax_inclusion_mode.added": "Added to price",
+    "inventory.enum.tax_inclusion_mode.included": "Included in price",
     "inventory.form.category_code_placeholder": "E.g.: CG-0001",
     "inventory.form.category_item_kind": "Type of good or service",
     "inventory.form.category_item_kind_description":
@@ -3523,6 +3559,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.products.inventory_track_lots_expiration":
       "Track lots + expiration",
     "inventory.products.inventory_track_only": "Track inventory",
+    "inventory.product_fiscal_data_required":
+      "Product has no tax profile. Complete its fiscal data before selling.",
+    "inventory.products.missing_tax_profile": "⚠ No tax profile",
     "inventory.products.no_commercial_reference": "No commercial reference",
     "inventory.products.operational_behavior_description":
       "Inventory flags are only available for real products, not services.",
@@ -4117,6 +4156,13 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The order cannot be cancelled because it already has logistics operations.",
     "sales.order_delete_not_allowed":
       "The order cannot be deleted in its current state.",
+    "sales.final_consumer": "Final consumer",
+    "sales.final_consumer_description":
+      "Sale to final consumer without identification. Invoice is emitted without a specific receiver.",
+    "sales.invoice_readiness.email_or_phone_required":
+      "Contact needs at least email or phone to receive the electronic invoice.",
+    "sales.order_customer_contact_required":
+      "Select a customer for the order. Only final consumer orders can omit the customer.",
     "sales.order_not_found": "The sale order does not exist.",
     "sales.order_not_confirmed": "The sale order is not confirmed.",
     "sales.line_not_found": "The order line does not exist.",

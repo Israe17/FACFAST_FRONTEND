@@ -28,6 +28,7 @@ import type {
   WarehouseLocation,
   WarehouseStockRow,
 } from "../types";
+import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap, warehousePurposeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -139,7 +140,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             <span className="font-medium">{m.code ?? m.id}</span>
             {m.status ? (
               <Badge variant={m.status === "posted" ? "default" : "outline"} className="ml-1.5 text-[10px] px-1.5 py-0">
-                {t(`inventory.enum.inventory_movement_status.${m.status}` as const)}
+                {t(inventoryMovementStatusTranslationMap[m.status] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
             {m.notes ? (
@@ -155,7 +156,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
       cell: ({ row }) => {
         const m = row.original;
         if (m.movement_type) {
-          return t(`inventory.enum.ledger_movement_type.${m.movement_type}` as const);
+          return t(ledgerMovementTypeTranslationMap[m.movement_type] ?? "inventory.common.not_available");
         }
         // Infer type from source_document_type or notes
         if (m.source_document_type) {
@@ -213,7 +214,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
             {warehouse.is_default ? <Badge>{t("inventory.form.default_warehouse")}</Badge> : null}
             {warehouse.purpose ? (
               <Badge variant="outline">
-                {t(`inventory.enum.warehouse_purpose.${warehouse.purpose}` as const)}
+                {t(warehousePurposeTranslationMap[warehouse.purpose] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
           </>
@@ -265,7 +266,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
               <dt className="text-sm text-muted-foreground">{t("inventory.form.purpose")}</dt>
               <dd className="font-medium">
                 {warehouse.purpose
-                  ? t(`inventory.enum.warehouse_purpose.${warehouse.purpose}` as const)
+                  ? t(warehousePurposeTranslationMap[warehouse.purpose] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
               </dd>
             </div>

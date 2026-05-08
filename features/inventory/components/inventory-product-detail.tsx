@@ -31,6 +31,7 @@ import type {
   Promotion,
   WarehouseStockRow,
 } from "../types";
+import { ledgerMovementTypeTranslationMap, promotionTypeTranslationMap, productTypeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -184,7 +185,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
       header: t("inventory.form.movement_type"),
       cell: ({ row }) =>
         row.original.movement_type
-          ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
+          ? t(ledgerMovementTypeTranslationMap[row.original.movement_type] ?? "inventory.common.not_available")
           : t("inventory.common.not_available"),
     },
     {
@@ -214,7 +215,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
       header: t("inventory.form.promotion_type"),
       cell: ({ row }) =>
         row.original.type
-          ? t(`inventory.enum.promotion_type.${row.original.type}` as const)
+          ? t(promotionTypeTranslationMap[row.original.type] ?? "inventory.common.not_available")
           : t("inventory.common.not_available"),
     },
     {
@@ -236,7 +237,7 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
             </Badge>
             <Badge variant="outline">
               {product.type
-                ? t(`inventory.enum.product_type.${product.type}` as const)
+                ? t(productTypeTranslationMap[product.type] ?? "inventory.common.not_available")
                 : t("inventory.common.not_available")}
             </Badge>
             {product.track_inventory ? (

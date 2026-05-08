@@ -15,6 +15,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import { listProductPrices } from "../api";
 import { inventoryKeys, usePriceListQuery, useProductsQuery, usePromotionsQuery } from "../queries";
 import type { ProductPrice, Promotion } from "../types";
+import { priceListKindTranslationMap, promotionTypeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
@@ -142,7 +143,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
       header: t("inventory.form.promotion_type"),
       cell: ({ row }) =>
         row.original.type
-          ? t(`inventory.enum.promotion_type.${row.original.type}` as const)
+          ? t(promotionTypeTranslationMap[row.original.type] ?? "inventory.common.not_available")
           : t("inventory.common.not_available"),
     },
     {
@@ -165,7 +166,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
             {priceList.is_default ? <Badge>{t("inventory.form.default_price_list")}</Badge> : null}
             {priceList.kind ? (
               <Badge variant="outline">
-                {t(`inventory.enum.price_list_kind.${priceList.kind}` as const)}
+                {t(priceListKindTranslationMap[priceList.kind] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
           </>
@@ -213,7 +214,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
               <dt className="text-sm text-muted-foreground">{t("inventory.common.kind")}</dt>
               <dd className="font-medium">
                 {priceList.kind
-                  ? t(`inventory.enum.price_list_kind.${priceList.kind}` as const)
+                  ? t(priceListKindTranslationMap[priceList.kind] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
               </dd>
             </div>

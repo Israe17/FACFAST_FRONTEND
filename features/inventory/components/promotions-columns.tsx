@@ -7,6 +7,7 @@ import { TableRowActions } from "@/shared/components/table-row-actions";
 import { formatDateTime } from "@/shared/lib/utils";
 
 import type { Promotion } from "../types";
+import { promotionTypeTranslationMap } from "../constants";
 
 export function getPromotionsColumns({
   canDelete,
@@ -51,7 +52,7 @@ export function getPromotionsColumns({
       cell: ({ row }) => (
         <Badge variant="outline">
           {row.original.type
-            ? t(`inventory.enum.promotion_type.${row.original.type}` as const)
+            ? t(promotionTypeTranslationMap[row.original.type] ?? "inventory.common.not_available")
             : t("inventory.common.not_available")}
         </Badge>
       ),

@@ -9,6 +9,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 import { getInventoryMovementRoute } from "@/shared/lib/routes";
 
 import type { InventoryMovementHeader } from "../types";
+import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap } from "../constants";
 
 type GetInventoryMovementsColumnsParams = {
   canCancel: boolean;
@@ -33,7 +34,7 @@ export function getInventoryMovementsColumns({
             <p className="font-medium">{row.original.code ?? row.original.id}</p>
             {row.original.status ? (
               <Badge variant="outline">
-                {t(`inventory.enum.inventory_movement_status.${row.original.status}` as const)}
+                {t(inventoryMovementStatusTranslationMap[row.original.status] ?? "inventory.common.not_available")}
               </Badge>
             ) : null}
           </div>
@@ -54,7 +55,7 @@ export function getInventoryMovementsColumns({
           <div className="flex items-center gap-2">
             <span>
               {row.original.movement_type
-                ? t(`inventory.enum.ledger_movement_type.${row.original.movement_type}` as const)
+                ? t(ledgerMovementTypeTranslationMap[row.original.movement_type] ?? "inventory.common.not_available")
                 : t("inventory.common.not_available")}
             </span>
             {isManaged ? (

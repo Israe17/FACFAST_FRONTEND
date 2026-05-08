@@ -52,6 +52,7 @@ import type {
   UpdateProductSerialStatusInput,
   Warehouse,
 } from "../types";
+import { serialStatusTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 import { FormFieldError } from "./form-field-error";
@@ -252,7 +253,7 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
       header: t("inventory.common.status"),
       cell: ({ row }) => (
         <Badge variant={statusBadgeByValue[row.original.status] ?? "outline"}>
-          {t(`inventory.enum.serial_status.${row.original.status}` as const)}
+          {t(serialStatusTranslationMap[row.original.status] ?? "inventory.common.not_available")}
         </Badge>
       ),
     },
@@ -397,7 +398,7 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
                 <SelectItem value={EMPTY_SELECT_VALUE}>{t("inventory.serials.all_statuses")}</SelectItem>
                 {serialStatusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    {t(`inventory.enum.serial_status.${option.value}` as const)}
+                    {t(serialStatusTranslationMap[option.value] ?? "inventory.common.not_available")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -561,7 +562,7 @@ function ProductSerialsSection({ product }: ProductSerialsSectionProps) {
                 <SelectContent>
                   {serialStatusOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {t(`inventory.enum.serial_status.${option.value}` as const)}
+                      {t(serialStatusTranslationMap[option.value] ?? "inventory.common.not_available")}
                     </SelectItem>
                   ))}
                 </SelectContent>

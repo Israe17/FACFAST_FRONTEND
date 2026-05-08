@@ -26,6 +26,7 @@ import {
   useWarehouseStockQuery,
 } from "../queries";
 import type { WarehouseStockRow } from "../types";
+import { productTypeTranslationMap } from "../constants";
 import { CatalogSectionCard } from "./catalog-section-card";
 
 const ALL_WAREHOUSES_VALUE = "__all__";
@@ -67,7 +68,7 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
               <p className="font-medium">{row.original.product.name}</p>
               {row.original.product.type ? (
                 <Badge variant="outline">
-                  {t(`inventory.enum.product_type.${row.original.product.type}` as const)}
+                  {t(productTypeTranslationMap[row.original.product.type] ?? "inventory.common.not_available")}
                 </Badge>
               ) : null}
             </div>

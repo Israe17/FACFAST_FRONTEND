@@ -6,6 +6,7 @@ import type { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { TableRowActions } from "@/shared/components/table-row-actions";
 
 import type { ProductCategory } from "../types";
+import { taxProfileItemKindTranslationMap } from "../constants";
 
 type GetProductCategoriesColumnsParams = {
   canDelete: boolean;
@@ -86,7 +87,7 @@ function getProductCategoriesColumns({
         }
         return (
           <Badge variant="outline">
-            {t(`inventory.enum.tax_profile_item_kind.${itemKind}`)}
+            {t(taxProfileItemKindTranslationMap[itemKind] ?? "inventory.common.not_available")}
           </Badge>
         );
       },

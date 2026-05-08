@@ -5,6 +5,7 @@ import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import { AlertCircle, ChevronDown, MapPin, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -141,6 +142,7 @@ function SaleOrderForm({
   const saleMode = watch("sale_mode");
   const selectedBranchId = watch("branch_id");
   const selectedWarehouseId = watch("warehouse_id");
+  const isFinalConsumer = watch("is_final_consumer");
   const selectedCustomerId = watch("customer_contact_id");
 
   const isDelivery = fulfillmentMode === "delivery";
@@ -537,29 +539,51 @@ function SaleOrderForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="so-customer-contact-id">
-            {t("sales.form.customer_contact_id")}
-          </Label>
-          <Controller
-            control={control}
-            name="customer_contact_id"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger id="so-customer-contact-id">
-                  <SelectValue placeholder={t("sales.form.select_customer")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {activeContacts.map((contact) => (
-                    <SelectItem key={contact.id} value={contact.id}>
-                      {contact.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FormFieldError message={errors.customer_contact_id?.message} />
+          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
+            <Checkbox
+              checked={Boolean(isFinalConsumer)}
+              onCheckedChange={(checked) => {
+                setValue("is_final_consumer", checked === true, { shouldDirty: true });
+                if (checked === true) {
+                  setValue("customer_contact_id", undefined, { shouldDirty: true });
+                }
+              }}
+            />
+            <div className="space-y-1">
+              <p className="font-medium">{t("sales.final_consumer")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("sales.final_consumer_description")}
+              </p>
+            </div>
+          </label>
         </div>
+
+        {isFinalConsumer ? null : (
+          <div className="space-y-2">
+            <Label htmlFor="so-customer-contact-id">
+              {t("sales.form.customer_contact_id")}
+            </Label>
+            <Controller
+              control={control}
+              name="customer_contact_id"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger id="so-customer-contact-id">
+                    <SelectValue placeholder={t("sales.form.select_customer")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeContacts.map((contact) => (
+                      <SelectItem key={contact.id} value={contact.id}>
+                        {contact.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FormFieldError message={errors.customer_contact_id?.message} />
+          </div>
+        )}
       </div>
 
       {/* Vendedor y bodega */}

@@ -20,6 +20,7 @@ export const emptySaleOrderFormValues: CreateSaleOrderInput = {
   branch_id: "",
   code: "",
   customer_contact_id: "",
+  is_final_consumer: false,
   delivery_address: "",
   delivery_canton: "",
   delivery_charges: [],
@@ -53,6 +54,7 @@ export function getSaleOrderFormValues(order: SaleOrder): CreateSaleOrderInput {
     branch_id: String(order.branch?.id ?? ""),
     code: order.code ?? "",
     customer_contact_id: String(order.customer_contact?.id ?? ""),
+    is_final_consumer: order.is_final_consumer ?? false,
     delivery_address: order.delivery_address ?? "",
     delivery_canton: order.delivery_canton ?? "",
     delivery_charges: (order.delivery_charges ?? []).map((charge) => ({

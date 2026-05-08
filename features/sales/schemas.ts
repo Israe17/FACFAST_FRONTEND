@@ -222,8 +222,9 @@ const saleOrderFormObjectSchema = z.object({
   code: makeOptionalCodeSchema("SO"),
   customer_contact_id: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : String(v)),
-    z.string().regex(positiveIntegerPattern, "Selecciona un cliente."),
+    z.string().regex(positiveIntegerPattern, "Selecciona un cliente.").optional(),
   ),
+  is_final_consumer: z.boolean().default(false),
   delivery_address: optionalTextSchema,
   delivery_canton: optionalTextSchema,
   delivery_charges: z.array(createSaleOrderDeliveryChargeSchema).optional().default([]),

@@ -135,29 +135,35 @@ export function UserActivityTab({
           ) : null}
         </TabsList>
 
-        <div className="ml-auto flex items-center gap-2">
-          <Building2
-            className="size-4 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <Select value={branchFilter} onValueChange={setBranchFilter}>
-            <SelectTrigger className="h-9 w-[14rem]">
-              <SelectValue
-                placeholder={t("users.activity.branch_filter_placeholder")}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={BRANCH_FILTER_ALL}>
-                {t("users.activity.branch_filter_all")}
-              </SelectItem>
-              {branchOptions.map((branch) => (
-                <SelectItem key={branch.id} value={String(branch.id)}>
-                  {branch.name}
+        {hasNoBranches ? null : (
+          <div className="ml-auto flex items-center gap-2">
+            <Building2
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Select value={branchFilter} onValueChange={setBranchFilter}>
+              <SelectTrigger className="h-9 w-[14rem]">
+                <SelectValue
+                  placeholder={t("users.activity.branch_filter_placeholder")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={BRANCH_FILTER_ALL}>
+                  {t("users.activity.branch_filter_all")}
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+                {branchOptions
+                  .filter((branch) =>
+                    user.branch_ids.some((id) => String(id) === String(branch.id)),
+                  )
+                  .map((branch) => (
+                    <SelectItem key={branch.id} value={String(branch.id)}>
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {hasNoBranches && !isPrivileged ? (

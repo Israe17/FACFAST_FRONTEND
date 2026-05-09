@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  ChevronDown,
   KeyRound,
   Mail,
   Pencil,
@@ -14,6 +15,13 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -155,48 +163,13 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
             ) : null}
           </div>
 
-          <div className="flex shrink-0 flex-wrap gap-2">
-            {can("users.update") ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setActiveDialog("edit")}
-              >
-                <Pencil className="size-4" />
-                {t("users.actions.edit")}
-              </Button>
-            ) : null}
-            {can("users.change_status") ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setActiveDialog("status")}
-              >
-                <ToggleLeft className="size-4" />
-                {t("users.actions.change_status")}
-              </Button>
-            ) : null}
-            {can("users.change_password") ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setActiveDialog("password")}
-              >
-                <KeyRound className="size-4" />
-                {t("users.actions.change_password")}
-              </Button>
-            ) : null}
-            {canDelete ? (
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => setActiveDialog("delete")}
-              >
-                <Trash2 className="size-4" />
-                {t("users.actions.delete")}
-              </Button>
-            ) : null}
-          </div>
+          <UserActionsMenu
+            canEdit={can("users.update")}
+            canChangeStatus={can("users.change_status")}
+            canChangePassword={can("users.change_password")}
+            canDelete={canDelete}
+            onSelect={(dialog) => setActiveDialog(dialog)}
+          />
         </div>
       </section>
 
@@ -338,5 +311,70 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
         title={t("users.delete_dialog_title")}
       />
     </div>
+  );
+}
+
+type ActionDialog = "edit" | "status" | "password" | "delete";
+
+function UserActionsMenu({
+  canEdit,
+  canChangeStatus,
+  canChangePassword,
+  canDelete,
+  onSelect,
+}: {
+  canEdit: boolean;
+  canChangeStatus: boolean;
+  canChangePassword: boolean;
+  canDelete: boolean;
+  onSelect: (dialog: ActionDialog) => void;
+}) {
+  const { t } = useAppTranslator();
+  const hasAny = canEdit || canChangeStatus || canChangePassword || canDelete;
+  if (!hasAny) return null;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="secondary">
+          {t("users.actions.menu_label")}
+          <ChevronDown className="size-4" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {canEdit ? (
+          <DropdownMenuItem onSelect={() => onSelect("edit")}>
+            <Pencil className="size-4" aria-hidden="true" />
+            {t("users.actions.edit")}
+          </DropdownMenuItem>
+        ) : null}
+        {canChangeStatus ? (
+          <DropdownMenuItem onSelect={() => onSelect("status")}>
+            <ToggleLeft className="size-4" aria-hidden="true" />
+            {t("users.actions.change_status")}
+          </DropdownMenuItem>
+        ) : null}
+        {canChangePassword ? (
+          <DropdownMenuItem onSelect={() => onSelect("password")}>
+            <KeyRound className="size-4" aria-hidden="true" />
+            {t("users.actions.change_password")}
+          </DropdownMenuItem>
+        ) : null}
+        {canDelete ? (
+          <>
+            {canEdit || canChangeStatus || canChangePassword ? (
+              <DropdownMenuSeparator />
+            ) : null}
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive data-[highlighted]:bg-destructive/10"
+              onSelect={() => onSelect("delete")}
+            >
+              <Trash2 className="size-4" aria-hidden="true" />
+              {t("users.actions.delete")}
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

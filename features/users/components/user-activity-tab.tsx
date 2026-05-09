@@ -54,19 +54,37 @@ export function UserActivityTab({
   const { t } = useAppTranslator();
   const { can } = usePermissions();
 
-  const canViewMovements = can("inventory_movements.view");
-  const canViewSales = can("sale_orders.view");
-  const canViewDispatch = can("dispatch_orders.view");
+  const viewerCanViewMovements = can("inventory_movements.view");
+  const viewerCanViewSales = can("sale_orders.view");
+  const viewerCanViewDispatch = can("dispatch_orders.view");
   const isPrivileged = user.is_platform_admin || user.user_type === "owner";
+
+  // The target user can only have produced records of a given kind if their
+  // effective permissions include at least one perform action for it.
+  // Owners and platform admins are treated as universally privileged.
+  const targetPermissions = new Set(user.effective_permissions ?? []);
+  const targetCanPerformMovements =
+    isPrivileged ||
+    targetPermissions.has("inventory_movements.adjust") ||
+    targetPermissions.has("inventory_movements.transfer") ||
+    targetPermissions.has("inventory_movements.cancel");
+  const targetCanPerformSales =
+    isPrivileged || targetPermissions.has("sale_orders.create");
+  const targetCanPerformDispatch =
+    isPrivileged || targetPermissions.has("dispatch_orders.create");
+
+  const showMovements = viewerCanViewMovements && targetCanPerformMovements;
+  const showSales = viewerCanViewSales && targetCanPerformSales;
+  const showDispatch = viewerCanViewDispatch && targetCanPerformDispatch;
 
   const userIdNumber = Number(user.id);
   const validUserId = Number.isFinite(userIdNumber) && userIdNumber > 0;
 
-  const initialSubTab = canViewMovements
+  const initialSubTab = showMovements
     ? "movements"
-    : canViewSales
+    : showSales
       ? "sales"
-      : canViewDispatch
+      : showDispatch
         ? "dispatch"
         : "movements";
 
@@ -81,7 +99,7 @@ export function UserActivityTab({
     branchIdNumber === undefined ||
     (Number.isFinite(branchIdNumber) && branchIdNumber > 0);
 
-  if (!canViewMovements && !canViewSales && !canViewDispatch) {
+  if (!viewerCanViewMovements && !viewerCanViewSales && !viewerCanViewDispatch) {
     return (
       <EmptyState
         icon={ShieldOff}
@@ -114,21 +132,41 @@ export function UserActivityTab({
     );
   }
 
+  if (!showMovements && !showSales && !showDispatch) {
+    return (
+      <EmptyState
+        icon={ShieldOff}
+        title={t("users.activity.no_actionable_perms_title")}
+        description={t("users.activity.no_actionable_perms_description", {
+          name: user.name,
+        })}
+        action={
+          can("users.assign_roles") && onRequestTab ? (
+            <Button onClick={() => onRequestTab("roles")} size="sm">
+              <ShieldCheck className="size-4" />
+              {t("users.activity.assign_roles_action")}
+            </Button>
+          ) : undefined
+        }
+      />
+    );
+  }
+
   return (
     <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
       <div className="flex flex-wrap items-center gap-2">
         <TabsList>
-          {canViewMovements ? (
+          {showMovements ? (
             <TabsTrigger value="movements">
               {t("users.activity.movements_title")}
             </TabsTrigger>
           ) : null}
-          {canViewSales ? (
+          {showSales ? (
             <TabsTrigger value="sales">
               {t("users.activity.sales_title")}
             </TabsTrigger>
           ) : null}
-          {canViewDispatch ? (
+          {showDispatch ? (
             <TabsTrigger value="dispatch">
               {t("users.activity.dispatch_title")}
             </TabsTrigger>
@@ -188,7 +226,7 @@ export function UserActivityTab({
         </div>
       ) : null}
 
-      {canViewMovements ? (
+      {showMovements ? (
         <TabsContent value="movements" className="space-y-3">
           <MovementsList
             userId={userIdNumber}
@@ -203,7 +241,7 @@ export function UserActivityTab({
         </TabsContent>
       ) : null}
 
-      {canViewSales ? (
+      {showSales ? (
         <TabsContent value="sales" className="space-y-3">
           <SalesList
             userId={userIdNumber}
@@ -218,7 +256,7 @@ export function UserActivityTab({
         </TabsContent>
       ) : null}
 
-      {canViewDispatch ? (
+      {showDispatch ? (
         <TabsContent value="dispatch" className="space-y-3">
           <DispatchList
             userId={userIdNumber}

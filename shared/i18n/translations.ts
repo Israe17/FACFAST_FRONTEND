@@ -2064,6 +2064,7 @@ const esTranslations = {
     "Necesitas permiso para ver usuarios.",
   "roles.kpi.modules_title": "Módulos",
   "roles.kpi.modules_description": "{count} permisos en total",
+  "roles.kpi.modules_short_hint": "/ {count} permisos",
   "roles.kpi.permissions_permission_required":
     "Necesitas permiso para ver el catálogo de permisos.",
   "roles.tabs.permissions": "Permisos",
@@ -4584,6 +4585,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "You need permission to view users.",
     "roles.kpi.modules_title": "Modules",
     "roles.kpi.modules_description": "{count} permissions total",
+    "roles.kpi.modules_short_hint": "/ {count} permissions",
     "roles.kpi.permissions_permission_required":
       "You need permission to view the permission catalog.",
     "roles.tabs.permissions": "Permissions",

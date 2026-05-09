@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -11,15 +12,23 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 
 import { useUserEffectivePermissionsQuery } from "../queries";
+import type { User } from "../types";
 
 type UserPermissionsTabProps = {
-  userId: string;
+  user: User;
   enabled: boolean;
+  canAssignRoles: boolean;
+  onAssignRolesClick?: () => void;
 };
 
-export function UserPermissionsTab({ userId, enabled }: UserPermissionsTabProps) {
+export function UserPermissionsTab({
+  user,
+  enabled,
+  canAssignRoles,
+  onAssignRolesClick,
+}: UserPermissionsTabProps) {
   const { t } = useAppTranslator();
-  const permissionsQuery = useUserEffectivePermissionsQuery(userId, enabled);
+  const permissionsQuery = useUserEffectivePermissionsQuery(user.id, enabled);
 
   const grouped = useMemo(() => {
     const data = permissionsQuery.data ?? [];
@@ -48,11 +57,50 @@ export function UserPermissionsTab({ userId, enabled }: UserPermissionsTabProps)
   }
 
   if (!permissionsQuery.data?.length) {
+    const hasNoRoles =
+      user.roles.length === 0 && user.role_ids.length === 0;
+    const isPrivileged =
+      user.user_type === "owner" || user.is_platform_admin;
+
+    if (isPrivileged) {
+      return (
+        <EmptyState
+          icon={ShieldCheck}
+          title={t("users.detail.permissions_empty_privileged_title")}
+          description={t("users.detail.permissions_empty_privileged_description", {
+            name: user.name,
+          })}
+        />
+      );
+    }
+
+    if (hasNoRoles) {
+      return (
+        <EmptyState
+          icon={ShieldCheck}
+          title={t("users.detail.permissions_no_roles_title")}
+          description={t("users.detail.permissions_no_roles_description", {
+            name: user.name,
+          })}
+          action={
+            canAssignRoles && onAssignRolesClick ? (
+              <Button onClick={onAssignRolesClick} size="sm">
+                <ShieldCheck className="size-4" />
+                {t("users.actions.assign_roles")}
+              </Button>
+            ) : undefined
+          }
+        />
+      );
+    }
+
     return (
       <EmptyState
         icon={ShieldCheck}
-        title={t("users.no_permissions_title")}
-        description={t("users.no_permissions_description")}
+        title={t("users.detail.permissions_empty_with_roles_title")}
+        description={t("users.detail.permissions_empty_with_roles_description", {
+          name: user.name,
+        })}
       />
     );
   }

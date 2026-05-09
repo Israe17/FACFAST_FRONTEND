@@ -46,47 +46,50 @@ export function RoleDetailPanel({
   const deletable = canDelete && !role.is_system;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <section
         className={cn(
-          "relative overflow-hidden rounded-2xl bg-gradient-to-br p-5 shadow-sm",
+          "relative overflow-hidden rounded-xl bg-gradient-to-br p-3 shadow-sm sm:p-4",
           color.hero,
         )}
       >
-        <div className="flex flex-wrap items-start gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <span
-            className="flex size-14 items-center justify-center rounded-full bg-white/20 text-lg font-semibold text-white backdrop-blur"
+            className="flex size-10 items-center justify-center rounded-full bg-white/20 text-sm font-semibold text-white backdrop-blur"
             aria-hidden="true"
           >
             {initials}
           </span>
 
-          <div className="min-w-0 flex-1 space-y-2">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-semibold leading-tight">{role.name}</h2>
+              <h2 className="text-lg font-semibold leading-tight sm:text-xl">
+                {role.name}
+              </h2>
               {role.is_system ? (
-                <Badge className="bg-white/20 text-white hover:bg-white/30">
+                <Badge className="bg-white/20 px-1.5 py-0 text-[11px] text-white hover:bg-white/30">
                   <Lock className="size-3" aria-hidden="true" />
                   {t("roles.system_badge")}
                 </Badge>
               ) : null}
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-white/90">
-              <span className="font-mono text-xs">{role.role_key}</span>
-              {role.code ? <span className="text-xs">·</span> : null}
+              <span className="font-mono text-[11px] text-white/80">
+                {role.role_key}
+              </span>
               {role.code ? (
-                <span className="font-mono text-xs">{role.code}</span>
+                <span className="font-mono text-[11px] text-white/70">
+                  · {role.code}
+                </span>
               ) : null}
+              <span className="inline-flex items-center gap-1 text-[11px] text-white/85">
+                <Users className="size-3" aria-hidden="true" />
+                {t("roles.user_count", { count: String(userCount) })}
+              </span>
             </div>
-            <p className="text-sm text-white/90">
-              {role.is_system
-                ? t("roles.system_description")
-                : t("roles.custom_description")}
-            </p>
-            <p className="inline-flex items-center gap-1.5 text-sm text-white/90">
-              <Users className="size-3.5" aria-hidden="true" />
-              {t("roles.user_count", { count: String(userCount) })}
-            </p>
+            {role.is_system ? (
+              <p className="text-xs text-white/85">
+                {t("roles.system_description")}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex shrink-0 gap-2">
@@ -124,7 +127,7 @@ export function RoleDetailPanel({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="permissions" className="space-y-4">
+        <TabsContent value="permissions" className="space-y-3">
           <RolePermissionsMatrix role={role} canEdit={canUpdate} />
         </TabsContent>
 

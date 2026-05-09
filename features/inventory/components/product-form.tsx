@@ -159,6 +159,12 @@ export function ProductForm({
 
       {/* --- 1. Categoría + clasificación fiscal --- */}
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
+        <div className="space-y-1">
+          <h3 className="font-semibold">{t("inventory.products.classification_title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("inventory.products.classification_description")}
+          </p>
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="product-category">{t("inventory.entity.category")}</Label>
@@ -304,6 +310,12 @@ export function ProductForm({
 
       {/* --- 2. Identidad del producto --- */}
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
+        <div className="space-y-1">
+          <h3 className="font-semibold">{t("inventory.products.general_information_title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("inventory.products.general_information_description")}
+          </p>
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="product-name">{t("inventory.common.name")}</Label>
@@ -339,6 +351,12 @@ export function ProductForm({
 
       {/* --- Relaciones opcionales --- */}
       <section className="space-y-4 rounded-xl border border-border/70 p-4">
+        <div className="space-y-1">
+          <h3 className="font-semibold">{t("inventory.products.relations_title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("inventory.products.relations_description")}
+          </p>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="product-brand">{t("inventory.entity.brand")}</Label>

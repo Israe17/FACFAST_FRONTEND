@@ -32,6 +32,7 @@ import {
   warehouseLocationSchema,
   warehouseSchema,
   warehouseStockRowSchema,
+  warehouseStockThresholdsResponseSchema,
   warrantyProfileSchema,
   branchAssignmentsViewSchema,
   zoneSchema,
@@ -74,6 +75,7 @@ import type {
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
+  UpdateWarehouseStockThresholdsInput,
   UpdateWarrantyProfileInput,
   SetBranchAssignmentsInput,
   CreateZoneInput,
@@ -818,6 +820,29 @@ export async function listWarehouseStockByWarehouse(warehouseId: string) {
   const response = await http.get(`/warehouse-stock/${warehouseId}/products`);
   return extractCollection(response.data, ["rows", "stock", "warehouse_stock"]).map((item) =>
     warehouseStockRowSchema.parse(item),
+  );
+}
+
+export async function updateWarehouseStockThresholds(
+  warehouseId: string,
+  variantId: string,
+  payload: UpdateWarehouseStockThresholdsInput,
+) {
+  const body: Record<string, number | null> = {};
+  if (payload.min_stock !== undefined) {
+    body.min_stock =
+      typeof payload.min_stock === "number" ? payload.min_stock : null;
+  }
+  if (payload.max_stock !== undefined) {
+    body.max_stock =
+      typeof payload.max_stock === "number" ? payload.max_stock : null;
+  }
+  const response = await http.patch(
+    `/warehouse-stock/${warehouseId}/variants/${variantId}/thresholds`,
+    body,
+  );
+  return warehouseStockThresholdsResponseSchema.parse(
+    extractEntity(response.data, ["thresholds", "warehouse_stock_thresholds"]),
   );
 }
 

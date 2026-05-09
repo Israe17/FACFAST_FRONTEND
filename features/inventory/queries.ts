@@ -94,6 +94,7 @@ import {
   updateTaxProfile,
   updateWarehouse,
   updateWarehouseLocation,
+  updateWarehouseStockThresholds,
   updateWarrantyProfile,
   createZone,
   getZone,
@@ -168,6 +169,7 @@ import type {
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
+  UpdateWarehouseStockThresholdsInput,
   UpdateWarrantyProfileInput,
   CreateZoneInput,
   UpdateZoneInput,
@@ -1183,6 +1185,40 @@ export function useWarehouseStockByWarehouseQuery(warehouseId: string, enabled =
   });
 }
 
+export function useUpdateWarehouseStockThresholdsMutation(
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+
+  return useMutation({
+    mutationFn: ({
+      warehouseId,
+      variantId,
+      payload,
+    }: {
+      warehouseId: string;
+      variantId: string;
+      payload: UpdateWarehouseStockThresholdsInput;
+    }) => updateWarehouseStockThresholds(warehouseId, variantId, payload),
+    onSuccess: (_data, variables) => {
+      invalidateInventoryQueries(queryClient, [
+        inventoryKeys.warehouseStock(),
+        inventoryKeys.warehouseStockByWarehouse(variables.warehouseId),
+      ]);
+      toast.success(t("common.update_success"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("inventory.warehouse_stock_update_error_fallback"),
+          translateMessage: t,
+        });
+      }
+    },
+  });
+}
+
 export function useInventoryLotsQuery(enabled = true) {
   return useQuery({
     enabled,
@@ -1400,6 +1436,40 @@ export function useInventoryMovementsCursorQuery(params: { search?: string; sort
     search: params.search,
     sortOrder: params.sortOrder,
     enabled,
+  });
+}
+
+export function useInventoryMovementsByVariantQuery(
+  filters: { warehouseId: string; variantId: string },
+  enabled = true,
+) {
+  const warehouseIdNumber = Number(filters.warehouseId);
+  const variantIdNumber = Number(filters.variantId);
+  const isReady =
+    Boolean(filters.warehouseId) &&
+    Boolean(filters.variantId) &&
+    Number.isFinite(warehouseIdNumber) &&
+    Number.isFinite(variantIdNumber);
+
+  return useQuery({
+    enabled: enabled && isReady,
+    queryKey: [
+      ...inventoryKeys.inventoryMovements(),
+      "by-variant",
+      filters.warehouseId,
+      filters.variantId,
+    ] as const,
+    queryFn: async () => {
+      const response = await listInventoryMovementsCursor(
+        { limit: 50, sort_order: "DESC" },
+        {
+          warehouse_id: warehouseIdNumber,
+          product_variant_id: variantIdNumber,
+        },
+      );
+      return response.data;
+    },
+    staleTime: 30 * 1000,
   });
 }
 

@@ -1223,6 +1223,35 @@ const esTranslations = {
     "No fue posible actualizar la ubicación de bodega.",
   "inventory.warehouse_stock.section_description":
     "Lectura materializada de balances por bodega, producto y variante default.",
+  "inventory.warehouse_detail.no_category_group": "Sin categoría",
+  "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} unidades",
+  "inventory.warehouse_detail.product_movements_title":
+    "Movimientos en {warehouse}",
+  "inventory.warehouse_detail.product_movements_description":
+    "Historial de entradas, salidas y ajustes de {product} en esta bodega.",
+  "inventory.warehouse_detail.no_movements_for_product":
+    "No hay movimientos registrados para este producto en esta bodega.",
+  "inventory.warehouse_detail.view_product_movements_action":
+    "Ver movimientos",
+  "inventory.detail.performed_by": "Realizado por",
+  "inventory.form.code": "Código",
+  "inventory.movements_load_error_fallback":
+    "No fue posible cargar los movimientos de inventario.",
+  "inventory.warehouse_stock.below_min_badge": "Bajo mínimo",
+  "inventory.warehouse_stock.min_stock_column": "Mínimo",
+  "inventory.warehouse_stock.max_stock_column": "Máximo",
+  "inventory.warehouse_stock.min_stock_label": "Stock mínimo",
+  "inventory.warehouse_stock.max_stock_label": "Stock máximo",
+  "inventory.warehouse_stock.threshold_dialog_title": "Editar mínimos y máximos",
+  "inventory.warehouse_stock.threshold_dialog_description":
+    "Define los umbrales que disparan la alerta de bajo mínimo en {warehouse} para {product}.",
+  "inventory.warehouse_stock.only_below_min_filter": "Solo bajo mínimo",
+  "inventory.warehouse_stock.edit_thresholds_action": "Editar mínimos",
+  "inventory.warehouse_stock.threshold_value_placeholder": "Sin definir",
+  "inventory.warehouse_stock_max_below_min":
+    "El stock máximo no puede ser menor que el mínimo.",
+  "inventory.warehouse_stock_update_error_fallback":
+    "No fue posible actualizar los mínimos y máximos.",
   "inventory.inventory_lots.deactivate_title": "Desactivar lote",
   "inventory.inventory_lots.deactivate_description":
     "El lote \"{lot_number}\" sera desactivado. No estara disponible para nuevas operaciones. Los datos historicos no seran afectados.",
@@ -3642,6 +3671,35 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to update the warehouse location.",
     "inventory.warehouse_stock.section_description":
       "Materialized warehouse balances by warehouse, product and default variant.",
+    "inventory.warehouse_detail.no_category_group": "Uncategorized",
+    "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} units",
+    "inventory.warehouse_detail.product_movements_title":
+      "Movements in {warehouse}",
+    "inventory.warehouse_detail.product_movements_description":
+      "Inbound, outbound and adjustment history of {product} in this warehouse.",
+    "inventory.warehouse_detail.no_movements_for_product":
+      "No movements recorded for this product in this warehouse.",
+    "inventory.warehouse_detail.view_product_movements_action":
+      "View movements",
+    "inventory.detail.performed_by": "Performed by",
+    "inventory.form.code": "Code",
+    "inventory.movements_load_error_fallback":
+      "Unable to load inventory movements.",
+    "inventory.warehouse_stock.below_min_badge": "Below minimum",
+    "inventory.warehouse_stock.min_stock_column": "Min",
+    "inventory.warehouse_stock.max_stock_column": "Max",
+    "inventory.warehouse_stock.min_stock_label": "Min stock",
+    "inventory.warehouse_stock.max_stock_label": "Max stock",
+    "inventory.warehouse_stock.threshold_dialog_title": "Edit min and max",
+    "inventory.warehouse_stock.threshold_dialog_description":
+      "Set the thresholds that trigger the below-minimum alert in {warehouse} for {product}.",
+    "inventory.warehouse_stock.only_below_min_filter": "Only below min",
+    "inventory.warehouse_stock.edit_thresholds_action": "Edit thresholds",
+    "inventory.warehouse_stock.threshold_value_placeholder": "Not set",
+    "inventory.warehouse_stock_max_below_min":
+      "Max stock cannot be lower than min stock.",
+    "inventory.warehouse_stock_update_error_fallback":
+      "Unable to update min and max thresholds.",
     "inventory.inventory_lots.deactivate_title": "Deactivate lot",
     "inventory.inventory_lots.deactivate_description":
       "The lot \"{lot_number}\" will be deactivated. It will not be available for new operations. Historical data will not be affected.",

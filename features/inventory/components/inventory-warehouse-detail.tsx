@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -26,12 +27,16 @@ import type {
   InventoryLot,
   InventoryMovementHeader,
   WarehouseLocation,
-  WarehouseStockRow,
 } from "../types";
 import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap, warehousePurposeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import {
+  ProductMovementsSheet,
+  type ProductMovementsTarget,
+} from "./product-movements-sheet";
+import { WarehouseStockByCategory } from "./warehouse-stock-by-category";
 
 type InventoryWarehouseDetailProps = {
   warehouseId: string;
@@ -42,6 +47,8 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
   const { canRunTenantQueries } = useInventoryModule();
   const { can } = usePermissions();
   const canViewWarehouse = can("warehouses.view");
+  const canViewMovements = can("inventory_movements.view");
+  const [movementsTarget, setMovementsTarget] = useState<ProductMovementsTarget | null>(null);
   const warehouseQuery = useWarehouseQuery(warehouseId, canRunTenantQueries && canViewWarehouse);
   const locationsQuery = useWarehouseLocationsQuery(
     warehouseId,
@@ -102,20 +109,6 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
       header: t("inventory.common.status"),
       cell: ({ row }) => (row.original.is_active ? t("inventory.common.active") : t("inventory.common.inactive")),
     },
-  ];
-
-  const stockColumns: ColumnDef<WarehouseStockRow>[] = [
-    { accessorKey: "product", header: t("inventory.entity.product"), cell: ({ row }) => row.original.product.name },
-    {
-      accessorKey: "product_variant",
-      header: t("inventory.detail.variant_label"),
-      cell: ({ row }) =>
-        row.original.product_variant?.variant_name ??
-        row.original.product_variant?.sku ??
-        t("inventory.detail.default_variant"),
-    },
-    { accessorKey: "quantity", header: t("inventory.form.on_hand_quantity") },
-    { accessorKey: "available_quantity", header: t("inventory.form.available_quantity") },
   ];
 
   const lotColumns: ColumnDef<InventoryLot>[] = [
@@ -350,11 +343,24 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           description={t("inventory.detail.stock_block_description")}
           title={t("inventory.entity.warehouse_stock")}
         >
-          <DataTable
-            enablePagination={false}
-            columns={stockColumns}
-            data={stockRows}
+          <WarehouseStockByCategory
+            rows={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
+            onSelectRow={
+              canViewMovements
+                ? (row) => {
+                    if (!row.product_variant?.id) {
+                      return;
+                    }
+                    setMovementsTarget({
+                      warehouseId: row.warehouse.id,
+                      warehouseName: row.warehouse.name ?? warehouse.name,
+                      variantId: row.product_variant.id,
+                      productName: row.product.name ?? "",
+                    });
+                  }
+                : undefined
+            }
           />
         </DetailBlock>
       </div>
@@ -384,6 +390,15 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           />
         </DetailBlock>
       </div>
+
+      <ProductMovementsSheet
+        onOpenChange={(open) => {
+          if (!open) {
+            setMovementsTarget(null);
+          }
+        }}
+        target={movementsTarget}
+      />
     </div>
   );
 }

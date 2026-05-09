@@ -125,6 +125,7 @@ const inventoryEntitySummarySchema = z
 
 const inventoryEntityWithTypeSummarySchema = inventoryEntitySummarySchema.extend({
   type: productTypeSchema.optional().catch(undefined),
+  category: inventoryEntitySummarySchema.nullable().optional().catch(null),
 });
 
 const measurementUnitSummarySchema = inventoryEntitySummarySchema.extend({
@@ -713,6 +714,46 @@ export const createProductSerialsSchema = z.object({
     .min(1, "Se requiere al menos un numero de serie."),
   warehouse_id: z.string().regex(positiveIntegerPattern, "Selecciona un almacen valido."),
 });
+
+export const warehouseStockThresholdsResponseSchema = z
+  .object({
+    warehouse_id: idSchema,
+    product_variant_id: idSchema,
+    product_id: idSchema,
+    min_stock: z.coerce.number().nullable(),
+    max_stock: z.coerce.number().nullable(),
+    updated_at: z.string(),
+  })
+  .passthrough();
+
+export const updateWarehouseStockThresholdsSchema = z
+  .object({
+    min_stock: z
+      .union([
+        z.coerce.number().min(0, "El minimo no puede ser negativo."),
+        z.literal("").transform(() => null),
+        z.null(),
+      ])
+      .optional(),
+    max_stock: z
+      .union([
+        z.coerce.number().min(0, "El maximo no puede ser negativo."),
+        z.literal("").transform(() => null),
+        z.null(),
+      ])
+      .optional(),
+  })
+  .superRefine((values, ctx) => {
+    const min = typeof values.min_stock === "number" ? values.min_stock : null;
+    const max = typeof values.max_stock === "number" ? values.max_stock : null;
+    if (min !== null && max !== null && max < min) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "El maximo no puede ser menor que el minimo.",
+        path: ["max_stock"],
+      });
+    }
+  });
 
 export const updateProductSerialStatusSchema = z.object({
   notes: optionalTextSchema,

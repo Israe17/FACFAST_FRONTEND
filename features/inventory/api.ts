@@ -32,6 +32,7 @@ import {
   warehouseLocationSchema,
   warehouseSchema,
   warehouseStockRowSchema,
+  warehouseStockThresholdsResponseSchema,
   warrantyProfileSchema,
   branchAssignmentsViewSchema,
   zoneSchema,
@@ -74,6 +75,7 @@ import type {
   UpdateTaxProfileInput,
   UpdateWarehouseInput,
   UpdateWarehouseLocationInput,
+  UpdateWarehouseStockThresholdsInput,
   UpdateWarrantyProfileInput,
   SetBranchAssignmentsInput,
   CreateZoneInput,
@@ -821,6 +823,29 @@ export async function listWarehouseStockByWarehouse(warehouseId: string) {
   );
 }
 
+export async function updateWarehouseStockThresholds(
+  warehouseId: string,
+  variantId: string,
+  payload: UpdateWarehouseStockThresholdsInput,
+) {
+  const body: Record<string, number | null> = {};
+  if (payload.min_stock !== undefined) {
+    body.min_stock =
+      typeof payload.min_stock === "number" ? payload.min_stock : null;
+  }
+  if (payload.max_stock !== undefined) {
+    body.max_stock =
+      typeof payload.max_stock === "number" ? payload.max_stock : null;
+  }
+  const response = await http.patch(
+    `/warehouse-stock/${warehouseId}/variants/${variantId}/thresholds`,
+    body,
+  );
+  return warehouseStockThresholdsResponseSchema.parse(
+    extractEntity(response.data, ["thresholds", "warehouse_stock_thresholds"]),
+  );
+}
+
 export async function listInventoryLots() {
   const response = await http.get("/inventory-lots");
   return extractCollection(response.data, ["inventory_lots", "inventoryLots"]).map((item) =>
@@ -917,8 +942,25 @@ export async function listInventoryMovementsPaginated(params: PaginatedQueryPara
   return paginatedSchema(inventoryMovementHeaderSchema).parse(response.data);
 }
 
-export async function listInventoryMovementsCursor(params: CursorQueryParams) {
-  const response = await http.get("/inventory-movements/cursor", { params });
+export type InventoryMovementsListFilters = {
+  warehouse_id?: number;
+  product_variant_id?: number;
+  product_id?: number;
+};
+
+export async function listInventoryMovementsCursor(
+  params: CursorQueryParams,
+  filters: InventoryMovementsListFilters = {},
+) {
+  const queryParams = compactRecord({
+    ...params,
+    warehouse_id: filters.warehouse_id,
+    product_variant_id: filters.product_variant_id,
+    product_id: filters.product_id,
+  });
+  const response = await http.get("/inventory-movements/cursor", {
+    params: queryParams,
+  });
   return cursorSchema(inventoryMovementHeaderSchema).parse(response.data);
 }
 

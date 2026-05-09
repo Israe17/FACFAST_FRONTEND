@@ -55,6 +55,7 @@ import {
   updateProductSerialStatusSchema,
   updateProductSchema,
   updateProductVariantSchema,
+  updateWarehouseStockThresholdsSchema,
   updatePromotionSchema,
   updatePromotionBranchAssignmentSchema,
   updateTaxProfileSchema,
@@ -150,6 +151,7 @@ export type CreateProductPriceInput = z.infer<typeof createProductPriceSchema>;
 export type CreateProductSerialsInput = z.infer<typeof createProductSerialsSchema>;
 export type UpdateProductPriceInput = z.infer<typeof updateProductPriceSchema>;
 export type UpdateProductSerialStatusInput = z.infer<typeof updateProductSerialStatusSchema>;
+export type UpdateWarehouseStockThresholdsInput = z.infer<typeof updateWarehouseStockThresholdsSchema>;
 export type CreatePromotionInput = z.infer<typeof createPromotionSchema>;
 export type CreatePromotionBranchAssignmentInput = z.infer<
   typeof createPromotionBranchAssignmentSchema

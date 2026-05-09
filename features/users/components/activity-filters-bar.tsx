@@ -4,7 +4,6 @@ import { Filter, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -13,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DateRangeSelect } from "@/shared/components/date-range-select";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 export const ANY_VALUE = "__any__";
@@ -78,18 +78,22 @@ export function ActivityFiltersBar({
       </header>
 
       <div className="flex flex-wrap items-end gap-2">
-        <DateField
-          id="activity-filter-from"
-          label={t("users.activity.filters.from_label")}
-          value={from ?? ""}
-          onChange={(value) => onFromChange(value || undefined)}
-        />
-        <DateField
-          id="activity-filter-to"
-          label={t("users.activity.filters.to_label")}
-          value={to ?? ""}
-          onChange={(value) => onToChange(value || undefined)}
-        />
+        <div className="flex min-w-[16rem] flex-col gap-1">
+          <Label className="text-[11px] text-muted-foreground">
+            {t("users.activity.filters.date_range_label")}
+          </Label>
+          <DateRangeSelect
+            from={from}
+            fromLabel={t("users.activity.filters.from_label")}
+            onChange={({ from: nextFrom, to: nextTo }) => {
+              onFromChange(nextFrom);
+              onToChange(nextTo);
+            }}
+            placeholder={t("date_range.placeholder")}
+            to={to}
+            toLabel={t("users.activity.filters.to_label")}
+          />
+        </div>
 
         {fields.map((field) => (
           <SelectField
@@ -108,29 +112,6 @@ export function ActivityFiltersBar({
         {trailing}
       </div>
     </section>
-  );
-}
-
-type DateFieldProps = {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-};
-
-function DateField({ id, label, value, onChange }: DateFieldProps) {
-  return (
-    <div className="flex min-w-[10rem] flex-col gap-1">
-      <Label className="text-[11px] text-muted-foreground" htmlFor={id}>
-        {label}
-      </Label>
-      <Input
-        id={id}
-        onChange={(event) => onChange(event.target.value)}
-        type="date"
-        value={value}
-      />
-    </div>
   );
 }
 

@@ -43,13 +43,11 @@ const ROLE_COLOR_PALETTE = [
 
 export type RoleColor = (typeof ROLE_COLOR_PALETTE)[number];
 
-const PRIVILEGED_KEYS = new Set([
-  "owner",
-  "root",
-  "superadmin",
-  "super_admin",
-  "platform_admin",
-]);
+// Roles "catch-all" que tienen literalmente todos los permisos del backend.
+// Los pintamos siempre con el primer color de la paleta (rojo) para
+// distinguirlos visualmente del resto. La fuente real de verdad sobre si un
+// rol es de sistema sigue siendo `role.is_system` (se respeta aparte).
+const PRIVILEGED_KEYS = new Set(["owner"]);
 
 function hashString(value: string): number {
   let hash = 0;

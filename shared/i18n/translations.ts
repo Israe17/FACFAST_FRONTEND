@@ -2046,6 +2046,57 @@ const esTranslations = {
   "roles.delete_title": "Eliminar rol",
   "roles.delete_description": "Esto eliminará el rol {name}.",
   "roles.delete_confirm": "Eliminar rol",
+  "roles.access_control_title": "Control de Accesos",
+  "roles.create_custom_button": "Nuevo rol personalizado",
+  "roles.system_badge": "Sistema",
+  "roles.system_description":
+    "Acceso total al sistema. No se puede modificar ni eliminar.",
+  "roles.custom_description":
+    "Rol personalizado. Configura el conjunto de permisos asignados.",
+  "roles.user_count": "{count} usuario(s)",
+  "roles.actions.edit_metadata": "Editar metadatos",
+  "roles.select_role_title": "Selecciona un rol",
+  "roles.select_role_description":
+    "Elige un rol del listado para ver y configurar sus permisos.",
+  "roles.kpi.roles_title": "Roles",
+  "roles.kpi.users_title": "Usuarios",
+  "roles.kpi.users_permission_required":
+    "Necesitas permiso para ver usuarios.",
+  "roles.kpi.modules_title": "Módulos",
+  "roles.kpi.modules_description": "{count} permisos en total",
+  "roles.kpi.permissions_permission_required":
+    "Necesitas permiso para ver el catálogo de permisos.",
+  "roles.tabs.permissions": "Permisos",
+  "roles.tabs.users": "Usuarios ({count})",
+  "roles.matrix.title": "Matriz de Permisos",
+  "roles.matrix.edit_hint":
+    "Activa o desactiva los permisos para este rol y guarda los cambios.",
+  "roles.matrix.system_lock_hint":
+    "Los roles del sistema no se pueden modificar.",
+  "roles.matrix.system_lock_message":
+    "Este rol del sistema tiene acceso total y no se puede editar ni eliminar.",
+  "roles.matrix.module_count": "{active} de {total} activos",
+  "roles.matrix.unsaved_changes": "Tienes cambios sin guardar.",
+  "roles.matrix.save_changes": "Guardar cambios",
+  "roles.matrix.loading": "Cargando catálogo de permisos.",
+  "roles.matrix.load_error_fallback":
+    "No fue posible cargar el catálogo de permisos.",
+  "roles.matrix.empty_title": "Sin permisos disponibles",
+  "roles.matrix.empty_description":
+    "El backend no devolvió ningún permiso para configurar.",
+  "roles.users_tab.loading": "Cargando usuarios.",
+  "roles.users_tab.load_error_fallback":
+    "No fue posible cargar los usuarios.",
+  "roles.users_tab.empty_title": "Aún no hay usuarios con este rol",
+  "roles.users_tab.empty_description":
+    "Asigna este rol a uno o más usuarios desde la sección de usuarios.",
+  "roles.users_tab.permission_required_title": "Permiso requerido",
+  "roles.users_tab.permission_required_description":
+    "Necesitas el permiso users.view para ver los usuarios asignados a este rol.",
+  "users.status.active": "Activo",
+  "users.status.inactive": "Inactivo",
+  "users.status.suspended": "Suspendido",
+  "users.status.deleted": "Eliminado",
   "users.branches_update_error_fallback":
     "No fue posible actualizar las sucursales del usuario.",
   "users.create_error_fallback": "No fue posible crear el usuario.",
@@ -4515,6 +4566,57 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "roles.delete_title": "Delete role",
     "roles.delete_description": "This will remove the role {name}.",
     "roles.delete_confirm": "Delete role",
+    "roles.access_control_title": "Access Control",
+    "roles.create_custom_button": "New custom role",
+    "roles.system_badge": "System",
+    "roles.system_description":
+      "Full system access. Cannot be modified or deleted.",
+    "roles.custom_description":
+      "Custom role. Configure the assigned set of permissions.",
+    "roles.user_count": "{count} user(s)",
+    "roles.actions.edit_metadata": "Edit metadata",
+    "roles.select_role_title": "Select a role",
+    "roles.select_role_description":
+      "Pick a role from the list to view and configure its permissions.",
+    "roles.kpi.roles_title": "Roles",
+    "roles.kpi.users_title": "Users",
+    "roles.kpi.users_permission_required":
+      "You need permission to view users.",
+    "roles.kpi.modules_title": "Modules",
+    "roles.kpi.modules_description": "{count} permissions total",
+    "roles.kpi.permissions_permission_required":
+      "You need permission to view the permission catalog.",
+    "roles.tabs.permissions": "Permissions",
+    "roles.tabs.users": "Users ({count})",
+    "roles.matrix.title": "Permission Matrix",
+    "roles.matrix.edit_hint":
+      "Toggle permissions for this role and save the changes.",
+    "roles.matrix.system_lock_hint":
+      "System roles cannot be modified.",
+    "roles.matrix.system_lock_message":
+      "This system role has full access and cannot be edited or deleted.",
+    "roles.matrix.module_count": "{active} of {total} active",
+    "roles.matrix.unsaved_changes": "You have unsaved changes.",
+    "roles.matrix.save_changes": "Save changes",
+    "roles.matrix.loading": "Loading permission catalog.",
+    "roles.matrix.load_error_fallback":
+      "Unable to load the permission catalog.",
+    "roles.matrix.empty_title": "No permissions available",
+    "roles.matrix.empty_description":
+      "The backend returned no permissions to configure.",
+    "roles.users_tab.loading": "Loading users.",
+    "roles.users_tab.load_error_fallback":
+      "Unable to load users.",
+    "roles.users_tab.empty_title": "No users with this role yet",
+    "roles.users_tab.empty_description":
+      "Assign this role to one or more users from the users section.",
+    "roles.users_tab.permission_required_title": "Permission required",
+    "roles.users_tab.permission_required_description":
+      "You need users.view to see the users assigned to this role.",
+    "users.status.active": "Active",
+    "users.status.inactive": "Inactive",
+    "users.status.suspended": "Suspended",
+    "users.status.deleted": "Deleted",
     "users.branches_update_error_fallback":
       "Unable to update user branches.",
     "users.create_error_fallback": "Unable to create the user.",

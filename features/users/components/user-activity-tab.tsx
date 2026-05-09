@@ -3,9 +3,11 @@
 import { useState } from "react";
 import {
   ArrowRightLeft,
+  Building2,
   ClipboardList,
   Loader2,
   Receipt,
+  ShieldCheck,
   ShieldOff,
   Truck,
 } from "lucide-react";
@@ -25,14 +27,21 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { formatDateTime } from "@/shared/lib/utils";
 
+import type { User } from "../types";
+
 type UserActivityTabProps = {
-  userId: string;
+  user: User;
   enabled: boolean;
+  onRequestTab?: (tab: string) => void;
 };
 
 const ACTIVITY_PAGE_SIZE = 20;
 
-export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
+export function UserActivityTab({
+  user,
+  enabled,
+  onRequestTab,
+}: UserActivityTabProps) {
   const { t } = useAppTranslator();
   const { can } = usePermissions();
 
@@ -40,7 +49,7 @@ export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
   const canViewSales = can("sale_orders.view");
   const canViewDispatch = can("dispatch_orders.view");
 
-  const userIdNumber = Number(userId);
+  const userIdNumber = Number(user.id);
   const validUserId = Number.isFinite(userIdNumber) && userIdNumber > 0;
 
   const initialSubTab = canViewMovements
@@ -59,6 +68,29 @@ export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
         icon={ShieldOff}
         title={t("users.activity.permission_required_title")}
         description={t("users.activity.permission_required_description")}
+      />
+    );
+  }
+
+  const hasNoRoles = user.roles.length === 0 && user.role_ids.length === 0;
+  const hasNoBranches = user.branch_ids.length === 0;
+
+  if (hasNoRoles) {
+    return (
+      <EmptyState
+        icon={ShieldOff}
+        title={t("users.activity.no_roles_title")}
+        description={t("users.activity.no_roles_description", {
+          name: user.name,
+        })}
+        action={
+          can("users.assign_roles") && onRequestTab ? (
+            <Button onClick={() => onRequestTab("roles")} size="sm">
+              <ShieldCheck className="size-4" />
+              {t("users.activity.assign_roles_action")}
+            </Button>
+          ) : undefined
+        }
       />
     );
   }
@@ -82,6 +114,28 @@ export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
           </TabsTrigger>
         ) : null}
       </TabsList>
+
+      {hasNoBranches ? (
+        <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
+          <div className="flex items-start gap-2">
+            <Building2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            <div className="flex-1 space-y-2">
+              <p>
+                {t("users.activity.no_branches_warning", { name: user.name })}
+              </p>
+              {can("users.assign_branches") && onRequestTab ? (
+                <Button
+                  onClick={() => onRequestTab("branches")}
+                  size="sm"
+                  variant="outline"
+                >
+                  {t("users.activity.assign_branches_action")}
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {canViewMovements ? (
         <TabsContent value="movements" className="space-y-3">

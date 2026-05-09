@@ -493,7 +493,6 @@ function MovementsList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
-        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={ArrowRightLeft}
@@ -511,6 +510,9 @@ function MovementsList({
         onNextPage={goNext}
         onPrevPage={goPrev}
         pageNumber={pageNumber}
+        total={query.data?.total ?? 0}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
       />
     </>
   );
@@ -653,7 +655,6 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
-        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Receipt}
@@ -671,6 +672,9 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         onNextPage={goNext}
         onPrevPage={goPrev}
         pageNumber={pageNumber}
+        total={query.data?.total ?? 0}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
       />
     </>
   );
@@ -831,7 +835,6 @@ function DispatchList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
-        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Truck}
@@ -849,6 +852,9 @@ function DispatchList({
         onNextPage={goNext}
         onPrevPage={goPrev}
         pageNumber={pageNumber}
+        total={query.data?.total ?? 0}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
       />
     </>
   );
@@ -863,12 +869,12 @@ function PageSizeSelect({
 }) {
   const { t } = useAppTranslator();
   return (
-    <div className="flex min-w-[7rem] flex-col gap-1">
+    <div className="flex items-center gap-2">
       <Label className="text-[11px] text-muted-foreground">
         {t("users.activity.filters.page_size_label")}
       </Label>
       <Select onValueChange={(v) => onChange(Number(v) as PageSize)} value={String(value)}>
-        <SelectTrigger>
+        <SelectTrigger className="h-8 w-[5rem]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -907,6 +913,9 @@ type ActivityListProps = {
   onNextPage: () => void;
   onPrevPage: () => void;
   pageNumber: number;
+  total: number;
+  pageSize: PageSize;
+  onPageSizeChange: (size: PageSize) => void;
 };
 
 function ActivityList({
@@ -925,6 +934,9 @@ function ActivityList({
   onNextPage,
   onPrevPage,
   pageNumber,
+  total,
+  pageSize,
+  onPageSizeChange,
 }: ActivityListProps) {
   const { t } = useAppTranslator();
   const topRef = useRef<HTMLDivElement>(null);
@@ -942,25 +954,35 @@ function ActivityList({
     );
   }
 
+  const toolbar = (
+    <div className="flex items-center justify-between gap-2">
+      <PageSizeSelect value={pageSize} onChange={onPageSizeChange} />
+      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        {isFetching ? (
+          <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+        ) : null}
+        {t("users.activity.total_records", { count: String(total) })}
+      </span>
+    </div>
+  );
+
   if (!items.length && !isFetching) {
     return (
-      <EmptyState
-        icon={ClipboardList}
-        title={emptyTitle}
-        description={emptyDescription}
-      />
+      <div className="space-y-2">
+        {toolbar}
+        <EmptyState
+          icon={ClipboardList}
+          title={emptyTitle}
+          description={emptyDescription}
+        />
+      </div>
     );
   }
 
   return (
     <div className="space-y-2">
       <div ref={topRef} />
-      <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-        {t("users.activity.loaded_count", { count: String(items.length) })}
-        {isFetching ? (
-          <Loader2 className="size-3 animate-spin" aria-hidden="true" />
-        ) : null}
-      </p>
+      {toolbar}
       <ul className="space-y-1.5">
         {items.map((item) => (
           <li

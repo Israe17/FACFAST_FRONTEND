@@ -16,6 +16,7 @@ export type CursorResponse<T> = {
   data: T[];
   next_cursor: number | null;
   has_more: boolean;
+  total: number;
 };
 
 // ─── Query Parameter Types ───
@@ -66,5 +67,6 @@ export function cursorSchema<T extends z.ZodType>(itemSchema: T) {
     data: z.array(itemSchema),
     next_cursor: z.number().nullable(),
     has_more: z.boolean(),
+    total: z.number().default(0),
   });
 }

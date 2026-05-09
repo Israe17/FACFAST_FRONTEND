@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,10 @@ import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import {
+  ProductMovementsSheet,
+  type ProductMovementsTarget,
+} from "./product-movements-sheet";
 import { WarehouseStockByCategory } from "./warehouse-stock-by-category";
 
 type InventoryWarehouseDetailProps = {
@@ -42,6 +47,8 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
   const { canRunTenantQueries } = useInventoryModule();
   const { can } = usePermissions();
   const canViewWarehouse = can("warehouses.view");
+  const canViewMovements = can("inventory_movements.view");
+  const [movementsTarget, setMovementsTarget] = useState<ProductMovementsTarget | null>(null);
   const warehouseQuery = useWarehouseQuery(warehouseId, canRunTenantQueries && canViewWarehouse);
   const locationsQuery = useWarehouseLocationsQuery(
     warehouseId,
@@ -339,6 +346,21 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           <WarehouseStockByCategory
             rows={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
+            onSelectRow={
+              canViewMovements
+                ? (row) => {
+                    if (!row.product_variant?.id) {
+                      return;
+                    }
+                    setMovementsTarget({
+                      warehouseId: row.warehouse.id,
+                      warehouseName: row.warehouse.name ?? warehouse.name,
+                      variantId: row.product_variant.id,
+                      productName: row.product.name ?? "",
+                    });
+                  }
+                : undefined
+            }
           />
         </DetailBlock>
       </div>
@@ -368,6 +390,15 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           />
         </DetailBlock>
       </div>
+
+      <ProductMovementsSheet
+        onOpenChange={(open) => {
+          if (!open) {
+            setMovementsTarget(null);
+          }
+        }}
+        target={movementsTarget}
+      />
     </div>
   );
 }

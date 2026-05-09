@@ -942,8 +942,25 @@ export async function listInventoryMovementsPaginated(params: PaginatedQueryPara
   return paginatedSchema(inventoryMovementHeaderSchema).parse(response.data);
 }
 
-export async function listInventoryMovementsCursor(params: CursorQueryParams) {
-  const response = await http.get("/inventory-movements/cursor", { params });
+export type InventoryMovementsListFilters = {
+  warehouse_id?: number;
+  product_variant_id?: number;
+  product_id?: number;
+};
+
+export async function listInventoryMovementsCursor(
+  params: CursorQueryParams,
+  filters: InventoryMovementsListFilters = {},
+) {
+  const queryParams = compactRecord({
+    ...params,
+    warehouse_id: filters.warehouse_id,
+    product_variant_id: filters.product_variant_id,
+    product_id: filters.product_id,
+  });
+  const response = await http.get("/inventory-movements/cursor", {
+    params: queryParams,
+  });
   return cursorSchema(inventoryMovementHeaderSchema).parse(response.data);
 }
 

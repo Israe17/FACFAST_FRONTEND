@@ -1439,6 +1439,40 @@ export function useInventoryMovementsCursorQuery(params: { search?: string; sort
   });
 }
 
+export function useInventoryMovementsByVariantQuery(
+  filters: { warehouseId: string; variantId: string },
+  enabled = true,
+) {
+  const warehouseIdNumber = Number(filters.warehouseId);
+  const variantIdNumber = Number(filters.variantId);
+  const isReady =
+    Boolean(filters.warehouseId) &&
+    Boolean(filters.variantId) &&
+    Number.isFinite(warehouseIdNumber) &&
+    Number.isFinite(variantIdNumber);
+
+  return useQuery({
+    enabled: enabled && isReady,
+    queryKey: [
+      ...inventoryKeys.inventoryMovements(),
+      "by-variant",
+      filters.warehouseId,
+      filters.variantId,
+    ] as const,
+    queryFn: async () => {
+      const response = await listInventoryMovementsCursor(
+        { limit: 50, sort_order: "DESC" },
+        {
+          warehouse_id: warehouseIdNumber,
+          product_variant_id: variantIdNumber,
+        },
+      );
+      return response.data;
+    },
+    staleTime: 30 * 1000,
+  });
+}
+
 export function useCreateInventoryAdjustmentMutation(options: MutationFeedbackOptions = {}) {
   const queryClient = useQueryClient();
   const { t } = useAppTranslator();

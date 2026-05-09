@@ -2,8 +2,10 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { History } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/shared/components/data-table";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
@@ -46,11 +48,13 @@ function groupByCategory(
 export type WarehouseStockByCategoryProps = {
   rows: WarehouseStockRow[];
   emptyMessage: string;
+  onSelectRow?: (row: WarehouseStockRow) => void;
 };
 
 export function WarehouseStockByCategory({
   rows,
   emptyMessage,
+  onSelectRow,
 }: WarehouseStockByCategoryProps) {
   const { t } = useAppTranslator();
   const noCategoryLabel = t("inventory.warehouse_detail.no_category_group");
@@ -79,8 +83,26 @@ export function WarehouseStockByCategory({
         accessorKey: "available_quantity",
         header: t("inventory.form.available_quantity"),
       },
+      ...(onSelectRow
+        ? [
+            {
+              id: "movements",
+              header: "",
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onSelectRow(row.original)}
+                >
+                  <History className="size-4" />
+                  {t("inventory.warehouse_detail.view_product_movements_action")}
+                </Button>
+              ),
+            } as ColumnDef<WarehouseStockRow>,
+          ]
+        : []),
     ],
-    [t],
+    [onSelectRow, t],
   );
 
   if (groups.length === 0) {

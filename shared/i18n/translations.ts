@@ -1225,6 +1225,18 @@ const esTranslations = {
     "Lectura materializada de balances por bodega, producto y variante default.",
   "inventory.warehouse_detail.no_category_group": "Sin categoría",
   "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} unidades",
+  "inventory.warehouse_detail.product_movements_title":
+    "Movimientos en {warehouse}",
+  "inventory.warehouse_detail.product_movements_description":
+    "Historial de entradas, salidas y ajustes de {product} en esta bodega.",
+  "inventory.warehouse_detail.no_movements_for_product":
+    "No hay movimientos registrados para este producto en esta bodega.",
+  "inventory.warehouse_detail.view_product_movements_action":
+    "Ver movimientos",
+  "inventory.detail.performed_by": "Realizado por",
+  "inventory.form.code": "Código",
+  "inventory.movements_load_error_fallback":
+    "No fue posible cargar los movimientos de inventario.",
   "inventory.warehouse_stock.below_min_badge": "Bajo mínimo",
   "inventory.warehouse_stock.min_stock_column": "Mínimo",
   "inventory.warehouse_stock.max_stock_column": "Máximo",
@@ -3661,6 +3673,18 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Materialized warehouse balances by warehouse, product and default variant.",
     "inventory.warehouse_detail.no_category_group": "Uncategorized",
     "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} units",
+    "inventory.warehouse_detail.product_movements_title":
+      "Movements in {warehouse}",
+    "inventory.warehouse_detail.product_movements_description":
+      "Inbound, outbound and adjustment history of {product} in this warehouse.",
+    "inventory.warehouse_detail.no_movements_for_product":
+      "No movements recorded for this product in this warehouse.",
+    "inventory.warehouse_detail.view_product_movements_action":
+      "View movements",
+    "inventory.detail.performed_by": "Performed by",
+    "inventory.form.code": "Code",
+    "inventory.movements_load_error_fallback":
+      "Unable to load inventory movements.",
     "inventory.warehouse_stock.below_min_badge": "Below minimum",
     "inventory.warehouse_stock.min_stock_column": "Min",
     "inventory.warehouse_stock.max_stock_column": "Max",

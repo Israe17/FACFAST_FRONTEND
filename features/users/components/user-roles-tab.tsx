@@ -58,6 +58,18 @@ export function UserRolesTab({ user, canAssign, onAssignClick }: UserRolesTabPro
     }));
   }, [rolesQuery.data, user.role_ids, user.roles]);
 
+  if (user.is_platform_admin) {
+    return (
+      <EmptyState
+        icon={ShieldCheck}
+        title={t("users.detail.roles_platform_admin_title")}
+        description={t("users.detail.roles_platform_admin_description", {
+          name: user.name,
+        })}
+      />
+    );
+  }
+
   if (!assignedRoles.length) {
     return (
       <EmptyState

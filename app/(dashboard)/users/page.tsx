@@ -25,6 +25,7 @@ import { LoadingState } from "@/shared/components/loading-state";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
+import { useSession } from "@/shared/hooks/use-session";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 
@@ -60,6 +61,7 @@ export default function UsersPage() {
   const { can } = usePermissions();
   const { activeBranchId, isBusinessLevelContext } = useActiveBranch();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
+  const { isPlatformAdmin } = useSession();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const canViewUsers = can("users.view");
 
@@ -73,7 +75,12 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-  const users = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
+  const users = useMemo(() => {
+    const raw = usersQuery.data ?? [];
+    return isPlatformAdmin
+      ? raw
+      : raw.filter((user) => !user.is_platform_admin);
+  }, [usersQuery.data, isPlatformAdmin]);
   const branches = branchesQuery.data ?? [];
   const ownerCount = useMemo(
     () => users.filter((user) => user.user_type === "owner").length,

@@ -1,8 +1,9 @@
 "use client";
 
-import { Filter, RotateCcw } from "lucide-react";
-import type { ReactNode } from "react";
+import { ChevronDown, Filter, RotateCcw } from "lucide-react";
+import { useState, type ReactNode } from "react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { DateRangeSelect } from "@/shared/components/date-range-select";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { cn } from "@/shared/lib/utils";
 
 export const ANY_VALUE = "__any__";
 
@@ -53,64 +55,87 @@ export function ActivityFiltersBar({
   trailing,
 }: ActivityFiltersBarProps) {
   const { t } = useAppTranslator();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const activeCount =
+    (from || to ? 1 : 0) + fields.filter((field) => field.value).length;
 
   return (
     <section
       aria-label={t("users.activity.filters.section_label")}
       className="rounded-xl border border-border/70 bg-card/60 p-3"
     >
-      <header className="mb-2 flex items-center gap-2">
-        <Filter className="size-4 text-muted-foreground" aria-hidden="true" />
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {t("users.activity.filters.section_label")}
-        </p>
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            disabled={!isDirty}
-            onClick={onClear}
-            size="sm"
-            variant="ghost"
-          >
-            <RotateCcw className="size-3.5" aria-hidden="true" />
-            {t("users.activity.filters.clear_label")}
-          </Button>
-        </div>
+      <header className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-expanded={!collapsed}
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="flex flex-1 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        >
+          <Filter className="size-4 text-muted-foreground" aria-hidden="true" />
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("users.activity.filters.section_label")}
+          </p>
+          {activeCount > 0 ? (
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+              {activeCount}
+            </Badge>
+          ) : null}
+          <ChevronDown
+            aria-hidden="true"
+            className={cn(
+              "size-4 text-muted-foreground transition-transform",
+              collapsed && "-rotate-90",
+            )}
+          />
+        </button>
+        <Button
+          disabled={!isDirty}
+          onClick={onClear}
+          size="sm"
+          variant="ghost"
+        >
+          <RotateCcw className="size-3.5" aria-hidden="true" />
+          {t("users.activity.filters.clear_label")}
+        </Button>
       </header>
 
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="flex min-w-[16rem] flex-col gap-1">
-          <Label className="text-[11px] text-muted-foreground">
-            {t("users.activity.filters.date_range_label")}
-          </Label>
-          <DateRangeSelect
-            from={from}
-            fromLabel={t("users.activity.filters.from_label")}
-            onChange={({ from: nextFrom, to: nextTo }) => {
-              onFromChange(nextFrom);
-              onToChange(nextTo);
-            }}
-            placeholder={t("date_range.placeholder")}
-            to={to}
-            toLabel={t("users.activity.filters.to_label")}
-          />
+      {!collapsed ? (
+        <div className="mt-2 flex flex-wrap items-end gap-2">
+          <div className="flex min-w-[16rem] flex-col gap-1">
+            <Label className="text-[11px] text-muted-foreground">
+              {t("users.activity.filters.date_range_label")}
+            </Label>
+            <DateRangeSelect
+              from={from}
+              fromLabel={t("users.activity.filters.from_label")}
+              onChange={({ from: nextFrom, to: nextTo }) => {
+                onFromChange(nextFrom);
+                onToChange(nextTo);
+              }}
+              placeholder={t("date_range.placeholder")}
+              to={to}
+              toLabel={t("users.activity.filters.to_label")}
+            />
+          </div>
+
+          {fields.map((field) => (
+            <SelectField
+              key={field.key}
+              id={`activity-filter-${field.key}`}
+              label={field.label}
+              placeholder={
+                field.placeholder ?? t("users.activity.filters.placeholder_any")
+              }
+              options={field.options}
+              value={field.value}
+              onChange={field.onChange}
+            />
+          ))}
+
+          {trailing}
         </div>
-
-        {fields.map((field) => (
-          <SelectField
-            key={field.key}
-            id={`activity-filter-${field.key}`}
-            label={field.label}
-            placeholder={
-              field.placeholder ?? t("users.activity.filters.placeholder_any")
-            }
-            options={field.options}
-            value={field.value}
-            onChange={field.onChange}
-          />
-        ))}
-
-        {trailing}
-      </div>
+      ) : null}
     </section>
   );
 }

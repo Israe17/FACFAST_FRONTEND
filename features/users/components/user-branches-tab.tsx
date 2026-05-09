@@ -41,8 +41,19 @@ export function UserBranchesTab({ user, canAssign, onAssignClick }: UserBranches
     }));
   }, [branchesQuery.data, user.branch_ids, user.branches]);
 
-  const isPrivilegedNoBranch =
-    user.user_type === "owner" || user.is_platform_admin;
+  if (user.is_platform_admin) {
+    return (
+      <EmptyState
+        icon={Waypoints}
+        title={t("users.detail.branches_platform_admin_title")}
+        description={t("users.detail.branches_platform_admin_description", {
+          name: user.name,
+        })}
+      />
+    );
+  }
+
+  const isPrivilegedNoBranch = user.user_type === "owner";
 
   if (!assignedBranches.length) {
     return (

@@ -242,7 +242,7 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
 
         <TabsContent value="roles" className="space-y-3">
           <div className="flex items-center justify-end">
-            {can("users.assign_roles") ? (
+            {can("users.assign_roles") && !user.is_platform_admin ? (
               <Button
                 size="sm"
                 variant="outline"
@@ -255,14 +255,14 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
           </div>
           <UserRolesTab
             user={user}
-            canAssign={can("users.assign_roles")}
+            canAssign={can("users.assign_roles") && !user.is_platform_admin}
             onAssignClick={() => setActiveDialog("roles")}
           />
         </TabsContent>
 
         <TabsContent value="branches" className="space-y-3">
           <div className="flex items-center justify-end">
-            {can("users.assign_branches") ? (
+            {can("users.assign_branches") && !user.is_platform_admin ? (
               <Button
                 size="sm"
                 variant="outline"
@@ -275,7 +275,7 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
           </div>
           <UserBranchesTab
             user={user}
-            canAssign={can("users.assign_branches")}
+            canAssign={can("users.assign_branches") && !user.is_platform_admin}
             onAssignClick={() => setActiveDialog("branches")}
           />
         </TabsContent>

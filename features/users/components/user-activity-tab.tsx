@@ -15,6 +15,13 @@ import type { LucideIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listDispatchOrdersCursor, listInventoryMovementsCursor } from "@/features/inventory/api";
 import { listSaleOrdersCursor } from "@/features/sales/api";
@@ -27,6 +34,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { formatDateTime } from "@/shared/lib/utils";
 
+import { useAssignableBranchesQuery } from "../queries";
 import type { User } from "../types";
 
 type UserActivityTabProps = {
@@ -36,6 +44,7 @@ type UserActivityTabProps = {
 };
 
 const ACTIVITY_PAGE_SIZE = 20;
+const BRANCH_FILTER_ALL = "all";
 
 export function UserActivityTab({
   user,
@@ -48,6 +57,7 @@ export function UserActivityTab({
   const canViewMovements = can("inventory_movements.view");
   const canViewSales = can("sale_orders.view");
   const canViewDispatch = can("dispatch_orders.view");
+  const isPrivileged = user.is_platform_admin || user.user_type === "owner";
 
   const userIdNumber = Number(user.id);
   const validUserId = Number.isFinite(userIdNumber) && userIdNumber > 0;
@@ -61,6 +71,15 @@ export function UserActivityTab({
         : "movements";
 
   const [activeSubTab, setActiveSubTab] = useState<string>(initialSubTab);
+  const [branchFilter, setBranchFilter] = useState<string>(BRANCH_FILTER_ALL);
+
+  const branchesQuery = useAssignableBranchesQuery(enabled);
+  const branchOptions = branchesQuery.data ?? [];
+  const branchIdNumber =
+    branchFilter === BRANCH_FILTER_ALL ? undefined : Number(branchFilter);
+  const validBranchFilter =
+    branchIdNumber === undefined ||
+    (Number.isFinite(branchIdNumber) && branchIdNumber > 0);
 
   if (!canViewMovements && !canViewSales && !canViewDispatch) {
     return (
@@ -75,7 +94,7 @@ export function UserActivityTab({
   const hasNoRoles = user.roles.length === 0 && user.role_ids.length === 0;
   const hasNoBranches = user.branch_ids.length === 0;
 
-  if (hasNoRoles) {
+  if (hasNoRoles && !user.is_platform_admin) {
     return (
       <EmptyState
         icon={ShieldOff}
@@ -97,25 +116,51 @@ export function UserActivityTab({
 
   return (
     <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
-      <TabsList>
-        {canViewMovements ? (
-          <TabsTrigger value="movements">
-            {t("users.activity.movements_title")}
-          </TabsTrigger>
-        ) : null}
-        {canViewSales ? (
-          <TabsTrigger value="sales">
-            {t("users.activity.sales_title")}
-          </TabsTrigger>
-        ) : null}
-        {canViewDispatch ? (
-          <TabsTrigger value="dispatch">
-            {t("users.activity.dispatch_title")}
-          </TabsTrigger>
-        ) : null}
-      </TabsList>
+      <div className="flex flex-wrap items-center gap-2">
+        <TabsList>
+          {canViewMovements ? (
+            <TabsTrigger value="movements">
+              {t("users.activity.movements_title")}
+            </TabsTrigger>
+          ) : null}
+          {canViewSales ? (
+            <TabsTrigger value="sales">
+              {t("users.activity.sales_title")}
+            </TabsTrigger>
+          ) : null}
+          {canViewDispatch ? (
+            <TabsTrigger value="dispatch">
+              {t("users.activity.dispatch_title")}
+            </TabsTrigger>
+          ) : null}
+        </TabsList>
 
-      {hasNoBranches ? (
+        <div className="ml-auto flex items-center gap-2">
+          <Building2
+            className="size-4 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Select value={branchFilter} onValueChange={setBranchFilter}>
+            <SelectTrigger className="h-9 w-[14rem]">
+              <SelectValue
+                placeholder={t("users.activity.branch_filter_placeholder")}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={BRANCH_FILTER_ALL}>
+                {t("users.activity.branch_filter_all")}
+              </SelectItem>
+              {branchOptions.map((branch) => (
+                <SelectItem key={branch.id} value={String(branch.id)}>
+                  {branch.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {hasNoBranches && !isPrivileged ? (
         <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
           <div className="flex items-start gap-2">
             <Building2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -141,7 +186,13 @@ export function UserActivityTab({
         <TabsContent value="movements" className="space-y-3">
           <MovementsList
             userId={userIdNumber}
-            enabled={enabled && validUserId && activeSubTab === "movements"}
+            branchId={branchIdNumber}
+            enabled={
+              enabled &&
+              validUserId &&
+              validBranchFilter &&
+              activeSubTab === "movements"
+            }
           />
         </TabsContent>
       ) : null}
@@ -150,7 +201,13 @@ export function UserActivityTab({
         <TabsContent value="sales" className="space-y-3">
           <SalesList
             userId={userIdNumber}
-            enabled={enabled && validUserId && activeSubTab === "sales"}
+            branchId={branchIdNumber}
+            enabled={
+              enabled &&
+              validUserId &&
+              validBranchFilter &&
+              activeSubTab === "sales"
+            }
           />
         </TabsContent>
       ) : null}
@@ -159,7 +216,13 @@ export function UserActivityTab({
         <TabsContent value="dispatch" className="space-y-3">
           <DispatchList
             userId={userIdNumber}
-            enabled={enabled && validUserId && activeSubTab === "dispatch"}
+            branchId={branchIdNumber}
+            enabled={
+              enabled &&
+              validUserId &&
+              validBranchFilter &&
+              activeSubTab === "dispatch"
+            }
           />
         </TabsContent>
       ) : null}
@@ -169,15 +232,25 @@ export function UserActivityTab({
 
 type ListProps = {
   userId: number;
+  branchId: number | undefined;
   enabled: boolean;
 };
 
-function MovementsList({ userId, enabled }: ListProps) {
+function MovementsList({ userId, branchId, enabled }: ListProps) {
   const { t } = useAppTranslator();
   const query = useCursorQuery({
-    queryKey: ["users", userId, "activity", "inventory-movements"],
+    queryKey: [
+      "users",
+      userId,
+      "activity",
+      "inventory-movements",
+      branchId ?? "all",
+    ],
     queryFn: (params) =>
-      listInventoryMovementsCursor(params, { performed_by_user_id: userId }),
+      listInventoryMovementsCursor(params, {
+        performed_by_user_id: userId,
+        branch_id: branchId,
+      }),
     limit: ACTIVITY_PAGE_SIZE,
     sortOrder: "DESC",
     enabled,
@@ -215,12 +288,21 @@ function MovementsList({ userId, enabled }: ListProps) {
   );
 }
 
-function SalesList({ userId, enabled }: ListProps) {
+function SalesList({ userId, branchId, enabled }: ListProps) {
   const { t } = useAppTranslator();
   const query = useCursorQuery({
-    queryKey: ["users", userId, "activity", "sale-orders"],
+    queryKey: [
+      "users",
+      userId,
+      "activity",
+      "sale-orders",
+      branchId ?? "all",
+    ],
     queryFn: (params) =>
-      listSaleOrdersCursor(params, { created_by_user_id: userId }),
+      listSaleOrdersCursor(params, {
+        created_by_user_id: userId,
+        branch_id: branchId,
+      }),
     limit: ACTIVITY_PAGE_SIZE,
     sortOrder: "DESC",
     enabled,
@@ -257,12 +339,21 @@ function SalesList({ userId, enabled }: ListProps) {
   );
 }
 
-function DispatchList({ userId, enabled }: ListProps) {
+function DispatchList({ userId, branchId, enabled }: ListProps) {
   const { t } = useAppTranslator();
   const query = useCursorQuery({
-    queryKey: ["users", userId, "activity", "dispatch-orders"],
+    queryKey: [
+      "users",
+      userId,
+      "activity",
+      "dispatch-orders",
+      branchId ?? "all",
+    ],
     queryFn: (params) =>
-      listDispatchOrdersCursor(params, { created_by_user_id: userId }),
+      listDispatchOrdersCursor(params, {
+        created_by_user_id: userId,
+        branch_id: branchId,
+      }),
     limit: ACTIVITY_PAGE_SIZE,
     sortOrder: "DESC",
     enabled,

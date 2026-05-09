@@ -946,6 +946,7 @@ export type InventoryMovementsListFilters = {
   warehouse_id?: number;
   product_variant_id?: number;
   product_id?: number;
+  performed_by_user_id?: number;
 };
 
 export async function listInventoryMovementsCursor(
@@ -957,6 +958,7 @@ export async function listInventoryMovementsCursor(
     warehouse_id: filters.warehouse_id,
     product_variant_id: filters.product_variant_id,
     product_id: filters.product_id,
+    performed_by_user_id: filters.performed_by_user_id,
   });
   const response = await http.get("/inventory-movements/cursor", {
     params: queryParams,
@@ -969,8 +971,21 @@ export async function listDispatchOrdersPaginated(params: PaginatedQueryParams) 
   return paginatedSchema(dispatchOrderSchema).parse(response.data);
 }
 
-export async function listDispatchOrdersCursor(params: CursorQueryParams) {
-  const response = await http.get("/dispatch-orders/cursor", { params });
+export type DispatchOrdersListFilters = {
+  created_by_user_id?: number;
+};
+
+export async function listDispatchOrdersCursor(
+  params: CursorQueryParams,
+  filters: DispatchOrdersListFilters = {},
+) {
+  const queryParams = compactRecord({
+    ...params,
+    created_by_user_id: filters.created_by_user_id,
+  });
+  const response = await http.get("/dispatch-orders/cursor", {
+    params: queryParams,
+  });
   return cursorSchema(dispatchOrderSchema).parse(response.data);
 }
 

@@ -48,8 +48,19 @@ export async function listSaleOrdersPaginated(params: PaginatedQueryParams) {
   return paginatedSchema(saleOrderSchema).parse(response.data);
 }
 
-export async function listSaleOrdersCursor(params: CursorQueryParams) {
-  const response = await http.get("/sale-orders/cursor", { params });
+export type SaleOrdersListFilters = {
+  created_by_user_id?: number;
+};
+
+export async function listSaleOrdersCursor(
+  params: CursorQueryParams,
+  filters: SaleOrdersListFilters = {},
+) {
+  const queryParams = compactRecord({
+    ...params,
+    created_by_user_id: filters.created_by_user_id,
+  });
+  const response = await http.get("/sale-orders/cursor", { params: queryParams });
   return cursorSchema(saleOrderSchema).parse(response.data);
 }
 

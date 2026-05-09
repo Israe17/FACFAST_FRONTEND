@@ -9,15 +9,18 @@ import {
   ClipboardList,
   Loader2,
   Receipt,
+  Search,
   ShieldCheck,
   ShieldOff,
   Truck,
+  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -42,6 +45,7 @@ import { listSaleOrdersCursor } from "@/features/sales/api";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
@@ -360,11 +364,13 @@ function MovementsList({
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
   const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
 
-  // Reset pagination when filters or page size change (render-time derived state reset)
-  const filtersKey = JSON.stringify(filters);
+  // Reset pagination when filters, search, or page size change.
+  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
   const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
   const [lastPageSize, setLastPageSize] = useState(pageSize);
   if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
@@ -434,10 +440,10 @@ function MovementsList({
   }
 
   const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters, pageSize, cursor],
+    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters, pageSize, debouncedSearch, cursor],
     queryFn: () =>
       listInventoryMovementsCursor(
-        { cursor, limit: pageSize, sort_order: "DESC" },
+        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
         {
           performed_by_user_id: userIdNumber,
           branch_id: toNumberFilter(filters.branch_id),
@@ -513,6 +519,8 @@ function MovementsList({
         total={query.data?.total ?? 0}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}
+        search={searchInput}
+        onSearchChange={setSearchInput}
       />
     </>
   );
@@ -529,10 +537,12 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
   const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
 
-  const filtersKey = JSON.stringify(filters);
+  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
   const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
   const [lastPageSize, setLastPageSize] = useState(pageSize);
   if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
@@ -598,10 +608,10 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   }
 
   const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters, pageSize, cursor],
+    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters, pageSize, debouncedSearch, cursor],
     queryFn: () =>
       listSaleOrdersCursor(
-        { cursor, limit: pageSize, sort_order: "DESC" },
+        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
         {
           created_by_user_id: userIdNumber,
           branch_id: toNumberFilter(filters.branch_id),
@@ -675,6 +685,8 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         total={query.data?.total ?? 0}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}
+        search={searchInput}
+        onSearchChange={setSearchInput}
       />
     </>
   );
@@ -696,10 +708,12 @@ function DispatchList({
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
   const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
 
-  const filtersKey = JSON.stringify(filters);
+  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
   const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
   const [lastPageSize, setLastPageSize] = useState(pageSize);
   if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
@@ -775,10 +789,10 @@ function DispatchList({
   }
 
   const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters, pageSize, cursor],
+    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters, pageSize, debouncedSearch, cursor],
     queryFn: () =>
       listDispatchOrdersCursor(
-        { cursor, limit: pageSize, sort_order: "DESC" },
+        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
         {
           created_by_user_id: userIdNumber,
           branch_id: toNumberFilter(filters.branch_id),
@@ -855,6 +869,8 @@ function DispatchList({
         total={query.data?.total ?? 0}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}
+        search={searchInput}
+        onSearchChange={setSearchInput}
       />
     </>
   );
@@ -926,6 +942,8 @@ type ActivityListProps = {
   total: number;
   pageSize: PageSize;
   onPageSizeChange: (size: PageSize) => void;
+  search: string;
+  onSearchChange: (value: string) => void;
 };
 
 function ActivityList({
@@ -947,6 +965,8 @@ function ActivityList({
   total,
   pageSize,
   onPageSizeChange,
+  search,
+  onSearchChange,
 }: ActivityListProps) {
   const { t } = useAppTranslator();
   const topRef = useRef<HTMLDivElement>(null);
@@ -965,9 +985,32 @@ function ActivityList({
   }
 
   const toolbar = (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="relative flex-1 min-w-[12rem]">
+        <Search
+          aria-hidden="true"
+          className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+        />
+        <Input
+          aria-label={t("users.activity.search_placeholder")}
+          className="h-8 pl-8 pr-7"
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder={t("users.activity.search_placeholder")}
+          value={search}
+        />
+        {search ? (
+          <button
+            type="button"
+            aria-label={t("common.clear")}
+            onClick={() => onSearchChange("")}
+            className="absolute right-1.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <X className="size-3" aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
       <PageSizeSelect value={pageSize} onChange={onPageSizeChange} />
-      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+      <span className="ml-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
         {isFetching ? (
           <Loader2 className="size-3 animate-spin" aria-hidden="true" />
         ) : null}

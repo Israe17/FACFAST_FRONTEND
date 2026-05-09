@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ArrowRightLeft,
   Building2,
+  ChevronsUp,
   ClipboardList,
   Loader2,
   Receipt,
@@ -15,6 +16,14 @@ import type { LucideIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useContactsQuery } from "@/features/contacts/queries";
 import {
   listDispatchOrdersCursor,
@@ -53,7 +62,9 @@ type UserActivityTabProps = {
   onRequestTab?: (tab: string) => void;
 };
 
-const ACTIVITY_PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
+type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+const DEFAULT_PAGE_SIZE: PageSize = 20;
 
 type MovementsFilters = {
   branch_id?: string;
@@ -347,6 +358,7 @@ function MovementsList({
 }: MovementsListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const productsQuery = useProductsQuery(enabled);
@@ -406,7 +418,7 @@ function MovementsList({
   }
 
   const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters],
+    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters, pageSize],
     queryFn: (params) =>
       listInventoryMovementsCursor(params, {
         performed_by_user_id: userIdNumber,
@@ -418,7 +430,7 @@ function MovementsList({
         status: filters.status,
         movement_type: filters.movement_type,
       }),
-    limit: ACTIVITY_PAGE_SIZE,
+    limit: pageSize,
     sortOrder: "DESC",
     enabled,
   });
@@ -447,6 +459,7 @@ function MovementsList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={ArrowRightLeft}
@@ -476,6 +489,7 @@ type SalesListProps = {
 function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const contactsQuery = useContactsQuery(enabled);
@@ -531,7 +545,7 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   }
 
   const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters],
+    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters, pageSize],
     queryFn: (params) =>
       listSaleOrdersCursor(params, {
         created_by_user_id: userIdNumber,
@@ -542,7 +556,7 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         to: filters.to,
         status: filters.status,
       }),
-    limit: ACTIVITY_PAGE_SIZE,
+    limit: pageSize,
     sortOrder: "DESC",
     enabled,
   });
@@ -570,6 +584,7 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Receipt}
@@ -604,6 +619,7 @@ function DispatchList({
 }: DispatchListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const vehiclesQuery = useVehiclesQuery(enabled);
   const routesQuery = useRoutesQuery(enabled);
@@ -669,7 +685,7 @@ function DispatchList({
   }
 
   const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters],
+    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters, pageSize],
     queryFn: (params) =>
       listDispatchOrdersCursor(params, {
         created_by_user_id: userIdNumber,
@@ -682,7 +698,7 @@ function DispatchList({
         status: filters.status,
         dispatch_type: filters.dispatch_type,
       }),
-    limit: ACTIVITY_PAGE_SIZE,
+    limit: pageSize,
     sortOrder: "DESC",
     enabled,
   });
@@ -711,6 +727,7 @@ function DispatchList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Truck}
@@ -727,6 +744,35 @@ function DispatchList({
         onLoadMore={() => query.fetchNextPage()}
       />
     </>
+  );
+}
+
+function PageSizeSelect({
+  value,
+  onChange,
+}: {
+  value: PageSize;
+  onChange: (size: PageSize) => void;
+}) {
+  const { t } = useAppTranslator();
+  return (
+    <div className="flex min-w-[7rem] flex-col gap-1">
+      <Label className="text-[11px] text-muted-foreground">
+        {t("users.activity.filters.page_size_label")}
+      </Label>
+      <Select onValueChange={(v) => onChange(Number(v) as PageSize)} value={String(value)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <SelectItem key={size} value={String(size)}>
+              {size}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -768,6 +814,7 @@ function ActivityList({
   onLoadMore,
 }: ActivityListProps) {
   const { t } = useAppTranslator();
+  const topRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) {
     return <LoadingState description={loadingLabel} />;
@@ -794,6 +841,7 @@ function ActivityList({
 
   return (
     <div className="space-y-2">
+      <div ref={topRef} />
       <p className="text-[11px] text-muted-foreground">
         {t("users.activity.loaded_count", { count: String(items.length) })}
       </p>
@@ -830,8 +878,16 @@ function ActivityList({
         ))}
       </ul>
 
-      {hasNextPage ? (
-        <div className="flex justify-center pt-1">
+      <div className="flex items-center justify-between pt-1">
+        <Button
+          onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
+          size="sm"
+          variant="ghost"
+        >
+          <ChevronsUp className="size-3.5" aria-hidden="true" />
+          {t("users.activity.scroll_to_top")}
+        </Button>
+        {hasNextPage ? (
           <Button
             disabled={isFetchingNextPage}
             onClick={onLoadMore}
@@ -845,12 +901,12 @@ function ActivityList({
               ? t("users.activity.loading_more")
               : t("users.activity.load_more")}
           </Button>
-        </div>
-      ) : (
-        <p className="pt-1 text-center text-[10px] text-muted-foreground">
-          {t("users.activity.end_of_list")}
-        </p>
-      )}
+        ) : (
+          <p className="text-[10px] text-muted-foreground">
+            {t("users.activity.end_of_list")}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

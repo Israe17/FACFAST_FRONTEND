@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Building2, Waypoints } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
@@ -12,9 +13,11 @@ import type { BranchOption, User } from "../types";
 
 type UserBranchesTabProps = {
   user: User;
+  canAssign: boolean;
+  onAssignClick?: () => void;
 };
 
-export function UserBranchesTab({ user }: UserBranchesTabProps) {
+export function UserBranchesTab({ user, canAssign, onAssignClick }: UserBranchesTabProps) {
   const { t } = useAppTranslator();
   const branchesQuery = useAssignableBranchesQuery(true);
 
@@ -38,12 +41,27 @@ export function UserBranchesTab({ user }: UserBranchesTabProps) {
     }));
   }, [branchesQuery.data, user.branch_ids, user.branches]);
 
+  const isPrivilegedNoBranch =
+    user.user_type === "owner" || user.is_platform_admin;
+
   if (!assignedBranches.length) {
     return (
       <EmptyState
         icon={Waypoints}
         title={t("users.detail.branches_empty_title")}
-        description={t("users.detail.branches_empty_description")}
+        description={
+          isPrivilegedNoBranch
+            ? t("users.detail.branches_empty_privileged", { name: user.name })
+            : t("users.detail.branches_empty_guidance", { name: user.name })
+        }
+        action={
+          !isPrivilegedNoBranch && canAssign && onAssignClick ? (
+            <Button onClick={onAssignClick} size="sm">
+              <Waypoints className="size-4" />
+              {t("users.actions.assign_branches")}
+            </Button>
+          ) : undefined
+        }
       />
     );
   }

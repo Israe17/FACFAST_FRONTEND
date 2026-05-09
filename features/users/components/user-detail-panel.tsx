@@ -200,6 +200,26 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
         </div>
       </section>
 
+      {status !== "active" && can("users.change_status") ? (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+          <ToggleLeft className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <div className="flex-1 space-y-2">
+            <p className="font-medium">
+              {t("users.detail.status_warning_title", { status: statusLabel })}
+            </p>
+            <p>{t("users.detail.status_warning_description")}</p>
+            <Button
+              onClick={() => setActiveDialog("status")}
+              size="sm"
+              variant="outline"
+            >
+              <ToggleLeft className="size-4" />
+              {t("users.actions.change_status")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="roles">
@@ -233,7 +253,11 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
               </Button>
             ) : null}
           </div>
-          <UserRolesTab user={user} />
+          <UserRolesTab
+            user={user}
+            canAssign={can("users.assign_roles")}
+            onAssignClick={() => setActiveDialog("roles")}
+          />
         </TabsContent>
 
         <TabsContent value="branches" className="space-y-3">
@@ -249,13 +273,19 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
               </Button>
             ) : null}
           </div>
-          <UserBranchesTab user={user} />
+          <UserBranchesTab
+            user={user}
+            canAssign={can("users.assign_branches")}
+            onAssignClick={() => setActiveDialog("branches")}
+          />
         </TabsContent>
 
         <TabsContent value="permissions" className="space-y-3">
           <UserPermissionsTab
-            userId={user.id}
+            user={user}
             enabled={activeTab === "permissions"}
+            canAssignRoles={can("users.assign_roles")}
+            onAssignRolesClick={() => setActiveDialog("roles")}
           />
         </TabsContent>
 

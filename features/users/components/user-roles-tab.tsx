@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Lock, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
@@ -14,6 +15,8 @@ import type { User } from "../types";
 
 type UserRolesTabProps = {
   user: User;
+  canAssign: boolean;
+  onAssignClick?: () => void;
 };
 
 type AssignedRoleEntry = {
@@ -23,7 +26,7 @@ type AssignedRoleEntry = {
   is_system: boolean;
 };
 
-export function UserRolesTab({ user }: UserRolesTabProps) {
+export function UserRolesTab({ user, canAssign, onAssignClick }: UserRolesTabProps) {
   const { t } = useAppTranslator();
   const rolesQuery = useRolesQuery(true);
 
@@ -60,7 +63,15 @@ export function UserRolesTab({ user }: UserRolesTabProps) {
       <EmptyState
         icon={ShieldCheck}
         title={t("users.detail.roles_empty_title")}
-        description={t("users.detail.roles_empty_description")}
+        description={t("users.detail.roles_empty_guidance", { name: user.name })}
+        action={
+          canAssign && onAssignClick ? (
+            <Button onClick={onAssignClick} size="sm">
+              <ShieldCheck className="size-4" />
+              {t("users.actions.assign_roles")}
+            </Button>
+          ) : undefined
+        }
       />
     );
   }

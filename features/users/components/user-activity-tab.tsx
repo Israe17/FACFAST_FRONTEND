@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ArrowRightLeft,
   Building2,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Loader2,
   Receipt,
@@ -12,9 +14,19 @@ import {
   Truck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useContactsQuery } from "@/features/contacts/queries";
 import {
   listDispatchOrdersCursor,
@@ -30,7 +42,6 @@ import { listSaleOrdersCursor } from "@/features/sales/api";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
@@ -45,7 +56,6 @@ import {
   type FilterField,
   type SelectOption,
 } from "./activity-filters-bar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type UserActivityTabProps = {
   user: User;
@@ -53,7 +63,9 @@ type UserActivityTabProps = {
   onRequestTab?: (tab: string) => void;
 };
 
-const ACTIVITY_PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
+type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+const DEFAULT_PAGE_SIZE: PageSize = 20;
 
 type MovementsFilters = {
   branch_id?: string;
@@ -347,6 +359,22 @@ function MovementsList({
 }: MovementsListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [cursor, setCursor] = useState<number | undefined>(undefined);
+  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+
+  // Reset pagination when filters or page size change (render-time derived state reset)
+  const filtersKey = JSON.stringify(filters);
+  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
+  const [lastPageSize, setLastPageSize] = useState(pageSize);
+  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
+    setLastFiltersKey(filtersKey);
+    setLastPageSize(pageSize);
+    setCursor(undefined);
+    setCursorStack([]);
+  }
+
+  const pageNumber = cursorStack.length + 1;
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const productsQuery = useProductsQuery(enabled);
@@ -405,25 +433,26 @@ function MovementsList({
     fields.shift();
   }
 
-  const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters],
-    queryFn: (params) =>
-      listInventoryMovementsCursor(params, {
-        performed_by_user_id: userIdNumber,
-        branch_id: toNumberFilter(filters.branch_id),
-        warehouse_id: toNumberFilter(filters.warehouse_id),
-        product_id: toNumberFilter(filters.product_id),
-        from: filters.from,
-        to: filters.to,
-        status: filters.status,
-        movement_type: filters.movement_type,
-      }),
-    limit: ACTIVITY_PAGE_SIZE,
-    sortOrder: "DESC",
+  const query = useQuery({
+    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters, pageSize, cursor],
+    queryFn: () =>
+      listInventoryMovementsCursor(
+        { cursor, limit: pageSize, sort_order: "DESC" },
+        {
+          performed_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(filters.branch_id),
+          warehouse_id: toNumberFilter(filters.warehouse_id),
+          product_id: toNumberFilter(filters.product_id),
+          from: filters.from,
+          to: filters.to,
+          status: filters.status,
+          movement_type: filters.movement_type,
+        },
+      ),
     enabled,
   });
 
-  const items = query.data.map((movement) => ({
+  const items = (query.data?.data ?? []).map((movement) => ({
     id: String(movement.id),
     primary: movement.code ?? `#${movement.id}`,
     secondary: [
@@ -437,6 +466,23 @@ function MovementsList({
     badge: movement.status ? String(movement.status) : null,
   }));
 
+  const hasNextPage = Boolean(query.data?.has_more);
+  const hasPrevPage = cursorStack.length > 0;
+
+  function goNext() {
+    const nextCursor = query.data?.next_cursor;
+    if (hasNextPage && nextCursor != null) {
+      setCursorStack((prev) => [...prev, cursor]);
+      setCursor(nextCursor);
+    }
+  }
+
+  function goPrev() {
+    const prevCursor = cursorStack[cursorStack.length - 1];
+    setCursor(prevCursor);
+    setCursorStack((prev) => prev.slice(0, -1));
+  }
+
   return (
     <>
       <ActivityFiltersBar
@@ -447,6 +493,7 @@ function MovementsList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={ArrowRightLeft}
@@ -455,12 +502,15 @@ function MovementsList({
         emptyDescription={t("users.activity.movements_empty_description")}
         items={items}
         isLoading={query.isLoading}
+        isFetching={query.isFetching && !query.isLoading}
         isError={query.isError}
         error={query.error}
         onRetry={() => query.refetch()}
-        hasNextPage={Boolean(query.hasNextPage)}
-        isFetchingNextPage={query.isFetchingNextPage}
-        onLoadMore={() => query.fetchNextPage()}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        onNextPage={goNext}
+        onPrevPage={goPrev}
+        pageNumber={pageNumber}
       />
     </>
   );
@@ -476,6 +526,21 @@ type SalesListProps = {
 function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [cursor, setCursor] = useState<number | undefined>(undefined);
+  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+
+  const filtersKey = JSON.stringify(filters);
+  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
+  const [lastPageSize, setLastPageSize] = useState(pageSize);
+  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
+    setLastFiltersKey(filtersKey);
+    setLastPageSize(pageSize);
+    setCursor(undefined);
+    setCursorStack([]);
+  }
+
+  const pageNumber = cursorStack.length + 1;
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const contactsQuery = useContactsQuery(enabled);
@@ -530,24 +595,25 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
     fields.shift();
   }
 
-  const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters],
-    queryFn: (params) =>
-      listSaleOrdersCursor(params, {
-        created_by_user_id: userIdNumber,
-        branch_id: toNumberFilter(filters.branch_id),
-        customer_contact_id: toNumberFilter(filters.customer_contact_id),
-        warehouse_id: toNumberFilter(filters.warehouse_id),
-        from: filters.from,
-        to: filters.to,
-        status: filters.status,
-      }),
-    limit: ACTIVITY_PAGE_SIZE,
-    sortOrder: "DESC",
+  const query = useQuery({
+    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters, pageSize, cursor],
+    queryFn: () =>
+      listSaleOrdersCursor(
+        { cursor, limit: pageSize, sort_order: "DESC" },
+        {
+          created_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(filters.branch_id),
+          customer_contact_id: toNumberFilter(filters.customer_contact_id),
+          warehouse_id: toNumberFilter(filters.warehouse_id),
+          from: filters.from,
+          to: filters.to,
+          status: filters.status,
+        },
+      ),
     enabled,
   });
 
-  const items = query.data.map((order) => ({
+  const items = (query.data?.data ?? []).map((order) => ({
     id: String(order.id),
     primary: order.code ?? `#${order.id}`,
     secondary: [
@@ -560,6 +626,23 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
     badge: order.status ? String(order.status) : null,
   }));
 
+  const hasNextPage = Boolean(query.data?.has_more);
+  const hasPrevPage = cursorStack.length > 0;
+
+  function goNext() {
+    const nextCursor = query.data?.next_cursor;
+    if (hasNextPage && nextCursor != null) {
+      setCursorStack((prev) => [...prev, cursor]);
+      setCursor(nextCursor);
+    }
+  }
+
+  function goPrev() {
+    const prevCursor = cursorStack[cursorStack.length - 1];
+    setCursor(prevCursor);
+    setCursorStack((prev) => prev.slice(0, -1));
+  }
+
   return (
     <>
       <ActivityFiltersBar
@@ -570,6 +653,7 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Receipt}
@@ -578,12 +662,15 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         emptyDescription={t("users.activity.sales_empty_description")}
         items={items}
         isLoading={query.isLoading}
+        isFetching={query.isFetching && !query.isLoading}
         isError={query.isError}
         error={query.error}
         onRetry={() => query.refetch()}
-        hasNextPage={Boolean(query.hasNextPage)}
-        isFetchingNextPage={query.isFetchingNextPage}
-        onLoadMore={() => query.fetchNextPage()}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        onNextPage={goNext}
+        onPrevPage={goPrev}
+        pageNumber={pageNumber}
       />
     </>
   );
@@ -604,6 +691,21 @@ function DispatchList({
 }: DispatchListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+  const [cursor, setCursor] = useState<number | undefined>(undefined);
+  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+
+  const filtersKey = JSON.stringify(filters);
+  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
+  const [lastPageSize, setLastPageSize] = useState(pageSize);
+  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
+    setLastFiltersKey(filtersKey);
+    setLastPageSize(pageSize);
+    setCursor(undefined);
+    setCursorStack([]);
+  }
+
+  const pageNumber = cursorStack.length + 1;
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const vehiclesQuery = useVehiclesQuery(enabled);
   const routesQuery = useRoutesQuery(enabled);
@@ -668,26 +770,27 @@ function DispatchList({
     fields.shift();
   }
 
-  const query = useCursorQuery({
-    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters],
-    queryFn: (params) =>
-      listDispatchOrdersCursor(params, {
-        created_by_user_id: userIdNumber,
-        branch_id: toNumberFilter(filters.branch_id),
-        vehicle_id: toNumberFilter(filters.vehicle_id),
-        driver_user_id: toNumberFilter(filters.driver_user_id),
-        route_id: toNumberFilter(filters.route_id),
-        from: filters.from,
-        to: filters.to,
-        status: filters.status,
-        dispatch_type: filters.dispatch_type,
-      }),
-    limit: ACTIVITY_PAGE_SIZE,
-    sortOrder: "DESC",
+  const query = useQuery({
+    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters, pageSize, cursor],
+    queryFn: () =>
+      listDispatchOrdersCursor(
+        { cursor, limit: pageSize, sort_order: "DESC" },
+        {
+          created_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(filters.branch_id),
+          vehicle_id: toNumberFilter(filters.vehicle_id),
+          driver_user_id: toNumberFilter(filters.driver_user_id),
+          route_id: toNumberFilter(filters.route_id),
+          from: filters.from,
+          to: filters.to,
+          status: filters.status,
+          dispatch_type: filters.dispatch_type,
+        },
+      ),
     enabled,
   });
 
-  const items = query.data.map((order) => ({
+  const items = (query.data?.data ?? []).map((order) => ({
     id: String(order.id),
     primary: order.code ?? `#${order.id}`,
     secondary: [
@@ -701,6 +804,23 @@ function DispatchList({
     badge: order.status ? String(order.status) : null,
   }));
 
+  const hasNextPage = Boolean(query.data?.has_more);
+  const hasPrevPage = cursorStack.length > 0;
+
+  function goNext() {
+    const nextCursor = query.data?.next_cursor;
+    if (hasNextPage && nextCursor != null) {
+      setCursorStack((prev) => [...prev, cursor]);
+      setCursor(nextCursor);
+    }
+  }
+
+  function goPrev() {
+    const prevCursor = cursorStack[cursorStack.length - 1];
+    setCursor(prevCursor);
+    setCursorStack((prev) => prev.slice(0, -1));
+  }
+
   return (
     <>
       <ActivityFiltersBar
@@ -711,6 +831,7 @@ function DispatchList({
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
+        trailing={<PageSizeSelect value={pageSize} onChange={setPageSize} />}
       />
       <ActivityList
         icon={Truck}
@@ -719,14 +840,46 @@ function DispatchList({
         emptyDescription={t("users.activity.dispatch_empty_description")}
         items={items}
         isLoading={query.isLoading}
+        isFetching={query.isFetching && !query.isLoading}
         isError={query.isError}
         error={query.error}
         onRetry={() => query.refetch()}
-        hasNextPage={Boolean(query.hasNextPage)}
-        isFetchingNextPage={query.isFetchingNextPage}
-        onLoadMore={() => query.fetchNextPage()}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        onNextPage={goNext}
+        onPrevPage={goPrev}
+        pageNumber={pageNumber}
       />
     </>
+  );
+}
+
+function PageSizeSelect({
+  value,
+  onChange,
+}: {
+  value: PageSize;
+  onChange: (size: PageSize) => void;
+}) {
+  const { t } = useAppTranslator();
+  return (
+    <div className="flex min-w-[7rem] flex-col gap-1">
+      <Label className="text-[11px] text-muted-foreground">
+        {t("users.activity.filters.page_size_label")}
+      </Label>
+      <Select onValueChange={(v) => onChange(Number(v) as PageSize)} value={String(value)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <SelectItem key={size} value={String(size)}>
+              {size}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -745,12 +898,15 @@ type ActivityListProps = {
   emptyDescription: string;
   items: ActivityItem[];
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   error: unknown;
   onRetry: () => void;
   hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  onLoadMore: () => void;
+  hasPrevPage: boolean;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  pageNumber: number;
 };
 
 function ActivityList({
@@ -760,14 +916,18 @@ function ActivityList({
   emptyDescription,
   items,
   isLoading,
+  isFetching,
   isError,
   error,
   onRetry,
   hasNextPage,
-  isFetchingNextPage,
-  onLoadMore,
+  hasPrevPage,
+  onNextPage,
+  onPrevPage,
+  pageNumber,
 }: ActivityListProps) {
   const { t } = useAppTranslator();
+  const topRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) {
     return <LoadingState description={loadingLabel} />;
@@ -782,7 +942,7 @@ function ActivityList({
     );
   }
 
-  if (!items.length) {
+  if (!items.length && !isFetching) {
     return (
       <EmptyState
         icon={ClipboardList}
@@ -794,8 +954,12 @@ function ActivityList({
 
   return (
     <div className="space-y-2">
-      <p className="text-[11px] text-muted-foreground">
+      <div ref={topRef} />
+      <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
         {t("users.activity.loaded_count", { count: String(items.length) })}
+        {isFetching ? (
+          <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+        ) : null}
       </p>
       <ul className="space-y-1.5">
         {items.map((item) => (
@@ -830,27 +994,35 @@ function ActivityList({
         ))}
       </ul>
 
-      {hasNextPage ? (
-        <div className="flex justify-center pt-1">
-          <Button
-            disabled={isFetchingNextPage}
-            onClick={onLoadMore}
-            size="sm"
-            variant="outline"
-          >
-            {isFetchingNextPage ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            ) : null}
-            {isFetchingNextPage
-              ? t("users.activity.loading_more")
-              : t("users.activity.load_more")}
-          </Button>
-        </div>
-      ) : (
-        <p className="pt-1 text-center text-[10px] text-muted-foreground">
-          {t("users.activity.end_of_list")}
-        </p>
-      )}
+      <div className="flex items-center justify-between pt-1">
+        <Button
+          disabled={!hasPrevPage || isFetching}
+          onClick={() => {
+            onPrevPage();
+            topRef.current?.scrollIntoView({ behavior: "smooth" });
+          }}
+          size="sm"
+          variant="ghost"
+        >
+          <ChevronLeft className="size-3.5" aria-hidden="true" />
+          {t("users.activity.prev_page")}
+        </Button>
+        <span className="text-[11px] text-muted-foreground">
+          {t("users.activity.page_number", { page: String(pageNumber) })}
+        </span>
+        <Button
+          disabled={!hasNextPage || isFetching}
+          onClick={() => {
+            onNextPage();
+            topRef.current?.scrollIntoView({ behavior: "smooth" });
+          }}
+          size="sm"
+          variant="ghost"
+        >
+          {t("users.activity.next_page")}
+          <ChevronRight className="size-3.5" aria-hidden="true" />
+        </Button>
+      </div>
     </div>
   );
 }

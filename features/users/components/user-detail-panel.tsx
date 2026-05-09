@@ -30,6 +30,7 @@ import { AssignUserRolesDialog } from "./assign-user-roles-dialog";
 import { ChangeUserPasswordDialog } from "./change-user-password-dialog";
 import { EditUserDialog } from "./edit-user-dialog";
 import { UpdateUserStatusDialog } from "./update-user-status-dialog";
+import { UserActivityTab } from "./user-activity-tab";
 import { UserBranchesTab } from "./user-branches-tab";
 import { UserPermissionsTab } from "./user-permissions-tab";
 import { UserRolesTab } from "./user-roles-tab";
@@ -55,6 +56,10 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
   const [activeTab, setActiveTab] = useState<string>("roles");
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
   const deleteUserMutation = useDeleteUserMutation(user.id);
+  const canViewActivity =
+    can("inventory_movements.view") ||
+    can("sale_orders.view") ||
+    can("dispatch_orders.view");
 
   useEffect(() => {
     setActiveTab("roles");
@@ -208,6 +213,11 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
           <TabsTrigger value="permissions">
             {t("users.detail.tabs.permissions")}
           </TabsTrigger>
+          {canViewActivity ? (
+            <TabsTrigger value="activity">
+              {t("users.detail.tabs.activity")}
+            </TabsTrigger>
+          ) : null}
         </TabsList>
 
         <TabsContent value="roles" className="space-y-3">
@@ -248,6 +258,15 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
             enabled={activeTab === "permissions"}
           />
         </TabsContent>
+
+        {canViewActivity ? (
+          <TabsContent value="activity" className="space-y-3">
+            <UserActivityTab
+              userId={user.id}
+              enabled={activeTab === "activity"}
+            />
+          </TabsContent>
+        ) : null}
       </Tabs>
 
       <EditUserDialog

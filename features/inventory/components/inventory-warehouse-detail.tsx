@@ -26,12 +26,12 @@ import type {
   InventoryLot,
   InventoryMovementHeader,
   WarehouseLocation,
-  WarehouseStockRow,
 } from "../types";
 import { inventoryMovementStatusTranslationMap, ledgerMovementTypeTranslationMap, warehousePurposeTranslationMap } from "../constants";
 import { useInventoryModule } from "../use-inventory-module";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { InventoryEntityHeader } from "./inventory-entity-header";
+import { WarehouseStockByCategory } from "./warehouse-stock-by-category";
 
 type InventoryWarehouseDetailProps = {
   warehouseId: string;
@@ -102,20 +102,6 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
       header: t("inventory.common.status"),
       cell: ({ row }) => (row.original.is_active ? t("inventory.common.active") : t("inventory.common.inactive")),
     },
-  ];
-
-  const stockColumns: ColumnDef<WarehouseStockRow>[] = [
-    { accessorKey: "product", header: t("inventory.entity.product"), cell: ({ row }) => row.original.product.name },
-    {
-      accessorKey: "product_variant",
-      header: t("inventory.detail.variant_label"),
-      cell: ({ row }) =>
-        row.original.product_variant?.variant_name ??
-        row.original.product_variant?.sku ??
-        t("inventory.detail.default_variant"),
-    },
-    { accessorKey: "quantity", header: t("inventory.form.on_hand_quantity") },
-    { accessorKey: "available_quantity", header: t("inventory.form.available_quantity") },
   ];
 
   const lotColumns: ColumnDef<InventoryLot>[] = [
@@ -350,10 +336,8 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
           description={t("inventory.detail.stock_block_description")}
           title={t("inventory.entity.warehouse_stock")}
         >
-          <DataTable
-            enablePagination={false}
-            columns={stockColumns}
-            data={stockRows}
+          <WarehouseStockByCategory
+            rows={stockRows}
             emptyMessage={t("inventory.detail.no_stock_rows")}
           />
         </DetailBlock>

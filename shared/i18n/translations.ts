@@ -1223,6 +1223,8 @@ const esTranslations = {
     "No fue posible actualizar la ubicación de bodega.",
   "inventory.warehouse_stock.section_description":
     "Lectura materializada de balances por bodega, producto y variante default.",
+  "inventory.warehouse_detail.no_category_group": "Sin categoría",
+  "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} unidades",
   "inventory.warehouse_stock.below_min_badge": "Bajo mínimo",
   "inventory.warehouse_stock.min_stock_column": "Mínimo",
   "inventory.warehouse_stock.max_stock_column": "Máximo",
@@ -3657,6 +3659,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "Unable to update the warehouse location.",
     "inventory.warehouse_stock.section_description":
       "Materialized warehouse balances by warehouse, product and default variant.",
+    "inventory.warehouse_detail.no_category_group": "Uncategorized",
+    "inventory.warehouse_detail.group_subtotal": "{skus} SKUs · {units} units",
     "inventory.warehouse_stock.below_min_badge": "Below minimum",
     "inventory.warehouse_stock.min_stock_column": "Min",
     "inventory.warehouse_stock.max_stock_column": "Max",

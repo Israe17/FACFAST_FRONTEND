@@ -125,6 +125,7 @@ const inventoryEntitySummarySchema = z
 
 const inventoryEntityWithTypeSummarySchema = inventoryEntitySummarySchema.extend({
   type: productTypeSchema.optional().catch(undefined),
+  category: inventoryEntitySummarySchema.nullable().optional().catch(null),
 });
 
 const measurementUnitSummarySchema = inventoryEntitySummarySchema.extend({

@@ -865,6 +865,12 @@ const productFormObjectSchema = z.object({
   track_serials: z.boolean().default(false),
   type: productTypeSchema,
   warranty_profile_id: makeOptionalIdSchema("Selecciona un perfil de garantia valido."),
+  initial_serials_text: z.string().default(""),
+  initial_serials_warehouse_id: z
+    .string()
+    .regex(positiveIntegerPattern, "Selecciona una bodega valida.")
+    .optional()
+    .or(z.literal("")),
 });
 
 function applyProductRules(
@@ -902,6 +908,38 @@ function applyProductRules(
       message: "El rastreo de seriales requiere rastreo de inventario.",
       path: ["track_serials"],
     });
+  }
+
+  const initialSerialsList =
+    typeof values.initial_serials_text === "string"
+      ? values.initial_serials_text
+          .split(/[\n,]+/)
+          .map((entry) => entry.trim())
+          .filter(Boolean)
+      : [];
+  if (initialSerialsList.length > 0) {
+    if (!values.track_serials) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Activa rastreo de seriales para cargar numeros de serie.",
+        path: ["initial_serials_text"],
+      });
+    }
+    if (!values.initial_serials_warehouse_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Selecciona una bodega para los seriales iniciales.",
+        path: ["initial_serials_warehouse_id"],
+      });
+    }
+    const uniqueSerials = new Set(initialSerialsList);
+    if (uniqueSerials.size !== initialSerialsList.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Hay numeros de serie repetidos.",
+        path: ["initial_serials_text"],
+      });
+    }
   }
 
   if (values.has_warranty && !values.warranty_profile_id) {

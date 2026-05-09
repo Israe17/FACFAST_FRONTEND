@@ -187,8 +187,24 @@ function buildWarrantyProfilePayload(
   });
 }
 
-function buildProductPayload(payload: CreateProductInput | UpdateProductInput) {
+function buildProductPayload(
+  payload: CreateProductInput | UpdateProductInput,
+  options: { includeInitialSerials?: boolean } = {},
+) {
   const isProduct = payload.type === "product";
+  const initialSerials =
+    options.includeInitialSerials &&
+    isProduct &&
+    payload.track_serials &&
+    typeof payload.initial_serials_text === "string"
+      ? payload.initial_serials_text
+          .split(/[\n,]+/)
+          .map((entry) => entry.trim())
+          .filter(Boolean)
+      : [];
+  const initialSerialsWarehouseId = toOptionalNumberId(
+    payload.initial_serials_warehouse_id,
+  );
 
   return compactRecord({
     allow_negative_stock: isProduct ? payload.allow_negative_stock : false,
@@ -202,6 +218,13 @@ function buildProductPayload(payload: CreateProductInput | UpdateProductInput) {
     description: payload.description,
     has_variants: isProduct ? payload.has_variants : false,
     has_warranty: payload.has_warranty,
+    initial_serials:
+      initialSerials.length > 0 && initialSerialsWarehouseId
+        ? {
+            serial_numbers: initialSerials,
+            warehouse_id: initialSerialsWarehouseId,
+          }
+        : undefined,
     is_active: payload.is_active,
     name: payload.name,
     sale_unit_id: toOptionalNumberId(payload.sale_unit_id),
@@ -537,7 +560,10 @@ export async function getProduct(productId: string) {
 }
 
 export async function createProduct(payload: CreateProductInput) {
-  const response = await http.post("/products", buildProductPayload(payload));
+  const response = await http.post(
+    "/products",
+    buildProductPayload(payload, { includeInitialSerials: true }),
+  );
   return productSchema.parse(extractEntity(response.data, ["product"]));
 }
 

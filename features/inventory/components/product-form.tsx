@@ -28,6 +28,7 @@ import type {
   MeasurementUnit,
   ProductCategory,
   TaxProfile,
+  Warehouse,
   WarrantyProfile,
 } from "../types";
 import { CabysSearchInput } from "./cabys-search-input";
@@ -43,8 +44,10 @@ export type ProductFormProps = {
   isPending?: boolean;
   measurementUnits: MeasurementUnit[];
   onSubmit: (values: CreateProductInput) => Promise<void> | void;
+  showInitialSerials?: boolean;
   submitLabel: string;
   taxProfiles: TaxProfile[];
+  warehouses?: Warehouse[];
   warrantyProfiles: WarrantyProfile[];
 };
 
@@ -56,8 +59,10 @@ export function ProductForm({
   isPending,
   measurementUnits,
   onSubmit,
+  showInitialSerials = false,
   submitLabel,
   taxProfiles,
+  warehouses = [],
   warrantyProfiles,
 }: ProductFormProps) {
   const {
@@ -104,6 +109,13 @@ export function ProductForm({
       form.setValue("warranty_profile_id", "", { shouldDirty: true });
     }
   }, [form, hasWarranty]);
+
+  useEffect(() => {
+    if (!trackSerials) {
+      form.setValue("initial_serials_text", "", { shouldDirty: true });
+      form.setValue("initial_serials_warehouse_id", "", { shouldDirty: true });
+    }
+  }, [form, trackSerials]);
 
   const categoryId = form.watch("category_id");
   const cabysCode = form.watch("cabys_code");
@@ -597,6 +609,72 @@ export function ProductForm({
           </label>
         </div>
       </section>
+
+      {showInitialSerials && isProductType && trackInventory && trackSerials ? (
+        <section className="space-y-4 rounded-xl border border-border/70 p-4">
+          <div className="space-y-1">
+            <h3 className="font-semibold">{t("inventory.products.initial_serials_title")}</h3>
+            <p className="text-sm text-muted-foreground">
+              {t("inventory.products.initial_serials_description")}
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="product-initial-serials-warehouse">
+                {t("inventory.entity.warehouse")}
+              </Label>
+              <Controller
+                control={form.control}
+                name="initial_serials_warehouse_id"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                    }
+                    value={field.value || EMPTY_SELECT_VALUE}
+                  >
+                    <SelectTrigger id="product-initial-serials-warehouse">
+                      <SelectValue
+                        placeholder={t("inventory.products.initial_serials_warehouse_placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>
+                        {t("inventory.products.initial_serials_warehouse_placeholder")}
+                      </SelectItem>
+                      {warehouses
+                        .filter((warehouse) => warehouse.is_active)
+                        .map((warehouse) => (
+                          <SelectItem key={warehouse.id} value={warehouse.id}>
+                            {warehouse.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FormFieldError message={errors.initial_serials_warehouse_id?.message} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="product-initial-serials-text">
+                {t("inventory.products.initial_serials_input_label")}
+              </Label>
+              <Textarea
+                id="product-initial-serials-text"
+                placeholder={t("inventory.products.initial_serials_input_placeholder")}
+                rows={5}
+                {...form.register("initial_serials_text")}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("inventory.products.initial_serials_input_hint")}
+              </p>
+              <FormFieldError message={errors.initial_serials_text?.message} />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <div className="flex justify-end">
         <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">

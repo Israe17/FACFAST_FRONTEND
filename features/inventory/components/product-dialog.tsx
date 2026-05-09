@@ -24,6 +24,7 @@ import type {
   Product,
   ProductCategory,
   TaxProfile,
+  Warehouse,
   WarrantyProfile,
 } from "../types";
 import { ProductForm } from "./product-form";
@@ -36,6 +37,7 @@ type ProductDialogProps = {
   open: boolean;
   product?: Product | null;
   taxProfiles: TaxProfile[];
+  warehouses: Warehouse[];
   warrantyProfiles: WarrantyProfile[];
 };
 
@@ -47,6 +49,7 @@ function ProductDialog({
   open,
   product,
   taxProfiles,
+  warehouses,
   warrantyProfiles,
 }: ProductDialogProps) {
   const createProductMutation = useCreateProductMutation({ showErrorToast: false });
@@ -100,7 +103,9 @@ function ProductDialog({
                   entity: t("inventory.entity.product"),
                 })
           }
+          showInitialSerials={!product}
           taxProfiles={taxProfiles}
+          warehouses={warehouses}
           warrantyProfiles={warrantyProfiles}
         />
       </SheetContent>

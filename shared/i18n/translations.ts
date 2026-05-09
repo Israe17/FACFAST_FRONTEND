@@ -1163,6 +1163,15 @@ const esTranslations = {
   "inventory.products.general_information_description":
     "Identidad principal del producto y referencias comerciales.",
   "inventory.products.general_information_title": "Información general",
+  "inventory.products.initial_serials_title": "Números de serie iniciales",
+  "inventory.products.initial_serials_description":
+    "Cargá ahora los códigos individuales (IMEI, VIN, placa, etc.) que querés rastrear. Quedan disponibles en la bodega seleccionada.",
+  "inventory.products.initial_serials_warehouse_placeholder": "Selecciona una bodega",
+  "inventory.products.initial_serials_input_label": "Números de serie",
+  "inventory.products.initial_serials_input_placeholder":
+    "IMEI-1234567890\nIMEI-0987654321\nVIN-ABC123",
+  "inventory.products.initial_serials_input_hint":
+    "Un número por línea o separados por coma. Es opcional, podés cargarlos después desde el detalle del producto.",
   "inventory.products.inventory_no_stock": "Sin stock",
   "inventory.products.inventory_service": "Servicio",
   "inventory.products.inventory_track_lots": "Rastrea lotes",
@@ -1868,6 +1877,8 @@ const esTranslations = {
     "El lote no pertenece a la variante indicada.",
   "inventory.product_serial_tracking_disabled":
     "Este producto no tiene habilitado el seguimiento por serie.",
+  "inventory.product_serials_require_inventory":
+    "Para registrar seriales el producto debe tener inventario activado.",
   "inventory.serial_not_found":
     "El número de serie no existe.",
   "inventory.serial_number_duplicate":
@@ -3571,6 +3582,15 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "inventory.products.general_information_description":
       "Core product identity and commercial references.",
     "inventory.products.general_information_title": "General information",
+    "inventory.products.initial_serials_title": "Initial serial numbers",
+    "inventory.products.initial_serials_description":
+      "Register individual codes now (IMEI, VIN, license plate, etc.) you want to track. They become available in the selected warehouse.",
+    "inventory.products.initial_serials_warehouse_placeholder": "Select a warehouse",
+    "inventory.products.initial_serials_input_label": "Serial numbers",
+    "inventory.products.initial_serials_input_placeholder":
+      "IMEI-1234567890\nIMEI-0987654321\nVIN-ABC123",
+    "inventory.products.initial_serials_input_hint":
+      "One per line or comma separated. Optional — you can also load them later from the product detail.",
     "inventory.products.inventory_no_stock": "No stock",
     "inventory.products.inventory_service": "Service",
     "inventory.products.inventory_track_lots": "Track lots",
@@ -4296,6 +4316,8 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The lot does not belong to the specified variant.",
     "inventory.product_serial_tracking_disabled":
       "This product does not have serial tracking enabled.",
+    "inventory.product_serials_require_inventory":
+      "To register serials the product must have inventory tracking enabled.",
     "inventory.serial_not_found":
       "The serial number does not exist.",
     "inventory.serial_number_duplicate":

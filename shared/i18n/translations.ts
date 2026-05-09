@@ -394,8 +394,8 @@ const esTranslations = {
   "inventory.common.unknown": "Desconocido",
   "inventory.common.updated": "Actualizado",
   "inventory.common.view": "Ver",
-  "inventory.entity.brand": "marca",
-  "inventory.entity.brands": "marcas",
+  "inventory.entity.brand": "Marca",
+  "inventory.entity.brands": "Marcas",
   "inventory.entity.category": "Categoría",
   "inventory.entity.measurement_unit": "unidad de medida",
   "inventory.entity.measurement_units": "unidades de medida",
@@ -1157,6 +1157,9 @@ const esTranslations = {
     "El producto \"{name}\" sera desactivado. No estara disponible para nuevas operaciones de inventario. Los datos historicos no seran afectados.",
   "inventory.products.dialog_description":
     "Crea o actualiza productos y servicios usando el contrato actual de inventario del backend.",
+  "inventory.products.classification_description":
+    "Define la categoría y la clasificación fiscal (CABYS o perfil fiscal) del producto.",
+  "inventory.products.classification_title": "Clasificación fiscal",
   "inventory.products.general_information_description":
     "Identidad principal del producto y referencias comerciales.",
   "inventory.products.general_information_title": "Información general",
@@ -3562,6 +3565,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "The product \"{name}\" will be deactivated. It will not be available for new inventory operations. Historical data will not be affected.",
     "inventory.products.dialog_description":
       "Create or update products and services using the current backend inventory contract.",
+    "inventory.products.classification_description":
+      "Define the category and fiscal classification (CABYS or tax profile) of the product.",
+    "inventory.products.classification_title": "Fiscal classification",
     "inventory.products.general_information_description":
       "Core product identity and commercial references.",
     "inventory.products.general_information_title": "General information",

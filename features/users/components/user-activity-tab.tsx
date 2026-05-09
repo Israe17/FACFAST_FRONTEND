@@ -1,9 +1,10 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   ArrowRightLeft,
   ClipboardList,
+  Loader2,
   Receipt,
   ShieldOff,
   Truck,
@@ -11,11 +12,14 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listDispatchOrdersCursor, listInventoryMovementsCursor } from "@/features/inventory/api";
 import { listSaleOrdersCursor } from "@/features/sales/api";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { useCursorQuery } from "@/shared/hooks/use-cursor-query";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
@@ -26,7 +30,7 @@ type UserActivityTabProps = {
   enabled: boolean;
 };
 
-const ACTIVITY_PAGE_SIZE = 10;
+const ACTIVITY_PAGE_SIZE = 20;
 
 export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
   const { t } = useAppTranslator();
@@ -39,35 +43,15 @@ export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
   const userIdNumber = Number(userId);
   const validUserId = Number.isFinite(userIdNumber) && userIdNumber > 0;
 
-  const movementsQuery = useQuery({
-    enabled: enabled && validUserId && canViewMovements,
-    queryKey: ["users", userId, "activity", "inventory-movements"],
-    queryFn: () =>
-      listInventoryMovementsCursor(
-        { limit: ACTIVITY_PAGE_SIZE },
-        { performed_by_user_id: userIdNumber },
-      ),
-  });
+  const initialSubTab = canViewMovements
+    ? "movements"
+    : canViewSales
+      ? "sales"
+      : canViewDispatch
+        ? "dispatch"
+        : "movements";
 
-  const salesQuery = useQuery({
-    enabled: enabled && validUserId && canViewSales,
-    queryKey: ["users", userId, "activity", "sale-orders"],
-    queryFn: () =>
-      listSaleOrdersCursor(
-        { limit: ACTIVITY_PAGE_SIZE },
-        { created_by_user_id: userIdNumber },
-      ),
-  });
-
-  const dispatchQuery = useQuery({
-    enabled: enabled && validUserId && canViewDispatch,
-    queryKey: ["users", userId, "activity", "dispatch-orders"],
-    queryFn: () =>
-      listDispatchOrdersCursor(
-        { limit: ACTIVITY_PAGE_SIZE },
-        { created_by_user_id: userIdNumber },
-      ),
-  });
+  const [activeSubTab, setActiveSubTab] = useState<string>(initialSubTab);
 
   if (!canViewMovements && !canViewSales && !canViewDispatch) {
     return (
@@ -80,87 +64,185 @@ export function UserActivityTab({ userId, enabled }: UserActivityTabProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
+      <TabsList>
+        {canViewMovements ? (
+          <TabsTrigger value="movements">
+            {t("users.activity.movements_title")}
+          </TabsTrigger>
+        ) : null}
+        {canViewSales ? (
+          <TabsTrigger value="sales">
+            {t("users.activity.sales_title")}
+          </TabsTrigger>
+        ) : null}
+        {canViewDispatch ? (
+          <TabsTrigger value="dispatch">
+            {t("users.activity.dispatch_title")}
+          </TabsTrigger>
+        ) : null}
+      </TabsList>
+
       {canViewMovements ? (
-        <ActivitySection
-          icon={ArrowRightLeft}
-          title={t("users.activity.movements_title")}
-          loadingLabel={t("users.activity.loading_movements")}
-          emptyTitle={t("users.activity.movements_empty_title")}
-          emptyDescription={t("users.activity.movements_empty_description")}
-          isLoading={movementsQuery.isLoading}
-          isError={movementsQuery.isError}
-          error={movementsQuery.error}
-          onRetry={() => movementsQuery.refetch()}
-          items={(movementsQuery.data?.data ?? []).map((movement) => ({
-            id: movement.id,
-            primary: movement.code ?? `#${movement.id}`,
-            secondary: [
-              movement.movement_type ? String(movement.movement_type) : null,
-              movement.status ? String(movement.status) : null,
-              movement.branch?.name ?? null,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            timestamp: movement.occurred_at ?? movement.created_at,
-            badge: movement.status ? String(movement.status) : null,
-          }))}
-        />
+        <TabsContent value="movements" className="space-y-3">
+          <MovementsList
+            userId={userIdNumber}
+            enabled={enabled && validUserId && activeSubTab === "movements"}
+          />
+        </TabsContent>
       ) : null}
 
       {canViewSales ? (
-        <ActivitySection
-          icon={Receipt}
-          title={t("users.activity.sales_title")}
-          loadingLabel={t("users.activity.loading_sales")}
-          emptyTitle={t("users.activity.sales_empty_title")}
-          emptyDescription={t("users.activity.sales_empty_description")}
-          isLoading={salesQuery.isLoading}
-          isError={salesQuery.isError}
-          error={salesQuery.error}
-          onRetry={() => salesQuery.refetch()}
-          items={(salesQuery.data?.data ?? []).map((order) => ({
-            id: order.id,
-            primary: order.code ?? `#${order.id}`,
-            secondary: [
-              order.customer_contact?.name ?? null,
-              order.branch?.name ?? null,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            timestamp: order.order_date ?? order.created_at,
-            badge: order.status ? String(order.status) : null,
-          }))}
-        />
+        <TabsContent value="sales" className="space-y-3">
+          <SalesList
+            userId={userIdNumber}
+            enabled={enabled && validUserId && activeSubTab === "sales"}
+          />
+        </TabsContent>
       ) : null}
 
       {canViewDispatch ? (
-        <ActivitySection
-          icon={Truck}
-          title={t("users.activity.dispatch_title")}
-          loadingLabel={t("users.activity.loading_dispatch")}
-          emptyTitle={t("users.activity.dispatch_empty_title")}
-          emptyDescription={t("users.activity.dispatch_empty_description")}
-          isLoading={dispatchQuery.isLoading}
-          isError={dispatchQuery.isError}
-          error={dispatchQuery.error}
-          onRetry={() => dispatchQuery.refetch()}
-          items={(dispatchQuery.data?.data ?? []).map((order) => ({
-            id: order.id,
-            primary: order.code ?? `#${order.id}`,
-            secondary: [
-              order.dispatch_type ? String(order.dispatch_type) : null,
-              order.branch?.name ?? null,
-              order.route?.name ?? null,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            timestamp: order.scheduled_date ?? order.dispatched_at ?? null,
-            badge: order.status ? String(order.status) : null,
-          }))}
-        />
+        <TabsContent value="dispatch" className="space-y-3">
+          <DispatchList
+            userId={userIdNumber}
+            enabled={enabled && validUserId && activeSubTab === "dispatch"}
+          />
+        </TabsContent>
       ) : null}
-    </div>
+    </Tabs>
+  );
+}
+
+type ListProps = {
+  userId: number;
+  enabled: boolean;
+};
+
+function MovementsList({ userId, enabled }: ListProps) {
+  const { t } = useAppTranslator();
+  const query = useCursorQuery({
+    queryKey: ["users", userId, "activity", "inventory-movements"],
+    queryFn: (params) =>
+      listInventoryMovementsCursor(params, { performed_by_user_id: userId }),
+    limit: ACTIVITY_PAGE_SIZE,
+    sortOrder: "DESC",
+    enabled,
+  });
+
+  const items = query.data.map((movement) => ({
+    id: String(movement.id),
+    primary: movement.code ?? `#${movement.id}`,
+    secondary: [
+      movement.movement_type ? String(movement.movement_type) : null,
+      movement.branch?.name ?? null,
+      movement.notes ?? null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    timestamp: movement.occurred_at ?? movement.created_at,
+    badge: movement.status ? String(movement.status) : null,
+  }));
+
+  return (
+    <ActivityList
+      icon={ArrowRightLeft}
+      loadingLabel={t("users.activity.loading_movements")}
+      emptyTitle={t("users.activity.movements_empty_title")}
+      emptyDescription={t("users.activity.movements_empty_description")}
+      items={items}
+      isLoading={query.isLoading}
+      isError={query.isError}
+      error={query.error}
+      onRetry={() => query.refetch()}
+      hasNextPage={Boolean(query.hasNextPage)}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMore={() => query.fetchNextPage()}
+    />
+  );
+}
+
+function SalesList({ userId, enabled }: ListProps) {
+  const { t } = useAppTranslator();
+  const query = useCursorQuery({
+    queryKey: ["users", userId, "activity", "sale-orders"],
+    queryFn: (params) =>
+      listSaleOrdersCursor(params, { created_by_user_id: userId }),
+    limit: ACTIVITY_PAGE_SIZE,
+    sortOrder: "DESC",
+    enabled,
+  });
+
+  const items = query.data.map((order) => ({
+    id: String(order.id),
+    primary: order.code ?? `#${order.id}`,
+    secondary: [
+      order.customer_contact?.name ?? null,
+      order.branch?.name ?? null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    timestamp: order.order_date ?? order.created_at,
+    badge: order.status ? String(order.status) : null,
+  }));
+
+  return (
+    <ActivityList
+      icon={Receipt}
+      loadingLabel={t("users.activity.loading_sales")}
+      emptyTitle={t("users.activity.sales_empty_title")}
+      emptyDescription={t("users.activity.sales_empty_description")}
+      items={items}
+      isLoading={query.isLoading}
+      isError={query.isError}
+      error={query.error}
+      onRetry={() => query.refetch()}
+      hasNextPage={Boolean(query.hasNextPage)}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMore={() => query.fetchNextPage()}
+    />
+  );
+}
+
+function DispatchList({ userId, enabled }: ListProps) {
+  const { t } = useAppTranslator();
+  const query = useCursorQuery({
+    queryKey: ["users", userId, "activity", "dispatch-orders"],
+    queryFn: (params) =>
+      listDispatchOrdersCursor(params, { created_by_user_id: userId }),
+    limit: ACTIVITY_PAGE_SIZE,
+    sortOrder: "DESC",
+    enabled,
+  });
+
+  const items = query.data.map((order) => ({
+    id: String(order.id),
+    primary: order.code ?? `#${order.id}`,
+    secondary: [
+      order.dispatch_type ? String(order.dispatch_type) : null,
+      order.branch?.name ?? null,
+      order.route?.name ?? null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    timestamp: order.scheduled_date ?? order.dispatched_at ?? null,
+    badge: order.status ? String(order.status) : null,
+  }));
+
+  return (
+    <ActivityList
+      icon={Truck}
+      loadingLabel={t("users.activity.loading_dispatch")}
+      emptyTitle={t("users.activity.dispatch_empty_title")}
+      emptyDescription={t("users.activity.dispatch_empty_description")}
+      items={items}
+      isLoading={query.isLoading}
+      isError={query.isError}
+      error={query.error}
+      onRetry={() => query.refetch()}
+      hasNextPage={Boolean(query.hasNextPage)}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMore={() => query.fetchNextPage()}
+    />
   );
 }
 
@@ -172,91 +254,119 @@ type ActivityItem = {
   badge?: string | null;
 };
 
-type ActivitySectionProps = {
+type ActivityListProps = {
   icon: LucideIcon;
-  title: string;
   loadingLabel: string;
   emptyTitle: string;
   emptyDescription: string;
+  items: ActivityItem[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
   onRetry: () => void;
-  items: ActivityItem[];
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
 };
 
-function ActivitySection({
+function ActivityList({
   icon: Icon,
-  title,
   loadingLabel,
   emptyTitle,
   emptyDescription,
+  items,
   isLoading,
   isError,
   error,
   onRetry,
-  items,
-}: ActivitySectionProps) {
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
+}: ActivityListProps) {
   const { t } = useAppTranslator();
-  return (
-    <section className="space-y-2 rounded-2xl border border-border/70 bg-background p-3">
-      <header className="flex items-center gap-2">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-4" aria-hidden="true" />
-        </span>
-        <h3 className="text-sm font-semibold">{title}</h3>
-        {!isLoading && !isError ? (
-          <Badge variant="outline" className="ml-auto">
-            {items.length}
-          </Badge>
-        ) : null}
-      </header>
 
-      {isLoading ? <LoadingState description={loadingLabel} /> : null}
-      {isError ? (
-        <ErrorState
-          description={getBackendErrorMessage(error, t("common.load_failed"))}
-          onRetry={onRetry}
-        />
-      ) : null}
-      {!isLoading && !isError && items.length === 0 ? (
-        <EmptyState
-          icon={ClipboardList}
-          title={emptyTitle}
-          description={emptyDescription}
-        />
-      ) : null}
-      {!isLoading && !isError && items.length ? (
-        <ul className="space-y-1.5">
-          {items.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2"
-            >
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <p className="truncate text-sm font-medium">{item.primary}</p>
-                {item.secondary ? (
-                  <p className="truncate text-[11px] text-muted-foreground">
-                    {item.secondary}
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex shrink-0 flex-col items-end gap-1">
-                {item.badge ? (
-                  <Badge variant="outline" className="capitalize">
-                    {item.badge}
-                  </Badge>
-                ) : null}
-                {item.timestamp ? (
-                  <span className="text-[10px] text-muted-foreground">
-                    {formatDateTime(item.timestamp)}
-                  </span>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
+  if (isLoading) {
+    return <LoadingState description={loadingLabel} />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        description={getBackendErrorMessage(error, t("common.load_failed"))}
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  if (!items.length) {
+    return (
+      <EmptyState
+        icon={ClipboardList}
+        title={emptyTitle}
+        description={emptyDescription}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] text-muted-foreground">
+        {t("users.activity.loaded_count", { count: String(items.length) })}
+      </p>
+      <ul className="space-y-1.5">
+        {items.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Icon className="size-4" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1 space-y-0.5">
+              <p className="truncate text-sm font-medium">{item.primary}</p>
+              {item.secondary ? (
+                <p className="truncate text-[11px] text-muted-foreground">
+                  {item.secondary}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              {item.badge ? (
+                <Badge variant="outline" className="capitalize">
+                  {item.badge}
+                </Badge>
+              ) : null}
+              {item.timestamp ? (
+                <span className="text-[10px] text-muted-foreground">
+                  {formatDateTime(item.timestamp)}
+                </span>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {hasNextPage ? (
+        <div className="flex justify-center pt-1">
+          <Button
+            disabled={isFetchingNextPage}
+            onClick={onLoadMore}
+            size="sm"
+            variant="outline"
+          >
+            {isFetchingNextPage ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            ) : null}
+            {isFetchingNextPage
+              ? t("users.activity.loading_more")
+              : t("users.activity.load_more")}
+          </Button>
+        </div>
+      ) : (
+        <p className="pt-1 text-center text-[10px] text-muted-foreground">
+          {t("users.activity.end_of_list")}
+        </p>
+      )}
+    </div>
   );
 }

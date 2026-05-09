@@ -860,6 +860,16 @@ function DispatchList({
   );
 }
 
+function formatTotal(total: number, loaded: number, hasMore: boolean): string {
+  // When the backend returns a positive total, trust it as the authoritative
+  // filtered count. Otherwise (older backend that doesn't yet emit `total`),
+  // fall back to showing how many we've actually loaded so the operator still
+  // gets a useful number instead of a misleading "0".
+  if (total > 0) return String(total);
+  if (loaded === 0) return "0";
+  return hasMore ? `${loaded}+` : String(loaded);
+}
+
 function PageSizeSelect({
   value,
   onChange,
@@ -961,7 +971,9 @@ function ActivityList({
         {isFetching ? (
           <Loader2 className="size-3 animate-spin" aria-hidden="true" />
         ) : null}
-        {t("users.activity.total_records", { count: String(total) })}
+        {t("users.activity.total_records", {
+          count: formatTotal(total, items.length, hasNextPage),
+        })}
       </span>
     </div>
   );

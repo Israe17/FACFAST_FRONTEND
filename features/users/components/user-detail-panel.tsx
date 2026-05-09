@@ -262,8 +262,9 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
         {canViewActivity ? (
           <TabsContent value="activity" className="space-y-3">
             <UserActivityTab
-              userId={user.id}
+              user={user}
               enabled={activeTab === "activity"}
+              onRequestTab={setActiveTab}
             />
           </TabsContent>
         ) : null}

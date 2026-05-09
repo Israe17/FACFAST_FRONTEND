@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
+import { cn } from "@/shared/lib/utils";
 
 import { useUserEffectivePermissionsQuery } from "../queries";
 import type { User } from "../types";
@@ -110,22 +111,59 @@ export function UserPermissionsTab({
       {Object.entries(grouped)
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([group, permissions]) => (
-          <section
+          <PermissionGroup
             key={group}
-            className="space-y-2 rounded-2xl border border-border/70 bg-background p-3"
-          >
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {group}
-            </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {permissions.map((permission) => (
-                <Badge key={permission} variant="outline">
-                  {permission}
-                </Badge>
-              ))}
-            </div>
-          </section>
+            group={group}
+            permissions={permissions}
+          />
         ))}
     </div>
+  );
+}
+
+function PermissionGroup({
+  group,
+  permissions,
+}: {
+  group: string;
+  permissions: string[];
+}) {
+  const { t } = useAppTranslator();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <section className="rounded-2xl border border-border/70 bg-background p-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+      >
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {group}
+        </h3>
+        <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+          {t("users.detail.permissions_group_count", {
+            count: String(permissions.length),
+          })}
+        </Badge>
+        <ChevronDown
+          aria-hidden="true"
+          className={cn(
+            "ml-auto size-4 text-muted-foreground transition-transform",
+            !open && "-rotate-90",
+          )}
+        />
+      </button>
+      {open ? (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {permissions.map((permission) => (
+            <Badge key={permission} variant="outline">
+              {permission}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }

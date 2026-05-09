@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 type RoleFormValues = {
-  code?: string;
   name: string;
   role_key: string;
 };
@@ -28,6 +28,7 @@ function RoleForm({
   onSubmit,
   submitLabel,
 }: RoleFormProps) {
+  const { t } = useAppTranslator();
   const {
     formState: { errors },
   } = form;
@@ -36,22 +37,26 @@ function RoleForm({
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorBanner message={formError} />
 
-      <div className="space-y-2">
-        <Label htmlFor="role-code">Code</Label>
-        <Input id="role-code" placeholder="RL-0007" {...form.register("code")} />
-        {errors.code ? <p className="text-sm text-destructive">{errors.code.message}</p> : null}
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="role-name">Name</Label>
-          <Input id="role-name" placeholder="Manager" {...form.register("name")} />
-          {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
+          <Label htmlFor="role-name">{t("roles.form.name_label")}</Label>
+          <Input
+            id="role-name"
+            placeholder={t("roles.form.name_placeholder")}
+            {...form.register("name")}
+          />
+          {errors.name ? (
+            <p className="text-sm text-destructive">{errors.name.message}</p>
+          ) : null}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="role-key">Role key</Label>
-          <Input id="role-key" placeholder="manager" {...form.register("role_key")} />
+          <Label htmlFor="role-key">{t("roles.form.role_key_label")}</Label>
+          <Input
+            id="role-key"
+            placeholder={t("roles.form.role_key_placeholder")}
+            {...form.register("role_key")}
+          />
           {errors.role_key ? (
             <p className="text-sm text-destructive">{errors.role_key.message}</p>
           ) : null}
@@ -59,7 +64,7 @@ function RoleForm({
       </div>
 
       <div className="flex justify-end">
-        <ActionButton isLoading={isPending} loadingText="Saving" type="submit">
+        <ActionButton isLoading={isPending} loadingText={t("common.saving")} type="submit">
           {submitLabel}
         </ActionButton>
       </div>

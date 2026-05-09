@@ -1,8 +1,6 @@
 import { z } from "zod/v4";
 
 import {
-  entityCodePattern,
-  optionalTrimmedString,
   requiredTrimmedString,
   roleKeyPattern,
 } from "@/shared/lib/validation";
@@ -43,9 +41,6 @@ export const roleSchema = z
   .passthrough();
 
 export const createRoleSchema = z.object({
-  code: optionalTrimmedString(
-    z.string().regex(entityCodePattern, "Use a code like AA-0001."),
-  ),
   name: requiredTrimmedString("Name must contain at least 2 characters.", 2),
   role_key: z
     .string()

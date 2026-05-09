@@ -58,7 +58,7 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
   const { t } = useAppTranslator();
   const canView = can("warehouse_stock.view");
   const canViewWarehouses = can("warehouses.view");
-  const canUpdateWarehouses = can("warehouses.update");
+  const canUpdateThresholds = can("warehouse_stock.update");
   const [selectedWarehouseId, setSelectedWarehouseId] = useState(ALL_WAREHOUSES_VALUE);
   const [onlyBelowMin, setOnlyBelowMin] = useState(false);
   const [thresholdsTarget, setThresholdsTarget] = useState<WarehouseStockRow | null>(null);
@@ -156,7 +156,7 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
         header: t("inventory.common.updated"),
         cell: ({ row }) => <span>{formatDateTime(row.original.updated_at)}</span>,
       },
-      ...(canUpdateWarehouses
+      ...(canUpdateThresholds
         ? [
             {
               id: "actions",
@@ -176,7 +176,7 @@ function WarehouseStockSection({ enabled = true }: WarehouseStockSectionProps) {
           ]
         : []),
     ],
-    [canUpdateWarehouses, placeholder, t],
+    [canUpdateThresholds, placeholder, t],
   );
 
   if (!canView) {

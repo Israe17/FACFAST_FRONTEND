@@ -29,6 +29,7 @@ import {
   useProductCategoriesQuery,
   useProductsPaginatedQuery,
   useTaxProfilesQuery,
+  useWarehousesQuery,
   useWarrantyProfilesQuery,
 } from "../queries";
 import type { Product } from "../types";
@@ -52,6 +53,7 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const canViewMeasurementUnits = can("measurement_units.view");
   const canViewTaxProfiles = can("tax_profiles.view");
   const canViewWarrantyProfiles = can("warranty_profiles.view");
+  const canViewWarehouses = can("warehouses.view");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Product | null>(null);
@@ -62,6 +64,7 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
   const measurementUnitsQuery = useMeasurementUnitsQuery(enabled && canViewMeasurementUnits);
   const taxProfilesQuery = useTaxProfilesQuery(enabled && canViewTaxProfiles);
   const warrantyProfilesQuery = useWarrantyProfilesQuery(enabled && canViewWarrantyProfiles);
+  const warehousesQuery = useWarehousesQuery(enabled && canViewWarehouses);
   const deactivateMutation = useDeactivateProductMutation({ showErrorToast: true });
   const reactivateMutation = useReactivateProductMutation({ showErrorToast: true });
 
@@ -158,6 +161,7 @@ function ProductsSection({ enabled = true }: ProductsSectionProps) {
         open={dialogOpen}
         product={selectedProduct}
         taxProfiles={taxProfilesQuery.data ?? []}
+        warehouses={warehousesQuery.data ?? []}
         warrantyProfiles={warrantyProfilesQuery.data ?? []}
       />
 

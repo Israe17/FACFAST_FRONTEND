@@ -948,6 +948,10 @@ export type InventoryMovementsListFilters = {
   product_id?: number;
   performed_by_user_id?: number;
   branch_id?: number;
+  from?: string;
+  to?: string;
+  status?: string;
+  movement_type?: string;
 };
 
 export async function listInventoryMovementsCursor(
@@ -961,6 +965,10 @@ export async function listInventoryMovementsCursor(
     product_id: filters.product_id,
     performed_by_user_id: filters.performed_by_user_id,
     branch_id: filters.branch_id,
+    from: filters.from,
+    to: filters.to,
+    status: filters.status,
+    movement_type: filters.movement_type,
   });
   const response = await http.get("/inventory-movements/cursor", {
     params: queryParams,
@@ -976,6 +984,13 @@ export async function listDispatchOrdersPaginated(params: PaginatedQueryParams) 
 export type DispatchOrdersListFilters = {
   created_by_user_id?: number;
   branch_id?: number;
+  from?: string;
+  to?: string;
+  status?: string;
+  dispatch_type?: string;
+  vehicle_id?: number;
+  driver_user_id?: number;
+  route_id?: number;
 };
 
 export async function listDispatchOrdersCursor(
@@ -986,6 +1001,13 @@ export async function listDispatchOrdersCursor(
     ...params,
     created_by_user_id: filters.created_by_user_id,
     branch_id: filters.branch_id,
+    from: filters.from,
+    to: filters.to,
+    status: filters.status,
+    dispatch_type: filters.dispatch_type,
+    vehicle_id: filters.vehicle_id,
+    driver_user_id: filters.driver_user_id,
+    route_id: filters.route_id,
   });
   const response = await http.get("/dispatch-orders/cursor", {
     params: queryParams,

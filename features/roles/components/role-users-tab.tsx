@@ -42,9 +42,14 @@ export function RoleUsersTab({ role, canViewUsers }: RoleUsersTabProps) {
     if (!usersQuery.data) {
       return [];
     }
-    return usersQuery.data.filter((user) =>
-      user.role_ids.some((id) => String(id) === String(role.id)),
-    );
+    const target = String(role.id);
+    return usersQuery.data.filter((user) => {
+      const fromIds = user.role_ids?.some((id) => String(id) === target);
+      const fromObjects = user.roles?.some(
+        (assigned) => String(assigned.id) === target,
+      );
+      return Boolean(fromIds || fromObjects);
+    });
   }, [usersQuery.data, role.id]);
 
   if (!canViewUsers) {

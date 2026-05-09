@@ -61,8 +61,16 @@ export default function RolesPage() {
   const userCountByRole = useMemo(() => {
     const counts = new Map<string, number>();
     for (const user of usersQuery.data ?? []) {
-      for (const roleId of user.role_ids) {
-        const key = String(roleId);
+      const seen = new Set<string>();
+      // Backend populates the joined `roles` array; `role_ids` may stay empty
+      // depending on the serializer. Walk both and dedupe on role id.
+      for (const role of user.roles ?? []) {
+        seen.add(String(role.id));
+      }
+      for (const roleId of user.role_ids ?? []) {
+        seen.add(String(roleId));
+      }
+      for (const key of seen) {
         counts.set(key, (counts.get(key) ?? 0) + 1);
       }
     }

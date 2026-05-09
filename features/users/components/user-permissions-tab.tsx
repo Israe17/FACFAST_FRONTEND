@@ -132,7 +132,7 @@ function PermissionGroup({
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="rounded-2xl border border-border/70 bg-background p-3">
+    <section className="rounded-xl border border-border/70 bg-background p-3">
       <button
         type="button"
         aria-expanded={open}

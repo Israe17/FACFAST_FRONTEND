@@ -51,6 +51,11 @@ export async function listSaleOrdersPaginated(params: PaginatedQueryParams) {
 export type SaleOrdersListFilters = {
   created_by_user_id?: number;
   branch_id?: number;
+  from?: string;
+  to?: string;
+  status?: string;
+  customer_contact_id?: number;
+  warehouse_id?: number;
 };
 
 export async function listSaleOrdersCursor(
@@ -61,6 +66,11 @@ export async function listSaleOrdersCursor(
     ...params,
     created_by_user_id: filters.created_by_user_id,
     branch_id: filters.branch_id,
+    from: filters.from,
+    to: filters.to,
+    status: filters.status,
+    customer_contact_id: filters.customer_contact_id,
+    warehouse_id: filters.warehouse_id,
   });
   const response = await http.get("/sale-orders/cursor", { params: queryParams });
   return cursorSchema(saleOrderSchema).parse(response.data);

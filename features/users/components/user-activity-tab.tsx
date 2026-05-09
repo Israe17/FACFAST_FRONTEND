@@ -42,6 +42,11 @@ import {
   useWarehousesQuery,
 } from "@/features/inventory/queries";
 import { listSaleOrdersCursor } from "@/features/sales/api";
+import type { SaleOrder } from "@/features/sales/types";
+import type { DispatchOrder } from "@/features/inventory/types";
+import { DispatchOrderDetailDialog } from "@/features/inventory/components/dispatch-order-detail-dialog";
+import { SaleOrderDetailDialog } from "@/features/sales/components/sale-order-detail-dialog";
+import { InventoryMovementDetailSheet } from "./inventory-movement-detail-sheet";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -368,6 +373,7 @@ function MovementsList({
   const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+  const [selectedMovementId, setSelectedMovementId] = useState<string | null>(null);
 
   // Reset pagination when filters, search, or page size change.
   const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
@@ -521,6 +527,13 @@ function MovementsList({
         onPageSizeChange={setPageSize}
         search={searchInput}
         onSearchChange={setSearchInput}
+        onItemSelect={setSelectedMovementId}
+      />
+      <InventoryMovementDetailSheet
+        movementId={selectedMovementId}
+        onOpenChange={(open) => {
+          if (!open) setSelectedMovementId(null);
+        }}
       />
     </>
   );
@@ -541,6 +554,7 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<SaleOrder | null>(null);
 
   const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
   const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
@@ -687,6 +701,17 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         onPageSizeChange={setPageSize}
         search={searchInput}
         onSearchChange={setSearchInput}
+        onItemSelect={(id) => {
+          const found = query.data?.data.find((order) => String(order.id) === id);
+          if (found) setSelectedOrder(found);
+        }}
+      />
+      <SaleOrderDetailDialog
+        order={selectedOrder}
+        open={Boolean(selectedOrder)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedOrder(null);
+        }}
       />
     </>
   );
@@ -712,6 +737,7 @@ function DispatchList({
   const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
+  const [selectedDispatch, setSelectedDispatch] = useState<DispatchOrder | null>(null);
 
   const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
   const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
@@ -871,6 +897,17 @@ function DispatchList({
         onPageSizeChange={setPageSize}
         search={searchInput}
         onSearchChange={setSearchInput}
+        onItemSelect={(id) => {
+          const found = query.data?.data.find((order) => String(order.id) === id);
+          if (found) setSelectedDispatch(found);
+        }}
+      />
+      <DispatchOrderDetailDialog
+        order={selectedDispatch}
+        open={Boolean(selectedDispatch)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDispatch(null);
+        }}
       />
     </>
   );
@@ -944,6 +981,7 @@ type ActivityListProps = {
   onPageSizeChange: (size: PageSize) => void;
   search: string;
   onSearchChange: (value: string) => void;
+  onItemSelect?: (id: string) => void;
 };
 
 function ActivityList({
@@ -967,6 +1005,7 @@ function ActivityList({
   onPageSizeChange,
   search,
   onSearchChange,
+  onItemSelect,
 }: ActivityListProps) {
   const { t } = useAppTranslator();
   const topRef = useRef<HTMLDivElement>(null);
@@ -1039,36 +1078,53 @@ function ActivityList({
       <div ref={topRef} />
       {toolbar}
       <ul className="space-y-1.5">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2"
-          >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Icon className="size-4" aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1 space-y-0.5">
-              <p className="truncate text-sm font-medium">{item.primary}</p>
-              {item.secondary ? (
-                <p className="truncate text-[11px] text-muted-foreground">
-                  {item.secondary}
-                </p>
-              ) : null}
-            </div>
-            <div className="flex shrink-0 flex-col items-end gap-1">
-              {item.badge ? (
-                <Badge variant="outline" className="capitalize">
-                  {item.badge}
-                </Badge>
-              ) : null}
-              {item.timestamp ? (
-                <span className="text-[10px] text-muted-foreground">
-                  {formatDateTime(item.timestamp)}
-                </span>
-              ) : null}
-            </div>
-          </li>
-        ))}
+        {items.map((item) => {
+          const interactive = Boolean(onItemSelect);
+          const content = (
+            <>
+              <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="size-4" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1 space-y-0.5 text-left">
+                <p className="truncate text-sm font-medium">{item.primary}</p>
+                {item.secondary ? (
+                  <p className="truncate text-[11px] text-muted-foreground">
+                    {item.secondary}
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {item.badge ? (
+                  <Badge variant="outline" className="capitalize">
+                    {item.badge}
+                  </Badge>
+                ) : null}
+                {item.timestamp ? (
+                  <span className="text-[10px] text-muted-foreground">
+                    {formatDateTime(item.timestamp)}
+                  </span>
+                ) : null}
+              </div>
+            </>
+          );
+          return (
+            <li key={item.id}>
+              {interactive ? (
+                <button
+                  type="button"
+                  onClick={() => onItemSelect?.(item.id)}
+                  className="flex w-full items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2 text-left transition-colors hover:border-border hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                >
+                  {content}
+                </button>
+              ) : (
+                <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2">
+                  {content}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       <div className="flex items-center justify-between pt-1">

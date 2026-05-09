@@ -179,17 +179,17 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
   }
 
   return (
-    <div className="space-y-4">
-      <header className="space-y-1">
-        <h3 className="text-base font-semibold">{t("roles.matrix.title")}</h3>
-        <p className="text-sm text-muted-foreground">
+    <div className="space-y-3">
+      <header className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-semibold">{t("roles.matrix.title")}</h3>
+        <p className="text-xs text-muted-foreground">
           {role.is_system
             ? t("roles.matrix.system_lock_hint")
             : t("roles.matrix.edit_hint")}
         </p>
       </header>
 
-      <div className="space-y-5">
+      <div className="space-y-3">
         {groupedPermissions.map(({ moduleKey, permissions }) => {
           const Icon = pickModuleIcon(moduleKey);
           const moduleLabel = formatModuleLabel(moduleKey);
@@ -200,28 +200,25 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
           return (
             <section
               key={moduleKey}
-              className="space-y-3 rounded-2xl border border-border/70 bg-background p-4"
+              className="space-y-2 rounded-xl border border-border/70 bg-background p-3"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                    <Icon className="size-4" aria-hidden="true" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                      {moduleLabel}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("roles.matrix.module_count", {
-                        active: String(activeInModule),
-                        total: String(permissions.length),
-                      })}
-                    </p>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2">
+                <span className="flex size-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                  <Icon className="size-3.5" aria-hidden="true" />
+                </span>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {moduleLabel}
+                </p>
+                <span className="text-[11px] text-muted-foreground">
+                  ·{" "}
+                  {t("roles.matrix.module_count", {
+                    active: String(activeInModule),
+                    total: String(permissions.length),
+                  })}
+                </span>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {permissions.map((permission) => {
                   const checked = selectedIds.has(permission.id);
                   const inputId = `role-${role.id}-permission-${permission.id}`;
@@ -229,7 +226,7 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
                     <label
                       key={permission.id}
                       htmlFor={inputId}
-                      className={`flex items-start gap-3 rounded-xl border border-border/60 p-3 transition-colors ${
+                      className={`flex items-center gap-2 rounded-lg border border-border/60 px-2.5 py-1.5 transition-colors ${
                         editable ? "cursor-pointer hover:bg-muted/40" : "cursor-default"
                       }`}
                     >
@@ -241,18 +238,13 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
                           togglePermission(permission.id, value === true)
                         }
                       />
-                      <div className="min-w-0 space-y-1">
+                      <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
                           {permission.action ?? permission.key}
                         </p>
-                        {permission.description ? (
-                          <p className="text-xs text-muted-foreground">
-                            {permission.description}
-                          </p>
-                        ) : null}
-                        <Badge variant="outline" className="font-mono text-[11px]">
+                        <p className="truncate font-mono text-[11px] text-muted-foreground">
                           {permission.key}
-                        </Badge>
+                        </p>
                       </div>
                     </label>
                   );
@@ -264,17 +256,18 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
       </div>
 
       {role.is_system ? (
-        <div className="flex items-start gap-2 rounded-xl border border-border/70 bg-muted/40 p-3 text-sm text-muted-foreground">
-          <Lock className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+        <div className="flex items-start gap-2 rounded-lg border border-border/70 bg-muted/40 p-2.5 text-xs text-muted-foreground">
+          <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
           <p>{t("roles.matrix.system_lock_message")}</p>
         </div>
       ) : null}
 
       {editable && dirty ? (
-        <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/95 p-3 shadow-lg backdrop-blur">
+        <div className="sticky bottom-3 z-10 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background/95 px-3 py-2 shadow-lg backdrop-blur">
           <p className="text-sm font-medium">{t("roles.matrix.unsaved_changes")}</p>
           <div className="flex gap-2">
             <Button
+              size="sm"
               type="button"
               variant="outline"
               onClick={handleReset}
@@ -283,6 +276,7 @@ export function RolePermissionsMatrix({ role, canEdit }: RolePermissionsMatrixPr
               {t("common.cancel")}
             </Button>
             <ActionButton
+              size="sm"
               isLoading={assignPermissionsMutation.isPending}
               loadingText={t("common.saving")}
               onClick={handleSave}

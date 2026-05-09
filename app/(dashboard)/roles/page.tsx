@@ -32,37 +32,26 @@ function countModules(permissions: { module?: string }[] = []): number {
   return modules.size;
 }
 
-type Stat = {
+type StatChipProps = {
   icon: LucideIcon;
   label: string;
   value: string | number;
   hint?: string;
 };
 
-function StatsBar({ stats }: { stats: Stat[] }) {
+function StatChip({ icon: Icon, label, value, hint }: StatChipProps) {
   return (
-    <div className="flex items-stretch divide-x divide-border/70 rounded-xl border border-border/70 bg-background">
-      {stats.map(({ icon: Icon, label, value, hint }) => (
-        <div
-          key={label}
-          className="flex min-w-[7.5rem] flex-1 items-center gap-2.5 px-3 py-2"
-        >
-          <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-          <div className="min-w-0">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              {label}
-            </p>
-            <p className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-xl font-semibold">{value}</span>
-              {hint ? (
-                <span className="truncate text-[11px] font-normal text-muted-foreground">
-                  {hint}
-                </span>
-              ) : null}
-            </p>
-          </div>
-        </div>
-      ))}
+    <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background px-3 py-2">
+      <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="size-4" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-lg font-semibold leading-tight">{value}</p>
+        {hint ? (
+          <p className="text-[11px] text-muted-foreground">{hint}</p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -163,32 +152,31 @@ export default function RolesPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <StatsBar
-            stats={[
-              {
-                icon: ShieldCheck,
-                label: t("roles.kpi.roles_title"),
-                value: roles.length,
-              },
-              {
-                icon: Users,
-                label: t("roles.kpi.users_title"),
-                value: canViewUsers ? totalUsers : "—",
-              },
-              {
-                icon: Boxes,
-                label: t("roles.kpi.modules_title"),
-                value: canViewPermissions ? moduleCount : "—",
-                hint:
-                  canViewPermissions && totalPermissions > 0
-                    ? t("roles.kpi.modules_short_hint", {
-                        count: String(totalPermissions),
-                      })
-                    : undefined,
-              },
-            ]}
-          />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-2">
+            <StatChip
+              icon={ShieldCheck}
+              label={t("roles.kpi.roles_title")}
+              value={roles.length}
+            />
+            <StatChip
+              icon={Users}
+              label={t("roles.kpi.users_title")}
+              value={canViewUsers ? totalUsers : "—"}
+            />
+            <StatChip
+              icon={Boxes}
+              label={t("roles.kpi.modules_title")}
+              value={canViewPermissions ? moduleCount : "—"}
+              hint={
+                canViewPermissions
+                  ? t("roles.kpi.modules_description", {
+                      count: String(totalPermissions),
+                    })
+                  : undefined
+              }
+            />
+          </div>
 
           {canCreateRoles ? (
             <Button onClick={() => setCreateDialogOpen(true)}>

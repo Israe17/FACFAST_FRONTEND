@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
+import { EmptyState } from "@/shared/components/empty-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { MapView } from "@/shared/components/map-view";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -461,6 +462,29 @@ function ContactBranchesTab({
   const context = branchContextQuery.data;
   const assignments = context?.assignments ?? [];
   const isGlobal = context?.mode !== "scoped";
+  const canUpdate = can("contacts.update");
+
+  if (assignments.length === 0) {
+    return (
+      <EmptyState
+        icon={Building2}
+        title={t("contacts.branch_assignments.empty_title")}
+        description={
+          isGlobal
+            ? t("contacts.branch_assignments.global_empty_description")
+            : t("contacts.branch_assignments.scoped_empty_description")
+        }
+        action={
+          canUpdate ? (
+            <Button onClick={onManageClick} size="sm">
+              <Building2 className="size-4" aria-hidden="true" />
+              {t("contacts.actions.branch_context")}
+            </Button>
+          ) : undefined
+        }
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -472,7 +496,7 @@ function ContactBranchesTab({
                 count: String(assignments.length),
               })}
         </p>
-        {can("contacts.update") ? (
+        {canUpdate ? (
           <Button onClick={onManageClick} size="sm" variant="outline">
             <Building2 className="size-4" aria-hidden="true" />
             {t("contacts.actions.branch_context")}
@@ -480,14 +504,7 @@ function ContactBranchesTab({
         ) : null}
       </div>
 
-      {assignments.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-center text-sm text-muted-foreground">
-          {isGlobal
-            ? t("contacts.branch_assignments.global_empty_description")
-            : t("contacts.branch_assignments.scoped_empty_description")}
-        </div>
-      ) : (
-        <ul className="space-y-2">
+      <ul className="space-y-2">
           {assignments.map((assignment) => (
             <li
               key={assignment.id}
@@ -545,8 +562,7 @@ function ContactBranchesTab({
               </div>
             </li>
           ))}
-        </ul>
-      )}
+      </ul>
     </div>
   );
 }

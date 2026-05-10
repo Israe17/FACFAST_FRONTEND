@@ -1,21 +1,25 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import { sessionQueryKey } from "@/features/auth/queries";
+import { branchesKeys } from "@/features/branches/keys";
+import { businessesKeys } from "@/features/businesses/keys";
+import { contactsKeys } from "@/features/contacts/keys";
+import { inventoryKeys } from "@/features/inventory/keys";
+import { rolesKeys } from "@/features/roles/keys";
+import { usersKeys } from "@/features/users/keys";
 
-// Inline the root query keys for each operational domain instead of importing
-// them from each feature's queries.ts. Those modules transitively import
-// useAppTranslator → useSession → session-state.ts, which would re-enter this
-// file before the imported `*Keys` constants are initialized (TDZ ReferenceError
-// on `branchesKeys`/`contactsKeys`/etc. depending on which page is the entry).
-// These literals must stay in sync with the matching `*Keys.all` definitions
-// in features/{branches,businesses,contacts,inventory,roles,users}/queries.ts.
+// Imports are taken from each feature's `keys.ts` module — not the
+// `queries.ts` entry — because those modules transitively pull in
+// useAppTranslator → useSession → this file. Importing from the leaf
+// `keys.ts` (which has no other dependencies) breaks the cycle that
+// otherwise leaves the *Keys consts in TDZ at evaluation time.
 const operationalQueryKeys = [
-  ["businesses"],
-  ["branches"],
-  ["contacts"],
-  ["inventory"],
-  ["roles"],
-  ["users"],
+  businessesKeys.all,
+  branchesKeys.all,
+  contactsKeys.all,
+  inventoryKeys.all,
+  rolesKeys.all,
+  usersKeys.all,
 ] as const;
 
 export async function resetOperationalQueries(queryClient: QueryClient) {

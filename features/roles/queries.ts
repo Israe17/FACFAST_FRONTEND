@@ -21,11 +21,9 @@ import type {
   UpdateRoleInput,
 } from "./types";
 
-export const rolesKeys = {
-  all: ["roles"] as const,
-  list: () => [...rolesKeys.all, "list"] as const,
-  permissions: () => [...rolesKeys.all, "permissions"] as const,
-};
+import { rolesKeys } from "./keys";
+
+export { rolesKeys } from "./keys";
 
 function invalidateRoleQueries(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: rolesKeys.list() });

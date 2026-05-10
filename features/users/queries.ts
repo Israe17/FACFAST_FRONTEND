@@ -8,7 +8,7 @@ import { useSession } from "@/shared/hooks/use-session";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
-import { rolesKeys } from "@/features/roles/queries";
+import { rolesKeys } from "@/features/roles/keys";
 
 import {
   assignUserBranches,
@@ -32,14 +32,9 @@ import type {
   UpdateUserStatusInput,
 } from "./types";
 
-export const usersKeys = {
-  all: ["users"] as const,
-  list: () => [...usersKeys.all, "list"] as const,
-  detail: (userId: string) => [...usersKeys.all, "detail", userId] as const,
-  effectivePermissions: (userId: string) =>
-    [...usersKeys.all, "effective-permissions", userId] as const,
-  branches: () => [...usersKeys.all, "branches"] as const,
-};
+import { usersKeys } from "./keys";
+
+export { usersKeys } from "./keys";
 
 function invalidateUserQueries(queryClient: ReturnType<typeof useQueryClient>, userId?: string) {
   queryClient.invalidateQueries({ queryKey: usersKeys.all });

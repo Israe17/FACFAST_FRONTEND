@@ -7,7 +7,11 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { presentBackendErrorToast } from "@/shared/lib/error-presentation";
 import { parseBackendError } from "@/shared/lib/backend-error-parser";
 import { CATALOG_STALE_TIME } from "@/shared/lib/query-config";
-import { usersKeys } from "@/features/users/queries";
+import { usersKeys } from "@/features/users/keys";
+
+import { branchesKeys } from "./keys";
+
+export { branchesKeys } from "./keys";
 
 import {
   createBranch,
@@ -25,12 +29,6 @@ import type {
   UpdateBranchInput,
   UpdateTerminalInput,
 } from "./types";
-
-export const branchesKeys = {
-  all: ["branches"] as const,
-  detail: (branchId: string) => [...branchesKeys.all, "detail", branchId] as const,
-  list: () => [...branchesKeys.all, "list"] as const,
-};
 
 function invalidateBranchQueries(
   queryClient: ReturnType<typeof useQueryClient>,

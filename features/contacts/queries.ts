@@ -32,14 +32,9 @@ import type {
   UpdateContactInput,
 } from "./types";
 
-export const contactsKeys = {
-  all: ["contacts"] as const,
-  branchContext: (contactId: string) => [...contactsKeys.all, "branches", contactId] as const,
-  detail: (contactId: string) => [...contactsKeys.all, "detail", contactId] as const,
-  list: () => [...contactsKeys.all, "list"] as const,
-  lookup: (identification: string) =>
-    [...contactsKeys.all, "lookup", identification] as const,
-};
+import { contactsKeys } from "./keys";
+
+export { contactsKeys } from "./keys";
 
 function getContactDeleteDependencySummary(error: unknown, t: ReturnType<typeof useAppTranslator>["t"]) {
   const backendError = parseBackendError(error);

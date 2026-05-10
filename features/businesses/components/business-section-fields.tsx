@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { DetailBlock } from "@/shared/components/detail-block";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { identificationTypeValues } from "@/shared/lib/validation";
 
 type BusinessSectionFieldsProps = {
@@ -35,6 +37,7 @@ function BusinessSectionFields<TFormValues extends FieldValues>({
   includeCode = true,
   prefix,
 }: BusinessSectionFieldsGenericProps<TFormValues>) {
+  const { t } = useAppTranslator();
   const fieldName = (name: string) => (prefix ? `${prefix}.${name}` : name);
   const getError = (name: string) =>
     form.getFieldState(fieldName(name) as never).error?.message;
@@ -42,291 +45,319 @@ function BusinessSectionFields<TFormValues extends FieldValues>({
 
   return (
     <div className="space-y-5">
-      <section className="space-y-4 rounded-xl border border-border/70 p-4">
-        <div className="space-y-1">
-          <h3 className="font-semibold">Identidad del negocio</h3>
-          <p className="text-sm text-muted-foreground">
-            Datos fiscales y operativos del tenant actual.
-          </p>
-        </div>
+      <DetailBlock
+        title={t("business.identity.title")}
+        description={t("business.identity.description")}
+      >
+        <div className="space-y-4">
+          {includeCode ? (
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("code")}>{t("business.field.code")}</Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("code")}
+                placeholder={t("business.field.code_placeholder")}
+                {...form.register(fieldName("code") as never)}
+              />
+              <FieldError message={getError("code")} />
+            </div>
+          ) : null}
 
-        {includeCode ? (
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("code")}>Código</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("code")}
-              placeholder="BS-0001"
-              {...form.register(fieldName("code") as never)}
-            />
-            <FieldError message={getError("code")} />
-          </div>
-        ) : null}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("name")}>{t("business.field.name")}</Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("name")}
+                placeholder={t("business.field.name_placeholder")}
+                {...form.register(fieldName("name") as never)}
+              />
+              <FieldError message={getError("name")} />
+            </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("name")}>Nombre comercial</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("name")}
-              placeholder="FACFAST"
-              {...form.register(fieldName("name") as never)}
-            />
-            <FieldError message={getError("name")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("legal_name")}>Razón social</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("legal_name")}
-              placeholder="FACFAST Sociedad Anónima"
-              {...form.register(fieldName("legal_name") as never)}
-            />
-            <FieldError message={getError("legal_name")} />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("identification_type")}>Tipo de identificación</Label>
-            <Controller
-              control={form.control}
-              name={fieldName("identification_type") as never}
-              render={({ field }) => (
-                <Select
-                  disabled={disabled}
-                  onValueChange={field.onChange}
-                  value={field.value ?? ""}
-                >
-                  <SelectTrigger id={fieldName("identification_type")}>
-                    <SelectValue placeholder="Selecciona un tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {identificationTypeValues.map((value) => (
-                      <SelectItem key={value} value={value}>
-                        {value}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError message={getError("identification_type")} />
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("legal_name")}>
+                {t("business.field.legal_name")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("legal_name")}
+                placeholder={t("business.field.legal_name_placeholder")}
+                {...form.register(fieldName("legal_name") as never)}
+              />
+              <FieldError message={getError("legal_name")} />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("identification_number")}>Número de identificación</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("identification_number")}
-              placeholder="3101123456"
-              {...form.register(fieldName("identification_number") as never)}
-            />
-            <FieldError message={getError("identification_number")} />
-          </div>
-        </div>
-      </section>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("identification_type")}>
+                {t("business.field.identification_type")}
+              </Label>
+              <Controller
+                control={form.control}
+                name={fieldName("identification_type") as never}
+                render={({ field }) => (
+                  <Select
+                    disabled={disabled}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                  >
+                    <SelectTrigger id={fieldName("identification_type")}>
+                      <SelectValue
+                        placeholder={t(
+                          "business.field.identification_type_placeholder",
+                        )}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {identificationTypeValues.map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldError message={getError("identification_type")} />
+            </div>
 
-      <section className="space-y-4 rounded-xl border border-border/70 p-4">
-        <div className="space-y-1">
-          <h3 className="font-semibold">Configuración operativa</h3>
-          <p className="text-sm text-muted-foreground">
-            Preferencias de idioma, moneda y estado general.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("currency_code")}>Moneda</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("currency_code")}
-              placeholder="CRC"
-              {...form.register(fieldName("currency_code") as never)}
-            />
-            <FieldError message={getError("currency_code")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("timezone")}>Zona horaria</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("timezone")}
-              placeholder="America/Costa_Rica"
-              {...form.register(fieldName("timezone") as never)}
-            />
-            <FieldError message={getError("timezone")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("language")}>Idioma</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("language")}
-              placeholder="es-CR"
-              {...form.register(fieldName("language") as never)}
-            />
-            <FieldError message={getError("language")} />
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("identification_number")}>
+                {t("business.field.identification_number")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("identification_number")}
+                placeholder={t("business.field.identification_number_placeholder")}
+                {...form.register(fieldName("identification_number") as never)}
+              />
+              <FieldError message={getError("identification_number")} />
+            </div>
           </div>
         </div>
+      </DetailBlock>
 
-        <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
-          <Checkbox
-            checked={Boolean(isActive)}
-            disabled={disabled}
-            onCheckedChange={(checked) => {
-              form.setValue(fieldName("is_active") as never, (checked === true) as never, {
-                shouldDirty: true,
-              });
-            }}
-          />
-          <div className="space-y-1">
-            <p className="font-medium">Empresa activa</p>
-            <p className="text-sm text-muted-foreground">
-              Permite mantener el tenant disponible para operación.
-            </p>
+      <DetailBlock
+        title={t("business.operational.title")}
+        description={t("business.operational.description")}
+      >
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("currency_code")}>
+                {t("business.field.currency_code")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("currency_code")}
+                placeholder={t("business.field.currency_code_placeholder")}
+                {...form.register(fieldName("currency_code") as never)}
+              />
+              <FieldError message={getError("currency_code")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("timezone")}>
+                {t("business.field.timezone")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("timezone")}
+                placeholder={t("business.field.timezone_placeholder")}
+                {...form.register(fieldName("timezone") as never)}
+              />
+              <FieldError message={getError("timezone")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("language")}>
+                {t("business.field.language")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("language")}
+                placeholder={t("business.field.language_placeholder")}
+                {...form.register(fieldName("language") as never)}
+              />
+              <FieldError message={getError("language")} />
+            </div>
           </div>
-        </label>
-      </section>
 
-      <section className="space-y-4 rounded-xl border border-border/70 p-4">
-        <div className="space-y-1">
-          <h3 className="font-semibold">Contacto y ubicación</h3>
-          <p className="text-sm text-muted-foreground">
-            Canales de contacto y localización administrativa.
-          </p>
+          <label className="flex items-start gap-3 rounded-xl border border-border/70 p-3">
+            <Checkbox
+              checked={Boolean(isActive)}
+              disabled={disabled}
+              onCheckedChange={(checked) => {
+                form.setValue(
+                  fieldName("is_active") as never,
+                  (checked === true) as never,
+                  { shouldDirty: true },
+                );
+              }}
+            />
+            <div className="space-y-1">
+              <p className="font-medium">{t("business.field.is_active")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("business.field.is_active_description")}
+              </p>
+            </div>
+          </label>
         </div>
+      </DetailBlock>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("email")}>Correo</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("email")}
-              placeholder="admin@facfast.com"
-              {...form.register(fieldName("email") as never)}
-            />
-            <FieldError message={getError("email")} />
+      <DetailBlock
+        title={t("business.contact.title")}
+        description={t("business.contact.description")}
+      >
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("email")}>{t("business.field.email")}</Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("email")}
+                placeholder={t("business.field.email_placeholder")}
+                {...form.register(fieldName("email") as never)}
+              />
+              <FieldError message={getError("email")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("phone")}>{t("business.field.phone")}</Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("phone")}
+                placeholder={t("business.field.phone_placeholder")}
+                {...form.register(fieldName("phone") as never)}
+              />
+              <FieldError message={getError("phone")} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("website")}>
+                {t("business.field.website")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("website")}
+                placeholder={t("business.field.website_placeholder")}
+                {...form.register(fieldName("website") as never)}
+              />
+              <FieldError message={getError("website")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("logo_url")}>
+                {t("business.field.logo_url")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("logo_url")}
+                placeholder={t("business.field.logo_url_placeholder")}
+                {...form.register(fieldName("logo_url") as never)}
+              />
+              <FieldError message={getError("logo_url")} />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={fieldName("phone")}>Teléfono</Label>
-            <Input
+            <Label htmlFor={fieldName("address")}>
+              {t("business.field.address")}
+            </Label>
+            <Textarea
               disabled={disabled}
-              id={fieldName("phone")}
-              placeholder="+506 2222-3333"
-              {...form.register(fieldName("phone") as never)}
+              id={fieldName("address")}
+              placeholder={t("business.field.address_placeholder")}
+              {...form.register(fieldName("address") as never)}
             />
-            <FieldError message={getError("phone")} />
+            <FieldError message={getError("address")} />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("country")}>
+                {t("business.field.country")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("country")}
+                placeholder={t("business.field.country_placeholder")}
+                {...form.register(fieldName("country") as never)}
+              />
+              <FieldError message={getError("country")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("postal_code")}>
+                {t("business.field.postal_code")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("postal_code")}
+                placeholder={t("business.field.postal_code_placeholder")}
+                {...form.register(fieldName("postal_code") as never)}
+              />
+              <FieldError message={getError("postal_code")} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("province")}>
+                {t("business.field.province")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("province")}
+                placeholder={t("business.field.province_placeholder")}
+                {...form.register(fieldName("province") as never)}
+              />
+              <FieldError message={getError("province")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("canton")}>
+                {t("business.field.canton")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("canton")}
+                placeholder={t("business.field.canton_placeholder")}
+                {...form.register(fieldName("canton") as never)}
+              />
+              <FieldError message={getError("canton")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("district")}>
+                {t("business.field.district")}
+              </Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("district")}
+                placeholder={t("business.field.district_placeholder")}
+                {...form.register(fieldName("district") as never)}
+              />
+              <FieldError message={getError("district")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={fieldName("city")}>{t("business.field.city")}</Label>
+              <Input
+                disabled={disabled}
+                id={fieldName("city")}
+                placeholder={t("business.field.city_placeholder")}
+                {...form.register(fieldName("city") as never)}
+              />
+              <FieldError message={getError("city")} />
+            </div>
           </div>
         </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("website")}>Sitio web</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("website")}
-              placeholder="https://facfast.com"
-              {...form.register(fieldName("website") as never)}
-            />
-            <FieldError message={getError("website")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("logo_url")}>Logo URL</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("logo_url")}
-              placeholder="https://cdn.facfast.com/logo.png"
-              {...form.register(fieldName("logo_url") as never)}
-            />
-            <FieldError message={getError("logo_url")} />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor={fieldName("address")}>Dirección</Label>
-          <Textarea
-            disabled={disabled}
-            id={fieldName("address")}
-            placeholder="Dirección exacta y referencias"
-            {...form.register(fieldName("address") as never)}
-          />
-          <FieldError message={getError("address")} />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("country")}>País</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("country")}
-              placeholder="Costa Rica"
-              {...form.register(fieldName("country") as never)}
-            />
-            <FieldError message={getError("country")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("postal_code")}>Código postal</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("postal_code")}
-              placeholder="10101"
-              {...form.register(fieldName("postal_code") as never)}
-            />
-            <FieldError message={getError("postal_code")} />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-4">
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("province")}>Provincia</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("province")}
-              placeholder="San José"
-              {...form.register(fieldName("province") as never)}
-            />
-            <FieldError message={getError("province")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("canton")}>Cantón</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("canton")}
-              placeholder="Central"
-              {...form.register(fieldName("canton") as never)}
-            />
-            <FieldError message={getError("canton")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("district")}>Distrito</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("district")}
-              placeholder="Catedral"
-              {...form.register(fieldName("district") as never)}
-            />
-            <FieldError message={getError("district")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={fieldName("city")}>Ciudad</Label>
-            <Input
-              disabled={disabled}
-              id={fieldName("city")}
-              placeholder="San José"
-              {...form.register(fieldName("city") as never)}
-            />
-            <FieldError message={getError("city")} />
-          </div>
-        </div>
-      </section>
+      </DetailBlock>
     </div>
   );
 }

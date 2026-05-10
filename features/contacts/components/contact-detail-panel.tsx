@@ -39,6 +39,7 @@ import {
 } from "../queries";
 import type { Contact } from "../types";
 import { buildContactInitials, pickContactColor } from "../contact-visuals";
+import { ContactActivityTab } from "./contact-activity-tab";
 import { ContactBranchAssignmentsDialog } from "./contact-branch-assignments-dialog";
 import { ContactTypeBadge } from "./contact-type-badge";
 import { EditContactDialog } from "./edit-contact-dialog";
@@ -65,6 +66,10 @@ export function ContactDetailPanel({ contact }: ContactDetailPanelProps) {
   const canUpdate = can("contacts.update");
   const canDelete = can("contacts.delete");
   const canManageBranches = can("contacts.view_branch_assignments");
+  const canViewActivity =
+    can("inventory_movements.view") ||
+    can("sale_orders.view") ||
+    can("dispatch_orders.view");
 
   async function handleConfirm() {
     try {
@@ -181,6 +186,11 @@ export function ContactDetailPanel({ contact }: ContactDetailPanelProps) {
               {t("contacts.tabs.branches")}
             </TabsTrigger>
           ) : null}
+          {canViewActivity ? (
+            <TabsTrigger value="activity">
+              {t("contacts.tabs.activity")}
+            </TabsTrigger>
+          ) : null}
           <TabsTrigger value="map">{t("contacts.tabs.map")}</TabsTrigger>
         </TabsList>
 
@@ -194,6 +204,15 @@ export function ContactDetailPanel({ contact }: ContactDetailPanelProps) {
               contact={contact}
               enabled={activeTab === "branches"}
               onManageClick={() => setActiveDialog("branches")}
+            />
+          </TabsContent>
+        ) : null}
+
+        {canViewActivity ? (
+          <TabsContent value="activity" className="space-y-3">
+            <ContactActivityTab
+              contact={contact}
+              enabled={activeTab === "activity"}
             />
           </TabsContent>
         ) : null}

@@ -63,7 +63,7 @@ export function ActivityFiltersBar({
 
   return (
     <section
-      aria-label={t("users.activity.filters.section_label")}
+      aria-label={t("activity.filters.section_label")}
       className="rounded-xl border border-border/70 bg-card/60 p-3"
     >
       <header className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export function ActivityFiltersBar({
         >
           <Filter className="size-4 text-muted-foreground" aria-hidden="true" />
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("users.activity.filters.section_label")}
+            {t("activity.filters.section_label")}
           </p>
           {activeCount > 0 ? (
             <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
@@ -97,7 +97,7 @@ export function ActivityFiltersBar({
           variant="ghost"
         >
           <RotateCcw className="size-3.5" aria-hidden="true" />
-          {t("users.activity.filters.clear_label")}
+          {t("activity.filters.clear_label")}
         </Button>
       </header>
 
@@ -105,15 +105,15 @@ export function ActivityFiltersBar({
         <div className="mt-2 flex flex-wrap items-end gap-2">
           <div className="flex min-w-[16rem] flex-col gap-1">
             <Label className="text-[11px] text-muted-foreground">
-              {t("users.activity.filters.date_range_label")}
+              {t("activity.filters.date_range_label")}
             </Label>
             <DateRangeSelect
               from={from}
-              fromLabel={t("users.activity.filters.from_label")}
+              fromLabel={t("activity.filters.from_label")}
               onChange={onDateRangeChange}
               placeholder={t("date_range.placeholder")}
               to={to}
-              toLabel={t("users.activity.filters.to_label")}
+              toLabel={t("activity.filters.to_label")}
             />
           </div>
 
@@ -123,7 +123,7 @@ export function ActivityFiltersBar({
               id={`activity-filter-${field.key}`}
               label={field.label}
               placeholder={
-                field.placeholder ?? t("users.activity.filters.placeholder_any")
+                field.placeholder ?? t("activity.filters.placeholder_any")
               }
               options={field.options}
               value={field.value}

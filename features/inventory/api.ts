@@ -952,6 +952,7 @@ export type InventoryMovementsListFilters = {
   to?: string;
   status?: string;
   movement_type?: string;
+  supplier_contact_id?: number;
 };
 
 export async function listInventoryMovementsCursor(
@@ -969,6 +970,7 @@ export async function listInventoryMovementsCursor(
     to: filters.to,
     status: filters.status,
     movement_type: filters.movement_type,
+    supplier_contact_id: filters.supplier_contact_id,
   });
   const response = await http.get("/inventory-movements/cursor", {
     params: queryParams,
@@ -991,6 +993,7 @@ export type DispatchOrdersListFilters = {
   vehicle_id?: number;
   driver_user_id?: number;
   route_id?: number;
+  customer_contact_id?: number;
 };
 
 export async function listDispatchOrdersCursor(
@@ -1008,6 +1011,7 @@ export async function listDispatchOrdersCursor(
     vehicle_id: filters.vehicle_id,
     driver_user_id: filters.driver_user_id,
     route_id: filters.route_id,
+    customer_contact_id: filters.customer_contact_id,
   });
   const response = await http.get("/dispatch-orders/cursor", {
     params: queryParams,

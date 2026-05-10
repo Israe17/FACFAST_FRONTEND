@@ -36,8 +36,10 @@ export type FilterField = {
 type ActivityFiltersBarProps = {
   from: string | undefined;
   to: string | undefined;
-  onFromChange: (value: string | undefined) => void;
-  onToChange: (value: string | undefined) => void;
+  onDateRangeChange: (next: {
+    from: string | undefined;
+    to: string | undefined;
+  }) => void;
   fields: FilterField[];
   onClear: () => void;
   isDirty: boolean;
@@ -47,8 +49,7 @@ type ActivityFiltersBarProps = {
 export function ActivityFiltersBar({
   from,
   to,
-  onFromChange,
-  onToChange,
+  onDateRangeChange,
   fields,
   onClear,
   isDirty,
@@ -109,10 +110,7 @@ export function ActivityFiltersBar({
             <DateRangeSelect
               from={from}
               fromLabel={t("users.activity.filters.from_label")}
-              onChange={({ from: nextFrom, to: nextTo }) => {
-                onFromChange(nextFrom);
-                onToChange(nextTo);
-              }}
+              onChange={onDateRangeChange}
               placeholder={t("date_range.placeholder")}
               to={to}
               toLabel={t("users.activity.filters.to_label")}

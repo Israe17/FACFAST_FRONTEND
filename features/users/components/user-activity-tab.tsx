@@ -500,8 +500,9 @@ function MovementsList({
       <ActivityFiltersBar
         from={filters.from}
         to={filters.to}
-        onFromChange={(value) => setFilters({ ...filters, from: value })}
-        onToChange={(value) => setFilters({ ...filters, to: value })}
+        onDateRangeChange={({ from: nextFrom, to: nextTo }) =>
+          setFilters({ ...filters, from: nextFrom, to: nextTo })
+        }
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
@@ -674,8 +675,9 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
       <ActivityFiltersBar
         from={filters.from}
         to={filters.to}
-        onFromChange={(value) => setFilters({ ...filters, from: value })}
-        onToChange={(value) => setFilters({ ...filters, to: value })}
+        onDateRangeChange={({ from: nextFrom, to: nextTo }) =>
+          setFilters({ ...filters, from: nextFrom, to: nextTo })
+        }
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}
@@ -870,8 +872,9 @@ function DispatchList({
       <ActivityFiltersBar
         from={filters.from}
         to={filters.to}
-        onFromChange={(value) => setFilters({ ...filters, from: value })}
-        onToChange={(value) => setFilters({ ...filters, to: value })}
+        onDateRangeChange={({ from: nextFrom, to: nextTo }) =>
+          setFilters({ ...filters, from: nextFrom, to: nextTo })
+        }
         fields={fields}
         onClear={() => setFilters({})}
         isDirty={isFiltersDirty(filters)}

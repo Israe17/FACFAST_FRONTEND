@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Building2,
   ChevronDown,
@@ -56,10 +56,6 @@ export function ContactDetailPanel({ contact }: ContactDetailPanelProps) {
   const [activeDialog, setActiveDialog] = useState<ActionDialog | null>(null);
   const updateContactMutation = useUpdateContactMutation(contact.id);
   const deleteContactMutation = useDeleteContactMutation(contact.id);
-
-  useEffect(() => {
-    setActiveTab("information");
-  }, [contact.id]);
 
   const seed = contact.code ?? contact.identification_number ?? String(contact.id);
   const color = pickContactColor(seed, contact.name);

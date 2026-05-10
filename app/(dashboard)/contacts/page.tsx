@@ -1,15 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import {
-  ContactRound,
-  PieChart,
-  Plus,
-  Search,
-  Users,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ContactRound, PieChart, Plus, Search, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,14 +17,9 @@ import {
 import { useBranchesQuery } from "@/features/branches/queries";
 import { ContactDetailPanel } from "@/features/contacts/components/contact-detail-panel";
 import { ContactListCard } from "@/features/contacts/components/contact-list-card";
-import { ContactTypeBadge } from "@/features/contacts/components/contact-type-badge";
 import { CreateContactDialog } from "@/features/contacts/components/create-contact-dialog";
-import { EditContactDialog } from "@/features/contacts/components/edit-contact-dialog";
 import { contactTypeOptions } from "@/features/contacts/constants";
-import {
-  useContactLookupQuery,
-  useContactsQuery,
-} from "@/features/contacts/queries";
+import { useContactsQuery } from "@/features/contacts/queries";
 import { usePriceListsQuery } from "@/features/inventory/queries";
 import { useUsersQuery } from "@/features/users/queries";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -42,7 +30,6 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
-import { formatDateTime } from "@/shared/lib/utils";
 
 const ALL_TYPES = "all";
 
@@ -89,14 +76,6 @@ export default function ContactsPage() {
   const [typeFilter, setTypeFilter] = useState<string>(ALL_TYPES);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
 
-  const [lookupInput, setLookupInput] = useState("");
-  const [submittedLookup, setSubmittedLookup] = useState("");
-  const [lookupEditOpen, setLookupEditOpen] = useState(false);
-  const lookupQuery = useContactLookupQuery(
-    submittedLookup,
-    canRunTenantQueries && Boolean(submittedLookup),
-  );
-
   const contacts = contactsQuery.data ?? [];
 
   const filteredContacts = useMemo(() => {
@@ -129,20 +108,6 @@ export default function ContactsPage() {
       setSelectedContactId(String(filteredContacts[0].id));
     }
   }, [filteredContacts, selectedContactId]);
-
-  function handleLookupSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const nextLookup = lookupInput.trim();
-    if (!nextLookup) {
-      toast.info(t("contacts.lookup_empty_input"));
-      return;
-    }
-    if (nextLookup === submittedLookup) {
-      lookupQuery.refetch();
-      return;
-    }
-    setSubmittedLookup(nextLookup);
-  }
 
   if (!canViewContacts) {
     return (
@@ -222,82 +187,7 @@ export default function ContactsPage() {
           {t("contacts.active_branch_context", { value: activeBranchValue })}
         </Badge>
         <Badge variant="outline">Query source: /api/contacts</Badge>
-        {submittedLookup ? (
-          <Badge variant="outline">
-            {t("contacts.lookup_badge", { value: submittedLookup })}
-          </Badge>
-        ) : null}
       </div>
-
-      {/* Lookup card kept compact above the two-column layout */}
-      <section className="rounded-xl border border-border/70 bg-card/60 p-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Search
-            className="size-4 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("contacts.lookup.card_title")}
-          </p>
-        </div>
-        <form
-          className="mt-2 flex flex-col gap-2 sm:flex-row"
-          onSubmit={handleLookupSubmit}
-        >
-          <Input
-            onChange={(event) => setLookupInput(event.target.value)}
-            placeholder="3101123456"
-            value={lookupInput}
-          />
-          <Button type="submit" size="sm">
-            <Search className="size-4" />
-            {t("contacts.lookup.search_button")}
-          </Button>
-        </form>
-        {submittedLookup ? (
-          <div className="mt-2 text-xs text-muted-foreground">
-            {lookupQuery.isLoading ? t("contacts.lookup.searching") : null}
-            {lookupQuery.isError
-              ? (getTranslatedBackendErrorMessage(lookupQuery.error, {
-                  fallbackMessage: t("contacts.lookup_error_fallback"),
-                  translateMessage: t,
-                }) ?? t("contacts.lookup_error_fallback"))
-              : null}
-            {lookupQuery.isSuccess && !lookupQuery.data
-              ? t("contacts.lookup.not_found_description", {
-                  id: submittedLookup,
-                })
-              : null}
-            {lookupQuery.data ? (
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                <span className="font-medium text-foreground">
-                  {lookupQuery.data.name}
-                </span>
-                <ContactTypeBadge type={lookupQuery.data.type} />
-                <Badge variant="outline">
-                  {lookupQuery.data.is_active
-                    ? t("common.active_status")
-                    : t("common.inactive_status")}
-                </Badge>
-                <span>
-                  {t("contacts.lookup.updated_label", {
-                    value: formatDateTime(lookupQuery.data.updated_at),
-                  })}
-                </span>
-                {can("contacts.update") ? (
-                  <Button
-                    onClick={() => setLookupEditOpen(true)}
-                    size="sm"
-                    variant="outline"
-                  >
-                    {t("contacts.lookup.edit_button")}
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
 
       {contactsQuery.isLoading ? (
         <LoadingState description={t("contacts.loading_contacts")} />
@@ -418,13 +308,6 @@ export default function ContactsPage() {
         onOpenChange={setCreateDialogOpen}
         open={createDialogOpen}
       />
-      {lookupQuery.data ? (
-        <EditContactDialog
-          contactId={lookupQuery.data.id}
-          onOpenChange={setLookupEditOpen}
-          open={lookupEditOpen}
-        />
-      ) : null}
     </>
   );
 }

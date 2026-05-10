@@ -72,12 +72,24 @@ function MapViewInner({
 
   // Initialize map once Leaflet is loaded from CDN
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
+    // Track this effect's own instance so the cleanup tears down exactly what
+    // it created. React StrictMode runs mount→cleanup→mount in dev, and Leaflet
+    // can race: one init resolves after a previous instance was already
+    // attached. Without this scoping the cleanup would either no-op (because
+    // mapRef.current was still null when the async init was in flight) or
+    // dispose the wrong map, leaving zombie handlers that later fire on a
+    // detached DOM node and crash with `_leaflet_pos`.
     let cancelled = false;
+    let map: any = null;
+    let markersLayer: any = null;
+    let polylinesLayer: any = null;
+    let polygonsLayer: any = null;
 
     waitForLeaflet().then((L) => {
-      if (cancelled || !containerRef.current) return;
+      if (cancelled || !containerRef.current || mapRef.current) return;
 
       LRef.current = L;
 
@@ -89,7 +101,7 @@ function MapViewInner({
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      const map = L.map(containerRef.current).setView(
+      map = L.map(container).setView(
         center ?? DEFAULT_CENTER,
         zoom ?? DEFAULT_ZOOM,
       );
@@ -100,18 +112,28 @@ function MapViewInner({
         maxZoom: 19,
       }).addTo(map);
 
-      markersLayerRef.current = L.layerGroup().addTo(map);
-      polylinesLayerRef.current = L.layerGroup().addTo(map);
-      polygonsLayerRef.current = L.layerGroup().addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+      polylinesLayer = L.layerGroup().addTo(map);
+      polygonsLayer = L.layerGroup().addTo(map);
+
       mapRef.current = map;
+      markersLayerRef.current = markersLayer;
+      polylinesLayerRef.current = polylinesLayer;
+      polygonsLayerRef.current = polygonsLayer;
       setReady(true);
     });
 
     return () => {
       cancelled = true;
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
+      setReady(false);
+      if (map) {
+        map.remove();
+        if (mapRef.current === map) {
+          mapRef.current = null;
+          markersLayerRef.current = null;
+          polylinesLayerRef.current = null;
+          polygonsLayerRef.current = null;
+        }
       }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

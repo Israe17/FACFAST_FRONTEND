@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { Building2, Globe2, MapPinned } from "lucide-react";
+import { Building2, Globe2, MapPinned, ToggleLeft } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
+import { Badge } from "@/components/ui/badge";
 import { BusinessSettingsForm } from "@/features/businesses/components/business-settings-form";
 import {
   useCurrentBusinessQuery,
@@ -11,15 +13,14 @@ import {
 } from "@/features/businesses/queries";
 import { updateCurrentBusinessSchema } from "@/features/businesses/schemas";
 import type { UpdateCurrentBusinessInput } from "@/features/businesses/types";
-import { DataCard } from "@/shared/components/data-card";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { PageHeader } from "@/shared/components/page-header";
-import { useAppTranslator } from "@/shared/i18n/use-app-translator";
+import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
+import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { getBackendErrorMessage } from "@/shared/lib/backend-error-parser";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
@@ -46,18 +47,47 @@ const defaultValues: UpdateCurrentBusinessInput = {
   website: "",
 };
 
+type StatChipProps = {
+  icon: LucideIcon;
+  label: string;
+  value: string | number;
+  hint?: string;
+};
+
+function StatChip({ icon: Icon, label, value, hint }: StatChipProps) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background px-3 py-2">
+      <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="size-4" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-lg font-semibold leading-tight">{value}</p>
+        {hint ? (
+          <p className="text-[11px] text-muted-foreground">{hint}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export default function BusinessPage() {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
+  const { activeBranchId, isBusinessLevelContext } = useActiveBranch();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const canView = can("businesses.view");
   const canUpdate = can("businesses.update");
   const businessQuery = useCurrentBusinessQuery(canView && canRunTenantQueries);
-  const updateBusinessMutation = useUpdateCurrentBusinessMutation({ showErrorToast: false });
+  const updateBusinessMutation = useUpdateCurrentBusinessMutation({
+    showErrorToast: false,
+  });
   const form = useForm<UpdateCurrentBusinessInput>({
     defaultValues,
-    resolver: buildFormResolver<UpdateCurrentBusinessInput>(updateCurrentBusinessSchema),
+    resolver: buildFormResolver<UpdateCurrentBusinessInput>(
+      updateCurrentBusinessSchema,
+    ),
   });
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(form);
@@ -109,45 +139,71 @@ export default function BusinessPage() {
   if (!canView) {
     return (
       <ErrorState
-        description="No tienes permiso para ver la configuracion de empresa."
-        title="Acceso denegado"
+        description={t("business.page_access_denied")}
+        title={t("common.access_denied_title")}
       />
     );
   }
 
+  const business = businessQuery.data;
+  const noValue = t("business.kpi.no_value");
+  const nameValue = business?.name ?? noValue;
+  const localizationValue = business
+    ? `${business.currency_code ?? "—"} / ${business.language ?? "—"}`
+    : noValue;
+  const locationValue = business?.province ?? noValue;
+  const activeContextValue = isBusinessLevelContext
+    ? t("common.enterprise_level")
+    : (activeBranchId ?? t("common.none"));
+
   return (
     <>
-      <PageHeader
-        description="Autogestion del tenant actual usando /api/businesses/current."
-        eyebrow="Configuracion"
-        title="Empresa"
-      />
-
-      {businessQuery.data ? (
-        <div className="grid gap-4 lg:grid-cols-3">
-          <DataCard
-            description="Nombre visible del tenant autenticado."
-            icon={<Building2 className="size-5" />}
-            title="Nombre"
-            value={businessQuery.data.name ?? "Sin nombre"}
-          />
-          <DataCard
-            description="Moneda e idioma configurados para el tenant."
-            icon={<Globe2 className="size-5" />}
-            title="Localizacion"
-            value={`${businessQuery.data.currency_code ?? "-"} / ${businessQuery.data.language ?? "-"}`}
-          />
-          <DataCard
-            description="Ubicacion base configurada para el tenant."
-            icon={<MapPinned className="size-5" />}
-            title="Ubicacion"
-            value={businessQuery.data.province ?? "Sin provincia"}
-          />
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            {t("business.page_eyebrow")}
+          </p>
+          <h1 className="text-xl font-semibold sm:text-2xl">
+            {t("business.page_title")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t("business.page_description")}
+          </p>
         </div>
-      ) : null}
+
+        {business ? (
+          <div className="flex flex-wrap gap-2">
+            <StatChip
+              icon={Building2}
+              label={t("business.kpi.name_title")}
+              value={nameValue}
+              hint={t("business.kpi.name_hint")}
+            />
+            <StatChip
+              icon={Globe2}
+              label={t("business.kpi.localization_title")}
+              value={localizationValue}
+              hint={t("business.kpi.localization_hint")}
+            />
+            <StatChip
+              icon={MapPinned}
+              label={t("business.kpi.location_title")}
+              value={locationValue}
+              hint={t("business.kpi.location_hint")}
+            />
+          </div>
+        ) : null}
+      </header>
+
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline">
+          {t("business.context.active_label", { value: activeContextValue })}
+        </Badge>
+        <Badge variant="outline">{t("business.context.query_source")}</Badge>
+      </div>
 
       {businessQuery.isLoading ? (
-        <LoadingState description="Cargando configuracion de empresa." />
+        <LoadingState description={t("business.loading")} />
       ) : null}
       {businessQuery.isError ? (
         <ErrorState
@@ -158,19 +214,20 @@ export default function BusinessPage() {
           onRetry={() => businessQuery.refetch()}
         />
       ) : null}
-      {!businessQuery.isLoading && !businessQuery.isError && !businessQuery.data ? (
+      {!businessQuery.isLoading && !businessQuery.isError && !business ? (
         <EmptyState
-          description="El backend no devolvio datos para la empresa actual."
+          description={t("business.empty_description")}
           icon={Building2}
-          title="Sin configuracion disponible"
+          title={t("business.empty_title")}
         />
       ) : null}
 
-      {businessQuery.data ? (
-        <section className="rounded-2xl border border-border bg-card p-6">
+      {business ? (
+        <>
           {!canUpdate ? (
-            <div className="mb-5 rounded-xl border border-border/70 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-              Tienes permiso de lectura, pero no de edicion para la empresa actual.
+            <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+              <ToggleLeft className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <p className="flex-1">{t("business.read_only_warning")}</p>
             </div>
           ) : null}
 
@@ -181,7 +238,7 @@ export default function BusinessPage() {
             isPending={updateBusinessMutation.isPending}
             onSubmit={handleSubmit}
           />
-        </section>
+        </>
       ) : null}
     </>
   );

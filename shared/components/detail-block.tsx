@@ -26,11 +26,11 @@ function DetailBlock({
       )}
     >
       <CardHeader className="gap-0.5 px-4 py-3">
-        <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <CardTitle className="text-xs font-semibold uppercase tracking-wide text-foreground">
           {title}
         </CardTitle>
         {description ? (
-          <p className="text-[11px] text-muted-foreground/80">{description}</p>
+          <p className="text-[11px] text-muted-foreground">{description}</p>
         ) : null}
       </CardHeader>
       <CardContent className="px-4 py-3">{children}</CardContent>

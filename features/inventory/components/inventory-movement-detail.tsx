@@ -251,7 +251,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         >
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.movement_type")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.movement_type")}</dt>
               <dd className="font-semibold">
                 {movement.movement_type
                   ? t(ledgerMovementTypeTranslationMap[movement.movement_type] ?? "inventory.common.not_available")
@@ -259,7 +259,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.status")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.status")}</dt>
               <dd className="font-semibold">
                 {movement.status
                   ? t(inventoryMovementStatusTranslationMap[movement.status] ?? "inventory.common.not_available")
@@ -267,7 +267,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.branch")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.branch")}</dt>
               <dd className="font-semibold">
                 {movement.branch?.name ??
                   movement.branch?.business_name ??
@@ -275,13 +275,13 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.detail.registered_by")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.detail.registered_by")}</dt>
               <dd className="font-semibold">
                 {movement.performed_by?.name ?? t("inventory.common.not_available")}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 {t("inventory.detail.source_document")}
               </dt>
               <dd className="font-semibold">
@@ -289,7 +289,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 {t("inventory.detail.source_document_number")}
               </dt>
               <dd className="font-semibold">
@@ -308,13 +308,13 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
         >
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.reference_id")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.reference_id")}</dt>
               <dd className="font-semibold">
                 {movement.source_document_id ?? t("inventory.common.not_available")}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 {t("inventory.detail.transferred_serial_ids")}
               </dt>
               <dd className="font-semibold">
@@ -324,7 +324,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               </dd>
             </div>
             <div className="md:col-span-2">
-              <dt className="text-sm text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 {t("inventory.detail.legacy_reference")}
               </dt>
               <dd className="font-semibold">

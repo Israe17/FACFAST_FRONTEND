@@ -252,11 +252,11 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
         >
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.branch")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.branch")}</dt>
               <dd className="font-semibold">{branch?.name ?? warehouse.branch_id ?? t("inventory.common.not_available")}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.purpose")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.purpose")}</dt>
               <dd className="font-semibold">
                 {warehouse.purpose
                   ? t(warehousePurposeTranslationMap[warehouse.purpose] ?? "inventory.common.not_available")
@@ -264,17 +264,17 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.form.uses_locations")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.form.uses_locations")}</dt>
               <dd className="font-semibold">
                 {warehouse.uses_locations ? t("inventory.common.active") : t("inventory.common.inactive")}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.updated")}</dt>
               <dd className="font-semibold">{formatDateTime(warehouse.updated_at)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.detail.created_at")}</dt>
               <dd className="font-semibold">{formatDateTime(warehouse.created_at)}</dd>
             </div>
           </dl>

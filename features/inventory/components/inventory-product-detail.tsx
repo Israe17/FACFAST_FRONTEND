@@ -287,45 +287,45 @@ function InventoryProductDetail({ productId }: InventoryProductDetailProps) {
       >
         <dl className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.entity.brand")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.entity.brand")}</dt>
             <dd className="font-semibold">{product.brand?.name ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.entity.category")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.entity.category")}</dt>
             <dd className="font-semibold">{product.category?.name ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.form.tax_profile")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.form.tax_profile")}</dt>
             <dd className="font-semibold">{product.tax_profile?.name ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.form.warranty_profile")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.form.warranty_profile")}</dt>
             <dd className="font-semibold">
               {product.warranty_profile?.name ?? t("inventory.common.not_available")}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">SKU</dt>
+            <dt className="text-xs text-muted-foreground">SKU</dt>
             <dd className="font-semibold">{product.sku ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.form.barcode")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.form.barcode")}</dt>
             <dd className="font-semibold">{product.barcode ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.form.stock_unit")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.form.stock_unit")}</dt>
             <dd className="font-semibold">{product.stock_unit?.name ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.form.sale_unit")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.form.sale_unit")}</dt>
             <dd className="font-semibold">{product.sale_unit?.name ?? t("inventory.common.not_available")}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.common.updated")}</dt>
             <dd className="font-semibold">{formatDateTime(product.updated_at)}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
+            <dt className="text-xs text-muted-foreground">{t("inventory.detail.created_at")}</dt>
             <dd className="font-semibold">{formatDateTime(product.created_at)}</dd>
           </div>
         </dl>

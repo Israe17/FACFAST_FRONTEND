@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { Building2, Globe2, MapPinned, ToggleLeft } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Building2, ToggleLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
-import { BusinessSettingsForm } from "@/features/businesses/components/business-settings-form";
+import { BusinessDetailPanel } from "@/features/businesses/components/business-detail-panel";
 import {
   useCurrentBusinessQuery,
   useUpdateCurrentBusinessMutation,
@@ -47,30 +47,6 @@ const defaultValues: UpdateCurrentBusinessInput = {
   website: "",
 };
 
-type StatChipProps = {
-  icon: LucideIcon;
-  label: string;
-  value: string | number;
-  hint?: string;
-};
-
-function StatChip({ icon: Icon, label, value, hint }: StatChipProps) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background px-3 py-2">
-      <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-        <Icon className="size-4" aria-hidden="true" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-lg font-semibold leading-tight">{value}</p>
-        {hint ? (
-          <p className="text-[11px] text-muted-foreground">{hint}</p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
 export default function BusinessPage() {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
@@ -83,6 +59,7 @@ export default function BusinessPage() {
   const updateBusinessMutation = useUpdateCurrentBusinessMutation({
     showErrorToast: false,
   });
+  const toggleBusinessMutation = useUpdateCurrentBusinessMutation();
   const form = useForm<UpdateCurrentBusinessInput>({
     defaultValues,
     resolver: buildFormResolver<UpdateCurrentBusinessInput>(
@@ -92,37 +69,40 @@ export default function BusinessPage() {
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(form);
 
-  useEffect(() => {
-    if (!businessQuery.data) {
-      return;
-    }
-
-    form.reset({
-      address: businessQuery.data.address ?? "",
-      canton: businessQuery.data.canton ?? "",
-      city: businessQuery.data.city ?? "",
-      code: businessQuery.data.code ?? "",
-      country: businessQuery.data.country ?? "",
-      currency_code: businessQuery.data.currency_code ?? "",
-      district: businessQuery.data.district ?? "",
-      email: businessQuery.data.email ?? "",
-      identification_number: businessQuery.data.identification_number ?? "",
-      identification_type: businessQuery.data.identification_type as
+  const initialFormValues: UpdateCurrentBusinessInput | null = useMemo(() => {
+    const data = businessQuery.data;
+    if (!data) return null;
+    return {
+      address: data.address ?? "",
+      canton: data.canton ?? "",
+      city: data.city ?? "",
+      code: data.code ?? "",
+      country: data.country ?? "",
+      currency_code: data.currency_code ?? "",
+      district: data.district ?? "",
+      email: data.email ?? "",
+      identification_number: data.identification_number ?? "",
+      identification_type: data.identification_type as
         | UpdateCurrentBusinessInput["identification_type"]
         | undefined,
-      is_active: businessQuery.data.is_active,
-      language: businessQuery.data.language ?? "",
-      legal_name: businessQuery.data.legal_name ?? "",
-      logo_url: businessQuery.data.logo_url ?? "",
-      name: businessQuery.data.name ?? "",
-      phone: businessQuery.data.phone ?? "",
-      postal_code: businessQuery.data.postal_code ?? "",
-      province: businessQuery.data.province ?? "",
-      timezone: businessQuery.data.timezone ?? "",
-      website: businessQuery.data.website ?? "",
-    });
+      is_active: data.is_active,
+      language: data.language ?? "",
+      legal_name: data.legal_name ?? "",
+      logo_url: data.logo_url ?? "",
+      name: data.name ?? "",
+      phone: data.phone ?? "",
+      postal_code: data.postal_code ?? "",
+      province: data.province ?? "",
+      timezone: data.timezone ?? "",
+      website: data.website ?? "",
+    };
+  }, [businessQuery.data]);
+
+  useEffect(() => {
+    if (!initialFormValues) return;
+    form.reset(initialFormValues);
     resetBackendFormErrors();
-  }, [businessQuery.data, form, resetBackendFormErrors]);
+  }, [initialFormValues, form, resetBackendFormErrors]);
 
   async function handleSubmit(values: UpdateCurrentBusinessInput) {
     resetBackendFormErrors();
@@ -136,6 +116,28 @@ export default function BusinessPage() {
     }
   }
 
+  async function handleToggleActive() {
+    if (!businessQuery.data) return;
+    const next = !(businessQuery.data.is_active ?? true);
+    try {
+      await toggleBusinessMutation.mutateAsync({ is_active: next });
+      toast.success(
+        next
+          ? t("business.actions.toggle_success_active")
+          : t("business.actions.toggle_success_inactive"),
+      );
+    } catch {
+      // toggleBusinessMutation has showErrorToast on by default
+    }
+  }
+
+  function handleResetChanges() {
+    if (initialFormValues) {
+      form.reset(initialFormValues);
+      resetBackendFormErrors();
+    }
+  }
+
   if (!canView) {
     return (
       <ErrorState
@@ -146,53 +148,22 @@ export default function BusinessPage() {
   }
 
   const business = businessQuery.data;
-  const noValue = t("business.kpi.no_value");
-  const nameValue = business?.name ?? noValue;
-  const localizationValue = business
-    ? `${business.currency_code ?? "—"} / ${business.language ?? "—"}`
-    : noValue;
-  const locationValue = business?.province ?? noValue;
   const activeContextValue = isBusinessLevelContext
     ? t("common.enterprise_level")
     : (activeBranchId ?? t("common.none"));
 
   return (
     <>
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {t("business.page_eyebrow")}
-          </p>
-          <h1 className="text-xl font-semibold sm:text-2xl">
-            {t("business.page_title")}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("business.page_description")}
-          </p>
-        </div>
-
-        {business ? (
-          <div className="flex flex-wrap gap-2">
-            <StatChip
-              icon={Building2}
-              label={t("business.kpi.name_title")}
-              value={nameValue}
-              hint={t("business.kpi.name_hint")}
-            />
-            <StatChip
-              icon={Globe2}
-              label={t("business.kpi.localization_title")}
-              value={localizationValue}
-              hint={t("business.kpi.localization_hint")}
-            />
-            <StatChip
-              icon={MapPinned}
-              label={t("business.kpi.location_title")}
-              value={locationValue}
-              hint={t("business.kpi.location_hint")}
-            />
-          </div>
-        ) : null}
+      <header className="space-y-1">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {t("business.page_eyebrow")}
+        </p>
+        <h1 className="text-xl font-semibold sm:text-2xl">
+          {t("business.page_title")}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {t("business.page_description")}
+        </p>
       </header>
 
       <div className="flex flex-wrap gap-2">
@@ -231,12 +202,16 @@ export default function BusinessPage() {
             </div>
           ) : null}
 
-          <BusinessSettingsForm
+          <BusinessDetailPanel
+            business={business}
             canUpdate={canUpdate}
             form={form}
             formError={formError}
             isPending={updateBusinessMutation.isPending}
+            isToggling={toggleBusinessMutation.isPending}
             onSubmit={handleSubmit}
+            onToggleActive={handleToggleActive}
+            onResetChanges={handleResetChanges}
           />
         </>
       ) : null}

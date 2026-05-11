@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Lock, Pencil, Trash2, Users } from "lucide-react";
+import { ChevronDown, Lock, Pencil, Trash2, Users } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { cn } from "@/shared/lib/utils";
@@ -92,28 +99,12 @@ export function RoleDetailPanel({
             ) : null}
           </div>
 
-          <div className="flex shrink-0 gap-2">
-            {editable ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setEditDialogOpen(true)}
-              >
-                <Pencil className="size-4" />
-                {t("roles.actions.edit_metadata")}
-              </Button>
-            ) : null}
-            {deletable ? (
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onRequestDelete(role)}
-              >
-                <Trash2 className="size-4" />
-                {t("roles.actions.delete")}
-              </Button>
-            ) : null}
-          </div>
+          <RoleActionsMenu
+            canEdit={editable}
+            canDelete={deletable}
+            onEdit={() => setEditDialogOpen(true)}
+            onDelete={() => onRequestDelete(role)}
+          />
         </div>
       </section>
 
@@ -144,5 +135,51 @@ export function RoleDetailPanel({
         />
       ) : null}
     </div>
+  );
+}
+
+function RoleActionsMenu({
+  canEdit,
+  canDelete,
+  onEdit,
+  onDelete,
+}: {
+  canEdit: boolean;
+  canDelete: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useAppTranslator();
+  if (!canEdit && !canDelete) return null;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="secondary">
+          {t("roles.actions.menu_label")}
+          <ChevronDown className="size-4" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {canEdit ? (
+          <DropdownMenuItem onSelect={() => onEdit()}>
+            <Pencil className="size-4" aria-hidden="true" />
+            {t("roles.actions.edit_metadata")}
+          </DropdownMenuItem>
+        ) : null}
+        {canDelete ? (
+          <>
+            {canEdit ? <DropdownMenuSeparator /> : null}
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive data-[highlighted]:bg-destructive/10"
+              onSelect={() => onDelete()}
+            >
+              <Trash2 className="size-4" aria-hidden="true" />
+              {t("roles.actions.delete")}
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -10,6 +10,7 @@ import { hasTenantOperationalAccess } from "@/features/auth/utils";
 import { TenantModeGuard } from "@/shared/components/tenant-mode-guard";
 import { createQueryClient } from "@/shared/lib/query-client";
 import { APP_ROUTES } from "@/shared/lib/routes";
+import { RealtimeShell } from "@/shared/realtime/realtime-shell";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -32,9 +33,11 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <AdminShell>
-        <TenantModeGuard>{children}</TenantModeGuard>
-      </AdminShell>
+      <RealtimeShell>
+        <AdminShell>
+          <TenantModeGuard>{children}</TenantModeGuard>
+        </AdminShell>
+      </RealtimeShell>
     </HydrationBoundary>
   );
 }

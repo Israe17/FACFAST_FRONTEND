@@ -58,7 +58,14 @@ function TaxProfileForm({
   const ivaRateCode = form.watch("iva_rate_code");
   const taxInclusionMode = form.watch("tax_inclusion_mode");
   const currentCabys = useMemo(
-    () => (cabysCode ? { codigo: cabysCode, descripcion: "", impuesto: ivaRate ?? 0 } : null),
+    () =>
+      cabysCode
+        ? {
+            codigo: cabysCode,
+            descripcion: "",
+            impuesto: typeof ivaRate === "number" ? ivaRate : 0,
+          }
+        : null,
     [cabysCode, ivaRate],
   );
   const taxTypeOptions = useMemo(

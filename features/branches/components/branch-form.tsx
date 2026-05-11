@@ -132,6 +132,8 @@ function BranchForm({
   } = form;
   const { can } = usePermissions();
   const isActive = form.watch("is_active");
+  const watchedIdentificationType = form.watch("identification_type");
+  const lookupDisabled = !watchedIdentificationType;
   const canConfigure = can("branches.configure");
   const currentBusinessQuery = useCurrentBusinessQuery();
   const businessCountryId =
@@ -146,6 +148,11 @@ function BranchForm({
   }>({ open: false, activities: [] });
 
   const handleTaxpayerLookup = useCallback(async () => {
+    const identificationType = form.getValues("identification_type");
+    if (!identificationType) {
+      toast.info(t("branches.hacienda.type_required"));
+      return;
+    }
     const identification = form.getValues("cedula_juridica")?.trim();
     if (!identification) {
       toast.info(t("branches.hacienda.empty_identification"));
@@ -258,16 +265,27 @@ function BranchForm({
                 {...form.register("cedula_juridica")}
               />
               <ActionButton
+                disabled={lookupDisabled}
                 icon={Search}
                 isLoading={taxpayerLookup.isPending}
                 loadingText={t("branches.hacienda.looking_up")}
                 onClick={handleTaxpayerLookup}
+                title={
+                  lookupDisabled
+                    ? t("branches.hacienda.type_required")
+                    : undefined
+                }
                 type="button"
                 variant="outline"
               >
                 {t("branches.hacienda.lookup_button")}
               </ActionButton>
             </div>
+            <p className="text-xs text-muted-foreground">
+              {lookupDisabled
+                ? t("branches.hacienda.type_required")
+                : t("branches.hacienda.ready_hint")}
+            </p>
             <FieldError message={errors.cedula_juridica?.message} />
           </div>
         </div>

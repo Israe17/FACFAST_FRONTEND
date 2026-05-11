@@ -116,6 +116,8 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const watchedIdentificationType = form.watch("identification_type");
+  const lookupDisabled = !watchedIdentificationType;
   const currentBusinessQuery = useCurrentBusinessQuery();
   const businessCountryId =
     (currentBusinessQuery.data?.country_id as number | undefined) ?? null;
@@ -129,6 +131,11 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
   }>({ open: false, activities: [] });
 
   const handleTaxpayerLookup = useCallback(async () => {
+    const identificationType = form.getValues("identification_type");
+    if (!identificationType) {
+      toast.info(t("contacts.hacienda.type_required"));
+      return;
+    }
     const identification = form.getValues("identification_number")?.trim();
     if (!identification) {
       toast.info(t("contacts.hacienda.empty_identification"));
@@ -208,16 +215,27 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
                 {...form.register("identification_number")}
               />
               <ActionButton
+                disabled={lookupDisabled}
                 icon={Search}
                 isLoading={taxpayerLookup.isPending}
                 loadingText={t("contacts.hacienda.looking_up")}
                 onClick={handleTaxpayerLookup}
+                title={
+                  lookupDisabled
+                    ? t("contacts.hacienda.type_required")
+                    : undefined
+                }
                 type="button"
                 variant="outline"
               >
                 {t("contacts.hacienda.lookup_button")}
               </ActionButton>
             </div>
+            <p className="text-xs text-muted-foreground">
+              {lookupDisabled
+                ? t("contacts.hacienda.type_required")
+                : t("contacts.hacienda.ready_hint")}
+            </p>
             <FieldError message={errors.identification_number?.message} />
           </div>
 

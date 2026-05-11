@@ -29,7 +29,7 @@ import { LocationPicker } from "@/shared/components/location-picker";
 import { RegionPicker } from "@/shared/components/region-picker";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { identificationTypeOptions } from "@/shared/lib/validation";
+import { identificationTypeOptions } from "@/features/contacts/constants";
 
 type BranchFormValues = {
   activity_code?: string;

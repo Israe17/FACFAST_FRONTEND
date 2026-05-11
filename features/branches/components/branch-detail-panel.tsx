@@ -394,7 +394,7 @@ function BranchOperationalFields({ branch }: { branch: Branch }) {
         value={branch.signature_type}
       />
       <div className="space-y-1 sm:col-span-2">
-        <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <dt className="text-xs text-muted-foreground">
           {t("branches.detail.fields.hacienda_config")}
         </dt>
         <dd className="flex flex-wrap gap-2">
@@ -469,14 +469,12 @@ function InfoField({
   const { t } = useAppTranslator();
   return (
     <div className={cn("space-y-1", className)}>
-      <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd
         className={cn(
-          "text-sm",
+          "text-sm font-semibold",
           mono && "font-mono",
-          !value && "text-muted-foreground/70",
+          !value && "font-normal text-muted-foreground/70",
         )}
       >
         {value ?? t("common.not_set")}

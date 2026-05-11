@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/shared/lib/utils";
 
 type DetailBlockProps = {
@@ -19,12 +19,21 @@ function DetailBlock({
   title,
 }: DetailBlockProps) {
   return (
-    <Card className={cn("border-border/70 bg-card/95", className)}>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-lg">{title}</CardTitle>
-        {description ? <CardDescription>{description}</CardDescription> : null}
+    <Card
+      className={cn(
+        "rounded-xl border-border/70 bg-card/95 shadow-none",
+        className,
+      )}
+    >
+      <CardHeader className="gap-0.5 px-4 py-3">
+        <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {title}
+        </CardTitle>
+        {description ? (
+          <p className="text-[11px] text-muted-foreground/80">{description}</p>
+        ) : null}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="px-4 py-3">{children}</CardContent>
     </Card>
   );
 }

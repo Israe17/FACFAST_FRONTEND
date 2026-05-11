@@ -252,7 +252,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.form.movement_type")}</dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.movement_type
                   ? t(ledgerMovementTypeTranslationMap[movement.movement_type] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
@@ -260,7 +260,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.common.status")}</dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.status
                   ? t(inventoryMovementStatusTranslationMap[movement.status] ?? "inventory.common.not_available")
                   : t("inventory.common.not_available")}
@@ -268,7 +268,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.form.branch")}</dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.branch?.name ??
                   movement.branch?.business_name ??
                   t("inventory.common.not_available")}
@@ -276,7 +276,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.detail.registered_by")}</dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.performed_by?.name ?? t("inventory.common.not_available")}
               </dd>
             </div>
@@ -284,7 +284,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">
                 {t("inventory.detail.source_document")}
               </dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.source_document_type ?? t("inventory.common.not_available")}
               </dd>
             </div>
@@ -292,7 +292,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">
                 {t("inventory.detail.source_document_number")}
               </dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.source_document_number ?? t("inventory.common.not_available")}
               </dd>
             </div>
@@ -309,7 +309,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
               <dt className="text-sm text-muted-foreground">{t("inventory.form.reference_id")}</dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.source_document_id ?? t("inventory.common.not_available")}
               </dd>
             </div>
@@ -317,7 +317,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">
                 {t("inventory.detail.transferred_serial_ids")}
               </dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.transferred_serial_ids.length
                   ? movement.transferred_serial_ids.join(", ")
                   : t("inventory.common.not_available")}
@@ -327,7 +327,7 @@ function InventoryMovementDetail({ headerId }: InventoryMovementDetailProps) {
               <dt className="text-sm text-muted-foreground">
                 {t("inventory.detail.legacy_reference")}
               </dt>
-              <dd className="font-medium">
+              <dd className="font-semibold">
                 {movement.legacy_movement_ids.length
                   ? movement.legacy_movement_ids.join(", ")
                   : t("inventory.common.not_available")}

@@ -11,6 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useInventoryMovementQuery } from "@/features/inventory/queries";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -77,52 +78,56 @@ export function InventoryMovementDetailSheet({
                 ) : null}
               </div>
 
-              <dl className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-xs text-muted-foreground">
-                    {t("inventory.form.occurred_at")}
-                  </dt>
-                  <dd>{formatDateTime(movement.occurred_at)}</dd>
-                </div>
-                {movement.branch?.name ? (
+              <DetailBlock title={t("inventory.detail.summary_block_title")}>
+                <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <dt className="text-xs text-muted-foreground">
-                      {t("users.activity.filters.branch_label")}
+                      {t("inventory.form.occurred_at")}
                     </dt>
-                    <dd>{movement.branch.name}</dd>
-                  </div>
-                ) : null}
-                {movement.source_document_number ? (
-                  <div className="col-span-2">
-                    <dt className="text-xs text-muted-foreground">
-                      {t("users.activity.detail.source_document")}
-                    </dt>
-                    <dd>
-                      {movement.source_document_type
-                        ? `${movement.source_document_type} · `
-                        : ""}
-                      {movement.source_document_number}
+                    <dd className="text-sm font-semibold">
+                      {formatDateTime(movement.occurred_at)}
                     </dd>
                   </div>
-                ) : null}
-                {movement.notes ? (
-                  <div className="col-span-2">
-                    <dt className="text-xs text-muted-foreground">
-                      {t("users.activity.detail.notes")}
-                    </dt>
-                    <dd className="whitespace-pre-wrap">{movement.notes}</dd>
-                  </div>
-                ) : null}
-              </dl>
+                  {movement.branch?.name ? (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">
+                        {t("users.activity.filters.branch_label")}
+                      </dt>
+                      <dd className="text-sm font-semibold">
+                        {movement.branch.name}
+                      </dd>
+                    </div>
+                  ) : null}
+                  {movement.source_document_number ? (
+                    <div className="col-span-2">
+                      <dt className="text-xs text-muted-foreground">
+                        {t("users.activity.detail.source_document")}
+                      </dt>
+                      <dd className="text-sm font-semibold">
+                        {movement.source_document_type
+                          ? `${movement.source_document_type} · `
+                          : ""}
+                        {movement.source_document_number}
+                      </dd>
+                    </div>
+                  ) : null}
+                  {movement.notes ? (
+                    <div className="col-span-2">
+                      <dt className="text-xs text-muted-foreground">
+                        {t("users.activity.detail.notes")}
+                      </dt>
+                      <dd className="whitespace-pre-wrap text-sm font-semibold">
+                        {movement.notes}
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
+              </DetailBlock>
 
               {movement.lines && movement.lines.length > 0 ? (
-                <section>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {t("inventory.detail.line_items")}{" "}
-                    <span className="text-muted-foreground/70">
-                      ({movement.lines.length})
-                    </span>
-                  </h3>
+                <DetailBlock
+                  title={`${t("inventory.detail.line_items")} (${movement.lines.length})`}
+                >
                   <div className="overflow-hidden rounded-lg border border-border/70">
                     <table className="w-full text-sm">
                       <thead>
@@ -153,7 +158,7 @@ export function InventoryMovementDetailSheet({
                                 {line.line_no}
                               </td>
                               <td className="px-2 py-1.5">
-                                <div className="font-medium">
+                                <div className="font-semibold">
                                   {line.product.name}
                                 </div>
                                 {line.product_variant?.variant_name ||
@@ -167,7 +172,7 @@ export function InventoryMovementDetailSheet({
                               <td className="px-2 py-1.5">
                                 {line.warehouse.name}
                               </td>
-                              <td className="px-2 py-1.5 text-right tabular-nums">
+                              <td className="px-2 py-1.5 text-right font-semibold tabular-nums">
                                 {line.quantity ?? 0}
                               </td>
                             </tr>
@@ -175,7 +180,7 @@ export function InventoryMovementDetailSheet({
                       </tbody>
                     </table>
                   </div>
-                </section>
+                </DetailBlock>
               ) : null}
             </>
           )}

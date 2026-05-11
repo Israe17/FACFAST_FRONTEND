@@ -120,25 +120,25 @@ function ContactDetail({ contactId }: ContactDetailProps) {
               {contact.address ? (
                 <div className="sm:col-span-2">
                   <dt className="text-xs text-muted-foreground">{t("contacts.field.address")}</dt>
-                  <dd className="text-sm font-medium">{contact.address}</dd>
+                  <dd className="text-sm font-semibold">{contact.address}</dd>
                 </div>
               ) : null}
               {contact.province ? (
                 <div>
                   <dt className="text-xs text-muted-foreground">{t("contacts.field.province")}</dt>
-                  <dd className="text-sm font-medium">{contact.province}</dd>
+                  <dd className="text-sm font-semibold">{contact.province}</dd>
                 </div>
               ) : null}
               {contact.canton ? (
                 <div>
                   <dt className="text-xs text-muted-foreground">{t("contacts.field.canton")}</dt>
-                  <dd className="text-sm font-medium">{contact.canton}</dd>
+                  <dd className="text-sm font-semibold">{contact.canton}</dd>
                 </div>
               ) : null}
               {contact.district ? (
                 <div>
                   <dt className="text-xs text-muted-foreground">{t("contacts.field.district")}</dt>
-                  <dd className="text-sm font-medium">{contact.district}</dd>
+                  <dd className="text-sm font-semibold">{contact.district}</dd>
                 </div>
               ) : null}
             </dl>
@@ -172,7 +172,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
           ) : (
             <div className="h-40 rounded-lg border border-dashed border-border/70 flex flex-col items-center justify-center text-muted-foreground">
               <MapPin className="size-8 mb-2" />
-              <p className="text-sm font-medium">{t("contacts.detail.no_location")}</p>
+              <p className="text-sm font-semibold">{t("contacts.detail.no_location")}</p>
               <p className="text-xs mt-1">{t("contacts.detail.no_location_hint")}</p>
             </div>
           )}
@@ -189,31 +189,31 @@ function ContactDetail({ contactId }: ContactDetailProps) {
             {contact.exoneration_type ? (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("contacts.field.exoneration_type")}</dt>
-                <dd className="text-sm font-medium">{contact.exoneration_type}</dd>
+                <dd className="text-sm font-semibold">{contact.exoneration_type}</dd>
               </div>
             ) : null}
             {contact.exoneration_document_number ? (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("contacts.field.exoneration_document")}</dt>
-                <dd className="text-sm font-medium">{contact.exoneration_document_number}</dd>
+                <dd className="text-sm font-semibold">{contact.exoneration_document_number}</dd>
               </div>
             ) : null}
             {contact.exoneration_institution ? (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("contacts.field.exoneration_institution")}</dt>
-                <dd className="text-sm font-medium">{contact.exoneration_institution}</dd>
+                <dd className="text-sm font-semibold">{contact.exoneration_institution}</dd>
               </div>
             ) : null}
             {contact.exoneration_issue_date ? (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("contacts.field.exoneration_date")}</dt>
-                <dd className="text-sm font-medium">{contact.exoneration_issue_date}</dd>
+                <dd className="text-sm font-semibold">{contact.exoneration_issue_date}</dd>
               </div>
             ) : null}
             {contact.exoneration_percentage != null ? (
               <div>
                 <dt className="text-xs text-muted-foreground">{t("contacts.field.exoneration_percentage")}</dt>
-                <dd className="text-sm font-medium">{contact.exoneration_percentage}%</dd>
+                <dd className="text-sm font-semibold">{contact.exoneration_percentage}%</dd>
               </div>
             ) : null}
           </dl>
@@ -228,22 +228,22 @@ function ContactDetail({ contactId }: ContactDetailProps) {
         <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 text-sm">
           <div>
             <dt className="text-xs text-muted-foreground">{t("contacts.detail.created_at")}</dt>
-            <dd className="font-medium">{formatDateTime(contact.created_at)}</dd>
+            <dd className="font-semibold">{formatDateTime(contact.created_at)}</dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">{t("contacts.detail.updated_at")}</dt>
-            <dd className="font-medium">{formatDateTime(contact.updated_at)}</dd>
+            <dd className="font-semibold">{formatDateTime(contact.updated_at)}</dd>
           </div>
           {contact.delivery_latitude ? (
             <div>
               <dt className="text-xs text-muted-foreground">{t("contacts.field.latitude")}</dt>
-              <dd className="font-medium">{contact.delivery_latitude}</dd>
+              <dd className="font-semibold">{contact.delivery_latitude}</dd>
             </div>
           ) : null}
           {contact.delivery_longitude ? (
             <div>
               <dt className="text-xs text-muted-foreground">{t("contacts.field.longitude")}</dt>
-              <dd className="font-medium">{contact.delivery_longitude}</dd>
+              <dd className="font-semibold">{contact.delivery_longitude}</dd>
             </div>
           ) : null}
         </dl>

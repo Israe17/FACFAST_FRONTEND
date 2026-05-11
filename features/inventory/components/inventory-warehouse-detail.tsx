@@ -309,7 +309,7 @@ function InventoryWarehouseDetail({ warehouseId }: InventoryWarehouseDetailProps
                   lat: warehouse.latitude,
                   lng: warehouse.longitude,
                   color: "#16a34a",
-                  popup: `<strong>${warehouse.name}</strong>`,
+                  popup: { title: warehouse.name },
                 },
               ]}
               center={[warehouse.latitude, warehouse.longitude]}

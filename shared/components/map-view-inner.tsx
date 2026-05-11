@@ -21,6 +21,40 @@ const STOP_STATUS_COLORS: Record<string, string> = {
   skipped: "#6b7280",
 };
 
+/**
+ * Build a Leaflet popup DOM tree from a structured payload. We assemble the
+ * tree with `Element.textContent` so user-provided strings (contact names,
+ * order codes, zone names, etc.) cannot inject HTML. NEVER use innerHTML or
+ * string concatenation here — that's the XSS vector this exists to close.
+ */
+function buildPopupElement(
+  popup: NonNullable<MapMarker["popup"]>,
+): HTMLElement {
+  const root = document.createElement("div");
+  if (popup.title) {
+    const strong = document.createElement("strong");
+    strong.textContent = popup.title;
+    root.appendChild(strong);
+  }
+  if (popup.subtitle) {
+    if (root.childElementCount > 0) {
+      root.appendChild(document.createElement("br"));
+    }
+    const span = document.createElement("span");
+    span.textContent = popup.subtitle;
+    root.appendChild(span);
+  }
+  for (const line of popup.lines ?? []) {
+    if (root.childElementCount > 0) {
+      root.appendChild(document.createElement("br"));
+    }
+    const em = document.createElement("em");
+    em.textContent = line;
+    root.appendChild(em);
+  }
+  return root;
+}
+
 type MapViewInnerProps = {
   markers?: MapMarker[];
   polylines?: MapPolyline[];
@@ -207,7 +241,7 @@ function MapViewInner({
       const marker = L.marker([m.lat, m.lng], { icon, zIndexOffset: zOffset }).addTo(layer);
 
       if (m.popup) {
-        marker.bindPopup(typeof m.popup === "string" ? m.popup : "");
+        marker.bindPopup(buildPopupElement(m.popup));
       }
 
       if (onMarkerClick) {

@@ -25,11 +25,14 @@ import { buildFormResolver } from "@/shared/lib/form-resolver";
 const defaultValues: UpdateCurrentBusinessInput = {
   address: "",
   canton: "",
+  canton_id: null,
   city: "",
   code: "",
   country: "",
+  country_id: null,
   currency_code: "",
   district: "",
+  district_id: null,
   email: "",
   identification_number: "",
   identification_type: undefined,
@@ -41,6 +44,7 @@ const defaultValues: UpdateCurrentBusinessInput = {
   phone: "",
   postal_code: "",
   province: "",
+  province_id: null,
   timezone: "",
   website: "",
 };
@@ -72,11 +76,14 @@ export default function BusinessPage() {
     return {
       address: data.address ?? "",
       canton: data.canton ?? "",
+      canton_id: data.canton_id ?? null,
       city: data.city ?? "",
       code: data.code ?? "",
       country: data.country ?? "",
+      country_id: data.country_id ?? null,
       currency_code: data.currency_code ?? "",
       district: data.district ?? "",
+      district_id: data.district_id ?? null,
       email: data.email ?? "",
       identification_number: data.identification_number ?? "",
       identification_type: data.identification_type as
@@ -90,6 +97,7 @@ export default function BusinessPage() {
       phone: data.phone ?? "",
       postal_code: data.postal_code ?? "",
       province: data.province ?? "",
+      province_id: data.province_id ?? null,
       timezone: data.timezone ?? "",
       website: data.website ?? "",
     };

@@ -15,9 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCurrentBusinessQuery } from "@/features/businesses/queries";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LocationPicker } from "@/shared/components/location-picker";
+import { RegionPicker } from "@/shared/components/region-picker";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { identificationTypeValues } from "@/shared/lib/validation";
@@ -27,13 +29,16 @@ type BranchFormValues = {
   address: string;
   branch_number: string;
   business_name: string;
-  canton: string;
+  canton?: string;
+  canton_id: number | null;
   cedula_juridica: string;
   cert_path?: string;
   city?: string;
   code?: string;
+  country_id: number | null;
   crypto_key?: string;
-  district: string;
+  district?: string;
+  district_id: number | null;
   email?: string;
   hacienda_password?: string;
   hacienda_username?: string;
@@ -47,7 +52,8 @@ type BranchFormValues = {
   name?: string;
   phone?: string;
   provider_code?: string;
-  province: string;
+  province?: string;
+  province_id: number | null;
   signature_type?: string;
 };
 
@@ -120,6 +126,9 @@ function BranchForm({
   const { can } = usePermissions();
   const isActive = form.watch("is_active");
   const canConfigure = can("branches.configure");
+  const currentBusinessQuery = useCurrentBusinessQuery();
+  const businessCountryId =
+    (currentBusinessQuery.data?.country_id as number | undefined) ?? null;
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -241,30 +250,26 @@ function BranchForm({
           <FieldError message={errors.address?.message} />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <div className="space-y-2">
-            <Label htmlFor="branch-province">{t("branches.form.province")}</Label>
-            <Input id="branch-province" placeholder="San Jose" {...form.register("province")} />
-            <FieldError message={errors.province?.message} />
-          </div>
+        <RegionPicker
+          form={form}
+          fields={{
+            countryId: "country_id",
+            provinceId: "province_id",
+            cantonId: "canton_id",
+            districtId: "district_id",
+          }}
+          lockedCountryId={businessCountryId ?? null}
+          idPrefix="branch-region"
+        />
+        <FieldError message={errors.country_id?.message} />
+        <FieldError message={errors.province_id?.message} />
+        <FieldError message={errors.canton_id?.message} />
+        <FieldError message={errors.district_id?.message} />
 
-          <div className="space-y-2">
-            <Label htmlFor="branch-canton">{t("branches.form.canton")}</Label>
-            <Input id="branch-canton" placeholder="Escazu" {...form.register("canton")} />
-            <FieldError message={errors.canton?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="branch-district">{t("branches.form.district")}</Label>
-            <Input id="branch-district" placeholder="San Rafael" {...form.register("district")} />
-            <FieldError message={errors.district?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="branch-city">{t("branches.form.city")}</Label>
-            <Input id="branch-city" placeholder="San Jose" {...form.register("city")} />
-            <FieldError message={errors.city?.message} />
-          </div>
+        <div className="space-y-2 md:max-w-xs">
+          <Label htmlFor="branch-city">{t("branches.form.city")}</Label>
+          <Input id="branch-city" placeholder="San Jose" {...form.register("city")} />
+          <FieldError message={errors.city?.message} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

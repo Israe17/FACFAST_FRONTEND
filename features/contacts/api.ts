@@ -31,9 +31,12 @@ function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
   const base = compactRecord({
     address: payload.address,
     canton: payload.canton,
+    canton_id: payload.canton_id ?? undefined,
     code: payload.code,
     commercial_name: payload.commercial_name,
+    country_id: payload.country_id ?? undefined,
     district: payload.district,
+    district_id: payload.district_id ?? undefined,
     economic_activity_code: payload.economic_activity_code,
     email: payload.email,
     exoneration_document_number: payload.exoneration_document_number,
@@ -47,6 +50,7 @@ function buildContactPayload(payload: CreateContactInput | UpdateContactInput) {
     name: payload.name,
     phone: payload.phone,
     province: payload.province,
+    province_id: payload.province_id ?? undefined,
     tax_condition: payload.tax_condition,
     type: payload.type,
   });

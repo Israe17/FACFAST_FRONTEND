@@ -8,11 +8,14 @@ function buildCurrentBusinessPayload(payload: UpdateCurrentBusinessInput) {
   return compactRecord({
     address: payload.address,
     canton: payload.canton,
+    canton_id: payload.canton_id ?? undefined,
     city: payload.city,
     code: payload.code,
     country: payload.country,
+    country_id: payload.country_id ?? undefined,
     currency_code: payload.currency_code,
     district: payload.district,
+    district_id: payload.district_id ?? undefined,
     email: payload.email,
     identification_number: payload.identification_number,
     identification_type: payload.identification_type,
@@ -24,6 +27,7 @@ function buildCurrentBusinessPayload(payload: UpdateCurrentBusinessInput) {
     phone: payload.phone,
     postal_code: payload.postal_code,
     province: payload.province,
+    province_id: payload.province_id ?? undefined,
     timezone: payload.timezone,
     website: payload.website,
   });

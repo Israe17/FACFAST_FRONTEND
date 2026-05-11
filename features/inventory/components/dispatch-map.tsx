@@ -77,9 +77,21 @@ function DispatchMap({ orders, warehouses = [], zones = [], selectedOrderId = nu
             lat: stop.delivery_latitude,
             lng: stop.delivery_longitude,
             status: stop.status,
-            popup: `<strong>${order.code ?? `DO-${order.id}`}</strong><br/>
-              ${stop.sale_order?.code ?? ""} — ${stop.customer_contact?.name ?? ""}<br/>
-              <em>${t(dispatchStopStatusTranslationMap[stop.status] ?? "inventory.dispatch.stop_pending")}</em>`,
+            popup: {
+              title: order.code ?? `DO-${order.id}`,
+              subtitle: [
+                stop.sale_order?.code,
+                stop.customer_contact?.name,
+              ]
+                .filter(Boolean)
+                .join(" — "),
+              lines: [
+                t(
+                  dispatchStopStatusTranslationMap[stop.status] ??
+                    "inventory.dispatch.stop_pending",
+                ),
+              ],
+            },
           });
         }
       }
@@ -110,7 +122,9 @@ function DispatchMap({ orders, warehouses = [], zones = [], selectedOrderId = nu
         lat: w.latitude!,
         lng: w.longitude!,
         color: "#16a34a",
-        popup: `<strong>${t("inventory.dispatch.legend_warehouse")}: ${w.name}</strong>`,
+        popup: {
+          title: `${t("inventory.dispatch.legend_warehouse")}: ${w.name}`,
+        },
       }));
   }, [warehouses, t]);
 

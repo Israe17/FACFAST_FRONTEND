@@ -593,7 +593,7 @@ function ContactMapTab({ contact }: { contact: Contact }) {
             lat,
             lng,
             color: "#3b82f6",
-            popup: `<strong>${contact.name}</strong>`,
+            popup: { title: contact.name },
           },
         ]}
         center={[lat, lng]}

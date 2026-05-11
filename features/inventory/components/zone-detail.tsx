@@ -52,7 +52,7 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
         lat: zone.center_latitude!,
         lng: zone.center_longitude!,
         color: "#6366f1",
-        popup: `<strong>${zone.name}</strong>`,
+        popup: { title: zone.name },
       },
     ];
   }, [zone?.center_latitude, zone?.center_longitude, zone?.id, zone?.name]);

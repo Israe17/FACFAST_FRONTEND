@@ -161,7 +161,7 @@ function ContactDetail({ contactId }: ContactDetailProps) {
                     lat: contact.delivery_latitude!,
                     lng: contact.delivery_longitude!,
                     color: "#3b82f6",
-                    popup: `<strong>${contact.name}</strong>`,
+                    popup: { title: contact.name },
                   },
                 ]}
                 center={[contact.delivery_latitude!, contact.delivery_longitude!]}

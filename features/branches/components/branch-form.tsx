@@ -211,19 +211,11 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-code">{t("branches.form.code")}</Label>
-            <Input id="branch-code" placeholder="BR-0001" {...form.register("code")} />
-            <FieldError message={errors.code?.message} />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
             <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
             <FieldError message={errors.branch_number?.message} />
           </div>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-business-name">{t("branches.form.business_name")}</Label>
             <Input
@@ -233,7 +225,9 @@ function BranchForm({
             />
             <FieldError message={errors.business_name?.message} />
           </div>
+        </div>
 
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-legal-name">{t("branches.form.legal_name")}</Label>
             <Input
@@ -243,15 +237,15 @@ function BranchForm({
             />
             <FieldError message={errors.legal_name?.message} />
           </div>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
             <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />
             <FieldError message={errors.name?.message} />
           </div>
+        </div>
 
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-cedula">{t("branches.form.cedula_juridica")}</Label>
             <div className="flex gap-2">

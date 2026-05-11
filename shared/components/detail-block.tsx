@@ -26,7 +26,7 @@ function DetailBlock({
       )}
     >
       <CardHeader className="gap-0.5 px-4 py-3">
-        <CardTitle className="text-xs font-semibold uppercase tracking-wide text-foreground">
+        <CardTitle className="text-sm font-semibold uppercase tracking-wide text-foreground">
           {title}
         </CardTitle>
         {description ? (

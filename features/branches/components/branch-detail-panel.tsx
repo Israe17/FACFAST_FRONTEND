@@ -61,13 +61,15 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
     canSwitchBranchContext,
     setActiveBranchId,
   } = useActiveBranch();
-  const [activeTab, setActiveTab] = useState<string>("identity");
+  const [activeTab, setActiveTab] = useState<string>("info");
+  const [infoSubTab, setInfoSubTab] = useState<string>("identity");
   const [activeDialog, setActiveDialog] = useState<DialogKey | null>(null);
   const updateBranchMutation = useUpdateBranchMutation(branch.id);
   const deleteBranchMutation = useDeleteBranchMutation(branch.id);
 
   useEffect(() => {
-    setActiveTab("identity");
+    setActiveTab("info");
+    setInfoSubTab("identity");
   }, [branch.id]);
 
   const seed = branch.code ?? String(branch.id);
@@ -233,17 +235,8 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="identity">
-            {t("branches.detail.tabs.identity")}
-          </TabsTrigger>
-          <TabsTrigger value="operational">
-            {t("branches.detail.tabs.operational")}
-          </TabsTrigger>
-          <TabsTrigger value="contact">
-            {t("branches.detail.tabs.contact")}
-          </TabsTrigger>
-          <TabsTrigger value="location">
-            {t("branches.detail.tabs.location")}
+          <TabsTrigger value="info">
+            {t("branches.detail.tabs.info")}
           </TabsTrigger>
           <TabsTrigger value="terminals">
             {t("branches.detail.tabs.terminals", {
@@ -252,40 +245,59 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="identity" className="space-y-3">
-          <DetailBlock
-            title={t("branches.identity.title")}
-            description={t("branches.identity.description")}
-          >
-            <BranchIdentityFields branch={branch} />
-          </DetailBlock>
-        </TabsContent>
+        <TabsContent value="info" className="space-y-3">
+          <Tabs value={infoSubTab} onValueChange={setInfoSubTab}>
+            <TabsList>
+              <TabsTrigger value="identity">
+                {t("branches.detail.tabs.identity")}
+              </TabsTrigger>
+              <TabsTrigger value="operational">
+                {t("branches.detail.tabs.operational")}
+              </TabsTrigger>
+              <TabsTrigger value="contact">
+                {t("branches.detail.tabs.contact")}
+              </TabsTrigger>
+              <TabsTrigger value="location">
+                {t("branches.detail.tabs.location")}
+              </TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="operational" className="space-y-3">
-          <DetailBlock
-            title={t("branches.operational.title")}
-            description={t("branches.operational.description")}
-          >
-            <BranchOperationalFields branch={branch} />
-          </DetailBlock>
-        </TabsContent>
+            <TabsContent value="identity" className="space-y-3">
+              <DetailBlock
+                title={t("branches.identity.title")}
+                description={t("branches.identity.description")}
+              >
+                <BranchIdentityFields branch={branch} />
+              </DetailBlock>
+            </TabsContent>
 
-        <TabsContent value="contact" className="space-y-3">
-          <DetailBlock
-            title={t("branches.contact.title")}
-            description={t("branches.contact.description")}
-          >
-            <BranchContactFields branch={branch} />
-          </DetailBlock>
-        </TabsContent>
+            <TabsContent value="operational" className="space-y-3">
+              <DetailBlock
+                title={t("branches.operational.title")}
+                description={t("branches.operational.description")}
+              >
+                <BranchOperationalFields branch={branch} />
+              </DetailBlock>
+            </TabsContent>
 
-        <TabsContent value="location" className="space-y-3">
-          <DetailBlock
-            title={t("branches.location.title")}
-            description={t("branches.location.description")}
-          >
-            <BranchLocationFields branch={branch} />
-          </DetailBlock>
+            <TabsContent value="contact" className="space-y-3">
+              <DetailBlock
+                title={t("branches.contact.title")}
+                description={t("branches.contact.description")}
+              >
+                <BranchContactFields branch={branch} />
+              </DetailBlock>
+            </TabsContent>
+
+            <TabsContent value="location" className="space-y-3">
+              <DetailBlock
+                title={t("branches.location.title")}
+                description={t("branches.location.description")}
+              >
+                <BranchLocationFields branch={branch} />
+              </DetailBlock>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="terminals" className="space-y-3">

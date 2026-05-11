@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Search, ShieldCheck, X } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -68,25 +69,27 @@ function AssignUserDirectPermissionsDialog({
     [user.effective_permissions],
   );
 
-  const grantable = useMemo<PermissionDefinition[]>(() => {
+  const grantableCatalog = useMemo<PermissionDefinition[]>(() => {
     const data = permissionsQuery.data ?? [];
-    const lowered = search.trim().toLowerCase();
     return data
       .filter((permission) => !permission.key.startsWith("auth."))
-      .filter((permission) => !alreadyHeldKeys.has(permission.key))
-      .filter((permission) => {
-        if (!lowered) return true;
-        return (
-          permission.key.toLowerCase().includes(lowered) ||
-          (permission.description?.toLowerCase().includes(lowered) ?? false) ||
-          (permission.module?.toLowerCase().includes(lowered) ?? false)
-        );
-      });
-  }, [alreadyHeldKeys, permissionsQuery.data, search]);
+      .filter((permission) => !alreadyHeldKeys.has(permission.key));
+  }, [alreadyHeldKeys, permissionsQuery.data]);
+
+  const filtered = useMemo<PermissionDefinition[]>(() => {
+    const lowered = search.trim().toLowerCase();
+    if (!lowered) return grantableCatalog;
+    return grantableCatalog.filter(
+      (permission) =>
+        permission.key.toLowerCase().includes(lowered) ||
+        (permission.description?.toLowerCase().includes(lowered) ?? false) ||
+        (permission.module?.toLowerCase().includes(lowered) ?? false),
+    );
+  }, [grantableCatalog, search]);
 
   const grouped = useMemo(() => {
     const groups = new Map<string, PermissionDefinition[]>();
-    for (const permission of grantable) {
+    for (const permission of filtered) {
       const key = permission.module ?? permission.key.split(".")[0] ?? "general";
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(permission);
@@ -94,7 +97,7 @@ function AssignUserDirectPermissionsDialog({
     return Array.from(groups.entries()).sort(([left], [right]) =>
       left.localeCompare(right),
     );
-  }, [grantable]);
+  }, [filtered]);
 
   function togglePermission(id: number) {
     const idAsString = String(id);
@@ -116,11 +119,14 @@ function AssignUserDirectPermissionsDialog({
       });
       onOpenChange(false);
     } catch {
-      // The mutation surfaces the error via toast (showErrorToast: false here
-      // is intentional, but the mutation's onError fallback still runs).
-      // No-op: state stays open so the operator can retry.
+      // Mutation already surfaces the error via the global toast pipeline.
+      // Leave the sheet open so the operator can retry.
     }
   }
+
+  const catalogReady = Boolean(permissionsQuery.data);
+  const hasGrantableCatalog = catalogReady && grantableCatalog.length > 0;
+  const showSearchEmpty = hasGrantableCatalog && search.trim() !== "" && filtered.length === 0;
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
@@ -151,23 +157,43 @@ function AssignUserDirectPermissionsDialog({
               onRetry={() => permissionsQuery.refetch()}
             />
           ) : null}
-          {permissionsQuery.data && grantable.length === 0 && !search ? (
+
+          {catalogReady && !hasGrantableCatalog ? (
             <EmptyState
+              icon={ShieldCheck}
               title={t("users.direct_permissions.empty_title")}
               description={t("users.direct_permissions.empty_description")}
             />
           ) : null}
-          {permissionsQuery.data ? (
+
+          {hasGrantableCatalog ? (
             <div className="space-y-3">
-              <Input
-                aria-label={t("users.direct_permissions.search_label")}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={t("users.direct_permissions.search_placeholder")}
-                value={search}
-              />
+              <div className="relative">
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+                />
+                <Input
+                  aria-label={t("users.direct_permissions.search_label")}
+                  className="h-9 pl-8 pr-8"
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={t("users.direct_permissions.search_placeholder")}
+                  value={search}
+                />
+                {search ? (
+                  <button
+                    type="button"
+                    aria-label={t("common.clear")}
+                    onClick={() => setSearch("")}
+                    className="absolute right-1.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <X className="size-3" aria-hidden="true" />
+                  </button>
+                ) : null}
+              </div>
 
               <div className="max-h-[60vh] space-y-3 overflow-y-auto rounded-xl border border-border p-3">
-                {grouped.length === 0 ? (
+                {showSearchEmpty ? (
                   <p className="text-sm text-muted-foreground">
                     {t("users.direct_permissions.search_empty")}
                   </p>

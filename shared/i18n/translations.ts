@@ -2765,6 +2765,14 @@ const esTranslations = {
   "branches.select_branch_title": "Selecciona una sucursal",
   "branches.select_branch_description": "Elige una sucursal de la lista para ver su detalle y terminales.",
   "branches.actions.menu_label": "Acciones",
+  "branches.hacienda.empty_identification":
+    "Ingresa una cédula jurídica para consultar.",
+  "branches.hacienda.looking_up": "Consultando...",
+  "branches.hacienda.lookup_button": "Consultar Hacienda",
+  "branches.hacienda.lookup_error": "No fue posible consultar a Hacienda.",
+  "branches.hacienda.lookup_success":
+    "Datos del contribuyente cargados desde Hacienda.",
+  "branches.hacienda.not_found": "No se encontró el contribuyente en Hacienda.",
   "branches.detail.active_context_badge": "Contexto activo",
   "branches.detail.terminals_count": "{count} terminales",
   "branches.detail.updated_at": "Actualizado el {value}",
@@ -5605,6 +5613,14 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "branches.select_branch_title": "Select a branch",
     "branches.select_branch_description": "Pick a branch from the list to see its details and terminals.",
     "branches.actions.menu_label": "Actions",
+    "branches.hacienda.empty_identification":
+      "Enter a legal ID to look up.",
+    "branches.hacienda.looking_up": "Looking up...",
+    "branches.hacienda.lookup_button": "Lookup Hacienda",
+    "branches.hacienda.lookup_error": "Unable to query Hacienda.",
+    "branches.hacienda.lookup_success":
+      "Taxpayer data loaded from Hacienda.",
+    "branches.hacienda.not_found": "Taxpayer not found in Hacienda.",
     "branches.detail.active_context_badge": "Active context",
     "branches.detail.terminals_count": "{count} terminals",
     "branches.detail.updated_at": "Updated on {value}",

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { ContactRound, PieChart, Plus, Search, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,7 +24,6 @@ import { useUsersQuery } from "@/features/users/queries";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -60,7 +58,6 @@ function StatChip({ icon: Icon, label, value, hint }: StatChipProps) {
 export default function ContactsPage() {
   const { t } = useAppTranslator();
   const { can } = usePermissions();
-  const { activeBranchId, isBusinessLevelContext } = useActiveBranch();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const canViewContacts = can("contacts.view");
@@ -131,10 +128,6 @@ export default function ContactsPage() {
     (c) => c.type === "supplier" || c.type === "both",
   ).length;
 
-  const activeBranchValue = isBusinessLevelContext
-    ? t("common.enterprise_level")
-    : (activeBranchId ?? t("common.none"));
-
   return (
     <>
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -181,13 +174,6 @@ export default function ContactsPage() {
           ) : null}
         </div>
       </header>
-
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">
-          {t("contacts.active_branch_context", { value: activeBranchValue })}
-        </Badge>
-        <Badge variant="outline">Query source: /api/contacts</Badge>
-      </div>
 
       {contactsQuery.isLoading ? (
         <LoadingState description={t("contacts.loading_contacts")} />

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
@@ -60,13 +61,13 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
     canSwitchBranchContext,
     setActiveBranchId,
   } = useActiveBranch();
-  const [activeTab, setActiveTab] = useState<string>("info");
+  const [activeTab, setActiveTab] = useState<string>("identity");
   const [activeDialog, setActiveDialog] = useState<DialogKey | null>(null);
   const updateBranchMutation = useUpdateBranchMutation(branch.id);
   const deleteBranchMutation = useDeleteBranchMutation(branch.id);
 
   useEffect(() => {
-    setActiveTab("info");
+    setActiveTab("identity");
   }, [branch.id]);
 
   const seed = branch.code ?? String(branch.id);
@@ -232,8 +233,17 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="info">
-            {t("branches.detail.tabs.info")}
+          <TabsTrigger value="identity">
+            {t("branches.detail.tabs.identity")}
+          </TabsTrigger>
+          <TabsTrigger value="operational">
+            {t("branches.detail.tabs.operational")}
+          </TabsTrigger>
+          <TabsTrigger value="contact">
+            {t("branches.detail.tabs.contact")}
+          </TabsTrigger>
+          <TabsTrigger value="location">
+            {t("branches.detail.tabs.location")}
           </TabsTrigger>
           <TabsTrigger value="terminals">
             {t("branches.detail.tabs.terminals", {
@@ -242,8 +252,40 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="info" className="space-y-3">
-          <BranchInfoTab branch={branch} />
+        <TabsContent value="identity" className="space-y-3">
+          <DetailBlock
+            title={t("branches.identity.title")}
+            description={t("branches.identity.description")}
+          >
+            <BranchIdentityFields branch={branch} />
+          </DetailBlock>
+        </TabsContent>
+
+        <TabsContent value="operational" className="space-y-3">
+          <DetailBlock
+            title={t("branches.operational.title")}
+            description={t("branches.operational.description")}
+          >
+            <BranchOperationalFields branch={branch} />
+          </DetailBlock>
+        </TabsContent>
+
+        <TabsContent value="contact" className="space-y-3">
+          <DetailBlock
+            title={t("branches.contact.title")}
+            description={t("branches.contact.description")}
+          >
+            <BranchContactFields branch={branch} />
+          </DetailBlock>
+        </TabsContent>
+
+        <TabsContent value="location" className="space-y-3">
+          <DetailBlock
+            title={t("branches.location.title")}
+            description={t("branches.location.description")}
+          >
+            <BranchLocationFields branch={branch} />
+          </DetailBlock>
         </TabsContent>
 
         <TabsContent value="terminals" className="space-y-3">
@@ -310,23 +352,13 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
   );
 }
 
-function BranchInfoTab({ branch }: { branch: Branch }) {
+function BranchIdentityFields({ branch }: { branch: Branch }) {
   const { t } = useAppTranslator();
-
-  const locationParts = [
-    branch.address,
-    branch.district,
-    branch.canton,
-    branch.province,
-    branch.city,
-  ].filter(Boolean);
-
   const identification = branch.identification_number
     ? branch.identification_type
       ? `${branch.identification_type} · ${branch.identification_number}`
       : branch.identification_number
     : null;
-
   return (
     <dl className="grid gap-3 sm:grid-cols-2">
       <InfoField label={t("branches.detail.fields.legal_name")} value={branch.legal_name} />
@@ -335,29 +367,20 @@ function BranchInfoTab({ branch }: { branch: Branch }) {
       <InfoField label={t("branches.detail.fields.code")} value={branch.code} mono />
       <InfoField label={t("branches.detail.fields.identification")} value={identification} />
       <InfoField label={t("branches.detail.fields.cedula_juridica")} value={branch.cedula_juridica} mono />
+    </dl>
+  );
+}
+
+function BranchOperationalFields({ branch }: { branch: Branch }) {
+  const { t } = useAppTranslator();
+  return (
+    <dl className="grid gap-3 sm:grid-cols-2">
       <InfoField label={t("branches.detail.fields.activity_code")} value={branch.activity_code} mono />
       <InfoField label={t("branches.detail.fields.provider_code")} value={branch.provider_code} mono />
-      <InfoField label={t("branches.detail.fields.phone")} value={branch.phone} />
-      <InfoField label={t("branches.detail.fields.email")} value={branch.email} />
-      <InfoField
-        className="sm:col-span-2"
-        label={t("branches.detail.fields.location")}
-        value={locationParts.length ? locationParts.join(" · ") : null}
-      />
-      <InfoField
-        label={t("branches.detail.fields.coordinates")}
-        value={
-          branch.latitude != null && branch.longitude != null
-            ? `${branch.latitude.toFixed(5)}, ${branch.longitude.toFixed(5)}`
-            : null
-        }
-        mono
-      />
       <InfoField
         label={t("branches.detail.fields.signature_type")}
         value={branch.signature_type}
       />
-
       <div className="space-y-1 sm:col-span-2">
         <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           {t("branches.detail.fields.hacienda_config")}
@@ -377,6 +400,45 @@ function BranchInfoTab({ branch }: { branch: Branch }) {
           />
         </dd>
       </div>
+    </dl>
+  );
+}
+
+function BranchContactFields({ branch }: { branch: Branch }) {
+  const { t } = useAppTranslator();
+  return (
+    <dl className="grid gap-3 sm:grid-cols-2">
+      <InfoField label={t("branches.detail.fields.phone")} value={branch.phone} />
+      <InfoField label={t("branches.detail.fields.email")} value={branch.email} />
+    </dl>
+  );
+}
+
+function BranchLocationFields({ branch }: { branch: Branch }) {
+  const { t } = useAppTranslator();
+  const locationParts = [
+    branch.address,
+    branch.district,
+    branch.canton,
+    branch.province,
+    branch.city,
+  ].filter(Boolean);
+  return (
+    <dl className="grid gap-3 sm:grid-cols-2">
+      <InfoField
+        className="sm:col-span-2"
+        label={t("branches.detail.fields.location")}
+        value={locationParts.length ? locationParts.join(" · ") : null}
+      />
+      <InfoField
+        label={t("branches.detail.fields.coordinates")}
+        value={
+          branch.latitude != null && branch.longitude != null
+            ? `${branch.latitude.toFixed(5)}, ${branch.longitude.toFixed(5)}`
+            : null
+        }
+        mono
+      />
     </dl>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Building2, Plus, Search, ShieldCheck, UserCircle2, Users, Waypoints } from "lucide-react";
+import { Building2, Plus, Search, ShieldCheck, UserCircle2, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,7 +21,6 @@ import { useRolesQuery } from "@/features/roles/queries";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
 import { useSession } from "@/shared/hooks/use-session";
@@ -59,7 +57,6 @@ function StatChip({ icon: Icon, label, value, hint }: StatChipProps) {
 export default function UsersPage() {
   const { t } = useAppTranslator();
   const { can } = usePermissions();
-  const { activeBranchId, isBusinessLevelContext } = useActiveBranch();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const { isPlatformAdmin } = useSession();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
@@ -133,10 +130,6 @@ export default function UsersPage() {
   const activeUserCount = users.filter((user) => user.status === "active").length;
   const totalBranches = branches.length;
 
-  const activeBranchValue = isBusinessLevelContext
-    ? t("common.enterprise_level")
-    : (activeBranchId ?? t("common.none"));
-
   const branchFilterLabel =
     branchFilter === ALL_BRANCHES
       ? t("users.branch_filter.all")
@@ -189,13 +182,6 @@ export default function UsersPage() {
           ) : null}
         </div>
       </header>
-
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">
-          {t("users.active_branch_context", { value: activeBranchValue })}
-        </Badge>
-        <Badge variant="outline">Query source: /api/users</Badge>
-      </div>
 
       {usersQuery.isLoading ? (
         <LoadingState description={t("users.loading_users")} />

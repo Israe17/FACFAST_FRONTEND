@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  buildBusinessInitials,
-  pickBusinessColor,
-} from "@/features/businesses/business-visuals";
+  buildEntityInitials,
+  pickEntityColor,
+} from "@/shared/lib/entity-visuals";
 import {
   BusinessContactFields,
   BusinessIdentityFields,
@@ -71,8 +71,8 @@ export function BusinessDetailPanel({
   const businessName = business.name ?? "";
   const seed =
     business.code ?? business.identification_number ?? String(business.id ?? "");
-  const color = pickBusinessColor(seed, businessName);
-  const initials = buildBusinessInitials(businessName);
+  const color = pickEntityColor(seed, businessName);
+  const initials = buildEntityInitials(businessName);
   const isActive = business.is_active ?? true;
   const isDirty = form.formState.isDirty;
 

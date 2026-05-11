@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { z } from "zod/v4";
 
 import {
   Sheet,
-  SheetBody,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -20,7 +20,11 @@ import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentatio
 import { buildFormResolver } from "@/shared/lib/form-resolver";
 
 import { updateUserSchema } from "../schemas";
-import { useUpdateUserMutation, useUserQuery } from "../queries";
+import {
+  useAssignUserPermissionsMutation,
+  useUpdateUserMutation,
+  useUserQuery,
+} from "../queries";
 import type { UpdateUserInput } from "../types";
 import { UserForm, type UserFormValues } from "./user-form";
 
@@ -30,17 +34,27 @@ type EditUserDialogProps = {
   userId: string;
 };
 
+type EditUserFormValues = UpdateUserInput & { permission_ids: string[] };
+
 function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
   const userQuery = useUserQuery(userId, open);
   const updateUserMutation = useUpdateUserMutation(userId, { showErrorToast: false });
+  const assignPermissionsMutation = useAssignUserPermissionsMutation(userId, {
+    showErrorToast: false,
+  });
   const { t } = useAppTranslator();
-  const form = useForm<UpdateUserInput>({
+  const form = useForm<EditUserFormValues>({
     defaultValues: {
       email: "",
       max_sale_discount: 0,
       name: "",
+      permission_ids: [],
     },
-    resolver: buildFormResolver<UpdateUserInput>(updateUserSchema),
+    resolver: buildFormResolver<EditUserFormValues>(
+      updateUserSchema.extend({
+        permission_ids: z.array(z.string()).default([]),
+      }) as never,
+    ),
   });
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(form);
@@ -51,6 +65,7 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
         email: userQuery.data.email,
         max_sale_discount: userQuery.data.max_sale_discount,
         name: userQuery.data.name,
+        permission_ids: (userQuery.data.direct_permission_ids ?? []).map(String),
       });
       resetBackendFormErrors();
     }
@@ -62,11 +77,22 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
     }
   }, [open, resetBackendFormErrors]);
 
-  async function handleSubmit(values: UpdateUserInput) {
+  async function handleSubmit(values: EditUserFormValues) {
     resetBackendFormErrors();
+    const { permission_ids, ...userPayload } = values;
+    const initialPermissionIds = (userQuery.data?.direct_permission_ids ?? [])
+      .map(String)
+      .sort();
+    const submittedPermissionIds = [...permission_ids].sort();
+    const permissionsChanged =
+      initialPermissionIds.length !== submittedPermissionIds.length ||
+      initialPermissionIds.some((id, index) => id !== submittedPermissionIds[index]);
 
     try {
-      await updateUserMutation.mutateAsync(values);
+      await updateUserMutation.mutateAsync(userPayload);
+      if (permissionsChanged) {
+        await assignPermissionsMutation.mutateAsync({ permission_ids });
+      }
       onOpenChange(false);
     } catch (error) {
       handleBackendFormError(error, {
@@ -97,8 +123,10 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
           <UserForm
             form={form as unknown as UseFormReturn<UserFormValues>}
             formError={formError}
-            isPending={updateUserMutation.isPending}
-            onSubmit={(values) => handleSubmit(values as UpdateUserInput)}
+            isPending={
+              updateUserMutation.isPending || assignPermissionsMutation.isPending
+            }
+            onSubmit={(values) => handleSubmit(values as EditUserFormValues)}
             submitLabel={t("common.save_changes")}
           />
         ) : null}

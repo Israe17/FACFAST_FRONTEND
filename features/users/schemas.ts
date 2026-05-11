@@ -48,6 +48,8 @@ export const userSchema = z
     branches: z.array(branchOptionSchema).optional().default([]),
     code: z.string().optional().catch(undefined),
     created_at: z.string().optional(),
+    direct_permission_ids: z.array(idSchema).optional().default([]),
+    direct_permission_keys: z.array(z.string()).optional().default([]),
     email: z.string().catch(""),
     id: idSchema,
     effective_permissions: z.array(z.string()).optional().default([]),
@@ -74,6 +76,8 @@ export const userSchema = z
       branches: user.branches,
       code: user.code,
       created_at: user.created_at,
+      direct_permission_ids: user.direct_permission_ids,
+      direct_permission_keys: user.direct_permission_keys,
       email: user.email,
       effective_permissions: user.effective_permissions,
       id: user.id,
@@ -116,12 +120,19 @@ export const createUserSchema = z.object({
   max_sale_discount: z.coerce.number().min(0).max(100).default(0),
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres."),
   password: z.string().min(10, "La contrasena debe tener al menos 10 caracteres."),
+  permission_ids: uniquePositiveIntegerStringArraySchema.optional().default([]),
   role_ids: uniquePositiveIntegerStringArraySchema.optional().default([]),
   status: userStatusSchema.optional(),
   user_type: userTypeSchema.optional(),
 });
 
-export const updateUserSchema = createUserSchema.omit({ password: true });
+// permission_ids is intentionally excluded: direct permission grants on
+// existing users go through the dedicated PUT /users/:id/permissions endpoint
+// (assignUserPermissions), not the generic PATCH /users/:id update.
+export const updateUserSchema = createUserSchema.omit({
+  password: true,
+  permission_ids: true,
+});
 
 export const updateUserStatusSchema = z.object({
   allow_login: z.boolean().optional(),
@@ -144,4 +155,8 @@ export const assignUserRolesSchema = z.object({
 
 export const assignUserBranchesSchema = z.object({
   branch_ids: uniquePositiveIntegerStringArraySchema,
+});
+
+export const assignUserPermissionsSchema = z.object({
+  permission_ids: uniquePositiveIntegerStringArraySchema,
 });

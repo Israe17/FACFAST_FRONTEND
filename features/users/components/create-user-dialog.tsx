@@ -35,6 +35,7 @@ function CreateUserDialog({ onOpenChange, open }: CreateUserDialogProps) {
       max_sale_discount: 0,
       name: "",
       password: "",
+      permission_ids: [],
     },
     mutation: createUserMutation,
     fallbackErrorMessage: t("users.create_error_fallback"),

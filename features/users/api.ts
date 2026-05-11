@@ -4,6 +4,7 @@ import { extractCollection, extractEntity, compactRecord } from "@/shared/lib/ap
 import { branchOptionSchema, effectivePermissionsSchema, userSchema } from "./schemas";
 import type {
   AssignUserBranchesInput,
+  AssignUserPermissionsInput,
   AssignUserRolesInput,
   ChangeUserPasswordInput,
   CreateUserInput,
@@ -28,6 +29,10 @@ function buildUserMutationPayload(payload: CreateUserInput | UpdateUserInput) {
     max_sale_discount: payload.max_sale_discount,
     name: payload.name,
     password: "password" in payload ? payload.password : undefined,
+    permission_ids:
+      "permission_ids" in payload
+        ? toUniqueNumberArray(payload.permission_ids)
+        : undefined,
     role_ids: toUniqueNumberArray(payload.role_ids),
     status: payload.status,
     user_type: payload.user_type,
@@ -80,6 +85,16 @@ export async function assignUserBranches(userId: string, payload: AssignUserBran
   await http.put(`/users/${userId}/branches`, {
     branch_ids: toUniqueNumberArray(payload.branch_ids),
   });
+}
+
+export async function assignUserPermissions(
+  userId: string,
+  payload: AssignUserPermissionsInput,
+) {
+  const response = await http.put(`/users/${userId}/permissions`, {
+    permission_ids: toUniqueNumberArray(payload.permission_ids) ?? [],
+  });
+  return userSchema.parse(extractEntity(response.data, ["user"]));
 }
 
 export async function getUserEffectivePermissions(userId: string) {

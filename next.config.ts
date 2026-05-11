@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
-const backendUrl = (process.env.BACKEND_URL?.trim() || "http://localhost:3002").replace(
-  /\/$/,
-  "",
-);
+const rawBackendUrl = process.env.BACKEND_URL?.trim() || "http://localhost:3002";
+const backendUrl = (
+  /^https?:\/\//i.test(rawBackendUrl) ? rawBackendUrl : `https://${rawBackendUrl}`
+).replace(/\/$/, "");
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["leaflet"],

@@ -1,6 +1,11 @@
 "use client";
 
-import { Controller, type FieldValues, type UseFormReturn } from "react-hook-form";
+import {
+  Controller,
+  type FieldPath,
+  type FieldValues,
+  type UseFormReturn,
+} from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -14,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DetailBlock } from "@/shared/components/detail-block";
+import { RegionPicker } from "@/shared/components/region-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { identificationTypeValues } from "@/shared/lib/validation";
 
@@ -316,20 +322,19 @@ export function BusinessLocationFields<TFormValues extends FieldValues>({
         <FieldError message={getError("address")} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor={fieldName("country")}>
-            {t("business.field.country")}
-          </Label>
-          <Input
-            disabled={disabled}
-            id={fieldName("country")}
-            placeholder={t("business.field.country_placeholder")}
-            {...form.register(fieldName("country") as never)}
-          />
-          <FieldError message={getError("country")} />
-        </div>
+      <RegionPicker
+        form={form}
+        fields={{
+          countryId: fieldName("country_id") as FieldPath<TFormValues>,
+          provinceId: fieldName("province_id") as FieldPath<TFormValues>,
+          cantonId: fieldName("canton_id") as FieldPath<TFormValues>,
+          districtId: fieldName("district_id") as FieldPath<TFormValues>,
+        }}
+        disabled={disabled}
+        idPrefix={prefix ? `${prefix}-business-region` : "business-region"}
+      />
 
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={fieldName("postal_code")}>
             {t("business.field.postal_code")}
@@ -341,47 +346,6 @@ export function BusinessLocationFields<TFormValues extends FieldValues>({
             {...form.register(fieldName("postal_code") as never)}
           />
           <FieldError message={getError("postal_code")} />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="space-y-2">
-          <Label htmlFor={fieldName("province")}>
-            {t("business.field.province")}
-          </Label>
-          <Input
-            disabled={disabled}
-            id={fieldName("province")}
-            placeholder={t("business.field.province_placeholder")}
-            {...form.register(fieldName("province") as never)}
-          />
-          <FieldError message={getError("province")} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor={fieldName("canton")}>
-            {t("business.field.canton")}
-          </Label>
-          <Input
-            disabled={disabled}
-            id={fieldName("canton")}
-            placeholder={t("business.field.canton_placeholder")}
-            {...form.register(fieldName("canton") as never)}
-          />
-          <FieldError message={getError("canton")} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor={fieldName("district")}>
-            {t("business.field.district")}
-          </Label>
-          <Input
-            disabled={disabled}
-            id={fieldName("district")}
-            placeholder={t("business.field.district_placeholder")}
-            {...form.register(fieldName("district") as never)}
-          />
-          <FieldError message={getError("district")} />
         </div>
 
         <div className="space-y-2">

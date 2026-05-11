@@ -26,11 +26,14 @@ type CreateContactDialogProps = {
 const defaultValues: CreateContactInput = {
   address: "",
   canton: "",
+  canton_id: null,
   code: "",
   commercial_name: "",
+  country_id: null,
   delivery_latitude: null,
   delivery_longitude: null,
   district: "",
+  district_id: null,
   economic_activity_code: "",
   email: "",
   exoneration_document_number: "",
@@ -44,6 +47,7 @@ const defaultValues: CreateContactInput = {
   name: "",
   phone: "",
   province: "",
+  province_id: null,
   tax_condition: "",
   type: "customer",
 };

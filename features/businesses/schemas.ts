@@ -28,12 +28,15 @@ export const businessSchema = z
   .object({
     address: z.string().optional().catch(undefined),
     canton: z.string().optional().catch(undefined),
+    canton_id: z.number().int().nullable().optional().catch(null),
     city: z.string().optional().catch(undefined),
     code: z.string().optional().catch(undefined),
     country: z.string().optional().catch(undefined),
+    country_id: z.number().int().nullable().optional().catch(null),
     created_at: z.string().optional(),
     currency_code: z.string().optional().catch(undefined),
     district: z.string().optional().catch(undefined),
+    district_id: z.number().int().nullable().optional().catch(null),
     email: z.string().optional().catch(undefined),
     id: idSchema.optional(),
     identification_number: z.string().optional().catch(undefined),
@@ -46,6 +49,7 @@ export const businessSchema = z
     phone: z.string().optional().catch(undefined),
     postal_code: z.string().optional().catch(undefined),
     province: z.string().optional().catch(undefined),
+    province_id: z.number().int().nullable().optional().catch(null),
     timezone: z.string().optional().catch(undefined),
     updated_at: z.string().optional(),
     website: z.string().optional().catch(undefined),
@@ -55,11 +59,14 @@ export const businessSchema = z
 export const updateCurrentBusinessSchema = z.object({
   address: optionalTrimmedString(z.string().min(5, "La direccion debe tener al menos 5 caracteres.")),
   canton: optionalTrimmedString(z.string()),
+  canton_id: z.number().int().positive().nullable().optional(),
   city: optionalTrimmedString(z.string()),
   code: optionalCodeSchema,
   country: optionalTrimmedString(z.string()),
+  country_id: z.number().int().positive().nullable().optional(),
   currency_code: optionalCurrencyCodeSchema,
   district: optionalTrimmedString(z.string()),
+  district_id: z.number().int().positive().nullable().optional(),
   email: optionalEmailSchema,
   identification_number: optionalTrimmedString(
     z.string().min(2, "La identificacion debe tener al menos 2 caracteres."),
@@ -75,20 +82,24 @@ export const updateCurrentBusinessSchema = z.object({
   phone: optionalTrimmedString(z.string()),
   postal_code: optionalNumericTextSchema,
   province: optionalTrimmedString(z.string()),
+  province_id: z.number().int().positive().nullable().optional(),
   timezone: optionalTrimmedString(z.string().min(2, "La zona horaria es obligatoria.")),
   website: optionalTrimmedString(z.string().url("Ingresa una URL valida.")),
 });
 
 const onboardingBusinessSchema = z.object({
   address: requiredTrimmedString("La direccion es obligatoria.", 5),
-  canton: requiredTrimmedString("El canton es obligatorio.", 2),
+  canton: optionalTrimmedString(z.string()),
+  canton_id: z.number().int().positive().nullable(),
   city: optionalTrimmedString(z.string()),
   country: requiredTrimmedString("El pais es obligatorio.", 2),
+  country_id: z.number().int().positive().nullable(),
   currency_code: z
     .string()
     .trim()
     .regex(currencyCodePattern, "Usa un codigo de moneda de 3 letras."),
-  district: requiredTrimmedString("El distrito es obligatorio.", 2),
+  district: optionalTrimmedString(z.string()),
+  district_id: z.number().int().positive().nullable(),
   email: optionalEmailSchema,
   identification_number: requiredTrimmedString("La identificacion es obligatoria.", 2),
   identification_type: identificationTypeSchema,
@@ -99,7 +110,8 @@ const onboardingBusinessSchema = z.object({
   name: requiredTrimmedString("El nombre comercial es obligatorio.", 2),
   phone: optionalTrimmedString(z.string()),
   postal_code: optionalNumericTextSchema,
-  province: requiredTrimmedString("La provincia es obligatoria.", 2),
+  province: optionalTrimmedString(z.string()),
+  province_id: z.number().int().positive().nullable(),
   timezone: requiredTrimmedString("La zona horaria es obligatoria.", 2),
   website: optionalTrimmedString(z.string().url("Ingresa una URL valida.")),
 });
@@ -116,9 +128,9 @@ const onboardingOwnerSchema = z.object({
 const onboardingInitialBranchSchema = z.object({
   activity_code: optionalTrimmedString(z.string()),
   branch_address: requiredTrimmedString("La direccion de la sucursal es obligatoria.", 5),
-  branch_canton: requiredTrimmedString("El canton es obligatorio.", 2),
+  branch_canton: optionalTrimmedString(z.string()),
   branch_city: optionalTrimmedString(z.string()),
-  branch_district: requiredTrimmedString("El distrito es obligatorio.", 2),
+  branch_district: optionalTrimmedString(z.string()),
   branch_email: optionalEmailSchema,
   branch_identification_number: requiredTrimmedString(
     "La identificacion de la sucursal es obligatoria.",
@@ -131,8 +143,12 @@ const onboardingInitialBranchSchema = z.object({
     .trim()
     .regex(/^\d{3}$/, "El numero de sucursal debe tener exactamente 3 digitos."),
   branch_phone: optionalTrimmedString(z.string()),
-  branch_province: requiredTrimmedString("La provincia es obligatoria.", 2),
+  branch_province: optionalTrimmedString(z.string()),
+  canton_id: z.number().int().positive().nullable(),
+  country_id: z.number().int().positive().nullable(),
+  district_id: z.number().int().positive().nullable(),
   is_active: z.boolean().default(true),
+  province_id: z.number().int().positive().nullable(),
   provider_code: optionalTrimmedString(z.string()),
 });
 

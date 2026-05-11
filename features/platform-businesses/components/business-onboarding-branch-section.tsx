@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RegionPicker } from "@/shared/components/region-picker";
 import { identificationTypeValues } from "@/shared/lib/validation";
 
 import type { PlatformBusinessOnboardingInput } from "../types";
@@ -133,46 +134,26 @@ function BusinessOnboardingBranchSection({
         <FieldError message={getError("initial_branch.branch_address")} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="space-y-2">
-          <Label htmlFor="initial_branch.branch_province">Provincia</Label>
-          <Input
-            id="initial_branch.branch_province"
-            placeholder="San Jose"
-            {...form.register("initial_branch.branch_province")}
-          />
-          <FieldError message={getError("initial_branch.branch_province")} />
-        </div>
+      <RegionPicker
+        form={form}
+        fields={{
+          countryId: "initial_branch.country_id",
+          provinceId: "initial_branch.province_id",
+          cantonId: "initial_branch.canton_id",
+          districtId: "initial_branch.district_id",
+        }}
+        lockedCountryId={form.watch("business.country_id") ?? null}
+        idPrefix="initial-branch-region"
+      />
 
-        <div className="space-y-2">
-          <Label htmlFor="initial_branch.branch_canton">Canton</Label>
-          <Input
-            id="initial_branch.branch_canton"
-            placeholder="Escazu"
-            {...form.register("initial_branch.branch_canton")}
-          />
-          <FieldError message={getError("initial_branch.branch_canton")} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="initial_branch.branch_district">District</Label>
-          <Input
-            id="initial_branch.branch_district"
-            placeholder="San Rafael"
-            {...form.register("initial_branch.branch_district")}
-          />
-          <FieldError message={getError("initial_branch.branch_district")} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="initial_branch.branch_city">Ciudad</Label>
-          <Input
-            id="initial_branch.branch_city"
-            placeholder="San Jose"
-            {...form.register("initial_branch.branch_city")}
-          />
-          <FieldError message={getError("initial_branch.branch_city")} />
-        </div>
+      <div className="space-y-2 md:max-w-xs">
+        <Label htmlFor="initial_branch.branch_city">Ciudad</Label>
+        <Input
+          id="initial_branch.branch_city"
+          placeholder="San Jose"
+          {...form.register("initial_branch.branch_city")}
+        />
+        <FieldError message={getError("initial_branch.branch_city")} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

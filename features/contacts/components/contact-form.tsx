@@ -16,9 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCurrentBusinessQuery } from "@/features/businesses/queries";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LocationPicker } from "@/shared/components/location-picker";
+import { RegionPicker } from "@/shared/components/region-picker";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
 import { contactTypeOptions, identificationTypeOptions } from "../constants";
@@ -33,11 +35,14 @@ import { ActivityPickerDialog } from "./activity-picker-dialog";
 type ContactFormValues = {
   address?: string;
   canton?: string;
+  canton_id?: number | null;
   code?: string;
   commercial_name?: string;
+  country_id?: number | null;
   delivery_latitude?: number | null;
   delivery_longitude?: number | null;
   district?: string;
+  district_id?: number | null;
   economic_activity_code?: string;
   email?: string;
   exoneration_document_number?: string;
@@ -51,6 +56,7 @@ type ContactFormValues = {
   name: string;
   phone?: string;
   province?: string;
+  province_id?: number | null;
   tax_condition?: string;
   type?: string;
 };
@@ -110,6 +116,9 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
     formState: { errors },
   } = form;
   const isActive = form.watch("is_active");
+  const currentBusinessQuery = useCurrentBusinessQuery();
+  const businessCountryId =
+    (currentBusinessQuery.data?.country_id as number | undefined) ?? null;
 
   const taxpayerLookup = useTaxpayerLookupMutation({ showErrorToast: false });
   const taxpayerEmailLookup = useTaxpayerEmailLookupMutation({ showErrorToast: false });
@@ -354,25 +363,17 @@ function ContactForm({ form, formError, isPending, onSubmit, submitLabel }: Cont
           <FieldError message={errors.address?.message} />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="contact-province">{t("contacts.form.province")}</Label>
-            <Input id="contact-province" placeholder={t("contacts.form.province_placeholder")} {...form.register("province")} />
-            <FieldError message={errors.province?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-canton">{t("contacts.form.canton")}</Label>
-            <Input id="contact-canton" placeholder={t("contacts.form.canton_placeholder")} {...form.register("canton")} />
-            <FieldError message={errors.canton?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-district">{t("contacts.form.district")}</Label>
-            <Input id="contact-district" placeholder={t("contacts.form.district_placeholder")} {...form.register("district")} />
-            <FieldError message={errors.district?.message} />
-          </div>
-        </div>
+        <RegionPicker
+          form={form}
+          fields={{
+            countryId: "country_id",
+            provinceId: "province_id",
+            cantonId: "canton_id",
+            districtId: "district_id",
+          }}
+          lockedCountryId={businessCountryId ?? null}
+          idPrefix="contact-region"
+        />
 
         <LocationPickerSection form={form} />
       </section>

@@ -16,12 +16,15 @@ function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
     branch_number: payload.branch_number,
     business_name: payload.business_name,
     canton: payload.canton,
+    canton_id: payload.canton_id ?? undefined,
     cedula_juridica: payload.cedula_juridica,
     cert_path: payload.cert_path,
     city: payload.city,
     code: payload.code,
+    country_id: payload.country_id ?? undefined,
     crypto_key: payload.crypto_key,
     district: payload.district,
+    district_id: payload.district_id ?? undefined,
     email: payload.email,
     hacienda_password: payload.hacienda_password,
     hacienda_username: payload.hacienda_username,
@@ -34,6 +37,7 @@ function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
     phone: payload.phone,
     provider_code: payload.provider_code,
     province: payload.province,
+    province_id: payload.province_id ?? undefined,
     signature_type: payload.signature_type,
   });
   if (payload.latitude !== undefined) base.latitude = payload.latitude;

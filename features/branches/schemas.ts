@@ -44,12 +44,15 @@ export const branchSchema = z
     business_id: idSchema.optional().catch(undefined),
     business_name: z.string().optional().catch(undefined),
     canton: z.string().optional().catch(undefined),
+    canton_id: z.number().int().nullable().optional().catch(null),
     cedula_juridica: z.string().optional().catch(undefined),
     cert_path: z.string().optional().catch(undefined),
     city: z.string().optional().catch(undefined),
     code: z.string().optional().catch(undefined),
+    country_id: z.number().int().nullable().optional().catch(null),
     created_at: z.string().optional(),
     district: z.string().optional().catch(undefined),
+    district_id: z.number().int().nullable().optional().catch(null),
     email: z.string().optional().catch(undefined),
     hacienda_username: z.string().optional().catch(undefined),
     has_crypto_key: z.boolean().optional().default(false),
@@ -68,13 +71,14 @@ export const branchSchema = z
     phone: z.string().optional().catch(undefined),
     provider_code: z.string().optional().catch(undefined),
     province: z.string().optional().catch(undefined),
+    province_id: z.number().int().nullable().optional().catch(null),
     signature_type: z.string().optional().catch(undefined),
     terminals: z.array(terminalSchema).optional().default([]),
     updated_at: z.string().optional(),
   })
   .passthrough();
 
-export const createBranchSchema = z.object({
+const branchInputObject = z.object({
   activity_code: optionalTextSchema,
   address: requiredTrimmedString("La direccion debe tener al menos 5 caracteres.", 5),
   branch_number: z
@@ -82,7 +86,8 @@ export const createBranchSchema = z.object({
     .trim()
     .regex(branchNumberPattern, "El numero de sucursal debe ser exactamente 3 digitos."),
   business_name: z.string().trim().min(2, "El nombre comercial debe tener al menos 2 caracteres."),
-  canton: requiredTrimmedString("El canton es requerido."),
+  canton: optionalTextSchema,
+  canton_id: z.number().int().positive().nullable(),
   cedula_juridica: z
     .string()
     .trim()
@@ -90,8 +95,10 @@ export const createBranchSchema = z.object({
   cert_path: optionalTextSchema,
   city: optionalTextSchema,
   code: optionalCodeSchema,
+  country_id: z.number().int().positive().nullable(),
   crypto_key: optionalTextSchema,
-  district: requiredTrimmedString("El distrito es requerido."),
+  district: optionalTextSchema,
+  district_id: z.number().int().positive().nullable(),
   email: optionalEmailSchema,
   hacienda_password: optionalTextSchema,
   hacienda_username: optionalTextSchema,
@@ -112,11 +119,38 @@ export const createBranchSchema = z.object({
   ),
   phone: optionalTextSchema,
   provider_code: optionalTextSchema,
-  province: requiredTrimmedString("La provincia es requerida."),
+  province: optionalTextSchema,
+  province_id: z.number().int().positive().nullable(),
   signature_type: optionalTextSchema,
 });
 
-export const updateBranchSchema = createBranchSchema.partial().extend({
+function refineRequiredRegionIds<T extends {
+  country_id: number | null;
+  province_id: number | null;
+  canton_id: number | null;
+  district_id: number | null;
+}>(value: T, ctx: z.RefinementCtx) {
+  const required: Array<{
+    key: "country_id" | "province_id" | "canton_id" | "district_id";
+    message: string;
+  }> = [
+    { key: "country_id", message: "Selecciona un país." },
+    { key: "province_id", message: "Selecciona una provincia." },
+    { key: "canton_id", message: "Selecciona un cantón." },
+    { key: "district_id", message: "Selecciona un distrito." },
+  ];
+  for (const { key, message } of required) {
+    if (value[key] == null) {
+      ctx.addIssue({ code: "custom", message, path: [key] });
+    }
+  }
+}
+
+export const createBranchSchema = branchInputObject.superRefine(
+  refineRequiredRegionIds,
+);
+
+export const updateBranchSchema = branchInputObject.partial().extend({
   is_active: z.boolean().optional(),
 });
 

@@ -5,7 +5,6 @@ import { Building2, ToggleLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { BusinessDetailPanel } from "@/features/businesses/components/business-detail-panel";
 import {
   useCurrentBusinessQuery,
@@ -16,7 +15,6 @@ import type { UpdateCurrentBusinessInput } from "@/features/businesses/types";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { usePlatformMode } from "@/shared/hooks/use-platform-mode";
@@ -50,7 +48,6 @@ const defaultValues: UpdateCurrentBusinessInput = {
 export default function BusinessPage() {
   const { can } = usePermissions();
   const { t } = useAppTranslator();
-  const { activeBranchId, isBusinessLevelContext } = useActiveBranch();
   const { isTenantContextMode, isTenantMode } = usePlatformMode();
   const canRunTenantQueries = isTenantMode || isTenantContextMode;
   const canView = can("businesses.view");
@@ -148,9 +145,6 @@ export default function BusinessPage() {
   }
 
   const business = businessQuery.data;
-  const activeContextValue = isBusinessLevelContext
-    ? t("common.enterprise_level")
-    : (activeBranchId ?? t("common.none"));
 
   return (
     <>
@@ -165,13 +159,6 @@ export default function BusinessPage() {
           {t("business.page_description")}
         </p>
       </header>
-
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">
-          {t("business.context.active_label", { value: activeContextValue })}
-        </Badge>
-        <Badge variant="outline">{t("business.context.query_source")}</Badge>
-      </div>
 
       {businessQuery.isLoading ? (
         <LoadingState description={t("business.loading")} />

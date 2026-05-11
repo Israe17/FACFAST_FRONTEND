@@ -211,7 +211,7 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
         >
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.kind")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.kind")}</dt>
               <dd className="font-semibold">
                 {priceList.kind
                   ? t(priceListKindTranslationMap[priceList.kind] ?? "inventory.common.not_available")
@@ -219,15 +219,15 @@ function InventoryPriceListDetail({ priceListId }: InventoryPriceListDetailProps
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.currency")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.currency")}</dt>
               <dd className="font-semibold">{priceList.currency ?? t("inventory.common.not_available")}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.updated")}</dt>
               <dd className="font-semibold">{formatDateTime(priceList.updated_at)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.detail.created_at")}</dt>
               <dd className="font-semibold">{formatDateTime(priceList.created_at)}</dd>
             </div>
           </dl>

@@ -136,35 +136,35 @@ function ZoneDetail({ zoneId }: ZoneDetailProps) {
         >
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.name")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.name")}</dt>
               <dd className="font-semibold">{zone.name}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.code")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.code")}</dt>
               <dd className="font-semibold">{zone.code ?? t("inventory.common.not_available")}</dd>
             </div>
             <div className="md:col-span-2">
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.description")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.description")}</dt>
               <dd className="font-semibold">{zone.description ?? t("inventory.common.not_available")}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.status")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.status")}</dt>
               <dd className="font-semibold">
                 {zone.is_active ? t("inventory.common.active") : t("inventory.common.inactive")}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.zones.detail.scope")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.zones.detail.scope")}</dt>
               <dd className="font-semibold">
                 {zone.is_global ? t("inventory.zones.detail.global") : t("inventory.zones.detail.scoped")}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.detail.created_at")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.detail.created_at")}</dt>
               <dd className="font-semibold">{formatDateTime(zone.created_at)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">{t("inventory.common.updated")}</dt>
+              <dt className="text-xs text-muted-foreground">{t("inventory.common.updated")}</dt>
               <dd className="font-semibold">{formatDateTime(zone.updated_at)}</dd>
             </div>
           </dl>

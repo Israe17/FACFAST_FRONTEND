@@ -234,6 +234,10 @@ const esTranslations = {
   "contacts.lookup_error_fallback": "No fue posible ejecutar la busqueda del contacto.",
   "contacts.hacienda.empty_document": "Ingresa un numero de documento de exoneracion.",
   "contacts.hacienda.empty_identification": "Ingresa un numero de identificacion para consultar.",
+  "contacts.hacienda.type_required":
+    "Selecciona primero el tipo de identificación.",
+  "contacts.hacienda.ready_hint":
+    "Listo. Presiona Consultar Hacienda para autocompletar los datos.",
   "contacts.hacienda.exoneration_not_found":
     "No se encontro el documento de exoneracion en Hacienda.",
   "contacts.hacienda.looking_up": "Consultando...",
@@ -2767,6 +2771,10 @@ const esTranslations = {
   "branches.actions.menu_label": "Acciones",
   "branches.hacienda.empty_identification":
     "Ingresa una cédula jurídica para consultar.",
+  "branches.hacienda.type_required":
+    "Selecciona primero el tipo de identificación.",
+  "branches.hacienda.ready_hint":
+    "Listo. Presiona Consultar Hacienda para autocompletar los datos.",
   "branches.hacienda.looking_up": "Consultando...",
   "branches.hacienda.lookup_button": "Consultar Hacienda",
   "branches.hacienda.lookup_error": "No fue posible consultar a Hacienda.",
@@ -3070,6 +3078,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "contacts.lookup_error_fallback": "Unable to execute the contact lookup.",
     "contacts.hacienda.empty_document": "Enter an exoneration document number.",
     "contacts.hacienda.empty_identification": "Enter an identification number to look up.",
+    "contacts.hacienda.type_required":
+      "Pick the identification type first.",
+    "contacts.hacienda.ready_hint":
+      "Ready. Press Lookup Hacienda to autofill the data.",
     "contacts.hacienda.exoneration_not_found":
       "Exoneration document not found in Hacienda.",
     "contacts.hacienda.looking_up": "Looking up...",
@@ -5615,6 +5627,10 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "branches.actions.menu_label": "Actions",
     "branches.hacienda.empty_identification":
       "Enter a legal ID to look up.",
+    "branches.hacienda.type_required":
+      "Pick the identification type first.",
+    "branches.hacienda.ready_hint":
+      "Ready. Press Lookup Hacienda to autofill the data.",
     "branches.hacienda.looking_up": "Looking up...",
     "branches.hacienda.lookup_button": "Lookup Hacienda",
     "branches.hacienda.lookup_error": "Unable to query Hacienda.",

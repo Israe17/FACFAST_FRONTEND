@@ -30,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
 import { DetailBlock } from "@/shared/components/detail-block";
 import { EmptyState } from "@/shared/components/empty-state";
+import { MapView } from "@/shared/components/map-view";
 import { useActiveBranch } from "@/shared/hooks/use-active-branch";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
@@ -296,6 +297,9 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
               >
                 <BranchLocationFields branch={branch} />
               </DetailBlock>
+              <DetailBlock title={t("branches.location.map_title")}>
+                <BranchMap branch={branch} />
+              </DetailBlock>
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -423,6 +427,45 @@ function BranchContactFields({ branch }: { branch: Branch }) {
       <InfoField label={t("branches.detail.fields.phone")} value={branch.phone} />
       <InfoField label={t("branches.detail.fields.email")} value={branch.email} />
     </dl>
+  );
+}
+
+function BranchMap({ branch }: { branch: Branch }) {
+  const { t } = useAppTranslator();
+  const lat = branch.latitude;
+  const lng = branch.longitude;
+
+  if (lat == null || lng == null) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 py-12 text-muted-foreground">
+        <MapPin className="mb-2 size-8" aria-hidden="true" />
+        <p className="text-sm font-medium">
+          {t("branches.location.no_location")}
+        </p>
+        <p className="mt-1 text-xs">
+          {t("branches.location.no_location_hint")}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative z-0 h-72 overflow-hidden rounded-xl border border-border/70">
+      <MapView
+        markers={[
+          {
+            id: `branch-${branch.id}`,
+            lat,
+            lng,
+            color: "#3b82f6",
+            popup: { title: branch.name },
+          },
+        ]}
+        center={[lat, lng]}
+        zoom={14}
+        className="h-full rounded-none"
+      />
+    </div>
   );
 }
 

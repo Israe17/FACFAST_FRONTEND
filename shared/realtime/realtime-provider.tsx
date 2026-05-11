@@ -48,13 +48,19 @@ function resolveRealtimeUrl(): string {
  * upgrade handshake. There is no separate token to manage on the client.
  */
 export function RealtimeProvider({ children }: { children: ReactNode }) {
-  const { user } = useSession();
+  const { user, activeBusinessId } = useSession();
   const userId = user?.id ?? null;
+  // Platform admins switch tenants in-session via `acting_business_id`.
+  // Re-key the effect on the effective business id so the socket
+  // reconnects into the right tenant room on context switch — without
+  // this, an admin who enters tenant B keeps receiving emits aimed at
+  // tenant A's business room.
+  const connectionKey = userId !== null ? `${userId}:${activeBusinessId ?? ""}` : null;
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!userId) {
+    if (!connectionKey) {
       // Logged out (or still loading): make sure no stale socket lingers.
       // The cleanup function from the previous effect run handles that
       // already; this branch just makes the intent explicit.
@@ -88,9 +94,10 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       setSocket(null);
       setIsConnected(false);
     };
-    // The connection is keyed off the user id — we want a fresh socket
-    // when the user changes, even mid-session (e.g. tenant switch).
-  }, [userId]);
+    // The connection is keyed off (user id, effective business id) so a
+    // platform admin entering or leaving a tenant context triggers a
+    // clean reconnect into the correct business room.
+  }, [connectionKey]);
 
   const value = useMemo<RealtimeContextValue>(
     () => ({ socket, isConnected }),

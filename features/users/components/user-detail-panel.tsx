@@ -34,6 +34,7 @@ import { useDeleteUserMutation } from "../queries";
 import type { User } from "../types";
 import { buildUserInitials, pickUserColor } from "../user-visuals";
 import { AssignUserBranchesDialog } from "./assign-user-branches-dialog";
+import { AssignUserDirectPermissionsDialog } from "./assign-user-direct-permissions-dialog";
 import { AssignUserRolesDialog } from "./assign-user-roles-dialog";
 import { ChangeUserPasswordDialog } from "./change-user-password-dialog";
 import { EditUserDialog } from "./edit-user-dialog";
@@ -254,6 +255,18 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
         </TabsContent>
 
         <TabsContent value="permissions" className="space-y-3">
+          <div className="flex items-center justify-end">
+            {can("users.assign_permissions") && !user.is_platform_admin ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setActiveDialog("direct_permissions")}
+              >
+                <ShieldCheck className="size-4" />
+                {t("users.actions.assign_direct_permissions")}
+              </Button>
+            ) : null}
+          </div>
           <UserPermissionsTab
             user={user}
             enabled={activeTab === "permissions"}
@@ -296,6 +309,13 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
       <AssignUserBranchesDialog
         onOpenChange={(open) => setActiveDialog(open ? "branches" : null)}
         open={activeDialog === "branches"}
+        user={user}
+      />
+      <AssignUserDirectPermissionsDialog
+        onOpenChange={(open) =>
+          setActiveDialog(open ? "direct_permissions" : null)
+        }
+        open={activeDialog === "direct_permissions"}
         user={user}
       />
       <ConfirmDialog

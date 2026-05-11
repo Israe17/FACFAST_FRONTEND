@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
@@ -18,6 +18,7 @@ import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { useBackendFormErrors } from "@/shared/hooks/use-backend-form-errors";
 import { getTranslatedBackendErrorMessage } from "@/shared/lib/error-presentation";
 import { buildFormResolver } from "@/shared/lib/form-resolver";
+import { useAvailablePermissionsQuery } from "@/features/roles/queries";
 
 import { updateUserSchema } from "../schemas";
 import {
@@ -38,6 +39,7 @@ type EditUserFormValues = UpdateUserInput & { permission_ids: string[] };
 
 function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
   const userQuery = useUserQuery(userId, open);
+  const permissionsCatalogQuery = useAvailablePermissionsQuery(open);
   const updateUserMutation = useUpdateUserMutation(userId, { showErrorToast: false });
   const assignPermissionsMutation = useAssignUserPermissionsMutation(userId, {
     showErrorToast: false,
@@ -59,17 +61,38 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
   const { formError, handleBackendFormError, resetBackendFormErrors } =
     useBackendFormErrors(form);
 
+  // Catalog of auth.* permission IDs. The form section only manages this
+  // subset; the "Permisos efectivos" tab manages everything else. We compute
+  // the partition here so each surface can update its slice without wiping
+  // grants owned by the other.
+  const authPermissionIds = useMemo(() => {
+    const data = permissionsCatalogQuery.data ?? [];
+    return new Set(
+      data
+        .filter((permission) => permission.key.startsWith("auth."))
+        .map((permission) => String(permission.id)),
+    );
+  }, [permissionsCatalogQuery.data]);
+
   useEffect(() => {
     if (userQuery.data) {
+      const currentDirectIds = (userQuery.data.direct_permission_ids ?? []).map(
+        String,
+      );
+      // Seed the form only with the auth.* slice — the rest is preserved
+      // through handleSubmit's merge step, not displayed in this form.
+      const initialAuthIds = currentDirectIds.filter((id) =>
+        authPermissionIds.has(id),
+      );
       form.reset({
         email: userQuery.data.email,
         max_sale_discount: userQuery.data.max_sale_discount,
         name: userQuery.data.name,
-        permission_ids: (userQuery.data.direct_permission_ids ?? []).map(String),
+        permission_ids: initialAuthIds,
       });
       resetBackendFormErrors();
     }
-  }, [form, resetBackendFormErrors, userQuery.data]);
+  }, [authPermissionIds, form, resetBackendFormErrors, userQuery.data]);
 
   useEffect(() => {
     if (!open) {
@@ -79,19 +102,29 @@ function EditUserDialog({ onOpenChange, open, userId }: EditUserDialogProps) {
 
   async function handleSubmit(values: EditUserFormValues) {
     resetBackendFormErrors();
-    const { permission_ids, ...userPayload } = values;
-    const initialPermissionIds = (userQuery.data?.direct_permission_ids ?? [])
-      .map(String)
-      .sort();
-    const submittedPermissionIds = [...permission_ids].sort();
+    const { permission_ids: submittedAuthIds, ...userPayload } = values;
+    const currentDirectIds = (userQuery.data?.direct_permission_ids ?? []).map(
+      String,
+    );
+    const preservedNonAuthIds = currentDirectIds.filter(
+      (id) => !authPermissionIds.has(id),
+    );
+    const mergedPermissionIds = [
+      ...new Set([...preservedNonAuthIds, ...submittedAuthIds]),
+    ];
+
+    const initialIds = [...currentDirectIds].sort();
+    const finalIds = [...mergedPermissionIds].sort();
     const permissionsChanged =
-      initialPermissionIds.length !== submittedPermissionIds.length ||
-      initialPermissionIds.some((id, index) => id !== submittedPermissionIds[index]);
+      initialIds.length !== finalIds.length ||
+      initialIds.some((id, index) => id !== finalIds[index]);
 
     try {
       await updateUserMutation.mutateAsync(userPayload);
       if (permissionsChanged) {
-        await assignPermissionsMutation.mutateAsync({ permission_ids });
+        await assignPermissionsMutation.mutateAsync({
+          permission_ids: mergedPermissionIds,
+        });
       }
       onOpenChange(false);
     } catch (error) {

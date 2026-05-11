@@ -166,6 +166,9 @@ const esTranslations = {
   "date_range.preset_this_month": "Este mes",
   "date_range.preset_last_30d": "Últimos 30 días",
   "activity.search_placeholder": "Buscar en estos registros…",
+  "realtime.disconnected.title": "Sin conexión en tiempo real",
+  "realtime.disconnected.description":
+    "Algunos cambios pueden tardar en reflejarse. Estamos intentando reconectar.",
   "activity.page_size_label": "Por página",
   "activity.total_records": "{count} registros",
   "activity.prev_page": "Anterior",
@@ -2934,6 +2937,9 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "date_range.preset_this_month": "This month",
     "date_range.preset_last_30d": "Last 30 days",
     "activity.search_placeholder": "Search in these records…",
+    "realtime.disconnected.title": "Realtime connection lost",
+    "realtime.disconnected.description":
+      "Some changes may take a moment to show up. We're trying to reconnect.",
     "activity.page_size_label": "Per page",
     "activity.total_records": "{count} records",
     "activity.prev_page": "Previous",

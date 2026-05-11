@@ -58,12 +58,21 @@ const STATUS_LABEL_KEY = {
 
 type UserStatus = keyof typeof STATUS_LABEL_KEY;
 
+type DialogKey =
+  | "edit"
+  | "status"
+  | "password"
+  | "roles"
+  | "branches"
+  | "direct_permissions"
+  | "delete";
+
 export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
   const { t } = useAppTranslator();
   const { can } = usePermissions();
   const { user: sessionUser } = useSession();
   const [activeTab, setActiveTab] = useState<string>("roles");
-  const [activeDialog, setActiveDialog] = useState<string | null>(null);
+  const [activeDialog, setActiveDialog] = useState<DialogKey | null>(null);
   const deleteUserMutation = useDeleteUserMutation(user.id);
   const canViewActivity =
     can("inventory_movements.view") ||

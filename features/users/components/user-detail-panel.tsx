@@ -32,7 +32,7 @@ import { formatDateTime } from "@/shared/lib/utils";
 
 import { useDeleteUserMutation } from "../queries";
 import type { User } from "../types";
-import { buildUserInitials, pickUserColor } from "../user-visuals";
+import { buildEntityInitials, pickEntityColor } from "@/shared/lib/entity-visuals";
 import { AssignUserBranchesDialog } from "./assign-user-branches-dialog";
 import { AssignUserDirectPermissionsDialog } from "./assign-user-direct-permissions-dialog";
 import { AssignUserRolesDialog } from "./assign-user-roles-dialog";
@@ -84,8 +84,8 @@ export function UserDetailPanel({ user, ownerCount }: UserDetailPanelProps) {
   }, [user.id]);
 
   const seed = user.code ?? user.email ?? String(user.id);
-  const color = pickUserColor(seed, user.name);
-  const initials = buildUserInitials(user.name);
+  const color = pickEntityColor(seed, user.name);
+  const initials = buildEntityInitials(user.name);
   const status: UserStatus = (user.status ?? "inactive") as UserStatus;
   const statusLabel = t(STATUS_LABEL_KEY[status] ?? STATUS_LABEL_KEY.inactive);
   const isLastKnownOwner = user.user_type === "owner" && ownerCount <= 1;

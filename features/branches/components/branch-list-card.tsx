@@ -3,7 +3,7 @@
 import { Building2, ChevronRight, Monitor } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
-import { buildUserInitials, pickUserColor } from "@/features/users/user-visuals";
+import { buildEntityInitials, pickEntityColor } from "@/shared/lib/entity-visuals";
 
 import type { Branch } from "../types";
 
@@ -15,8 +15,8 @@ type BranchListCardProps = {
 
 export function BranchListCard({ branch, selected, onSelect }: BranchListCardProps) {
   const seed = branch.code ?? String(branch.id);
-  const color = pickUserColor(seed, branch.name);
-  const initials = buildUserInitials(branch.name);
+  const color = pickEntityColor(seed, branch.name);
+  const initials = buildEntityInitials(branch.name);
   const statusDot = branch.is_active ? "bg-emerald-500" : "bg-zinc-400";
   const terminalCount = branch.terminals.length;
 

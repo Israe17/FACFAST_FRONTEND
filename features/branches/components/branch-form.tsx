@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
-import { ChevronDown, MapPin } from "lucide-react";
+import { ChevronDown, MapPin, Search } from "lucide-react";
+import { toast } from "sonner";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,12 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCurrentBusinessQuery } from "@/features/businesses/queries";
+import { ActivityPickerDialog } from "@/features/contacts/components/activity-picker-dialog";
+import {
+  useTaxpayerEmailLookupMutation,
+  useTaxpayerLookupMutation,
+} from "@/features/contacts/queries";
+import type { HaciendaActivity } from "@/features/contacts/types";
 import { ActionButton } from "@/shared/components/action-button";
 import { FormErrorBanner } from "@/shared/components/form-error-banner";
 import { LocationPicker } from "@/shared/components/location-picker";
@@ -129,6 +136,66 @@ function BranchForm({
   const currentBusinessQuery = useCurrentBusinessQuery();
   const businessCountryId =
     (currentBusinessQuery.data?.country_id as number | undefined) ?? null;
+  const taxpayerLookup = useTaxpayerLookupMutation({ showErrorToast: false });
+  const taxpayerEmailLookup = useTaxpayerEmailLookupMutation({
+    showErrorToast: false,
+  });
+  const [activityPickerState, setActivityPickerState] = useState<{
+    open: boolean;
+    activities: HaciendaActivity[];
+  }>({ open: false, activities: [] });
+
+  const handleTaxpayerLookup = useCallback(async () => {
+    const identification = form.getValues("cedula_juridica")?.trim();
+    if (!identification) {
+      toast.info(t("branches.hacienda.empty_identification"));
+      return;
+    }
+    try {
+      const [result, email] = await Promise.all([
+        taxpayerLookup.mutateAsync(identification),
+        taxpayerEmailLookup.mutateAsync(identification).catch(() => null),
+      ]);
+      if (!result) {
+        toast.info(t("branches.hacienda.not_found"));
+        return;
+      }
+      form.setValue("business_name", result.nombre, { shouldDirty: true });
+      form.setValue("legal_name", result.nombre, { shouldDirty: true });
+      form.setValue(
+        "identification_type",
+        result.tipoIdentificacion,
+        { shouldDirty: true },
+      );
+      if (!form.getValues("identification_number")) {
+        form.setValue("identification_number", identification, {
+          shouldDirty: true,
+        });
+      }
+      if (email && !form.getValues("email")) {
+        form.setValue("email", email, { shouldDirty: true });
+      }
+      const activeActivities = result.actividades.filter((a) => a.estado === "A");
+      if (activeActivities.length === 1) {
+        form.setValue("activity_code", activeActivities[0].codigo, {
+          shouldDirty: true,
+        });
+      } else if (activeActivities.length > 1) {
+        setActivityPickerState({ open: true, activities: activeActivities });
+      }
+      toast.success(t("branches.hacienda.lookup_success"));
+    } catch {
+      toast.error(t("branches.hacienda.lookup_error"));
+    }
+  }, [form, taxpayerLookup, taxpayerEmailLookup, t]);
+
+  const handleActivityPicked = useCallback(
+    (activity: HaciendaActivity) => {
+      form.setValue("activity_code", activity.codigo, { shouldDirty: true });
+      setActivityPickerState({ open: false, activities: [] });
+    },
+    [form],
+  );
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -187,11 +254,26 @@ function BranchForm({
 
           <div className="space-y-2">
             <Label htmlFor="branch-cedula">{t("branches.form.cedula_juridica")}</Label>
-            <Input
-              id="branch-cedula"
-              placeholder="3101123456"
-              {...form.register("cedula_juridica")}
-            />
+            <div className="flex gap-2">
+              <Input
+                className="flex-1"
+                id="branch-cedula"
+                inputMode="numeric"
+                maxLength={12}
+                placeholder="3101123456"
+                {...form.register("cedula_juridica")}
+              />
+              <ActionButton
+                icon={Search}
+                isLoading={taxpayerLookup.isPending}
+                loadingText={t("branches.hacienda.looking_up")}
+                onClick={handleTaxpayerLookup}
+                type="button"
+                variant="outline"
+              >
+                {t("branches.hacienda.lookup_button")}
+              </ActionButton>
+            </div>
             <FieldError message={errors.cedula_juridica?.message} />
           </div>
         </div>
@@ -423,6 +505,13 @@ function BranchForm({
           {submitLabel}
         </ActionButton>
       </div>
+
+      <ActivityPickerDialog
+        activities={activityPickerState.activities}
+        onClose={() => setActivityPickerState({ open: false, activities: [] })}
+        onSelect={handleActivityPicked}
+        open={activityPickerState.open}
+      />
     </form>
   );
 }

@@ -218,41 +218,28 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
-            <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
-            <FieldError message={errors.branch_number?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="branch-business-name">{t("branches.form.business_name")}</Label>
-            <Input
-              id="branch-business-name"
-              placeholder="FastFact Escazu"
-              {...form.register("business_name")}
+            <Label htmlFor="branch-identification-type">{t("branches.form.identification_type")}</Label>
+            <Controller
+              control={form.control}
+              name="identification_type"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                  <SelectTrigger id="branch-identification-type">
+                    <SelectValue placeholder={t("branches.form.select_type")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {identificationTypeValues.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
-            <FieldError message={errors.business_name?.message} />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="branch-legal-name">{t("branches.form.legal_name")}</Label>
-            <Input
-              id="branch-legal-name"
-              placeholder="FastFact Sociedad Anonima"
-              {...form.register("legal_name")}
-            />
-            <FieldError message={errors.legal_name?.message} />
+            <FieldError message={errors.identification_type?.message} />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
-            <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />
-            <FieldError message={errors.name?.message} />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-cedula">{t("branches.form.cedula_juridica")}</Label>
             <div className="flex gap-2">
@@ -292,28 +279,27 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-identification-type">{t("branches.form.identification_type")}</Label>
-            <Controller
-              control={form.control}
-              name="identification_type"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                  <SelectTrigger id="branch-identification-type">
-                    <SelectValue placeholder={t("branches.form.select_type")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {identificationTypeValues.map((value) => (
-                      <SelectItem key={value} value={value}>
-                        {value}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+            <Label htmlFor="branch-business-name">{t("branches.form.business_name")}</Label>
+            <Input
+              id="branch-business-name"
+              placeholder="FastFact Escazu"
+              {...form.register("business_name")}
             />
-            <FieldError message={errors.identification_type?.message} />
+            <FieldError message={errors.business_name?.message} />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="branch-legal-name">{t("branches.form.legal_name")}</Label>
+            <Input
+              id="branch-legal-name"
+              placeholder="FastFact Sociedad Anonima"
+              {...form.register("legal_name")}
+            />
+            <FieldError message={errors.legal_name?.message} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-identification-number">{t("branches.form.identification_number")}</Label>
             <Input
@@ -322,6 +308,20 @@ function BranchForm({
               {...form.register("identification_number")}
             />
             <FieldError message={errors.identification_number?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
+            <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
+            <FieldError message={errors.branch_number?.message} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
+            <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />
+            <FieldError message={errors.name?.message} />
           </div>
         </div>
       </section>

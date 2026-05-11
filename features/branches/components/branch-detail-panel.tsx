@@ -370,19 +370,16 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
 
 function BranchIdentityFields({ branch }: { branch: Branch }) {
   const { t } = useAppTranslator();
-  const identification = branch.identification_number
-    ? branch.identification_type
-      ? `${branch.identification_type} · ${branch.identification_number}`
-      : branch.identification_number
-    : null;
+  const cedula = branch.identification_type
+    ? `${branch.identification_type} · ${branch.cedula_juridica ?? ""}`.trim()
+    : (branch.cedula_juridica ?? null);
   return (
     <dl className="grid gap-3 sm:grid-cols-2">
       <InfoField label={t("branches.detail.fields.legal_name")} value={branch.legal_name} />
       <InfoField label={t("branches.detail.fields.business_name")} value={branch.business_name} />
       <InfoField label={t("branches.detail.fields.branch_number")} value={branch.branch_number} mono />
       <InfoField label={t("branches.detail.fields.code")} value={branch.code} mono />
-      <InfoField label={t("branches.detail.fields.identification")} value={identification} />
-      <InfoField label={t("branches.detail.fields.cedula_juridica")} value={branch.cedula_juridica} mono />
+      <InfoField label={t("branches.detail.fields.cedula_juridica")} value={cedula} mono />
     </dl>
   );
 }

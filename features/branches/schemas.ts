@@ -59,7 +59,6 @@ export const branchSchema = z
     has_hacienda_password: z.boolean().optional().default(false),
     has_mail_key: z.boolean().optional().default(false),
     id: idSchema,
-    identification_number: z.string().optional().catch(undefined),
     identification_type: z
       .preprocess(normalizeIdentificationTypeValue, identificationTypeSchema.optional())
       .catch(undefined),
@@ -102,9 +101,6 @@ const branchInputObject = z.object({
   email: optionalEmailSchema,
   hacienda_password: optionalTextSchema,
   hacienda_username: optionalTextSchema,
-  identification_number: optionalTrimmedString(
-    z.string().min(2, "El numero de identificacion debe tener al menos 2 caracteres."),
-  ),
   identification_type: z.preprocess(
     normalizeIdentificationTypeValue,
     identificationTypeSchema.optional(),

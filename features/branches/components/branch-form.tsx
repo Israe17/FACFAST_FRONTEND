@@ -49,7 +49,6 @@ type BranchFormValues = {
   email?: string;
   hacienda_password?: string;
   hacienda_username?: string;
-  identification_number?: string;
   identification_type?: string;
   is_active: boolean;
   latitude?: number | null;
@@ -169,16 +168,9 @@ function BranchForm({
       }
       form.setValue("business_name", result.nombre, { shouldDirty: true });
       form.setValue("legal_name", result.nombre, { shouldDirty: true });
-      form.setValue(
-        "identification_type",
-        result.tipoIdentificacion,
-        { shouldDirty: true },
-      );
-      if (!form.getValues("identification_number")) {
-        form.setValue("identification_number", identification, {
-          shouldDirty: true,
-        });
-      }
+      form.setValue("identification_type", result.tipoIdentificacion, {
+        shouldDirty: true,
+      });
       if (email && !form.getValues("email")) {
         form.setValue("email", email, { shouldDirty: true });
       }
@@ -301,23 +293,11 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-identification-number">{t("branches.form.identification_number")}</Label>
-            <Input
-              id="branch-identification-number"
-              placeholder="3101123456"
-              {...form.register("identification_number")}
-            />
-            <FieldError message={errors.identification_number?.message} />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
             <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
             <FieldError message={errors.branch_number?.message} />
           </div>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
             <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />

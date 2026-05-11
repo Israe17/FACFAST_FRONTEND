@@ -2498,7 +2498,7 @@ const esTranslations = {
   "users.actions.assign_direct_permissions": "Asignar permisos directos",
   "users.direct_permissions.assign_title": "Asignar permisos directos",
   "users.direct_permissions.assign_description":
-    "Otorga permisos puntuales a {{name}}, independientes del rol. Solo se muestran los permisos que el usuario aún no tiene.",
+    "Otorga permisos puntuales a {name}, independientes del rol. Solo se muestran los permisos que el usuario aún no tiene.",
   "users.direct_permissions.search_label": "Buscar permisos",
   "users.direct_permissions.search_placeholder":
     "Filtrar por clave, módulo o descripción…",
@@ -2508,7 +2508,7 @@ const esTranslations = {
     "El usuario ya tiene todos los permisos disponibles",
   "users.direct_permissions.empty_description":
     "Sus roles asignados ya cubren el catálogo completo. No hay permisos adicionales para otorgar directamente.",
-  "users.direct_permissions.submit": "Otorgar ({{count}})",
+  "users.direct_permissions.submit": "Otorgar ({count})",
   "users.actions.view_permissions": "Permisos efectivos",
   "users.actions.delete": "Eliminar permanentemente",
   "users.delete_dialog_title": "Eliminar usuario permanentemente",
@@ -5302,7 +5302,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "users.actions.assign_direct_permissions": "Assign direct permissions",
     "users.direct_permissions.assign_title": "Assign direct permissions",
     "users.direct_permissions.assign_description":
-      "Grant specific permissions to {{name}}, independent of role assignments. Only permissions the user doesn't already have are shown.",
+      "Grant specific permissions to {name}, independent of role assignments. Only permissions the user doesn't already have are shown.",
     "users.direct_permissions.search_label": "Search permissions",
     "users.direct_permissions.search_placeholder":
       "Filter by key, module, or description…",
@@ -5312,7 +5312,7 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
       "User already has every available permission",
     "users.direct_permissions.empty_description":
       "Their assigned roles already cover the full catalog. No additional permissions to grant directly.",
-    "users.direct_permissions.submit": "Grant ({{count}})",
+    "users.direct_permissions.submit": "Grant ({count})",
     "users.actions.view_permissions": "Effective permissions",
     "users.actions.delete": "Delete permanently",
     "users.delete_dialog_title": "Delete user permanently",

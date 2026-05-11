@@ -1,4 +1,4 @@
-const USER_COLOR_PALETTE = [
+const ENTITY_COLOR_PALETTE = [
   {
     bubble: "bg-rose-500 text-white",
     hero: "from-rose-500 to-rose-700 text-white",
@@ -41,7 +41,7 @@ const USER_COLOR_PALETTE = [
   },
 ] as const;
 
-export type UserColor = (typeof USER_COLOR_PALETTE)[number];
+export type EntityColor = (typeof ENTITY_COLOR_PALETTE)[number];
 
 function hashString(value: string): number {
   let hash = 0;
@@ -51,12 +51,12 @@ function hashString(value: string): number {
   return Math.abs(hash);
 }
 
-export function pickUserColor(seed: string, fallback: string): UserColor {
+export function pickEntityColor(seed: string, fallback: string): EntityColor {
   const key = `${seed}|${fallback}`;
-  return USER_COLOR_PALETTE[hashString(key) % USER_COLOR_PALETTE.length];
+  return ENTITY_COLOR_PALETTE[hashString(key) % ENTITY_COLOR_PALETTE.length];
 }
 
-export function buildUserInitials(name: string): string {
+export function buildEntityInitials(name: string): string {
   const trimmed = name.trim();
   if (!trimmed) {
     return "?";

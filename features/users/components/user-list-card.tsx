@@ -5,7 +5,7 @@ import { ChevronRight, ShieldCheck, Waypoints } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 import type { User } from "../types";
-import { buildUserInitials, pickUserColor } from "../user-visuals";
+import { buildEntityInitials, pickEntityColor } from "@/shared/lib/entity-visuals";
 
 type UserListCardProps = {
   user: User;
@@ -22,8 +22,8 @@ const STATUS_DOT: Record<string, string> = {
 
 export function UserListCard({ user, selected, onSelect }: UserListCardProps) {
   const seed = user.code ?? user.email ?? String(user.id);
-  const color = pickUserColor(seed, user.name);
-  const initials = buildUserInitials(user.name);
+  const color = pickEntityColor(seed, user.name);
+  const initials = buildEntityInitials(user.name);
   const status = user.status ?? "inactive";
   const dot = STATUS_DOT[status] ?? STATUS_DOT.inactive;
 

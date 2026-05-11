@@ -34,7 +34,7 @@ import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 import { cn } from "@/shared/lib/utils";
 import { formatDateTime } from "@/shared/lib/utils";
-import { buildUserInitials, pickUserColor } from "@/features/users/user-visuals";
+import { buildEntityInitials, pickEntityColor } from "@/shared/lib/entity-visuals";
 
 import type { Branch } from "../types";
 import {
@@ -70,8 +70,8 @@ export function BranchDetailPanel({ branch }: BranchDetailPanelProps) {
   }, [branch.id]);
 
   const seed = branch.code ?? String(branch.id);
-  const color = pickUserColor(seed, branch.name);
-  const initials = buildUserInitials(branch.name);
+  const color = pickEntityColor(seed, branch.name);
+  const initials = buildEntityInitials(branch.name);
   const isActiveContext = branch.id === activeBranchId;
   const canUseAsContext =
     canSwitchBranchContext &&

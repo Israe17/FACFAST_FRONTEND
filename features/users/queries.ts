@@ -12,6 +12,7 @@ import { rolesKeys } from "@/features/roles/keys";
 
 import {
   assignUserBranches,
+  assignUserPermissions,
   assignUserRoles,
   changeUserPassword,
   createUser,
@@ -25,6 +26,7 @@ import {
 } from "./api";
 import type {
   AssignUserBranchesInput,
+  AssignUserPermissionsInput,
   AssignUserRolesInput,
   ChangeUserPasswordInput,
   CreateUserInput,
@@ -225,6 +227,34 @@ export function useAssignUserBranchesMutation(
       if (options.showErrorToast !== false) {
         presentBackendErrorToast(error, {
           fallbackMessage: t("users.branches_update_error_fallback"),
+        });
+      }
+    },
+  });
+}
+
+export function useAssignUserPermissionsMutation(
+  userId: string,
+  options: MutationFeedbackOptions = {},
+) {
+  const queryClient = useQueryClient();
+  const { t } = useAppTranslator();
+  const shouldInvalidateCurrentSession = useShouldInvalidateCurrentSession(userId);
+
+  return useMutation({
+    mutationFn: (payload: AssignUserPermissionsInput) =>
+      assignUserPermissions(userId, payload),
+    onSuccess: () => {
+      invalidateUserQueries(queryClient, userId);
+      if (shouldInvalidateCurrentSession) {
+        queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+      }
+      toast.success(t("common.saved_successfully"));
+    },
+    onError: (error) => {
+      if (options.showErrorToast !== false) {
+        presentBackendErrorToast(error, {
+          fallbackMessage: t("users.permissions_update_error_fallback"),
         });
       }
     },

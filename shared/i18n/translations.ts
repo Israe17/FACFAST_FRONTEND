@@ -2218,6 +2218,13 @@ const esTranslations = {
   "users.form.name_placeholder": "Nombre del usuario",
   "users.form.password": "Contraseña",
   "users.form.password_placeholder": "Contraseña temporal",
+  "users.form.auth_permissions_title": "Permisos directos de autenticación",
+  "users.form.auth_permissions_description":
+    "Otorga estos permisos directamente al usuario, independiente de los roles asignados. El usuario necesita auth.login para iniciar sesión.",
+  "users.form.auth_permissions_empty":
+    "No hay permisos de autenticación disponibles en el catálogo.",
+  "users.permissions_update_error_fallback":
+    "No fue posible actualizar los permisos directos del usuario.",
   "users.delete_error_fallback": "No fue posible eliminar el usuario.",
   "users.password_update_error_fallback":
     "No fue posible actualizar la contraseña del usuario.",
@@ -5013,6 +5020,13 @@ export const translations: Record<AppLanguage, TranslationDictionary> = {
     "users.form.name_placeholder": "User name",
     "users.form.password": "Password",
     "users.form.password_placeholder": "Temporary password",
+    "users.form.auth_permissions_title": "Direct authentication permissions",
+    "users.form.auth_permissions_description":
+      "Grant these permissions directly to the user, independent of assigned roles. The user needs auth.login to sign in.",
+    "users.form.auth_permissions_empty":
+      "No authentication permissions available in the catalog.",
+    "users.permissions_update_error_fallback":
+      "Unable to update the user's direct permissions.",
     "users.password_update_error_fallback":
       "Unable to update the user password.",
     "users.password_updated_success": "Password updated successfully.",

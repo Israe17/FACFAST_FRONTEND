@@ -2,6 +2,7 @@ import type { z } from "zod/v4";
 
 import {
   assignUserBranchesSchema,
+  assignUserPermissionsSchema,
   assignUserRolesSchema,
   branchOptionSchema,
   changeUserPasswordSchema,
@@ -24,3 +25,4 @@ export type UpdateUserStatusInput = z.infer<typeof updateUserStatusSchema>;
 export type ChangeUserPasswordInput = z.infer<typeof changeUserPasswordSchema>;
 export type AssignUserRolesInput = z.infer<typeof assignUserRolesSchema>;
 export type AssignUserBranchesInput = z.infer<typeof assignUserBranchesSchema>;
+export type AssignUserPermissionsInput = z.infer<typeof assignUserPermissionsSchema>;

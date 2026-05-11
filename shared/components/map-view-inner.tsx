@@ -70,8 +70,10 @@ type MapViewInnerProps = {
 const DEFAULT_CENTER: [number, number] = [9.9281, -84.0907];
 const DEFAULT_ZOOM = 8;
 
+const LEAFLET_LOAD_TIMEOUT_MS = 10_000;
+
 function waitForLeaflet(): Promise<any> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (window.L) {
       resolve(window.L);
       return;
@@ -79,9 +81,18 @@ function waitForLeaflet(): Promise<any> {
     const interval = setInterval(() => {
       if (window.L) {
         clearInterval(interval);
+        clearTimeout(timeout);
         resolve(window.L);
       }
     }, 50);
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      reject(
+        new Error(
+          `Leaflet failed to load within ${LEAFLET_LOAD_TIMEOUT_MS}ms (CDN unreachable or blocked).`,
+        ),
+      );
+    }, LEAFLET_LOAD_TIMEOUT_MS);
   });
 }
 
@@ -103,6 +114,7 @@ function MapViewInner({
   const polygonsLayerRef = useRef<any>(null);
   const LRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Initialize map once Leaflet is loaded from CDN
   useEffect(() => {
@@ -124,6 +136,7 @@ function MapViewInner({
 
     waitForLeaflet().then((L) => {
       if (cancelled || !containerRef.current || mapRef.current) return;
+      setLoadError(null);
 
       LRef.current = L;
 
@@ -155,6 +168,9 @@ function MapViewInner({
       polylinesLayerRef.current = polylinesLayer;
       polygonsLayerRef.current = polygonsLayer;
       setReady(true);
+    }).catch((err: Error) => {
+      if (cancelled) return;
+      setLoadError(err.message);
     });
 
     return () => {
@@ -335,6 +351,11 @@ function MapViewInner({
   return (
     <div className={`w-full h-full min-h-[400px] rounded-lg relative ${className}`}>
       <div ref={containerRef} className="absolute inset-0" />
+      {loadError ? (
+        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-muted/80 p-4 text-center text-sm text-muted-foreground">
+          {loadError}
+        </div>
+      ) : null}
       <button
         type="button"
         onClick={handleRecenter}

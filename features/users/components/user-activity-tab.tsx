@@ -9,7 +9,6 @@ import {
   ShieldOff,
   Truck,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,13 +34,9 @@ import {
   type FilterField,
   type SelectOption,
 } from "@/shared/components/activity-filters-bar";
-import {
-  ActivityList,
-  DEFAULT_PAGE_SIZE,
-  type PageSize,
-} from "@/shared/components/activity-list";
+import { ActivityList } from "@/shared/components/activity-list";
 import { EmptyState } from "@/shared/components/empty-state";
-import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
+import { useActivityCursorList } from "@/shared/hooks/use-activity-cursor-list";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
 
@@ -348,28 +343,32 @@ function MovementsList({
 }: MovementsListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
-  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
-  const [searchInput, setSearchInput] = useState("");
-  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
-  const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
-  const [selectedMovementId, setSelectedMovementId] = useState<string | null>(null);
-
-  // Reset pagination when filters, search, or page size change.
-  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
-  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
-  const [lastPageSize, setLastPageSize] = useState(pageSize);
-  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
-    setLastFiltersKey(filtersKey);
-    setLastPageSize(pageSize);
-    setCursor(undefined);
-    setCursorStack([]);
-  }
-
-  const pageNumber = cursorStack.length + 1;
+  const [selectedMovementId, setSelectedMovementId] = useState<string | null>(
+    null,
+  );
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const productsQuery = useProductsQuery(enabled);
+
+  const list = useActivityCursorList({
+    baseQueryKey: ["users", userIdNumber, "activity", "inventory-movements"],
+    filters,
+    enabled,
+    queryFn: ({ cursor, limit, search, filters: f }) =>
+      listInventoryMovementsCursor(
+        { cursor, limit, sort_order: "DESC", search },
+        {
+          performed_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(f.branch_id),
+          warehouse_id: toNumberFilter(f.warehouse_id),
+          product_id: toNumberFilter(f.product_id),
+          from: f.from,
+          to: f.to,
+          status: f.status,
+          movement_type: f.movement_type,
+        },
+      ),
+  });
 
   const statusOptions = buildEnumOptions(MOVEMENT_STATUS_VALUES, (value) =>
     t(`users.activity.status.${value}` as FrontendTranslationKey),
@@ -425,26 +424,7 @@ function MovementsList({
     fields.shift();
   }
 
-  const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "inventory-movements", filters, pageSize, debouncedSearch, cursor],
-    queryFn: () =>
-      listInventoryMovementsCursor(
-        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
-        {
-          performed_by_user_id: userIdNumber,
-          branch_id: toNumberFilter(filters.branch_id),
-          warehouse_id: toNumberFilter(filters.warehouse_id),
-          product_id: toNumberFilter(filters.product_id),
-          from: filters.from,
-          to: filters.to,
-          status: filters.status,
-          movement_type: filters.movement_type,
-        },
-      ),
-    enabled,
-  });
-
-  const items = (query.data?.data ?? []).map((movement) => ({
+  const items = list.rawItems.map((movement) => ({
     id: String(movement.id),
     primary: movement.code ?? `#${movement.id}`,
     secondary: [
@@ -457,23 +437,6 @@ function MovementsList({
     timestamp: movement.occurred_at ?? movement.created_at,
     badge: movement.status ? String(movement.status) : null,
   }));
-
-  const hasNextPage = Boolean(query.data?.has_more);
-  const hasPrevPage = cursorStack.length > 0;
-
-  function goNext() {
-    const nextCursor = query.data?.next_cursor;
-    if (hasNextPage && nextCursor != null) {
-      setCursorStack((prev) => [...prev, cursor]);
-      setCursor(nextCursor);
-    }
-  }
-
-  function goPrev() {
-    const prevCursor = cursorStack[cursorStack.length - 1];
-    setCursor(prevCursor);
-    setCursorStack((prev) => prev.slice(0, -1));
-  }
 
   return (
     <>
@@ -493,21 +456,21 @@ function MovementsList({
         emptyTitle={t("users.activity.movements_empty_title")}
         emptyDescription={t("users.activity.movements_empty_description")}
         items={items}
-        isLoading={query.isLoading}
-        isFetching={query.isFetching && !query.isLoading}
-        isError={query.isError}
-        error={query.error}
-        onRetry={() => query.refetch()}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        onNextPage={goNext}
-        onPrevPage={goPrev}
-        pageNumber={pageNumber}
-        total={query.data?.total ?? 0}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        search={searchInput}
-        onSearchChange={setSearchInput}
+        isLoading={list.isLoading}
+        isFetching={list.isFetching}
+        isError={list.isError}
+        error={list.error}
+        onRetry={list.refetch}
+        hasNextPage={list.hasNextPage}
+        hasPrevPage={list.hasPrevPage}
+        onNextPage={list.onNextPage}
+        onPrevPage={list.onPrevPage}
+        pageNumber={list.pageNumber}
+        total={list.total}
+        pageSize={list.pageSize}
+        onPageSizeChange={list.onPageSizeChange}
+        search={list.search}
+        onSearchChange={list.onSearchChange}
         onItemSelect={setSelectedMovementId}
       />
       <InventoryMovementDetailSheet
@@ -530,27 +493,29 @@ type SalesListProps = {
 function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
-  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
-  const [searchInput, setSearchInput] = useState("");
-  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
-  const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<SaleOrder | null>(null);
-
-  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
-  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
-  const [lastPageSize, setLastPageSize] = useState(pageSize);
-  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
-    setLastFiltersKey(filtersKey);
-    setLastPageSize(pageSize);
-    setCursor(undefined);
-    setCursorStack([]);
-  }
-
-  const pageNumber = cursorStack.length + 1;
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const warehousesQuery = useWarehousesQuery(enabled);
   const contactsQuery = useContactsQuery(enabled);
+
+  const list = useActivityCursorList({
+    baseQueryKey: ["users", userIdNumber, "activity", "sale-orders"],
+    filters,
+    enabled,
+    queryFn: ({ cursor, limit, search, filters: f }) =>
+      listSaleOrdersCursor(
+        { cursor, limit, sort_order: "DESC", search },
+        {
+          created_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(f.branch_id),
+          customer_contact_id: toNumberFilter(f.customer_contact_id),
+          warehouse_id: toNumberFilter(f.warehouse_id),
+          from: f.from,
+          to: f.to,
+          status: f.status,
+        },
+      ),
+  });
 
   const statusOptions = buildEnumOptions(SALE_ORDER_STATUS_VALUES, (value) =>
     t(`users.activity.status.${value}` as FrontendTranslationKey),
@@ -602,53 +567,15 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
     fields.shift();
   }
 
-  const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "sale-orders", filters, pageSize, debouncedSearch, cursor],
-    queryFn: () =>
-      listSaleOrdersCursor(
-        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
-        {
-          created_by_user_id: userIdNumber,
-          branch_id: toNumberFilter(filters.branch_id),
-          customer_contact_id: toNumberFilter(filters.customer_contact_id),
-          warehouse_id: toNumberFilter(filters.warehouse_id),
-          from: filters.from,
-          to: filters.to,
-          status: filters.status,
-        },
-      ),
-    enabled,
-  });
-
-  const items = (query.data?.data ?? []).map((order) => ({
+  const items = list.rawItems.map((order) => ({
     id: String(order.id),
     primary: order.code ?? `#${order.id}`,
-    secondary: [
-      order.customer_contact?.name ?? null,
-      order.branch?.name ?? null,
-    ]
+    secondary: [order.customer_contact?.name ?? null, order.branch?.name ?? null]
       .filter(Boolean)
       .join(" · "),
     timestamp: order.order_date ?? order.created_at,
     badge: order.status ? String(order.status) : null,
   }));
-
-  const hasNextPage = Boolean(query.data?.has_more);
-  const hasPrevPage = cursorStack.length > 0;
-
-  function goNext() {
-    const nextCursor = query.data?.next_cursor;
-    if (hasNextPage && nextCursor != null) {
-      setCursorStack((prev) => [...prev, cursor]);
-      setCursor(nextCursor);
-    }
-  }
-
-  function goPrev() {
-    const prevCursor = cursorStack[cursorStack.length - 1];
-    setCursor(prevCursor);
-    setCursorStack((prev) => prev.slice(0, -1));
-  }
 
   return (
     <>
@@ -668,23 +595,23 @@ function SalesList({ user, filters, setFilters, enabled }: SalesListProps) {
         emptyTitle={t("users.activity.sales_empty_title")}
         emptyDescription={t("users.activity.sales_empty_description")}
         items={items}
-        isLoading={query.isLoading}
-        isFetching={query.isFetching && !query.isLoading}
-        isError={query.isError}
-        error={query.error}
-        onRetry={() => query.refetch()}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        onNextPage={goNext}
-        onPrevPage={goPrev}
-        pageNumber={pageNumber}
-        total={query.data?.total ?? 0}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        search={searchInput}
-        onSearchChange={setSearchInput}
+        isLoading={list.isLoading}
+        isFetching={list.isFetching}
+        isError={list.isError}
+        error={list.error}
+        onRetry={list.refetch}
+        hasNextPage={list.hasNextPage}
+        hasPrevPage={list.hasPrevPage}
+        onNextPage={list.onNextPage}
+        onPrevPage={list.onPrevPage}
+        pageNumber={list.pageNumber}
+        total={list.total}
+        pageSize={list.pageSize}
+        onPageSizeChange={list.onPageSizeChange}
+        search={list.search}
+        onSearchChange={list.onSearchChange}
         onItemSelect={(id) => {
-          const found = query.data?.data.find((order) => String(order.id) === id);
+          const found = list.rawItems.find((order) => String(order.id) === id);
           if (found) setSelectedOrder(found);
         }}
       />
@@ -714,27 +641,33 @@ function DispatchList({
 }: DispatchListProps) {
   const { t } = useAppTranslator();
   const userIdNumber = Number(user.id);
-  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
-  const [searchInput, setSearchInput] = useState("");
-  const debouncedSearch = useDebouncedValue(searchInput.trim(), 300);
-  const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [cursorStack, setCursorStack] = useState<(number | undefined)[]>([]);
-  const [selectedDispatch, setSelectedDispatch] = useState<DispatchOrder | null>(null);
-
-  const filtersKey = JSON.stringify({ filters, search: debouncedSearch });
-  const [lastFiltersKey, setLastFiltersKey] = useState(filtersKey);
-  const [lastPageSize, setLastPageSize] = useState(pageSize);
-  if (filtersKey !== lastFiltersKey || pageSize !== lastPageSize) {
-    setLastFiltersKey(filtersKey);
-    setLastPageSize(pageSize);
-    setCursor(undefined);
-    setCursorStack([]);
-  }
-
-  const pageNumber = cursorStack.length + 1;
+  const [selectedDispatch, setSelectedDispatch] = useState<DispatchOrder | null>(
+    null,
+  );
   const branchOptions = useBranchOptionsForUser(user, enabled);
   const vehiclesQuery = useVehiclesQuery(enabled);
   const routesQuery = useRoutesQuery(enabled);
+
+  const list = useActivityCursorList({
+    baseQueryKey: ["users", userIdNumber, "activity", "dispatch-orders"],
+    filters,
+    enabled,
+    queryFn: ({ cursor, limit, search, filters: f }) =>
+      listDispatchOrdersCursor(
+        { cursor, limit, sort_order: "DESC", search },
+        {
+          created_by_user_id: userIdNumber,
+          branch_id: toNumberFilter(f.branch_id),
+          vehicle_id: toNumberFilter(f.vehicle_id),
+          driver_user_id: toNumberFilter(f.driver_user_id),
+          route_id: toNumberFilter(f.route_id),
+          from: f.from,
+          to: f.to,
+          status: f.status,
+          dispatch_type: f.dispatch_type,
+        },
+      ),
+  });
 
   const statusOptions = buildEnumOptions(
     DISPATCH_ORDER_STATUS_VALUES,
@@ -796,27 +729,7 @@ function DispatchList({
     fields.shift();
   }
 
-  const query = useQuery({
-    queryKey: ["users", userIdNumber, "activity", "dispatch-orders", filters, pageSize, debouncedSearch, cursor],
-    queryFn: () =>
-      listDispatchOrdersCursor(
-        { cursor, limit: pageSize, sort_order: "DESC", search: debouncedSearch || undefined },
-        {
-          created_by_user_id: userIdNumber,
-          branch_id: toNumberFilter(filters.branch_id),
-          vehicle_id: toNumberFilter(filters.vehicle_id),
-          driver_user_id: toNumberFilter(filters.driver_user_id),
-          route_id: toNumberFilter(filters.route_id),
-          from: filters.from,
-          to: filters.to,
-          status: filters.status,
-          dispatch_type: filters.dispatch_type,
-        },
-      ),
-    enabled,
-  });
-
-  const items = (query.data?.data ?? []).map((order) => ({
+  const items = list.rawItems.map((order) => ({
     id: String(order.id),
     primary: order.code ?? `#${order.id}`,
     secondary: [
@@ -829,23 +742,6 @@ function DispatchList({
     timestamp: order.scheduled_date ?? order.dispatched_at ?? null,
     badge: order.status ? String(order.status) : null,
   }));
-
-  const hasNextPage = Boolean(query.data?.has_more);
-  const hasPrevPage = cursorStack.length > 0;
-
-  function goNext() {
-    const nextCursor = query.data?.next_cursor;
-    if (hasNextPage && nextCursor != null) {
-      setCursorStack((prev) => [...prev, cursor]);
-      setCursor(nextCursor);
-    }
-  }
-
-  function goPrev() {
-    const prevCursor = cursorStack[cursorStack.length - 1];
-    setCursor(prevCursor);
-    setCursorStack((prev) => prev.slice(0, -1));
-  }
 
   return (
     <>
@@ -865,23 +761,23 @@ function DispatchList({
         emptyTitle={t("users.activity.dispatch_empty_title")}
         emptyDescription={t("users.activity.dispatch_empty_description")}
         items={items}
-        isLoading={query.isLoading}
-        isFetching={query.isFetching && !query.isLoading}
-        isError={query.isError}
-        error={query.error}
-        onRetry={() => query.refetch()}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        onNextPage={goNext}
-        onPrevPage={goPrev}
-        pageNumber={pageNumber}
-        total={query.data?.total ?? 0}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        search={searchInput}
-        onSearchChange={setSearchInput}
+        isLoading={list.isLoading}
+        isFetching={list.isFetching}
+        isError={list.isError}
+        error={list.error}
+        onRetry={list.refetch}
+        hasNextPage={list.hasNextPage}
+        hasPrevPage={list.hasPrevPage}
+        onNextPage={list.onNextPage}
+        onPrevPage={list.onPrevPage}
+        pageNumber={list.pageNumber}
+        total={list.total}
+        pageSize={list.pageSize}
+        onPageSizeChange={list.onPageSizeChange}
+        search={list.search}
+        onSearchChange={list.onSearchChange}
         onItemSelect={(id) => {
-          const found = query.data?.data.find((order) => String(order.id) === id);
+          const found = list.rawItems.find((order) => String(order.id) === id);
           if (found) setSelectedDispatch(found);
         }}
       />

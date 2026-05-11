@@ -30,6 +30,13 @@ export function useEnsurePermissionsCatalog() {
     queryKey: rolesKeys.permissions(),
     queryFn: listAvailablePermissions,
     staleTime: CATALOG_STALE_TIME,
+    // Permission keys can appear at runtime when a new role is seeded or a
+    // permission is added by a backend deploy. Refetch on focus / reconnect
+    // closes the window between "new key exists" and "client catalog
+    // reflects it" without spamming the endpoint — TanStack still respects
+    // the stale time for normal renders.
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 

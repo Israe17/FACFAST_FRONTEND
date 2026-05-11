@@ -17,6 +17,7 @@ const warnedPermissions = new Set<string>();
 
 function devWarnIfUnknown(
   catalog: Set<string> | null,
+  userPermissions: Set<string>,
   permission: string,
 ): void {
   if (process.env.NODE_ENV === "production") return;
@@ -25,6 +26,11 @@ function devWarnIfUnknown(
   // rather than warning on every check.
   if (!catalog) return;
   if (catalog.has(permission)) return;
+  // If the current user already has this permission in their session,
+  // then by definition the backend knows about it — the client-side
+  // catalog is simply stale (e.g. a backend deploy added the key
+  // moments ago). No point in spamming the dev about it.
+  if (userPermissions.has(permission)) return;
   if (warnedPermissions.has(permission)) return;
   warnedPermissions.add(permission);
   // eslint-disable-next-line no-console
@@ -41,6 +47,7 @@ export function usePermissions() {
   const catalog = useKnownPermissionKeys();
   const permissions = user?.permissions ?? [];
   const roles = user?.roles ?? [];
+  const userPermissionSet = new Set(permissions);
   const hasTenantContextAccess = isTenantContextPlatformAdmin(user);
 
   return {
@@ -48,14 +55,14 @@ export function usePermissions() {
     permissions,
     roles,
     can: (permission: string) => {
-      devWarnIfUnknown(catalog, permission);
+      devWarnIfUnknown(catalog, userPermissionSet, permission);
       return hasTenantContextAccess
         ? true
         : hasPermission(permissions, permission);
     },
     canAny: (requiredPermissions: string[]) => {
       for (const permission of requiredPermissions) {
-        devWarnIfUnknown(catalog, permission);
+        devWarnIfUnknown(catalog, userPermissionSet, permission);
       }
       return hasTenantContextAccess
         ? true
@@ -63,7 +70,7 @@ export function usePermissions() {
     },
     canAll: (requiredPermissions: string[]) => {
       for (const permission of requiredPermissions) {
-        devWarnIfUnknown(catalog, permission);
+        devWarnIfUnknown(catalog, userPermissionSet, permission);
       }
       return hasTenantContextAccess
         ? true

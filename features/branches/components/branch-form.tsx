@@ -29,7 +29,7 @@ import { LocationPicker } from "@/shared/components/location-picker";
 import { RegionPicker } from "@/shared/components/region-picker";
 import { usePermissions } from "@/shared/hooks/use-permissions";
 import { useAppTranslator } from "@/shared/i18n/use-app-translator";
-import { identificationTypeValues } from "@/shared/lib/validation";
+import { identificationTypeOptions } from "@/shared/lib/validation";
 
 type BranchFormValues = {
   activity_code?: string;
@@ -220,9 +220,9 @@ function BranchForm({
                     <SelectValue placeholder={t("branches.form.select_type")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {identificationTypeValues.map((value) => (
-                      <SelectItem key={value} value={value}>
-                        {value}
+                    {identificationTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

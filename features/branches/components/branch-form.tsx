@@ -301,23 +301,11 @@ function BranchForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="branch-identification-number">{t("branches.form.identification_number")}</Label>
-            <Input
-              id="branch-identification-number"
-              placeholder="3101123456"
-              {...form.register("identification_number")}
-            />
-            <FieldError message={errors.identification_number?.message} />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="branch-number">{t("branches.form.branch_number")}</Label>
             <Input id="branch-number" placeholder="001" {...form.register("branch_number")} />
             <FieldError message={errors.branch_number?.message} />
           </div>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="branch-name">{t("branches.form.branch_name")}</Label>
             <Input id="branch-name" placeholder="Escazu" {...form.register("name")} />

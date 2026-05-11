@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/shared/components/confirm-dialog";
+import { DetailBlock } from "@/shared/components/detail-block";
 import { EmptyState } from "@/shared/components/empty-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { MapView } from "@/shared/components/map-view";
@@ -333,10 +334,7 @@ function ContactInformationTab({ contact }: { contact: Contact }) {
 
   return (
     <>
-      <section className="rounded-xl border border-border/70 bg-background p-3">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t("contacts.detail.metadata_title")}
-        </h3>
+      <DetailBlock title={t("contacts.detail.metadata_title")}>
         <dl className="grid gap-3 sm:grid-cols-2">
           <DetailRow
             label={t("contacts.field.identification")}
@@ -369,12 +367,9 @@ function ContactInformationTab({ contact }: { contact: Contact }) {
             }
           />
         </dl>
-      </section>
+      </DetailBlock>
 
-      <section className="rounded-xl border border-border/70 bg-background p-3">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {t("contacts.detail.address_title")}
-        </h3>
+      <DetailBlock title={t("contacts.detail.address_title")}>
         {hasAddress ? (
           <dl className="grid gap-3 sm:grid-cols-2">
             {contact.address ? (
@@ -382,7 +377,7 @@ function ContactInformationTab({ contact }: { contact: Contact }) {
                 <dt className="text-xs text-muted-foreground">
                   {t("contacts.field.address")}
                 </dt>
-                <dd className="text-sm font-medium">{contact.address}</dd>
+                <dd className="text-sm font-semibold">{contact.address}</dd>
               </div>
             ) : null}
             <DetailRow
@@ -403,13 +398,10 @@ function ContactInformationTab({ contact }: { contact: Contact }) {
             {t("contacts.detail.no_address")}
           </p>
         )}
-      </section>
+      </DetailBlock>
 
       {hasExoneration ? (
-        <section className="rounded-xl border border-border/70 bg-background p-3">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {t("contacts.detail.exoneration_title")}
-          </h3>
+        <DetailBlock title={t("contacts.detail.exoneration_title")}>
           <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <DetailRow
               label={t("contacts.field.exoneration_type")}
@@ -436,7 +428,7 @@ function ContactInformationTab({ contact }: { contact: Contact }) {
               }
             />
           </dl>
-        </section>
+        </DetailBlock>
       ) : null}
     </>
   );
@@ -621,7 +613,7 @@ function DetailRow({
   return (
     <div>
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{display}</dd>
+      <dd className="text-sm font-semibold">{display}</dd>
       {hint ? (
         <p className="text-[11px] text-muted-foreground">{hint}</p>
       ) : null}

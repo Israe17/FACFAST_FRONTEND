@@ -28,7 +28,6 @@ function buildBranchPayload(payload: CreateBranchInput | UpdateBranchInput) {
     email: payload.email,
     hacienda_password: payload.hacienda_password,
     hacienda_username: payload.hacienda_username,
-    identification_number: payload.identification_number,
     identification_type: payload.identification_type,
     is_active: payload.is_active,
     legal_name: payload.legal_name,

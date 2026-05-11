@@ -49,7 +49,6 @@ type BranchFormValues = {
   email?: string;
   hacienda_password?: string;
   hacienda_username?: string;
-  identification_number?: string;
   identification_type?: string;
   is_active: boolean;
   latitude?: number | null;
@@ -169,16 +168,9 @@ function BranchForm({
       }
       form.setValue("business_name", result.nombre, { shouldDirty: true });
       form.setValue("legal_name", result.nombre, { shouldDirty: true });
-      form.setValue(
-        "identification_type",
-        result.tipoIdentificacion,
-        { shouldDirty: true },
-      );
-      if (!form.getValues("identification_number")) {
-        form.setValue("identification_number", identification, {
-          shouldDirty: true,
-        });
-      }
+      form.setValue("identification_type", result.tipoIdentificacion, {
+        shouldDirty: true,
+      });
       if (email && !form.getValues("email")) {
         form.setValue("email", email, { shouldDirty: true });
       }

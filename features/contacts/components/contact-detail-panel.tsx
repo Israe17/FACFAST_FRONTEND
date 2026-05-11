@@ -327,110 +327,131 @@ function ContactActionsMenu({
 
 function ContactInformationTab({ contact }: { contact: Contact }) {
   const { t } = useAppTranslator();
+  const [infoSubTab, setInfoSubTab] = useState<string>("registry");
   const hasAddress =
     contact.address || contact.province || contact.canton || contact.district;
   const hasExoneration =
     contact.exoneration_type || contact.exoneration_document_number;
 
   return (
-    <>
-      <DetailBlock title={t("contacts.detail.metadata_title")}>
-        <dl className="grid gap-3 sm:grid-cols-2">
-          <DetailRow
-            label={t("contacts.field.identification")}
-            value={contact.identification_number}
-            hint={contact.identification_type}
-          />
-          <DetailRow
-            label={t("contacts.field.email")}
-            value={contact.email}
-          />
-          <DetailRow
-            label={t("contacts.field.phone")}
-            value={contact.phone}
-          />
-          <DetailRow
-            label={t("contacts.field.economic_activity")}
-            value={contact.economic_activity_code}
-            hint={contact.tax_condition}
-          />
-          <DetailRow
-            label={t("contacts.detail.created_at")}
-            value={
-              contact.created_at ? formatDateTime(contact.created_at) : null
-            }
-          />
-          <DetailRow
-            label={t("contacts.detail.updated_at")}
-            value={
-              contact.updated_at ? formatDateTime(contact.updated_at) : null
-            }
-          />
-        </dl>
-      </DetailBlock>
+    <Tabs value={infoSubTab} onValueChange={setInfoSubTab}>
+      <TabsList>
+        <TabsTrigger value="registry">
+          {t("contacts.detail.metadata_title")}
+        </TabsTrigger>
+        <TabsTrigger value="address">
+          {t("contacts.detail.address_title")}
+        </TabsTrigger>
+        {hasExoneration ? (
+          <TabsTrigger value="exoneration">
+            {t("contacts.detail.exoneration_title")}
+          </TabsTrigger>
+        ) : null}
+      </TabsList>
 
-      <DetailBlock title={t("contacts.detail.address_title")}>
-        {hasAddress ? (
+      <TabsContent value="registry" className="space-y-3">
+        <DetailBlock title={t("contacts.detail.metadata_title")}>
           <dl className="grid gap-3 sm:grid-cols-2">
-            {contact.address ? (
-              <div className="sm:col-span-2">
-                <dt className="text-xs text-muted-foreground">
-                  {t("contacts.field.address")}
-                </dt>
-                <dd className="text-sm font-semibold">{contact.address}</dd>
-              </div>
-            ) : null}
             <DetailRow
-              label={t("contacts.field.province")}
-              value={contact.province}
+              label={t("contacts.field.identification")}
+              value={contact.identification_number}
+              hint={contact.identification_type}
             />
             <DetailRow
-              label={t("contacts.field.canton")}
-              value={contact.canton}
+              label={t("contacts.field.email")}
+              value={contact.email}
             />
             <DetailRow
-              label={t("contacts.field.district")}
-              value={contact.district}
-            />
-          </dl>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            {t("contacts.detail.no_address")}
-          </p>
-        )}
-      </DetailBlock>
-
-      {hasExoneration ? (
-        <DetailBlock title={t("contacts.detail.exoneration_title")}>
-          <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            <DetailRow
-              label={t("contacts.field.exoneration_type")}
-              value={contact.exoneration_type}
+              label={t("contacts.field.phone")}
+              value={contact.phone}
             />
             <DetailRow
-              label={t("contacts.field.exoneration_document")}
-              value={contact.exoneration_document_number}
+              label={t("contacts.field.economic_activity")}
+              value={contact.economic_activity_code}
+              hint={contact.tax_condition}
             />
             <DetailRow
-              label={t("contacts.field.exoneration_institution")}
-              value={contact.exoneration_institution}
-            />
-            <DetailRow
-              label={t("contacts.field.exoneration_date")}
-              value={contact.exoneration_issue_date}
-            />
-            <DetailRow
-              label={t("contacts.field.exoneration_percentage")}
+              label={t("contacts.detail.created_at")}
               value={
-                contact.exoneration_percentage != null
-                  ? `${contact.exoneration_percentage}%`
-                  : null
+                contact.created_at ? formatDateTime(contact.created_at) : null
+              }
+            />
+            <DetailRow
+              label={t("contacts.detail.updated_at")}
+              value={
+                contact.updated_at ? formatDateTime(contact.updated_at) : null
               }
             />
           </dl>
         </DetailBlock>
+      </TabsContent>
+
+      <TabsContent value="address" className="space-y-3">
+        <DetailBlock title={t("contacts.detail.address_title")}>
+          {hasAddress ? (
+            <dl className="grid gap-3 sm:grid-cols-2">
+              {contact.address ? (
+                <div className="sm:col-span-2">
+                  <dt className="text-xs text-muted-foreground">
+                    {t("contacts.field.address")}
+                  </dt>
+                  <dd className="text-sm font-semibold">{contact.address}</dd>
+                </div>
+              ) : null}
+              <DetailRow
+                label={t("contacts.field.province")}
+                value={contact.province}
+              />
+              <DetailRow
+                label={t("contacts.field.canton")}
+                value={contact.canton}
+              />
+              <DetailRow
+                label={t("contacts.field.district")}
+                value={contact.district}
+              />
+            </dl>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {t("contacts.detail.no_address")}
+            </p>
+          )}
+        </DetailBlock>
+      </TabsContent>
+
+      {hasExoneration ? (
+        <TabsContent value="exoneration" className="space-y-3">
+          <DetailBlock title={t("contacts.detail.exoneration_title")}>
+            <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <DetailRow
+                label={t("contacts.field.exoneration_type")}
+                value={contact.exoneration_type}
+              />
+              <DetailRow
+                label={t("contacts.field.exoneration_document")}
+                value={contact.exoneration_document_number}
+              />
+              <DetailRow
+                label={t("contacts.field.exoneration_institution")}
+                value={contact.exoneration_institution}
+              />
+              <DetailRow
+                label={t("contacts.field.exoneration_date")}
+                value={contact.exoneration_issue_date}
+              />
+              <DetailRow
+                label={t("contacts.field.exoneration_percentage")}
+                value={
+                  contact.exoneration_percentage != null
+                    ? `${contact.exoneration_percentage}%`
+                    : null
+                }
+              />
+            </dl>
+          </DetailBlock>
+        </TabsContent>
       ) : null}
-    </>
+    </Tabs>
   );
 }
 
